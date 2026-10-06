@@ -6,6 +6,7 @@
  */
 import { isPublicHoliday } from "./holidays";
 import type { ReportStatus } from "./report-access";
+import { isOpenStatus } from "./report-status";
 import { calendarDateIn, compareWeeks, isoWeekOf, isoWeekWorkdays, nextIsoWeek, type IsoWeek } from "./weeks";
 
 /** Zeitzone der Firma: bestimmt, wann eine neue Woche beginnt. */
@@ -87,8 +88,8 @@ export interface DayCorrection {
   dayType?: DayType;
 }
 
-/** Status, in denen der Azubi den Bericht noch bearbeiten kann („offen“). */
-export const OPEN_STATUSES: readonly ReportStatus[] = ["DRAFT", "REJECTED"];
+/** „Offen“: eine Definition für Bearbeiten, Übersicht und Erinnerung (`report-status.ts`). */
+export { OPEN_STATUSES } from "./report-status";
 
 /**
  * Nach einer Änderung des Ausbildungszeitraums (AK-203): die Markierung „außerhalb der Ausbildung“
@@ -140,6 +141,11 @@ export interface WeekClassification {
   hidden: boolean;
   /** Ganze Woche außerhalb der Ausbildung (mit Inhalt oder Historie sichtbar, so markiert). */
   outsideTraining: boolean;
+  /**
+   * Zählt als offen (Entwurf oder Abgelehnt, nicht ganz außerhalb der Ausbildung) – eine
+   * Definition für Übersicht, Hervorhebung und (ab Etappe 6) Erinnerung.
+   */
+  open: boolean;
   /** Offen und vor der aktuellen Woche: deutlich hervorheben (AK-306). */
   pastOpen: boolean;
 }
@@ -153,10 +159,12 @@ export interface WeekClassification {
 export function classifyWeek(week: WeekForOverview, period: TrainingPeriod, current: IsoWeek): WeekClassification {
   const outsideTraining = isWeekOutsideTraining(week, period);
   const untouched = week.status === "DRAFT" && !week.hasContent && !week.hasHistory;
+  const open = !outsideTraining && isOpenStatus(week.status);
   return {
     hidden: outsideTraining && untouched,
     outsideTraining,
-    pastOpen: !outsideTraining && isPastOpen(week, current),
+    open,
+    pastOpen: open && compareWeeks(week, current) < 0,
   };
 }
 
@@ -166,5 +174,5 @@ export function classifyWeek(week: WeekForOverview, period: TrainingPeriod, curr
  * Ausbildung schließt `classifyWeek` zusätzlich aus.
  */
 export function isPastOpen(report: IsoWeek & { status: ReportStatus }, current: IsoWeek): boolean {
-  return OPEN_STATUSES.includes(report.status) && compareWeeks(report, current) < 0;
+  return isOpenStatus(report.status) && compareWeeks(report, current) < 0;
 }

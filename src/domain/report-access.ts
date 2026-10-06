@@ -5,6 +5,7 @@
  * die einen Bericht liest oder ändert, fragt hier nach; ausgeblendete Schaltflächen sind kein Schutz.
  */
 import type { Role } from "./access";
+import { STATUS_LABELS, isOpenStatus } from "./report-status";
 
 export type ReportStatus = "DRAFT" | "SUBMITTED" | "APPROVED" | "REJECTED";
 
@@ -23,9 +24,6 @@ export interface ReportForAccess {
   traineeActive: boolean;
 }
 
-/** Status, in denen der Azubi seinen Bericht bearbeiten darf: „offen“ laut Spezifikation. */
-const EDITABLE_STATUSES: readonly ReportStatus[] = ["DRAFT", "REJECTED"];
-
 /**
  * Ansehen: Ein Azubi sieht nur eigene Berichte (AK-103); jeder Ausbilder sieht die Berichte
  * aller Azubis, auch deaktivierter (AK-105, AK-204). Deaktivierte Personen sehen nichts.
@@ -40,7 +38,7 @@ export function canViewReport(viewer: Viewer, report: Pick<ReportForAccess, "tra
 /**
  * Inhalt ändern: nur der Azubi selbst, solange er aktiv ist und der Bericht offen ist
  * (Entwurf oder Abgelehnt). Berichte deaktivierter Azubis sind nicht mehr änderbar (AK-204).
- * Ausbilder ändern keine Inhalte; Prüfen ist eine eigene Aktion (Etappe 4).
+ * Ausbilder ändern keine Inhalte; Prüfen ist ein Statuswechsel (`report-status.ts`).
  */
 export function canEditReport(viewer: Viewer, report: ReportForAccess): boolean {
   return (
@@ -48,7 +46,7 @@ export function canEditReport(viewer: Viewer, report: ReportForAccess): boolean 
     viewer.role === "TRAINEE" &&
     report.traineeId === viewer.id &&
     report.traineeActive &&
-    EDITABLE_STATUSES.includes(report.status)
+    isOpenStatus(report.status)
   );
 }
 
@@ -62,14 +60,5 @@ export const ACCESS_DENIED_MESSAGE = "Zugriff verweigert";
 
 /** Anzeigename des Status. */
 export function reportStatusLabel(status: ReportStatus): string {
-  switch (status) {
-    case "DRAFT":
-      return "Entwurf";
-    case "SUBMITTED":
-      return "Eingereicht";
-    case "APPROVED":
-      return "Freigegeben";
-    case "REJECTED":
-      return "Abgelehnt";
-  }
+  return STATUS_LABELS[status];
 }

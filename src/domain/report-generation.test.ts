@@ -153,7 +153,12 @@ describe("Wochen ganz außerhalb der Ausbildung", () => {
 
   it("AK-203 unberührter leerer Entwurf ganz außerhalb wird ausgeblendet und zählt nicht als offen", () => {
     expect(isWeekOutsideTraining({ isoYear: 2026, isoWeek: 35 }, shifted)).toBe(true);
-    expect(classifyWeek(week(35), shifted, current)).toEqual({ hidden: true, outsideTraining: true, pastOpen: false });
+    expect(classifyWeek(week(35), shifted, current)).toEqual({
+      hidden: true,
+      outsideTraining: true,
+      open: false,
+      pastOpen: false,
+    });
   });
 
   it("AK-306 Woche ganz außerhalb mit Inhalt oder Historie bleibt sichtbar, markiert, nicht offen", () => {
@@ -165,6 +170,7 @@ describe("Wochen ganz außerhalb der Ausbildung", () => {
       expect(classifyWeek(week(34, extra), shifted, current)).toEqual({
         hidden: false,
         outsideTraining: true,
+        open: false,
         pastOpen: false,
       });
     }
@@ -172,10 +178,16 @@ describe("Wochen ganz außerhalb der Ausbildung", () => {
 
   it("AK-306 Woche teilweise in der Ausbildung bleibt normal; wandert der Beginn zurück, erscheint die Woche wieder", () => {
     // KW 36: Montag davor, Rest in der Ausbildung.
-    expect(classifyWeek(week(36), shifted, current)).toEqual({ hidden: false, outsideTraining: false, pastOpen: true });
+    expect(classifyWeek(week(36), shifted, current)).toEqual({
+      hidden: false,
+      outsideTraining: false,
+      open: true,
+      pastOpen: true,
+    });
     expect(classifyWeek(week(35), period("2026-08-01"), current)).toEqual({
       hidden: false,
       outsideTraining: false,
+      open: true,
       pastOpen: true,
     });
     // Nach dem Ausbildungsende.

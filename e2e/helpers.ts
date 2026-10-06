@@ -1,5 +1,6 @@
 import { expect, type Page } from "@playwright/test";
 import pg from "pg";
+import { isoWeekWorkdays, toDateInput } from "../src/domain/weeks";
 import { accountToCreate, accountWithoutEntry, seedPersons, seedReport } from "../src/lib/seed-data";
 
 /** „keycloak“: echter OIDC-Login; „test“: Test-Login-Provider ohne Keycloak. */
@@ -181,4 +182,48 @@ export async function restoreSeedState() {
       [seedPersons.anna.email],
     );
   });
+}
+
+export type DayContent = { dayType: "WORK" | "SCHOOL" | "VACATION" | "SICK" | "HOLIDAY" | null; activities: string };
+
+/**
+ * Legt einen Wochenbericht mit fünf Tagen an bzw. überschreibt dessen Tage (Testvorbereitung).
+ * `days` sind Mo–Fr; Tage außerhalb der Ausbildung gibt es hier nicht. Gibt die Bericht-ID zurück.
+ */
+export async function prepareWeek(
+  email: string,
+  isoYear: number,
+  isoWeek: number,
+  days: readonly DayContent[],
+): Promise<string> {
+  const dates = isoWeekWorkdays(isoYear, isoWeek).map(toDateInput);
+  return withDatabase(async (db) => {
+    await db.query(
+      `INSERT INTO weekly_report (id, trainee_id, iso_year, iso_week, updated_at)
+       VALUES (gen_random_uuid(), (SELECT id FROM person WHERE email = $1), $2, $3, now())
+       ON CONFLICT (trainee_id, iso_year, iso_week) DO NOTHING`,
+      [email, isoYear, isoWeek],
+    );
+    const reportId = await reportIdOf(email, isoYear, isoWeek);
+    for (const [index, date] of dates.entries()) {
+      await db.query(
+        `INSERT INTO report_day (id, report_id, date, day_type, activities)
+         VALUES (gen_random_uuid(), $1, $2, $3, $4)
+         ON CONFLICT (report_id, date) DO UPDATE SET day_type = EXCLUDED.day_type, activities = EXCLUDED.activities`,
+        [reportId, date, days[index]?.dayType ?? null, days[index]?.activities ?? ""],
+      );
+    }
+    return reportId;
+  });
+}
+
+/** Löscht einen Bericht ohne Historie (z. B. eine nur für einen Test angelegte Woche). */
+export async function deleteReportWithoutHistory(email: string, isoYear: number, isoWeek: number) {
+  await withDatabase((db) =>
+    db.query(
+      `DELETE FROM weekly_report WHERE trainee_id = (SELECT id FROM person WHERE email = $1)
+       AND iso_year = $2 AND iso_week = $3`,
+      [email, isoYear, isoWeek],
+    ),
+  );
 }

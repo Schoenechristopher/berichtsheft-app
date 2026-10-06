@@ -84,16 +84,16 @@ model Setting {
 
 /// Wochenbericht: genau einer pro Azubi und ISO-Woche (AK-304).
 model WeeklyReport {
-  id         String       @id @default(uuid()) @db.Uuid
-  traineeId  String       @map("trainee_id") @db.Uuid
-  trainee    Person       @relation(fields: [traineeId], references: [id], onDelete: Cascade)
-  isoYear    Int          @map("iso_year")
-  isoWeek    Int          @map("iso_week")
-  status     ReportStatus @default(DRAFT)
+  id        String       @id @default(uuid()) @db.Uuid
+  traineeId String       @map("trainee_id") @db.Uuid
+  trainee   Person       @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  isoYear   Int          @map("iso_year")
+  isoWeek   Int          @map("iso_week")
+  status    ReportStatus @default(DRAFT)
   /// Versionszähler für bedingte Updates (AK-508).
-  version    Int          @default(0)
-  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt  DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+  version   Int          @default(0)
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   days          ReportDay[]
   comments      Comment[]
@@ -122,7 +122,8 @@ model ReportDay {
   @@map("report_day")
 }
 
-/// Kommentar eines Ausbilders: Gesamtkommentar (dayId leer) oder Tageskommentar, je Prüfrunde. Nie änderbar.
+/// Kommentar eines Ausbilders: Gesamtkommentar (dayId leer) oder Tageskommentar, je Prüfrunde.
+/// Nie änderbar: die Datenbank weist UPDATE und DELETE ab, außer beim endgültigen Löschen der Person (AK-803).
 model Comment {
   id          String       @id @default(uuid()) @db.Uuid
   reportId    String       @map("report_id") @db.Uuid
@@ -142,15 +143,19 @@ model Comment {
 /// Historie der Statuswechsel. Nie änderbar: die Datenbank weist UPDATE und DELETE ab,
 /// außer beim endgültigen Löschen der Person per Kaskade (AK-803, Trigger in der Migration).
 model StatusChange {
-  id         String        @id @default(uuid()) @db.Uuid
-  reportId   String        @map("report_id") @db.Uuid
-  report     WeeklyReport  @relation(fields: [reportId], references: [id], onDelete: Cascade)
-  fromStatus ReportStatus? @map("from_status")
-  toStatus   ReportStatus  @map("to_status")
-  actorId    String        @map("actor_id") @db.Uuid
-  actor      Person        @relation(fields: [actorId], references: [id], onDelete: NoAction)
-  reason     String?
-  createdAt  DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  id          String        @id @default(uuid()) @db.Uuid
+  reportId    String        @map("report_id") @db.Uuid
+  report      WeeklyReport  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  fromStatus  ReportStatus? @map("from_status")
+  toStatus    ReportStatus  @map("to_status")
+  actorId     String        @map("actor_id") @db.Uuid
+  actor       Person        @relation(fields: [actorId], references: [id], onDelete: NoAction)
+  reason      String?
+  /// Prüfrunde: Jede Einreichung beginnt eine neue (1, 2, …); andere Wechsel gehören zur laufenden.
+  reviewRound Int           @default(0) @map("review_round")
+  /// Reihenfolge der Einträge, auch bei gleichem Zeitpunkt (fest eingestellte Uhr).
+  seq         Int           @unique @default(autoincrement())
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
 
   @@index([reportId])
   @@map("status_change")

@@ -3,7 +3,7 @@ import { reportStatusLabel, type ReportStatus } from "@/domain/report-access";
 import { compareWeeks, weekRangeLabel, type IsoWeek } from "@/domain/weeks";
 import { Badge } from "@/components/ui";
 
-const STATUS_TONES: Record<ReportStatus, "slate" | "blue" | "green" | "amber"> = {
+export const STATUS_TONES: Record<ReportStatus, "slate" | "blue" | "green" | "amber"> = {
   DRAFT: "slate",
   SUBMITTED: "blue",
   APPROVED: "green",
