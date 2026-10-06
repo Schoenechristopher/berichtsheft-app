@@ -4,9 +4,9 @@ Digitales Berichtsheft: Azubis erfassen ihre Wochenberichte (Mo–Fr), Ausbilder
 
 - [Spezifikation und Akzeptanzkriterien](docs/01-spezifikation.md)
 - [Plan: Technik und Hosting](docs/02-plan.md)
-- [Auftrag Etappe 1](AUFTRAG-ETAPPE-1.md)
+- [Auftrag Etappe 1](AUFTRAG-ETAPPE-1.md), [Auftrag Etappe 2](AUFTRAG-ETAPPE-2.md)
 
-Status: Etappe 1 (Grundgerüst) – Anmelden und Abmelden über das Firmenkonto, Startseite je Rolle (Platzhalter).
+Status: Etappe 2 (Nutzerverwaltung) – Anmelden und Abmelden über das Firmenkonto; Ausbilder verwalten Personen (anlegen, bearbeiten, deaktivieren, endgültig löschen) und das Bundesland; Zugriffsschutz für Berichte mit einer lesenden Berichtsansicht (Platzhalter bis Etappe 3).
 
 ## Demo starten in drei Schritten
 
@@ -28,6 +28,9 @@ Die Anmeldung läuft über Keycloak als Ersatz für das Firmenkonto. Benutzernam
 | `bernd` | `bernd` | Ausbilder (Admin) |
 | `clara` | `clara` | Ausbilderin (Admin, Vertretung) |
 | `dora` | `dora` | Konto ohne Eintrag in der App → „Kein Zugang – bitte an den Ausbilder wenden“ |
+| `emil` | `emil` | Firmenkonto `emil@berichtsheft.test`, in der App erst nach dem Anlegen durch einen Ausbilder; der erste Login verknüpft das Konto |
+
+Ausprobieren: als `bernd` unter „Personen“ → „Person anlegen“ Emil Neu mit `emil@berichtsheft.test` anlegen (Rolle Azubi, Ausbilder, Beginn), dann in einem privaten Fenster als `emil` anmelden.
 
 ### Adressen
 
@@ -51,7 +54,8 @@ Beenden mit `Strg+C` bzw. `docker compose down`; `docker compose down -v` lösch
 
 - Fachregeln liegen als reine Funktionen in `src/domain/`; „jetzt“ kommt nur aus dem Uhr-Modul `src/domain/clock.ts`.
 - Datenmodell: `prisma/schema.prisma`, Migrationen in `prisma/migrations/`. Die Historie (`status_change`) ist per Datenbank-Trigger unveränderlich.
-- Anmeldung: Auth.js mit OpenID Connect (`src/auth.ts`). Personen werden über die stabile Konto-ID (`sub`, bei Entra ID `oid`) zugeordnet, nicht über Namen. Für Microsoft Entra ID werden nur Umgebungsvariablen getauscht (`AUTH_OIDC_*`, siehe `.env.example`).
+- Anmeldung: Auth.js mit OpenID Connect (`src/auth.ts`). Personen werden über die stabile Konto-ID (`sub`, bei Entra ID `oid`) zugeordnet, nicht über Namen. Neu angelegte Personen haben noch keine Konto-ID; der erste Login ordnet sie über die vom Identity Provider bestätigte E-Mail zu und speichert die Konto-ID (`src/lib/auth/login.ts`). Für Microsoft Entra ID werden nur Umgebungsvariablen getauscht (`AUTH_OIDC_*`, siehe `.env.example`).
+- Nutzerverwaltung: Regeln in `src/domain/people.ts`, Zugriffsregeln für Berichte in `src/domain/report-access.ts`, serverseitige Durchsetzung in `src/lib/people/service.ts`; Seiten unter `/ausbilder/personen` und `/ausbilder/einstellungen`, Berichtsansicht unter `/berichte/[id]`.
 
 ## Entwicklung
 

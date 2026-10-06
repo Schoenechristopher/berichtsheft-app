@@ -40,12 +40,16 @@ enum DayType {
   HOLIDAY
 }
 
-/// Person mit Firmenkonto. Zuordnung beim Login über die stabile Konto-ID (sub/oid).
+/// Person mit Firmenkonto. Der Admin legt sie mit Firmen-E-Mail an; beim ersten Login wird sie
+/// über die vom Identity Provider bestätigte E-Mail zugeordnet und die stabile Konto-ID (sub/oid)
+/// gespeichert. Danach zählt nur noch die Konto-ID.
 /// Ein Azubi braucht Ausbilder und Ausbildungsbeginn (AK-202, per CHECK-Constraint abgesichert).
 model Person {
   id            String    @id @default(uuid()) @db.Uuid
   /// Stabile Konto-ID des Firmenkontos (OIDC-Claim `sub`, bei Entra ID `oid`).
-  accountId     String    @unique @map("account_id")
+  /// Leer, bis sich die Person zum ersten Mal angemeldet hat („noch nie angemeldet“).
+  accountId     String?   @unique @map("account_id")
+  /// Firmen-E-Mail, immer klein geschrieben gespeichert (Abgleich ohne Groß-/Kleinschreibung).
   email         String    @unique
   name          String
   role          Role

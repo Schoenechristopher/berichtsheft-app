@@ -1,6 +1,6 @@
 # Plan: Technik und Hosting
 
-Stand: 06.10.2026 · freigegeben
+Stand: 06.10.2026 · freigegeben · Entscheidungen aus Etappe 1 und 2 ergänzt (freigegeben am 06.10.2026)
 
 Die erste Version läuft als Demo per Docker Compose auf dem eigenen Rechner: eine TypeScript-Web-App mit PostgreSQL, Test-Login und Test-Mailserver. Für die Übernahme in die Firmeninfrastruktur werden nur Konfiguration und Zielumgebung getauscht, nicht der Code. Anforderungen und Akzeptanzkriterien: [01-spezifikation.md](01-spezifikation.md).
 
@@ -16,6 +16,8 @@ Alles läuft in einem TypeScript-Stack, und jeder externe Dienst steckt hinter e
 | Datenbank | PostgreSQL im Container | Transaktionen für Statusübergänge, überall verfügbar | Firmen-PostgreSQL oder Azure Database for PostgreSQL |
 | Datenzugriff | Prisma (Schema + Migrationen) | typsicher, Datenmodell versioniert im Repository | bleibt |
 | Anmeldung | Auth.js mit OpenID Connect; Keycloak-Container mit Testkonten | gleiches Protokoll wie Microsoft, echter Login-Ablauf schon in der Demo | Microsoft Entra ID (App-Registrierung) |
+| Zuordnung beim Login | Admin legt Person mit Firmen-E-Mail an; der erste Login ordnet sie über die bestätigte E-Mail zu (Keycloak: Claim `email_verified`) und speichert die Konto-ID (`sub`); danach zählt nur die Konto-ID | kein Abtippen von Konto-IDs; spätere E-Mail-Änderungen brechen die Zuordnung nicht | Entra ID: Konto-ID `oid`, Bestätigung über einen konfigurierbaren Claim (z. B. optionales Claim `xms_edov`) |
+| Sitzungen | signierte JWT-Cookies, 8 Stunden gültig, kein serverseitiger Widerruf | einfach, keine Sitzungstabelle; eine Deaktivierung wirkt trotzdem sofort, weil jede Anfrage die Person in der Datenbank prüft | bleibt |
 | Rollen und Zuordnung | in der App-Datenbank | der Admin pflegt sie in der App, nicht im Firmenkonto | bleibt |
 | Zeitgesteuerte Jobs | pg-boss in einem eigenen Worker-Container | Erinnerung Mo 9:00 Uhr (Europe/Berlin), Jobs ohne Duplikate | bleibt |
 | E-Mail | SMTP über Nodemailer an Mailpit | fängt alle Mails ab, Ansicht im Browser, nichts geht nach außen | Exchange Online |
@@ -58,7 +60,7 @@ Die fachlichen Regeln liegen in wenigen serverseitigen Modulen ohne Abhängigkei
 
 | Tabelle | Inhalt | Wichtige Regel |
 | --- | --- | --- |
-| Person | Firmenkonto-ID, E-Mail, Name, Rolle, aktiv, zugeordneter Ausbilder, Ausbildungsbeginn und -ende, gewählte Kanäle | Azubi nur mit Ausbilder und Beginn speicherbar (AK-202) |
+| Person | Firmenkonto-ID, E-Mail, Name, Rolle, aktiv, zugeordneter Ausbilder, Ausbildungsbeginn und -ende, gewählte Kanäle | Azubi nur mit Ausbilder und Beginn speicherbar (AK-202); Firmenkonto-ID leer bis zum ersten Login, danach eindeutig und fest; E-Mail eindeutig, klein geschrieben gespeichert |
 | Einstellung | Bundesland der Firma | eine Zeile für die ganze App |
 | Wochenbericht | Azubi, ISO-Jahr, ISO-Woche, Status, Versionszähler | eindeutig pro Azubi und Woche (AK-304) |
 | Tag | Bericht, Datum, Tagesart, Tätigkeiten, außerhalb der Ausbildung ja/nein | Tagesart nur aus den fünf Werten (AK-402) |
@@ -72,6 +74,8 @@ Die fachlichen Regeln liegen in wenigen serverseitigen Modulen ohne Abhängigkei
 - **Wochenberichte erzeugen:** Fehlende Wochen vom Ausbildungsbeginn bis zur aktuellen Woche werden beim Öffnen der Übersicht und zusätzlich täglich per Job angelegt. Tage außerhalb der Ausbildung werden markiert, Feiertage des Bundeslands per feiertagejs vorbelegt.
 - **Einreichen prüfen:** Die Pflichtfeld-Regel aus AK-501 ist eine Funktion, die Oberfläche und Server gemeinsam nutzen. Der Server prüft immer, die Oberfläche nur zur Vorschau.
 - **Zugriffsschutz:** Jede Serveraktion prüft Rolle und Besitz selbst; ausgeblendete Schaltflächen allein gelten nicht als Schutz (AK-103, AK-104).
+- **Anmeldung und Zuordnung:** Beim Login sucht die App zuerst nach der Konto-ID. Ist keine Person damit verknüpft und hat der Identity Provider die E-Mail bestätigt, wird eine angelegte, aktive und noch nicht verknüpfte Person mit dieser E-Mail (ohne Groß-/Kleinschreibung) einmalig an die Konto-ID gebunden. Eine bereits verknüpfte Person wird nie über die E-Mail umgebunden.
+- **Löschen und Historie:** Endgültiges Löschen entfernt Person, Berichte und deren Historie per Kaskade. Kommt die Person in der Historie von Berichten anderer Azubis vor (Statuswechsel oder Kommentare), lässt sie sich nur deaktivieren; die Nutzerverwaltung prüft das vorher und erklärt es, die Datenbank weist das Löschen zusätzlich ab.
 - **Benachrichtigungen:** Ein Statuswechsel schreibt in derselben Transaktion seine Benachrichtigungen in die Tabelle (Outbox). Der Worker versendet sie je Kanal über einen eigenen Adapter: E-Mail, Teams, App. Geht der Wechsel schief, entsteht auch keine Nachricht.
 - **Erinnerung:** Ein Job läuft montags um 9:00 Uhr Europe/Berlin. Für jeden aktiven Azubi sammelt er alle offenen Wochen vor der aktuellen und schickt eine Nachricht mit allen (AK-1025). Ist eine davon älter als eine Woche, geht zusätzlich eine Information an den zugeordneten Ausbilder.
 - **PDF:** Je eine Serverroute für eine Woche und für einen Zeitraum, mit denselben Zugriffsregeln wie die Berichtsseite.

@@ -1,6 +1,6 @@
 import { expect, type Page } from "@playwright/test";
 import pg from "pg";
-import { accountWithoutEntry, seedPersons } from "../src/lib/seed-data";
+import { accountToCreate, accountWithoutEntry, seedPersons, seedReport } from "../src/lib/seed-data";
 
 /** „keycloak“: echter OIDC-Login; „test“: Test-Login-Provider ohne Keycloak. */
 export const loginMode = (process.env.E2E_LOGIN_MODE ?? "keycloak") as "keycloak" | "test";
@@ -14,6 +14,7 @@ export const accounts = {
   bernd: { ...seedPersons.bernd, username: "bernd", password: "bernd" },
   clara: { ...seedPersons.clara, username: "clara", password: "clara" },
   dora: { ...accountWithoutEntry, username: "dora", password: "dora" },
+  emil: { ...accountToCreate, username: "emil", password: "emil" },
 } as const;
 
 export type TestAccount = (typeof accounts)[keyof typeof accounts];
@@ -30,7 +31,10 @@ export async function login(page: Page, account: TestAccount) {
     await page.getByRole("button", { name: "Mit Firmenkonto anmelden" }).click();
     await submitIdpLogin(page, account);
   }
-  await page.waitForURL((url) => url.origin !== idpOrigin && !url.pathname.startsWith("/api/auth"));
+  // Fertig, sobald die App eine Seite nach der Anmeldung zeigt (Startseite oder „Kein Zugang“).
+  await page.waitForURL(
+    (url) => url.origin !== idpOrigin && !url.pathname.startsWith("/api/auth") && url.pathname !== "/anmelden",
+  );
 }
 
 /** Füllt das Login-Formular von Keycloak aus. */
@@ -59,4 +63,94 @@ export async function withDatabase<T>(fn: (client: pg.Client) => Promise<T>): Pr
   } finally {
     await client.end();
   }
+}
+
+/** Eine Zeile aus der Datenbank lesen (oder null). */
+export async function queryOne<T extends Record<string, unknown>>(
+  sql: string,
+  params: unknown[] = [],
+): Promise<T | null> {
+  return withDatabase(async (db) => ((await db.query(sql, params)).rows[0] as T | undefined) ?? null);
+}
+
+/** ID einer Person anhand ihrer E-Mail. */
+export async function personId(email: string): Promise<string> {
+  const row = await queryOne<{ id: string }>("SELECT id FROM person WHERE email = $1", [email]);
+  if (!row) {
+    throw new Error(`Person ${email} nicht gefunden`);
+  }
+  return row.id;
+}
+
+/** ID von Annas Beispielbericht aus dem Seed (KW 40/2026). */
+export async function annasSeedReportId(): Promise<string> {
+  const row = await queryOne<{ id: string }>(
+    `SELECT r.id FROM weekly_report r JOIN person p ON p.id = r.trainee_id
+     WHERE p.email = $1 AND r.iso_year = $2 AND r.iso_week = $3`,
+    [seedPersons.anna.email, seedReport.isoYear, seedReport.isoWeek],
+  );
+  if (!row) {
+    throw new Error("Annas Seed-Bericht fehlt – Seed ausführen (npm run db:seed).");
+  }
+  return row.id;
+}
+
+/**
+ * Legt einen Azubi direkt in der Datenbank an (Testvorbereitung), optional mit Konto-ID und
+ * einem Bericht KW 40/2026. Gibt die IDs zurück.
+ */
+export async function insertTrainee(options: {
+  name: string;
+  email: string;
+  trainerEmail?: string;
+  accountId?: string | null;
+  withReport?: boolean;
+}): Promise<{ id: string; reportId: string | null }> {
+  return withDatabase(async (db) => {
+    const { rows } = await db.query(
+      `INSERT INTO person (id, account_id, email, name, role, trainer_id, training_start, updated_at)
+       VALUES (gen_random_uuid(), $1, $2, $3, 'TRAINEE', (SELECT id FROM person WHERE email = $4), '2026-09-01', now())
+       RETURNING id`,
+      [options.accountId ?? null, options.email, options.name, options.trainerEmail ?? seedPersons.bernd.email],
+    );
+    const id = rows[0].id as string;
+    let reportId: string | null = null;
+    if (options.withReport) {
+      const report = await db.query(
+        `INSERT INTO weekly_report (id, trainee_id, iso_year, iso_week, updated_at)
+         VALUES (gen_random_uuid(), $1, 2026, 40, now()) RETURNING id`,
+        [id],
+      );
+      reportId = report.rows[0].id as string;
+      await db.query(
+        `INSERT INTO report_day (id, report_id, date, day_type, activities)
+         VALUES (gen_random_uuid(), $1, '2026-09-28', 'WORK', 'Testtätigkeit')`,
+        [reportId],
+      );
+    }
+    return { id, reportId };
+  });
+}
+
+/** Entfernt Testpersonen (Azubis zuerst, damit die Kaskade ihre Berichte und Historie mitnimmt). */
+export async function deletePersons(...emails: string[]) {
+  await withDatabase(async (db) => {
+    await db.query("DELETE FROM person WHERE email = ANY($1) AND role = 'TRAINEE'", [emails]);
+    await db.query("DELETE FROM person WHERE email = ANY($1)", [emails]);
+  });
+}
+
+/** Stellt den Seed-Zustand von Anna, Bernd, Clara und dem Bundesland wieder her. */
+export async function restoreSeedState() {
+  await withDatabase(async (db) => {
+    await db.query("UPDATE person SET active = true WHERE email = ANY($1)", [
+      [seedPersons.anna.email, seedPersons.bernd.email, seedPersons.clara.email],
+    ]);
+    await db.query(
+      `UPDATE person SET trainer_id = (SELECT id FROM person WHERE email = $2), training_start = '2026-09-01',
+       training_end = NULL, role = 'TRAINEE', name = $3 WHERE email = $1`,
+      [seedPersons.anna.email, seedPersons.bernd.email, seedPersons.anna.name],
+    );
+    await db.query("UPDATE setting SET federal_state = 'NW' WHERE id = 1");
+  });
 }

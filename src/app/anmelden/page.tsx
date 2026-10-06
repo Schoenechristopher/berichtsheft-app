@@ -4,7 +4,7 @@ import { AuthCard } from "@/components/AuthCard";
 import { homePathFor } from "@/domain/access";
 import { OIDC_PROVIDER_ID, TEST_PROVIDER_ID, oidcConfig, testLoginEnabled } from "@/lib/auth/config";
 import { getCurrentPerson } from "@/lib/session";
-import { accountWithoutEntry, seedPersons } from "@/lib/seed-data";
+import { testAccounts } from "@/lib/seed-data";
 
 /** Anmeldeseite (AK-101): nur über das Firmenkonto, kein eigenes Passwort in der App. */
 export default async function LoginPage({ searchParams }: PageProps<"/anmelden">) {
@@ -70,7 +70,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/anmelden">
             Ersetzt den Identity Provider, wenn Keycloak nicht läuft. In Produktion abgeschaltet.
           </p>
           <form action={loginWithTestAccount} className="mt-2 grid grid-cols-2 gap-2">
-            {[seedPersons.anna, seedPersons.bernd, seedPersons.clara, accountWithoutEntry].map((account) => (
+            {testAccounts.map((account) => (
               <button
                 key={account.accountId}
                 type="submit"
