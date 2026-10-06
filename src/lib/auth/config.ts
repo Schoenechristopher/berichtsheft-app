@@ -6,6 +6,14 @@
 export const OIDC_PROVIDER_ID = "firmenkonto";
 export const TEST_PROVIDER_ID = "test-login";
 
+/**
+ * Sitzungen (Entscheidung „Sitzungen“): signierte JWT-Cookies, 8 Stunden gültig, kein
+ * serverseitiger Widerruf. Eine Deaktivierung wirkt trotzdem sofort, weil jede Anfrage die
+ * Person in der Datenbank prüft (src/lib/session.ts).
+ */
+export const SESSION_STRATEGY = "jwt";
+export const SESSION_MAX_AGE_SECONDS = 8 * 60 * 60;
+
 export interface OidcConfig {
   /** Aussteller-URL, wie der Browser den IdP erreicht (steht auch im Token als `iss`). */
   issuer: string;
@@ -15,6 +23,13 @@ export interface OidcConfig {
   clientSecret: string;
   /** Claim mit der stabilen Konto-ID: `sub` (Keycloak) oder `oid` (Entra ID). */
   accountIdClaim: string;
+  /** Claim mit der E-Mail für die Zuordnung beim ersten Login (Standard `email`). */
+  emailClaim: string;
+  /**
+   * Claim, der die E-Mail als bestätigt ausweist; nur dann wird über die E-Mail zugeordnet.
+   * Keycloak: `email_verified`; Entra ID: z. B. das optionale Claim `xms_edov`.
+   */
+  emailVerifiedClaim: string;
   /** Anzeigename auf dem Login-Knopf. */
   name: string;
 }
@@ -31,6 +46,8 @@ export function oidcConfig(env: Record<string, string | undefined> = process.env
     clientId,
     clientSecret: env.AUTH_OIDC_CLIENT_SECRET ?? "",
     accountIdClaim: env.AUTH_OIDC_ACCOUNT_ID_CLAIM?.trim() || "sub",
+    emailClaim: env.AUTH_OIDC_EMAIL_CLAIM?.trim() || "email",
+    emailVerifiedClaim: env.AUTH_OIDC_EMAIL_VERIFIED_CLAIM?.trim() || "email_verified",
     name: env.AUTH_OIDC_NAME?.trim() || "Firmenkonto",
   };
 }

@@ -54,3 +54,76 @@ export function homePathFor(role: Role): string {
 export function roleLabel(role: Role): string {
   return role === "TRAINER" ? "Ausbilder" : "Azubi";
 }
+
+/** Für die Zuordnung beim Login relevante Angaben des Identity Providers. */
+export interface LoginClaims {
+  /** Stabile Konto-ID (`sub` bzw. `oid`). */
+  accountId: string | null;
+  /** E-Mail laut Identity Provider, normalisiert (klein geschrieben). */
+  email: string | null;
+  /** Hat der Identity Provider die E-Mail bestätigt? Nur dann wird über sie zugeordnet. */
+  emailVerified: boolean;
+}
+
+/** Welche Claims gelesen werden; per Konfiguration einstellbar (Keycloak vs. Entra ID). */
+export interface ClaimNames {
+  accountIdClaim?: string;
+  emailClaim?: string;
+  emailVerifiedClaim?: string;
+}
+
+/**
+ * Liest Konto-ID, E-Mail und Bestätigung der E-Mail aus den Claims.
+ * Als bestätigt gilt eine E-Mail nur, wenn der konfigurierte Claim `true` ist
+ * (Keycloak: `email_verified`; Entra ID z. B. das optionale Claim `xms_edov`).
+ */
+export function extractLoginClaims(
+  claims: Record<string, unknown> | null | undefined,
+  names: ClaimNames = {},
+): LoginClaims {
+  const rawEmail = claims?.[names.emailClaim ?? "email"];
+  const email = typeof rawEmail === "string" && rawEmail.trim() !== "" ? rawEmail.trim().toLowerCase() : null;
+  const verified = claims?.[names.emailVerifiedClaim ?? "email_verified"];
+  return {
+    accountId: extractAccountId(claims, names.accountIdClaim),
+    email,
+    emailVerified: email !== null && (verified === true || verified === "true"),
+  };
+}
+
+/** Kandidat für die Zuordnung beim Login. */
+export interface LoginCandidate {
+  id: string;
+  accountId: string | null;
+  active: boolean;
+}
+
+export type LoginMatch =
+  { kind: "known"; personId: string } | { kind: "bind"; personId: string; accountId: string } | { kind: "none" };
+
+/**
+ * Ordnet ein Firmenkonto beim Login einer Person zu (Entscheidung „Anlegen über die Firmen-E-Mail“):
+ *
+ * 1. Gibt es eine Person mit dieser Konto-ID, ist sie es – egal, welche E-Mail das Konto
+ *    inzwischen hat.
+ * 2. Sonst, nur bei bestätigter E-Mail: Eine aktive Person mit dieser E-Mail, die noch an kein
+ *    Konto gebunden ist, wird an diese Konto-ID gebunden.
+ * 3. Sonst keine Zuordnung (AK-102). Eine Person, die schon an ein anderes Konto gebunden ist,
+ *    wird nie über die E-Mail umgebunden.
+ */
+export function matchLogin(
+  claims: LoginClaims,
+  byAccountId: LoginCandidate | null | undefined,
+  byEmail: LoginCandidate | null | undefined,
+): LoginMatch {
+  if (!claims.accountId) {
+    return { kind: "none" };
+  }
+  if (byAccountId) {
+    return { kind: "known", personId: byAccountId.id };
+  }
+  if (claims.emailVerified && byEmail && byEmail.accountId === null && byEmail.active) {
+    return { kind: "bind", personId: byEmail.id, accountId: claims.accountId };
+  }
+  return { kind: "none" };
+}

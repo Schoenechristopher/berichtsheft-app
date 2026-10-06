@@ -1,9 +1,19 @@
 import NextAuth, { customFetch, type NextAuthConfig } from "next-auth";
 import type { Provider } from "next-auth/providers";
 import Credentials from "next-auth/providers/credentials";
-import { decideAccess, extractAccountId } from "@/domain/access";
-import { OIDC_PROVIDER_ID, TEST_PROVIDER_ID, oidcConfig, testLoginEnabled, toInternalUrl } from "@/lib/auth/config";
+import { decideAccess, extractAccountId, extractLoginClaims, type LoginClaims } from "@/domain/access";
+import {
+  OIDC_PROVIDER_ID,
+  SESSION_MAX_AGE_SECONDS,
+  SESSION_STRATEGY,
+  TEST_PROVIDER_ID,
+  oidcConfig,
+  testLoginEnabled,
+  toInternalUrl,
+} from "@/lib/auth/config";
+import { resolveLoginPerson } from "@/lib/auth/login";
 import { db } from "@/lib/db";
+import { testAccounts } from "@/lib/seed-data";
 
 declare module "next-auth" {
   interface Session {
@@ -64,7 +74,9 @@ function buildProviders(): Provider[] {
             return null;
           }
           const accountId = typeof credentials?.accountId === "string" ? credentials.accountId.trim() : "";
-          return accountId ? { id: accountId } : null;
+          // Wie beim echten Identity Provider: Konto-ID und bestätigte E-Mail des Testkontos.
+          const account = testAccounts.find((candidate) => candidate.accountId === accountId);
+          return account ? { id: account.accountId, email: account.email } : null;
         },
       }),
     );
@@ -72,42 +84,43 @@ function buildProviders(): Provider[] {
   return providers;
 }
 
-/** Stabile Konto-ID des gerade anmeldenden Kontos – nie Name oder E-Mail. */
-function accountIdFromSignIn(params: {
+const NO_CLAIMS: LoginClaims = { accountId: null, email: null, emailVerified: false };
+
+/**
+ * Angaben des gerade anmeldenden Kontos: stabile Konto-ID und, nur für die Zuordnung beim
+ * ersten Login, die vom Identity Provider bestätigte E-Mail.
+ */
+function claimsFromSignIn(params: {
   account?: { provider: string; providerAccountId: string } | null;
   profile?: Record<string, unknown>;
-  user?: { id?: string };
-}): string | null {
+  user?: { id?: string; email?: string | null };
+}): LoginClaims {
   if (params.account?.provider === OIDC_PROVIDER_ID) {
-    return extractAccountId(params.profile, oidcConfig()?.accountIdClaim);
+    return extractLoginClaims(params.profile, oidcConfig() ?? {});
   }
   if (params.account?.provider === TEST_PROVIDER_ID && testLoginEnabled()) {
-    return params.user?.id ?? null;
+    return extractLoginClaims({ sub: params.user?.id, email: params.user?.email, email_verified: true });
   }
-  return null;
-}
-
-async function findPersonByAccountId(accountId: string | null) {
-  if (!accountId) {
-    return null;
-  }
-  return db().person.findUnique({ where: { accountId } });
+  return NO_CLAIMS;
 }
 
 export const authConfig = {
   providers: buildProviders(),
-  session: { strategy: "jwt", maxAge: 8 * 60 * 60 },
+  // Entscheidung „Sitzungen“: signierte JWT-Cookies, 8 Stunden gültig.
+  session: { strategy: SESSION_STRATEGY, maxAge: SESSION_MAX_AGE_SECONDS },
   pages: { signIn: "/anmelden", error: "/anmelden" },
   trustHost: true,
   callbacks: {
     async signIn({ account, profile, user }) {
-      const person = await findPersonByAccountId(accountIdFromSignIn({ account, profile, user }));
+      // Beim ersten Login wird hier die Konto-ID an die angelegte Person gebunden.
+      const person = await resolveLoginPerson(db(), claimsFromSignIn({ account, profile, user }));
       // AK-102: ohne Eintrag oder deaktiviert → Hinweis statt Sitzung.
       return decideAccess(person).allowed ? true : NO_ACCESS_PATH;
     },
     async jwt({ token, account, profile, user }) {
       if (account) {
-        const person = await findPersonByAccountId(accountIdFromSignIn({ account, profile, user }));
+        const { accountId } = claimsFromSignIn({ account, profile, user });
+        const person = accountId ? await db().person.findUnique({ where: { accountId } }) : null;
         if (!person) {
           throw new Error("Person zur Anmeldung nicht gefunden");
         }

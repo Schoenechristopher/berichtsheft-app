@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { oidcConfig, testLoginEnabled, toInternalUrl } from "./config";
+import { SESSION_MAX_AGE_SECONDS, SESSION_STRATEGY, oidcConfig, testLoginEnabled, toInternalUrl } from "./config";
 
 describe("Anmelde-Konfiguration", () => {
   it("liest den OIDC-Adapter aus der Umgebung", () => {
@@ -16,6 +16,8 @@ describe("Anmelde-Konfiguration", () => {
       clientId: "berichtsheft-app",
       clientSecret: "geheim",
       accountIdClaim: "sub",
+      emailClaim: "email",
+      emailVerifiedClaim: "email_verified",
       name: "Firmenkonto",
     });
   });
@@ -28,6 +30,22 @@ describe("Anmelde-Konfiguration", () => {
         AUTH_OIDC_ACCOUNT_ID_CLAIM: "oid",
       })?.accountIdClaim,
     ).toBe("oid");
+  });
+
+  it("AK-201 Entra ID: E-Mail und Bestätigungs-Claim per Konfiguration", () => {
+    const config = oidcConfig({
+      AUTH_OIDC_ISSUER: "https://login.microsoftonline.com/tenant/v2.0",
+      AUTH_OIDC_CLIENT_ID: "app",
+      AUTH_OIDC_EMAIL_CLAIM: "email",
+      AUTH_OIDC_EMAIL_VERIFIED_CLAIM: "xms_edov",
+    });
+    expect(config?.emailClaim).toBe("email");
+    expect(config?.emailVerifiedClaim).toBe("xms_edov");
+  });
+
+  it("AK-204 Sitzungen: signierte JWT-Cookies, 8 Stunden gültig (Entscheidung Sitzungen)", () => {
+    expect(SESSION_STRATEGY).toBe("jwt");
+    expect(SESSION_MAX_AGE_SECONDS).toBe(8 * 60 * 60);
   });
 
   it("ohne Aussteller oder Client-ID gibt es keinen OIDC-Provider", () => {
