@@ -1,12 +1,14 @@
 /**
  * Wochenberichte auf dem Server: erzeugen (AK-301 – AK-305, AK-404), anzeigen (AK-103, AK-105,
- * AK-306) und Entwürfe speichern (AK-405 – AK-407).
+ * AK-306), Entwürfe speichern (AK-405 – AK-407), Historie und Prüfliste lesen (AK-601, AK-801).
+ * Statuswechsel: `report-transitions.ts`.
  *
  * Die Regeln stehen als reine Funktionen in `src/domain/`; hier werden sie mit der Datenbank
  * verbunden. „Jetzt“ übergibt der Aufrufer aus dem Uhr-Modul.
  */
 import { validateDayInputs, type DayErrors, type DayInput, type DayUpdate } from "@/domain/report-days";
-import { canEditReport, canViewReport, type Viewer } from "@/domain/report-access";
+import { canEditReport, canManagePeople, canViewReport, type Viewer } from "@/domain/report-access";
+import type { HistoryChange, HistoryComment } from "@/domain/report-history";
 import {
   OPEN_STATUSES,
   classifyWeek,
@@ -194,8 +196,8 @@ export async function saveReportDays(
     return { ok: false, formError: "Bericht nicht gefunden." };
   }
   return prisma.$transaction(async (tx) => {
-    // Sperrt den Bericht bis zum Ende der Transaktion: Ein gleichzeitiger Statuswechsel (Etappe 4)
-    // wartet, und der Status unten ist der aktuelle.
+    // Sperrt den Bericht bis zum Ende der Transaktion: Ein gleichzeitiger Statuswechsel wartet,
+    // und der Status unten ist der aktuelle.
     await tx.$queryRaw`SELECT 1 FROM weekly_report WHERE id = ${reportId}::uuid FOR UPDATE`;
     const report = await tx.weeklyReport.findUnique({
       where: { id: reportId },
@@ -236,4 +238,64 @@ export function dayInputsFromForm(formData: FormData, dayIds: readonly string[])
     return typeof value === "string" ? value : null;
   };
   return new Map(dayIds.map((id) => [id, { dayType: field(`dayType-${id}`), activities: field(`activities-${id}`) }]));
+}
+
+/** Historie eines Berichts (AK-801, AK-802): Statuswechsel und Kommentare mit Namen. */
+export async function loadReportHistory(
+  prisma: PrismaClient,
+  reportId: string,
+): Promise<{ changes: HistoryChange[]; comments: HistoryComment[] }> {
+  const [changes, comments] = await Promise.all([
+    prisma.statusChange.findMany({
+      where: { reportId },
+      include: { actor: { select: { name: true } } },
+      orderBy: { seq: "asc" },
+    }),
+    prisma.comment.findMany({
+      where: { reportId },
+      include: { author: { select: { name: true } }, day: { select: { date: true } } },
+      orderBy: [{ reviewRound: "asc" }, { createdAt: "asc" }],
+    }),
+  ]);
+  return {
+    changes: changes.map(({ actor, ...change }) => ({ ...change, actorName: actor.name })),
+    comments: comments.map(({ author, day, ...comment }) => ({
+      ...comment,
+      authorName: author.name,
+      dayDate: day?.date ?? null,
+    })),
+  };
+}
+
+/** Filter der Prüfliste (AK-601): eigene Azubis (Voreinstellung) oder alle. */
+export type ReviewScope = "mine" | "all";
+
+/**
+ * Prüfliste (AK-601): eingereichte Berichte mit Azubi, Woche und Einreichungsdatum, älteste
+ * Einreichung zuerst. Standardmäßig nur die Azubis, denen der Ausbilder zugeordnet ist; per
+ * Filter alle (Vertretung, AK-602). Nur für aktive Ausbilder.
+ */
+export async function listReviewQueue(prisma: PrismaClient, viewer: Viewer, scope: ReviewScope) {
+  if (!canManagePeople(viewer)) {
+    return [];
+  }
+  const reports = await prisma.weeklyReport.findMany({
+    where: { status: "SUBMITTED", ...(scope === "mine" ? { trainee: { trainerId: viewer.id } } : {}) },
+    include: {
+      trainee: { select: { id: true, name: true, active: true, trainerId: true } },
+      statusChanges: {
+        where: { toStatus: "SUBMITTED" },
+        orderBy: { seq: "desc" },
+        take: 1,
+        select: { createdAt: true },
+      },
+    },
+  });
+  return reports
+    .map(({ statusChanges, ...report }) => ({
+      ...report,
+      submittedAt: statusChanges[0]?.createdAt ?? report.updatedAt,
+      assignedToViewer: report.trainee.trainerId === viewer.id,
+    }))
+    .sort((a, b) => a.submittedAt.getTime() - b.submittedAt.getTime());
 }

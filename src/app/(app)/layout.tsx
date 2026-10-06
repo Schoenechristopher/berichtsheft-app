@@ -37,6 +37,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 </Link>
               </li>
               <li>
+                <Link href="/ausbilder/pruefliste" className="text-blue-700 hover:underline">
+                  Prüfliste
+                </Link>
+              </li>
+              <li>
                 <Link href="/ausbilder/personen" className="text-blue-700 hover:underline">
                   Personen
                 </Link>

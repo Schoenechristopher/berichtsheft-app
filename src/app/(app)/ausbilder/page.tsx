@@ -3,10 +3,10 @@ import { now } from "@/domain/clock";
 import { Badge } from "@/components/ui";
 import { db } from "@/lib/db";
 import { trainingPeriod } from "@/lib/people/labels";
-import { ensureReportsForAllTrainees, listTraineeWeeks } from "@/lib/reports";
+import { ensureReportsForAllTrainees, listReviewQueue, listTraineeWeeks } from "@/lib/reports";
 import { requirePerson } from "@/lib/session";
 
-/** Startseite für Ausbilder: Azubis mit ihren Wochenberichten (AK-105, nur lesend), Verwaltung. */
+/** Startseite für Ausbilder: Prüfliste (AK-601), Azubis mit ihren Wochenberichten (AK-105), Verwaltung. */
 export default async function TrainerHomePage() {
   const person = await requirePerson("TRAINER");
   const instant = now();
@@ -16,6 +16,7 @@ export default async function TrainerHomePage() {
     include: { trainer: { select: { name: true } } },
     orderBy: [{ active: "desc" }, { name: "asc" }],
   });
+  const toReview = await listReviewQueue(db(), person, "mine");
   const trainees = await Promise.all(
     people.map(async (trainee) => ({
       ...trainee,
@@ -26,7 +27,20 @@ export default async function TrainerHomePage() {
   return (
     <section className="space-y-4">
       <h1 className="text-2xl font-semibold">Hallo {person.name.split(" ")[0]}!</h1>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Link
+          href="/ausbilder/pruefliste"
+          className="rounded-lg border border-slate-200 bg-white p-4 font-medium text-blue-800 hover:border-blue-400"
+        >
+          Prüfliste
+          <span className="block text-sm font-normal text-slate-600" data-testid="review-count">
+            {toReview.length === 0
+              ? "nichts zu prüfen"
+              : toReview.length === 1
+                ? "1 Bericht Ihrer Azubis"
+                : `${toReview.length} Berichte Ihrer Azubis`}
+          </span>
+        </Link>
         <Link
           href="/ausbilder/personen"
           className="rounded-lg border border-slate-200 bg-white p-4 font-medium text-blue-800 hover:border-blue-400"
@@ -68,7 +82,6 @@ export default async function TrainerHomePage() {
           })}
         </ul>
       )}
-      <p className="text-sm text-slate-500">Die Prüfliste folgt in Etappe 4.</p>
     </section>
   );
 }

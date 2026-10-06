@@ -7,12 +7,17 @@ import {
   MAX_ACTIVITIES_LENGTH,
   activitiesError,
   activitiesLength,
+  isDayType,
 } from "@/domain/report-days";
-import { Notice, inputClass, primaryButtonClass } from "@/components/ui";
+import { SUBMISSION_PROBLEM_LABELS, submissionSummary, validateSubmission } from "@/domain/report-submission";
+import { ConfirmSubmit } from "@/components/ConfirmSubmit";
+import { Notice, inputClass, primaryButtonClass, secondaryButtonClass } from "@/components/ui";
 import type { SaveState } from "./actions";
 
 export interface EditorDay {
   id: string;
+  /** Kalendertag JJJJ-MM-TT */
+  date: string;
   /** z. B. „Montag, 05.10.2026“ */
   label: string;
   outsideTraining: boolean;
@@ -33,14 +38,37 @@ function valuesOf(days: EditorDay[]): Values {
   return Object.fromEntries(days.map((day) => [day.id, { dayType: day.dayType, activities: day.activities }]));
 }
 
+/** Einreichen bzw. erneut einreichen, mit dem Stand, den der Azubi gerade sieht (AK-508). */
+export interface EditorSubmit {
+  action: "SUBMIT" | "RESUBMIT";
+  status: string;
+  version: number;
+}
+
 /**
  * Bericht erfassen (AK-401 – AK-408): pro Tag Tagesart und „Tätigkeiten“, ausdrücklicher
  * „Speichern“-Knopf, Warnung beim Verlassen mit ungespeicherten Änderungen. Tage außerhalb der
  * Ausbildung sind ausgegraut und gesperrt. Geprüft wird immer auf dem Server.
+ *
+ * Einreichen (AK-501 – AK-505, AK-701): Vor dem Bestätigungsdialog prüft die Seite die Pflichtfelder
+ * mit derselben Funktion wie der Server und markiert fehlende Angaben am Tag. Bestätigt der Azubi,
+ * speichert der Server die Eingaben und reicht in derselben Transaktion ein – oder nennt die Tage,
+ * an denen etwas fehlt. Kommentare des Ausbilders aus der letzten Ablehnung stehen beim Tag (AK-606).
  */
-export function ReportEditor({ days, action }: { days: EditorDay[]; action: Action }) {
+export function ReportEditor({
+  days,
+  action,
+  submit,
+  dayComments = {},
+}: {
+  days: EditorDay[];
+  action: Action;
+  submit?: EditorSubmit;
+  dayComments?: Record<string, string[]>;
+}) {
   const [state, formAction, pending] = useActionState(action, null);
   const [values, setValues] = useState<Values>(() => valuesOf(days));
+  const [checkSubmission, setCheckSubmission] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   const baseline = state?.saved ?? valuesOf(days);
@@ -57,12 +85,35 @@ export function ReportEditor({ days, action }: { days: EditorDay[]; action: Acti
   const dayErrors = state && !state.ok ? (state.dayErrors ?? {}) : {};
   const hasDayErrors = Object.keys(dayErrors).length > 0;
 
+  // Pflichtfelder (AK-501, AK-502): nach dem ersten Versuch laufend neu geprüft, damit die
+  // Markierungen verschwinden, sobald der Tag ergänzt ist.
+  const currentIssues = () =>
+    validateSubmission(
+      days.map((day) => {
+        const { dayType, activities } = values[day.id];
+        return {
+          id: day.id,
+          date: new Date(`${day.date}T00:00:00Z`),
+          outsideTraining: day.outsideTraining,
+          dayType: isDayType(dayType) ? dayType : null,
+          activities,
+        };
+      }),
+    );
+  const showIssues = checkSubmission || (state?.submissionIssues?.length ?? 0) > 0;
+  const issues = showIssues ? currentIssues() : [];
+  const issueOf = new Map(issues.map((issue) => [issue.dayId, issue.problem]));
+
   const update = (id: string, field: "dayType" | "activities", value: string) =>
     setValues((current) => ({ ...current, [id]: { ...current[id], [field]: value } }));
 
   return (
     <form ref={formRef} action={formAction} className="space-y-4" noValidate aria-label="Bericht erfassen">
-      {state && !state.ok && state.formError ? <Notice tone="error">{state.formError}</Notice> : null}
+      {issues.length > 0 ? (
+        <Notice tone="error">{submissionSummary(issues)}</Notice>
+      ) : state && !state.ok && state.formError && !state.submissionIssues ? (
+        <Notice tone="error">{state.formError}</Notice>
+      ) : null}
       {hasDayErrors ? <Notice tone="error">Nicht gespeichert – bitte die markierten Felder prüfen.</Notice> : null}
 
       {days.map((day) => {
@@ -72,17 +123,42 @@ export function ReportEditor({ days, action }: { days: EditorDay[]; action: Acti
         const tooLong = activitiesError(value.activities) ?? errors.activities;
         const typeId = `dayType-${day.id}`;
         const textId = `activities-${day.id}`;
+        const problem = issueOf.get(day.id);
+        const typeError =
+          errors.dayType ?? (problem === "DAY_TYPE_MISSING" ? SUBMISSION_PROBLEM_LABELS[problem] : undefined);
+        const textMissing = problem === "ACTIVITIES_MISSING" ? SUBMISSION_PROBLEM_LABELS[problem] : undefined;
+        const comments = dayComments[day.id] ?? [];
         return (
           <fieldset
             key={day.id}
             disabled={day.outsideTraining}
             data-testid="report-day"
             data-outside-training={day.outsideTraining ? "true" : undefined}
+            data-issue={problem}
             className={`min-w-0 space-y-3 rounded-lg border p-3 ${
-              day.outsideTraining ? "border-slate-200 bg-slate-100 text-slate-500" : "border-slate-200 bg-white"
+              day.outsideTraining
+                ? "border-slate-200 bg-slate-100 text-slate-500"
+                : problem
+                  ? "border-red-400 bg-white"
+                  : "border-slate-200 bg-white"
             }`}
           >
             <legend className="px-1 font-medium">{day.label}</legend>
+            {problem ? (
+              <p className="text-sm font-medium text-red-700" data-testid="day-issue">
+                {SUBMISSION_PROBLEM_LABELS[problem]}
+              </p>
+            ) : null}
+            {comments.map((comment, index) => (
+              <p
+                key={index}
+                className="rounded-md bg-amber-50 p-2 text-sm break-words whitespace-pre-wrap text-amber-900"
+                data-testid="day-comment"
+              >
+                <span className="font-medium">Kommentar des Ausbilders: </span>
+                {comment}
+              </p>
+            ))}
             {day.outsideTraining ? (
               <p className="text-sm">Außerhalb der Ausbildung – keine Angaben nötig.</p>
             ) : (
@@ -97,8 +173,8 @@ export function ReportEditor({ days, action }: { days: EditorDay[]; action: Acti
                 name={typeId}
                 value={value.dayType}
                 onChange={(event) => update(day.id, "dayType", event.target.value)}
-                aria-invalid={errors.dayType ? true : undefined}
-                aria-describedby={errors.dayType ? `${typeId}-error` : undefined}
+                aria-invalid={typeError ? true : undefined}
+                aria-describedby={typeError ? `${typeId}-error` : undefined}
                 className={`${inputClass} disabled:bg-slate-100 disabled:text-slate-500`}
               >
                 <option value="">{day.outsideTraining ? "–" : "Bitte wählen"}</option>
@@ -108,9 +184,9 @@ export function ReportEditor({ days, action }: { days: EditorDay[]; action: Acti
                   </option>
                 ))}
               </select>
-              {errors.dayType ? (
+              {typeError ? (
                 <p id={`${typeId}-error`} className="text-sm text-red-700">
-                  {errors.dayType}
+                  {typeError}
                 </p>
               ) : null}
             </div>
@@ -124,8 +200,8 @@ export function ReportEditor({ days, action }: { days: EditorDay[]; action: Acti
                 rows={4}
                 value={value.activities}
                 onChange={(event) => update(day.id, "activities", event.target.value)}
-                aria-invalid={tooLong ? true : undefined}
-                aria-describedby={`${textId}-count${tooLong ? ` ${textId}-error` : ""}`}
+                aria-invalid={tooLong || textMissing ? true : undefined}
+                aria-describedby={`${textId}-count${tooLong || textMissing ? ` ${textId}-error` : ""}`}
                 className={`${inputClass} resize-y disabled:bg-slate-100 disabled:text-slate-500`}
               />
               <p
@@ -135,9 +211,9 @@ export function ReportEditor({ days, action }: { days: EditorDay[]; action: Acti
               >
                 {numberFormat.format(length)} / {numberFormat.format(MAX_ACTIVITIES_LENGTH)} Zeichen
               </p>
-              {tooLong && !day.outsideTraining ? (
+              {(tooLong || textMissing) && !day.outsideTraining ? (
                 <p id={`${textId}-error`} className="text-sm text-red-700">
-                  {tooLong}
+                  {tooLong ?? textMissing}
                 </p>
               ) : null}
             </div>
@@ -146,9 +222,34 @@ export function ReportEditor({ days, action }: { days: EditorDay[]; action: Acti
       })}
 
       <div className="sticky bottom-0 -mx-4 flex flex-wrap items-center gap-3 border-t border-slate-200 bg-white/95 px-4 py-3">
-        <button type="submit" disabled={pending} className={primaryButtonClass}>
-          {pending ? "Wird gespeichert …" : "Speichern"}
+        <button type="submit" disabled={pending} className={submit ? secondaryButtonClass : primaryButtonClass}>
+          {pending ? "Bitte warten …" : "Speichern"}
         </button>
+        {submit ? (
+          <>
+            <input type="hidden" name="action" value={submit.action} />
+            <input type="hidden" name="status" value={submit.status} />
+            <input type="hidden" name="version" value={submit.version} />
+            <ConfirmSubmit
+              label={submit.action === "RESUBMIT" ? "Erneut einreichen" : "Einreichen"}
+              title={submit.action === "RESUBMIT" ? "Bericht erneut einreichen?" : "Bericht einreichen?"}
+              message={
+                <p>
+                  Nach dem Einreichen ist der Bericht schreibgeschützt, bis Sie ihn zurückziehen oder er abgelehnt wird.
+                  {dirty ? " Ihre ungespeicherten Änderungen werden dabei gespeichert." : ""}
+                </p>
+              }
+              buttonClass={primaryButtonClass}
+              name="intent"
+              value="submit"
+              disabled={pending}
+              beforeOpen={() => {
+                setCheckSubmission(true);
+                return currentIssues().length === 0;
+              }}
+            />
+          </>
+        ) : null}
         <span role="status" className="text-sm text-slate-600" data-testid="save-status">
           {pending
             ? ""
