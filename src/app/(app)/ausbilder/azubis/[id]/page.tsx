@@ -2,10 +2,13 @@ import { notFound } from "next/navigation";
 import { now } from "@/domain/clock";
 import { currentIsoWeek } from "@/domain/report-generation";
 import { BackLink, Badge } from "@/components/ui";
+import { PdfRangeForm } from "@/components/PdfExport";
 import { WeekOverview } from "@/components/WeekOverview";
+import { toDateInput } from "@/domain/weeks";
 import { db } from "@/lib/db";
 import { isUuid } from "@/lib/ids";
 import { trainingPeriod } from "@/lib/people/labels";
+import { exportRangeDefaults } from "@/lib/report-export";
 import { ensureReportsForTrainee, listTraineeWeeks } from "@/lib/reports";
 import { requirePerson } from "@/lib/session";
 
@@ -23,6 +26,7 @@ export default async function TraineeWeeksPage({ params }: PageProps<"/ausbilder
     notFound();
   }
   const { trainee, reports } = overview;
+  const range = exportRangeDefaults(trainee, instant);
 
   return (
     <section className="space-y-4">
@@ -34,6 +38,9 @@ export default async function TraineeWeeksPage({ params }: PageProps<"/ausbilder
         </p>
         {trainee.active ? null : <Badge tone="slate">deaktiviert</Badge>}
       </div>
+      {range ? (
+        <PdfRangeForm action={`/azubis/${trainee.id}/pdf`} from={toDateInput(range.from)} to={toDateInput(range.to)} />
+      ) : null}
       <WeekOverview reports={reports} currentWeek={currentIsoWeek(instant)} />
     </section>
   );

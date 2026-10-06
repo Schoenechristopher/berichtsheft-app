@@ -1,6 +1,6 @@
 # Plan: Technik und Hosting
 
-Stand: 06.10.2026 · freigegeben · Entscheidungen aus Etappe 1 bis 4 ergänzt (freigegeben am 06.10.2026)
+Stand: 06.10.2026 · freigegeben · Entscheidungen aus Etappe 1 bis 5 ergänzt (freigegeben am 06.10.2026)
 
 Die erste Version läuft als Demo per Docker Compose auf dem eigenen Rechner: eine TypeScript-Web-App mit PostgreSQL, Test-Login und Test-Mailserver. Für die Übernahme in die Firmeninfrastruktur werden nur Konfiguration und Zielumgebung getauscht, nicht der Code. Anforderungen und Akzeptanzkriterien: [01-spezifikation.md](01-spezifikation.md).
 
@@ -24,7 +24,7 @@ Alles läuft in einem TypeScript-Stack, und jeder externe Dienst steckt hinter e
 | Teams | simuliert: Nachrichten landen in einem Entwickler-Postfach | echte Teams-Nachrichten brauchen den Firmen-Tenant | Microsoft Graph, mit der IT zu klären |
 | App-Benachrichtigung | eigene Tabelle, Glocke mit Zähler | AK-1015 | bleibt |
 | Feiertage | npm-Paket feiertagejs | alle Bundesländer, ohne Internetzugriff | bleibt |
-| PDF | @react-pdf/renderer mit eingebetteter Schrift | kein Browser im Container nötig, Umlaute sicher (AK-907) | bleibt |
+| PDF | @react-pdf/renderer mit eingebetteter Schrift Noto Sans (SIL OFL, im Repository unter `assets/fonts/`) | kein Browser im Container nötig, Umlaute sicher (AK-907), kein Internetzugriff zur Laufzeit | bleibt |
 | Tests | Vitest (Logik), Playwright (Browser) | jedes AK als benannter Test | bleibt |
 | Code und CI | GitHub-Repository, GitHub Actions | Prüfung bei jedem Push | bleibt |
 | Betrieb | Docker Compose, ein Befehl startet alles | identische Container später auf Server oder Cloud | Docker Compose auf Firmen-VM oder Azure Container Apps |
@@ -83,7 +83,7 @@ Die fachlichen Regeln liegen in wenigen serverseitigen Modulen ohne Abhängigkei
 - **Regeln der Nutzerverwaltung:** reine Funktionen in `src/domain/people.ts`, serverseitig in jeder Aktion geprüft (in einer serialisierbaren Transaktion, damit gleichzeitige Änderungen den letzten aktiven Ausbilder nicht umgehen): letzter aktiver Ausbilder (AK-207); zugeordnete Azubis – fürs Deaktivieren nur aktive, fürs Löschen und Herabstufen alle (AK-208); kein Ausbilder deaktiviert, löscht oder stuft sich selbst um; Reaktivieren eines Azubis nur mit aktivem Ausbilder.
 - **Benachrichtigungen:** Ein Statuswechsel schreibt in derselben Transaktion seine Benachrichtigungen in die Tabelle (Outbox). Der Worker versendet sie je Kanal über einen eigenen Adapter: E-Mail, Teams, App. Geht der Wechsel schief, entsteht auch keine Nachricht.
 - **Erinnerung:** Ein Job läuft montags um 9:00 Uhr Europe/Berlin. Für jeden aktiven Azubi sammelt er alle offenen Wochen vor der aktuellen und schickt eine Nachricht mit allen (AK-1025). Ist eine davon älter als eine Woche, geht zusätzlich eine Information an den zugeordneten Ausbilder.
-- **PDF:** Je eine Serverroute für eine Woche und für einen Zeitraum, mit denselben Zugriffsregeln wie die Berichtsseite.
+- **PDF:** Je eine Serverroute für eine Woche (`/berichte/[id]/pdf`) und für einen Zeitraum (`/azubis/[id]/pdf?von=…&bis=…`), mit denselben Zugriffsregeln wie die Berichtsseite (`canViewReport`; fremd 403, unbekannt 404). Was gedruckt wird (Wochen des Zeitraums, Freigabevermerk der aktuell gültigen Freigabe bzw. Kennzeichnung, Dateiname), entscheiden reine Funktionen in `src/domain/report-pdf.ts`; das Layout ist eine eigene Einheit in `src/pdf/` (Daten rein, PDF raus), das Laden in `src/lib/report-export.ts`. Das PDF entsteht bei jedem Aufruf neu (`Cache-Control: no-store`), damit nach einer Rücknahme kein Vermerk bleibt. Messung: 150 Wochen (300 Seiten) in rund 6 s.
 - **Zeit:** Alle Regeln holen „jetzt“ aus einem Uhr-Modul. Tests stellen damit Montag 9:00 Uhr oder einen Feiertag gezielt ein.
 
 ## Tests
@@ -96,7 +96,7 @@ Jedes Akzeptanzkriterium bekommt mindestens einen Test, dessen Name mit der AK-I
 | Server mit Datenbank | Vitest gegen PostgreSQL im Container | Zugriffsschutz, Historie unveränderbar, Benachrichtigung genau einmal, Gleichzeitigkeit (AK-103, AK-508, AK-803, AK-1004) |
 | Browser | Playwright gegen die laufende Demo | komplette Abläufe und die drei Beispielszenarien; Login über Keycloak, Mails in Mailpit nachgesehen |
 | Geräte und Browser | Playwright-Projekte für Chromium, Firefox, Edge und 375 px Breite | AK-1101, AK-1102 |
-| PDF | Vitest: PDF erzeugen, Text auslesen | Inhalt, Freigabevermerk, Umlaute, langer Text (AK-901–907) |
+| PDF | Vitest: PDF erzeugen, Text mit pdfjs-dist auslesen | Inhalt, Freigabevermerk, Umlaute, langer Text (AK-901–907); Beispiel-PDFs als CI-Artefakt (`npm run pdf:beispiel`) |
 
 - **Testdaten:** Ein Seed-Skript legt Anna (Azubi, Beginn 01.09.2026), Bernd (Ausbilder, Annas Zuordnung) und Clara (Ausbilderin, Vertretung) an, passend zu den Beispielszenarien. Dieselben Konten gibt es in Keycloak.
 - **Zeitsteuerung:** Erinnerungen und Feiertage werden über das Uhr-Modul mit festen Zeitpunkten getestet, nie mit der echten Uhrzeit.

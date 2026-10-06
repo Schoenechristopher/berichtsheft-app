@@ -46,8 +46,15 @@ jobs:
         run: npm run format:check
       - name: Typecheck
         run: npm run typecheck
-      - name: Vitest (Logik und Datenbank)
+      - name: Vitest (Logik, PDF und Datenbank)
         run: npm test
+      - name: Beispiel-PDFs aus den Seed-Daten
+        run: npm run pdf:beispiel
+      - uses: actions/upload-artifact@v4
+        with:
+          name: beispiel-pdf
+          path: beispiel-pdf/
+          retention-days: 14
 
   e2e:
     name: Docker Compose + Playwright
