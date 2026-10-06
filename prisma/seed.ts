@@ -1,9 +1,15 @@
 /**
- * Seed: legt die Testpersonen Anna, Bernd und Clara sowie die Einstellungen an.
+ * Seed: legt die Testpersonen Anna, Bernd und Clara sowie die Einstellungen an, dazu Annas
+ * Beispielbericht KW 40/2026; alle übrigen Wochen entstehen über die Wochenerzeugung.
  * Idempotent – kann bei jedem Start laufen, ohne Daten zu verdoppeln.
  */
 import "dotenv/config";
+import { now } from "../src/domain/clock";
+import { planReportDays } from "../src/domain/report-generation";
+import { toDateInput } from "../src/domain/weeks";
 import { createPrismaClient } from "../src/lib/db";
+import { getFederalState } from "../src/lib/people/service";
+import { ensureReportsForTrainee } from "../src/lib/reports";
 import { seedFederalState, seedPersons, seedReport } from "../src/lib/seed-data";
 
 async function main() {
@@ -36,30 +42,43 @@ async function main() {
       update: {},
     });
 
-    // Ein Beispielbericht für die Berichtsansicht (AK-103, AK-105), bis Etappe 3 die Wochen erzeugt.
+    // Annas Beispielbericht KW 40/2026 mit Inhalt; angelegt wie von der Wochenerzeugung
+    // (Tage außerhalb der Ausbildung, Feiertage), nur mit vorausgefülltem Inhalt.
     const { isoYear, isoWeek, days } = seedReport;
     const existing = await prisma.weeklyReport.findUnique({
       where: { traineeId_isoYear_isoWeek: { traineeId: annaPerson.id, isoYear, isoWeek } },
     });
-    if (!existing) {
+    if (!existing && annaPerson.trainingStart) {
+      const federalState = await getFederalState(prisma);
+      const planned = planReportDays(
+        { isoYear, isoWeek },
+        { start: annaPerson.trainingStart, end: annaPerson.trainingEnd },
+        federalState,
+      );
       await prisma.weeklyReport.create({
         data: {
           traineeId: annaPerson.id,
           isoYear,
           isoWeek,
           days: {
-            create: days.map((day) => ({
-              date: new Date(`${day.date}T00:00:00Z`),
-              dayType: day.dayType,
-              activities: day.activities,
-            })),
+            create: planned.map((day) => {
+              const content = days.find((seedDay) => seedDay.date === toDateInput(day.date));
+              return {
+                ...day,
+                dayType: day.outsideTraining ? day.dayType : (content?.dayType ?? day.dayType),
+                activities: day.outsideTraining ? "" : (content?.activities ?? ""),
+              };
+            }),
           },
         },
       });
     }
 
+    // Alle übrigen Wochen bis heute entstehen über die normale Wochenerzeugung (Uhr-Modul).
+    const generated = await ensureReportsForTrainee(prisma, annaPerson.id, now());
+
     console.log(
-      `Seed: Anna (Azubi, zugeordnet Bernd), Bernd und Clara (Ausbilder), Bundesland NW, Annas Bericht KW ${isoWeek}/${isoYear}.`,
+      `Seed: Anna (Azubi, zugeordnet Bernd), Bernd und Clara (Ausbilder), Bundesland NW, Annas Bericht KW ${isoWeek}/${isoYear}; ${generated.createdReports} weitere Wochen erzeugt.`,
     );
   } finally {
     await prisma.$disconnect();

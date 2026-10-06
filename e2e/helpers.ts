@@ -82,6 +82,19 @@ export async function personId(email: string): Promise<string> {
   return row.id;
 }
 
+/** ID eines Wochenberichts einer Person (per E-Mail) oder Fehler, falls er fehlt. */
+export async function reportIdOf(email: string, isoYear: number, isoWeek: number): Promise<string> {
+  const row = await queryOne<{ id: string }>(
+    `SELECT r.id FROM weekly_report r JOIN person p ON p.id = r.trainee_id
+     WHERE p.email = $1 AND r.iso_year = $2 AND r.iso_week = $3`,
+    [email, isoYear, isoWeek],
+  );
+  if (!row) {
+    throw new Error(`Bericht KW ${isoWeek}/${isoYear} von ${email} fehlt.`);
+  }
+  return row.id;
+}
+
 /** ID von Annas Beispielbericht aus dem Seed (KW 40/2026). */
 export async function annasSeedReportId(): Promise<string> {
   const row = await queryOne<{ id: string }>(
@@ -105,13 +118,21 @@ export async function insertTrainee(options: {
   trainerEmail?: string;
   accountId?: string | null;
   withReport?: boolean;
+  /** Ausbildungsbeginn JJJJ-MM-TT, Voreinstellung 2026-09-01. */
+  trainingStart?: string;
 }): Promise<{ id: string; reportId: string | null }> {
   return withDatabase(async (db) => {
     const { rows } = await db.query(
       `INSERT INTO person (id, account_id, email, name, role, trainer_id, training_start, updated_at)
-       VALUES (gen_random_uuid(), $1, $2, $3, 'TRAINEE', (SELECT id FROM person WHERE email = $4), '2026-09-01', now())
+       VALUES (gen_random_uuid(), $1, $2, $3, 'TRAINEE', (SELECT id FROM person WHERE email = $4), $5, now())
        RETURNING id`,
-      [options.accountId ?? null, options.email, options.name, options.trainerEmail ?? seedPersons.bernd.email],
+      [
+        options.accountId ?? null,
+        options.email,
+        options.name,
+        options.trainerEmail ?? seedPersons.bernd.email,
+        options.trainingStart ?? "2026-09-01",
+      ],
     );
     const id = rows[0].id as string;
     let reportId: string | null = null;
@@ -152,5 +173,12 @@ export async function restoreSeedState() {
       [seedPersons.anna.email, seedPersons.bernd.email, seedPersons.anna.name],
     );
     await db.query("UPDATE setting SET federal_state = 'NW' WHERE id = 1");
+    // Wochen, die nur durch einen vorübergehend früheren Ausbildungsbeginn entstanden sind
+    // (die App löscht Berichte nie automatisch), wieder entfernen.
+    await db.query(
+      `DELETE FROM weekly_report WHERE trainee_id = (SELECT id FROM person WHERE email = $1)
+       AND (iso_year, iso_week) < (2026, 36)`,
+      [seedPersons.anna.email],
+    );
   });
 }

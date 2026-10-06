@@ -40,3 +40,59 @@ const WEEKDAYS = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] as const;
 export function weekdayShort(date: Date): string {
   return WEEKDAYS[date.getUTCDay()];
 }
+
+/** Eine ISO-Kalenderwoche. */
+export interface IsoWeek {
+  isoYear: number;
+  isoWeek: number;
+}
+
+const DAY_MS = 86_400_000;
+
+/** ISO-Woche, in der der Kalendertag liegt (Datum als UTC-Mitternacht). */
+export function isoWeekOf(date: Date): IsoWeek {
+  const weekday = (date.getUTCDay() + 6) % 7; // 0 = Montag
+  // Der Donnerstag derselben Woche bestimmt das ISO-Jahr.
+  const thursday = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 3 - weekday));
+  const isoYear = thursday.getUTCFullYear();
+  const isoWeek = 1 + Math.floor((thursday.getTime() - isoWeekMonday(isoYear, 1).getTime()) / (7 * DAY_MS));
+  return { isoYear, isoWeek };
+}
+
+/** Vergleicht zwei Wochen: negativ, wenn `a` früher liegt, 0 bei gleicher Woche. */
+export function compareWeeks(a: IsoWeek, b: IsoWeek): number {
+  return a.isoYear !== b.isoYear ? a.isoYear - b.isoYear : a.isoWeek - b.isoWeek;
+}
+
+/** Die darauffolgende ISO-Woche. */
+export function nextIsoWeek(week: IsoWeek): IsoWeek {
+  return isoWeekOf(new Date(isoWeekMonday(week.isoYear, week.isoWeek).getTime() + 7 * DAY_MS));
+}
+
+/**
+ * Kalendertag eines Zeitpunkts in der angegebenen Zeitzone, als UTC-Mitternacht.
+ * Beispiel: 2026-10-04T22:30:00Z ist in Europe/Berlin schon Montag, der 05.10.2026.
+ */
+export function calendarDateIn(instant: Date, timeZone: string): Date {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(instant);
+  const part = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  return new Date(Date.UTC(part("year"), part("month") - 1, part("day")));
+}
+
+/** Zeitraum Mo–Fr als Text, z. B. „28.09.2026 – 02.10.2026“. */
+export function weekRangeLabel(isoYear: number, isoWeek: number): string {
+  const days = isoWeekWorkdays(isoYear, isoWeek);
+  return `${formatDate(days[0])} – ${formatDate(days[4])}`;
+}
+
+const WEEKDAYS_LONG = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] as const;
+
+/** Ausgeschriebener Wochentag, z. B. „Montag“. */
+export function weekdayLong(date: Date): string {
+  return WEEKDAYS_LONG[date.getUTCDay()];
+}

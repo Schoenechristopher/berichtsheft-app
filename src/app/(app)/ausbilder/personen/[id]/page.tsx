@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { roleLabel } from "@/domain/access";
-import { reportStatusLabel } from "@/domain/report-access";
-import { toDateInput, weekLabel } from "@/domain/weeks";
+import { toDateInput } from "@/domain/weeks";
 import { Badge, BackLink, Notice } from "@/components/ui";
 import { db } from "@/lib/db";
 import { isUuid } from "@/lib/ids";
@@ -23,7 +22,7 @@ export default async function PersonPage({ params, searchParams }: PageProps<"/a
     where: { id },
     include: {
       trainer: { select: { name: true } },
-      reports: { orderBy: [{ isoYear: "desc" }, { isoWeek: "desc" }] },
+      reports: { select: { id: true } },
     },
   });
   if (!person) {
@@ -84,20 +83,12 @@ export default async function PersonPage({ params, searchParams }: PageProps<"/a
           <h2 id="reports-heading" className="text-lg font-semibold">
             Berichte
           </h2>
-          {person.reports.length === 0 ? (
-            <p className="text-sm text-slate-600">Noch keine Berichte.</p>
-          ) : (
-            <ul className="space-y-1">
-              {person.reports.map((report) => (
-                <li key={report.id}>
-                  <Link href={`/berichte/${report.id}`} className="text-blue-700 underline">
-                    {weekLabel(report.isoYear, report.isoWeek)}
-                  </Link>{" "}
-                  <span className="text-sm text-slate-600">· {reportStatusLabel(report.status)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+          <p className="text-sm text-slate-600">
+            {person.reports.length === 1 ? "1 Wochenbericht." : `${person.reports.length} Wochenberichte.`}{" "}
+            <Link href={`/ausbilder/azubis/${person.id}`} className="text-blue-700 underline">
+              Wochenberichte ansehen
+            </Link>
+          </p>
         </section>
       ) : null}
 
