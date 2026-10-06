@@ -49,26 +49,41 @@ async function snapshot(tx: Tx): Promise<PersonSnapshot[]> {
   return tx.person.findMany({ select: { id: true, name: true, role: true, active: true, trainerId: true } });
 }
 
-/** Führt `work` serialisierbar aus; bei Konflikt bis zu dreimal. */
+const MAX_ATTEMPTS = 5;
+
+/** Führt `work` serialisierbar aus; bei Konflikt mit kurzer, zufälliger Pause bis zu fünfmal. */
 async function serializable(prisma: PrismaClient, work: (tx: Tx) => Promise<ActionResult>): Promise<ActionResult> {
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
       return await prisma.$transaction(work, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
     } catch (error) {
-      if (isSerializationFailure(error)) {
-        continue;
+      if (!isSerializationFailure(error)) {
+        throw error;
       }
-      throw error;
+      await new Promise((resolve) => setTimeout(resolve, Math.random() * 20 * attempt));
     }
   }
   return RETRY;
 }
 
+/**
+ * Konflikt zweier serialisierbarer Transaktionen (SQLSTATE 40001, Deadlock 40P01). Prisma meldet
+ * ihn je nach Stelle als P2034 oder – über den Treiber-Adapter – als `TransactionWriteConflict`
+ * mit dem ursprünglichen Code in `cause`.
+ */
 function isSerializationFailure(error: unknown): boolean {
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2034") {
-    return true;
+  for (let current = error, depth = 0; current && depth < 5; depth++) {
+    if (current instanceof Prisma.PrismaClientKnownRequestError && current.code === "P2034") {
+      return true;
+    }
+    const details = current as { message?: unknown; code?: unknown; originalCode?: unknown; kind?: unknown };
+    const text = [details.message, details.code, details.originalCode, details.kind].map(String).join(" ");
+    if (/TransactionWriteConflict|could not serialize|40001|40P01|deadlock/i.test(text)) {
+      return true;
+    }
+    current = (current as { cause?: unknown }).cause;
   }
-  return /could not serialize|40001|deadlock/i.test(String((error as Error)?.message ?? error));
+  return false;
 }
 
 function isUniqueViolation(error: unknown, field: string): boolean {
