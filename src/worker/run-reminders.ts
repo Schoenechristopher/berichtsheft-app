@@ -1,13 +1,16 @@
 /**
  * Montags-Job einmal von Hand auslösen (Demo und Entwicklung): schreibt Erinnerungen und
  * Informationen zum aktuellen Zeitpunkt der Uhr (z. B. APP_FIXED_NOW=2026-10-12T09:00:00+02:00)
- * in die Outbox. Versendet werden sie vom laufenden Worker. Doppelte Läufe derselben Woche
- * erzeugen nichts doppelt.
+ * in die Outbox und versendet sie gleich mit derselben Uhr – ein Worker mit echter Uhr würde
+ * Nachrichten mit einem Zeitpunkt in der Zukunft erst dann versenden. Doppelte Läufe derselben
+ * Woche erzeugen nichts doppelt.
  */
 import "dotenv/config";
 import { now } from "../domain/clock";
 import { createPrismaClient } from "../lib/db";
-import { appBaseUrl } from "../lib/notifications/config";
+import { createDeliveryAdapters } from "../lib/notifications/adapters";
+import { notificationConfig } from "../lib/notifications/config";
+import { deliverPendingNotifications } from "../lib/notifications/outbox";
 import { runWeeklyReminders } from "../lib/notifications/service";
 
 async function main() {
@@ -17,8 +20,14 @@ async function main() {
   }
   const prisma = createPrismaClient(url);
   try {
-    const result = await runWeeklyReminders(prisma, { now: now(), baseUrl: appBaseUrl() });
+    const config = notificationConfig();
+    const result = await runWeeklyReminders(prisma, { now: now(), baseUrl: config.baseUrl });
     console.log(`Erinnerungen zum ${now().toISOString()}: ${result.created} Benachrichtigungen angelegt.`);
+    const delivery = await deliverPendingNotifications(prisma, createDeliveryAdapters(config, prisma), {
+      now,
+      maxAttempts: config.maxAttempts,
+    });
+    console.log(`Versendet: ${delivery.sent}, später erneut: ${delivery.retried}, aufgegeben: ${delivery.failed}.`);
   } finally {
     await prisma.$disconnect();
   }

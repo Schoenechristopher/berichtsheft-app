@@ -88,7 +88,7 @@ Ohne Keycloak (z. B. wenn das Image nicht geladen werden kann): in `.env` `AUTH_
 | `npm run lint`, `npm run format:check`, `npm run typecheck` | Codequalität |
 | `npm test` | Vitest: Fachlogik und PDF-Layout (`src/**/*.test.ts(x)`; PDFs werden erzeugt und wieder ausgelesen) und Datenbank (`tests/db/`, braucht `TEST_DATABASE_URL`; E-Mail-Versand gegen einen SMTP-Mock in `tests/smtp-mock.ts`) |
 | `npm run pdf:beispiel` | erzeugt Beispiel-PDFs aus den Seed-Daten (Einzelwoche mit Freigabevermerk, Sammel-PDF) in `beispiel-pdf/`, ohne Datenbank |
-| `APP_FIXED_NOW=2026-10-12T09:00:00+02:00 npm run erinnerung` | löst den Montags-Job (Erinnerung, Information an den Ausbilder) einmal zum angegebenen Zeitpunkt aus; der laufende Worker versendet |
+| `APP_FIXED_NOW=2026-10-12T09:00:00+02:00 npm run erinnerung` | löst den Montags-Job (Erinnerung, Information an den Ausbilder) einmal zum angegebenen Zeitpunkt aus und versendet die Nachrichten gleich (E-Mail an Mailpit) |
 | `npm run test:e2e` | Playwright gegen die laufende Demo (`docker compose up`), Login über Keycloak |
 | `E2E_LOGIN_MODE=test npm run test:e2e` | Playwright mit Test-Login, startet `next dev` selbst (ohne Keycloak) |
 | `E2E_MAILPIT_URL=http://localhost:8025 npm run test:e2e` | zusätzlich E-Mails über die Mailpit-API und das Teams-Postfach prüfen (braucht laufenden Worker und Mailpit; in CI immer an) |
