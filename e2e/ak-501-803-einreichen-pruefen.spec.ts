@@ -4,6 +4,7 @@ import {
   annasSeedReportId,
   deletePersons,
   deleteReportWithoutHistory,
+  downloadPdf,
   insertTrainee,
   login,
   prepareWeek,
@@ -283,7 +284,9 @@ test.describe("Einreichen und Prüfen", () => {
     await bernd.context.close();
   });
 
-  test("Beispielszenario: Vertretung nimmt Freigabe zurück (AK-703 AK-704 AK-801)", async ({ browser }) => {
+  test("Beispielszenario: Vertretung nimmt Freigabe zurück (AK-703 AK-704 AK-801 AK-903 AK-905)", async ({
+    browser,
+  }) => {
     const reportId = await createEmilWithWeek40();
     // Emil reicht ein, Bernd gibt frei.
     const trainee = await newSession(browser, emil);
@@ -293,6 +296,11 @@ test.describe("Einreichen und Prüfen", () => {
     await bernd.page.goto(`/berichte/${reportId}`);
     await confirmAction(bernd.page, "Freigeben", "Bericht freigeben?");
     await expect(bernd.page.getByTestId("report-status")).toHaveText("Status: Freigegeben");
+    // AK-903: Das PDF trägt den Freigabevermerk mit Bernds Namen.
+    const approvedPdf = await downloadPdf(bernd.page, () =>
+      bernd.page.getByRole("link", { name: "Als PDF herunterladen" }).click(),
+    );
+    expect(approvedPdf.text).toMatch(/Freigegeben von Bernd Ausbilder am \d{2}\.\d{2}\.\d{4}, \d{2}:\d{2} Uhr/);
 
     // AK-704: Freigegeben ist für den Azubi nicht änderbar.
     await trainee.page.reload();
@@ -330,7 +338,13 @@ test.describe("Einreichen und Prüfen", () => {
     await expect(trainee.page.getByTestId("review-feedback-text")).toHaveText("Begründung: Mittwoch falsches Datum");
     await expect(day(trainee.page, "Mittwoch, 30.09.2026").getByLabel("Tätigkeiten")).toBeEditable();
     await expect(trainee.page.getByRole("button", { name: "Erneut einreichen" })).toBeVisible();
-    // Benachrichtigung (Etappe 6) und PDF ohne Freigabevermerk (Etappe 5) folgen später.
+    // Und ein neu erzeugtes PDF enthält keinen Freigabevermerk (AK-905).
+    const revokedPdf = await downloadPdf(clara.page, () =>
+      clara.page.getByRole("link", { name: "Als PDF herunterladen" }).click(),
+    );
+    expect(revokedPdf.text).toContain("Nicht freigegeben – Status: Abgelehnt");
+    expect(revokedPdf.text).not.toContain("Freigegeben von");
+    // Benachrichtigung (Etappe 6) folgt später.
     for (const session of [trainee, bernd, clara]) {
       await session.context.close();
     }

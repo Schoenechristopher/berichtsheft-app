@@ -290,7 +290,12 @@ function useLeaveWarning(dirty: boolean, formRef: React.RefObject<HTMLFormElemen
       if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
         return;
       }
-      if (link.getAttribute("target") === "_blank" || link.getAttribute("href")?.startsWith("#")) {
+      // Downloads (PDF) verlassen die Seite nicht; das PDF zeigt den gespeicherten Stand.
+      if (
+        link.getAttribute("target") === "_blank" ||
+        link.hasAttribute("download") ||
+        link.getAttribute("href")?.startsWith("#")
+      ) {
         return;
       }
       cancelUnlessConfirmed(event);

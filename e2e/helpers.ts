@@ -1,5 +1,7 @@
 import { expect, type Page } from "@playwright/test";
+import { readFile } from "node:fs/promises";
 import pg from "pg";
+import { extractPdfText } from "../tests/pdf-text";
 import { isoWeekWorkdays, toDateInput } from "../src/domain/weeks";
 import { accountToCreate, accountWithoutEntry, seedPersons, seedReport } from "../src/lib/seed-data";
 
@@ -226,4 +228,15 @@ export async function deleteReportWithoutHistory(email: string, isoYear: number,
       [email, isoYear, isoWeek],
     ),
   );
+}
+
+/**
+ * Lädt ein PDF über die Oberfläche herunter (`trigger` klickt den Download) und liest den Text aus.
+ */
+export async function downloadPdf(page: Page, trigger: () => Promise<void>) {
+  const [download] = await Promise.all([page.waitForEvent("download"), trigger()]);
+  const path = await download.path();
+  const buffer = await readFile(path);
+  expect(buffer.subarray(0, 5).toString()).toBe("%PDF-");
+  return { fileName: download.suggestedFilename(), ...(await extractPdfText(buffer)) };
 }

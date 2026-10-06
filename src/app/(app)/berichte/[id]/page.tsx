@@ -6,6 +6,7 @@ import { availableActions } from "@/domain/report-status";
 import { formatDate, toDateInput, weekLabel, weekdayLong } from "@/domain/weeks";
 import { BackLink, Badge } from "@/components/ui";
 import { ReportHistory } from "@/components/ReportHistory";
+import { PdfDownloadLink } from "@/components/PdfExport";
 import { STATUS_TONES } from "@/components/WeekOverview";
 import { homePathFor } from "@/domain/access";
 import { db } from "@/lib/db";
@@ -85,6 +86,9 @@ export default async function ReportPage({ params }: PageProps<"/berichte/[id]">
             Freigegeben von {approval.actorName} am {formatDateTime(approval.at)}
           </p>
         ) : null}
+        <div className="pt-1">
+          <PdfDownloadLink href={`/berichte/${report.id}/pdf`} />
+        </div>
       </div>
 
       {feedback ? (
