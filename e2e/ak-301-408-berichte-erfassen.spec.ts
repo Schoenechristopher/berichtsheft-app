@@ -1,8 +1,17 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Dialog, type Page } from "@playwright/test";
 import { now } from "../src/domain/clock";
 import { currentIsoWeek, weeksDue } from "../src/domain/report-generation";
 import { MAX_ACTIVITIES_LENGTH } from "../src/domain/report-days";
-import { accounts, deletePersons, insertTrainee, login, reportIdOf, restoreSeedState, withDatabase } from "./helpers";
+import {
+  accounts,
+  deletePersons,
+  downloadPdf,
+  insertTrainee,
+  login,
+  reportIdOf,
+  restoreSeedState,
+  withDatabase,
+} from "./helpers";
 
 // „Jetzt“ kommt auch in den Browser-Tests aus dem Uhr-Modul – derselben Quelle wie die App.
 const annaStart = new Date("2026-09-01T00:00:00Z");
@@ -251,6 +260,52 @@ test.describe("Berichte erfassen", () => {
     await page.getByRole("link", { name: "Zur Übersicht" }).click();
     await expect(page).toHaveURL(/\/azubi$/);
     expect(dialogShown).toBe(false);
+  });
+
+  test("AK-408 AK-901 PDF-Download mit ungespeicherten Änderungen weist auf den gespeicherten Stand hin", async ({
+    page,
+  }) => {
+    await login(page, accounts.anna);
+    await openWeek39(page);
+    const montag = day(page, "Montag, 21.09.2026").getByLabel("Tätigkeiten");
+    const pdfLink = page.getByRole("link", { name: "Als PDF herunterladen" });
+
+    // Ohne ungespeicherte Änderungen: kein Hinweis, direkt der Download.
+    const dialogs: string[] = [];
+    const recordAndAccept = async (dialog: Dialog) => {
+      dialogs.push(dialog.message());
+      await dialog.accept();
+    };
+    page.on("dialog", recordAndAccept);
+    const clean = await downloadPdf(page, () => pdfLink.click());
+    expect(clean.fileName).toBe("Berichtsheft_Anna-Azubi_KW39-2026.pdf");
+    expect(dialogs).toEqual([]);
+    page.off("dialog", recordAndAccept);
+
+    // Mit ungespeicherten Änderungen: Hinweis; „Abbrechen“ bleibt im Editor, kein Download.
+    await montag.fill("noch nicht gespeichert");
+    let downloads = 0;
+    page.on("download", () => downloads++);
+    page.once("dialog", async (dialog) => {
+      dialogs.push(dialog.message());
+      await dialog.dismiss();
+    });
+    await pdfLink.click();
+    await expect.poll(() => dialogs.length).toBe(1);
+    expect(dialogs[0]).toBe("Es wird der zuletzt gespeicherte Stand exportiert.");
+    await expect(page).toHaveURL(/\/berichte\//);
+    await expect(montag).toHaveValue("noch nicht gespeichert");
+    expect(downloads).toBe(0);
+
+    // Bestätigen: Download des gespeicherten Stands, die Eingabe bleibt im Editor.
+    page.once("dialog", async (dialog) => {
+      dialogs.push(dialog.message());
+      await dialog.accept();
+    });
+    const saved = await downloadPdf(page, () => pdfLink.click());
+    expect(dialogs).toHaveLength(2);
+    expect(saved.text).not.toContain("noch nicht gespeichert");
+    await expect(montag).toHaveValue("noch nicht gespeichert");
   });
 
   test("AK-408 Zurück und Vor im Browser warnen bei ungespeicherten Änderungen", async ({ page }) => {

@@ -32,6 +32,9 @@ type Action = (prev: SaveState, formData: FormData) => Promise<SaveState>;
 export const LEAVE_WARNING =
   "Es gibt ungespeicherte Änderungen. Seite trotzdem verlassen? Die Änderungen gehen verloren.";
 
+/** Hinweis vor dem PDF-Download mit ungespeicherten Änderungen (bestätigte Auslegung zu AK-901). */
+export const EXPORT_SAVED_HINT = "Es wird der zuletzt gespeicherte Stand exportiert.";
+
 const numberFormat = new Intl.NumberFormat("de-DE");
 
 function valuesOf(days: EditorDay[]): Values {
@@ -290,12 +293,16 @@ function useLeaveWarning(dirty: boolean, formRef: React.RefObject<HTMLFormElemen
       if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
         return;
       }
-      // Downloads (PDF) verlassen die Seite nicht; das PDF zeigt den gespeicherten Stand.
-      if (
-        link.getAttribute("target") === "_blank" ||
-        link.hasAttribute("download") ||
-        link.getAttribute("href")?.startsWith("#")
-      ) {
+      if (link.getAttribute("target") === "_blank" || link.getAttribute("href")?.startsWith("#")) {
+        return;
+      }
+      // Downloads (PDF) verlassen die Seite nicht, exportieren aber nur den gespeicherten Stand:
+      // Hinweis; Abbrechen bleibt im Editor.
+      if (link.hasAttribute("download")) {
+        if (!window.confirm(EXPORT_SAVED_HINT)) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
         return;
       }
       cancelUnlessConfirmed(event);

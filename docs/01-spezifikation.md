@@ -1,6 +1,6 @@
 # Berichtsheft-App – Anforderungen und Akzeptanzkriterien
 
-Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201, AK-204, AK-206 bis AK-208 freigegeben am 06.10.2026 (Etappe 2) · Ergänzungen zu AK-203, AK-305, AK-306, AK-404, AK-406 bis AK-408 freigegeben am 06.10.2026 (Etappe 3) · Ergänzungen zu AK-501, AK-502, AK-505, AK-604 bis AK-606, AK-803 und zum Statusmodell freigegeben am 06.10.2026 (Etappe 4)
+Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201, AK-204, AK-206 bis AK-208 freigegeben am 06.10.2026 (Etappe 2) · Ergänzungen zu AK-203, AK-305, AK-306, AK-404, AK-406 bis AK-408 freigegeben am 06.10.2026 (Etappe 3) · Ergänzungen zu AK-501, AK-502, AK-505, AK-604 bis AK-606, AK-803 und zum Statusmodell freigegeben am 06.10.2026 (Etappe 4) · Ergänzungen zu AK-901 bis AK-907 und zum PDF-Export freigegeben am 06.10.2026 (Etappe 5)
 
 Azubis führen ihr Berichtsheft digital als Wochenbericht, Ausbilder prüfen und geben es frei. Diese Spezifikation ist freigegeben und durch die Akzeptanzkriterien (AK) testbar. Technik und Hosting stehen in [02-plan.md](02-plan.md).
 
@@ -51,6 +51,9 @@ Zurückziehen geht nur, solange der Bericht noch nicht geprüft ist. Ablehnung u
 
 - Einzelne Woche als PDF und Sammel-PDF für einen frei wählbaren Zeitraum (z. B. gesamte Ausbildung), jede Woche auf neuer Seite.
 - Freigegebene Wochen tragen einen Freigabevermerk (Name des Ausbilders, Datum); nicht freigegebene sind deutlich als solche gekennzeichnet.
+- **Inhalt:** nur der aktuelle Inhalt der Woche, Status und Vermerk bzw. Kennzeichnung; Kommentare, Verlauf und die Begründung einer Rücknahme kommen nicht ins PDF. Keine Unterschriftszeilen: Der elektronische Freigabevermerk gilt als Nachweis. Kein Hinweis „deaktiviert“ im PDF.
+- **Zeitraum:** Zum Zeitraum gehört jede Woche, deren Mo–Fr ihn berührt (mindestens ein Arbeitstag zwischen Von und Bis); gedruckt wird immer die ganze Woche. Ausgeblendete Wochen (AK-306) fehlen. Vorbelegung: Ausbildungsbeginn bis heute, nach Ausbildungsende bis zum Ende. Ein Zeitraum ohne Wochen ergibt ein PDF mit Hinweis statt einer Fehlermeldung.
+- **Seiten:** Kopfzeile mit Name, Kalenderwoche und Status bzw. „Nicht freigegeben“ auf jeder Seite; Fußzeile mit Erstellungsdatum und „Seite x von y“, gezählt über das ganze Dokument.
 
 ## Benachrichtigungen und Erinnerung
 
@@ -172,13 +175,13 @@ Jedes Kriterium ist eine prüfbare Aussage mit eigener ID, damit Testfälle dara
 
 | ID | Kriterium |
 | --- | --- |
-| AK-901 | Eine Woche lässt sich als PDF exportieren, mit Name des Azubis, Kalenderwoche, Zeitraum, allen Tagen mit Datum, Tagesart und Tätigkeiten sowie dem Status. |
-| AK-902 | Für einen Zeitraum (von–bis) entsteht ein Sammel-PDF aller Wochen in zeitlicher Reihenfolge; jede Woche beginnt auf einer neuen Seite. |
-| AK-903 | Freigegebene Wochen tragen einen Freigabevermerk mit Name des Ausbilders und Datum. |
+| AK-901 | Eine Woche lässt sich als PDF exportieren, mit Name des Azubis, Kalenderwoche, Zeitraum, allen Tagen mit Datum, Tagesart und Tätigkeiten sowie dem Status. Ergänzung: Exportiert wird der zuletzt gespeicherte Stand. Hat der Editor ungespeicherte Änderungen, erscheint vor dem Download der Hinweis „Es wird der zuletzt gespeicherte Stand exportiert.“ (bestätigen → Download, abbrechen → bleibt im Editor); ohne ungespeicherte Änderungen kein Hinweis. |
+| AK-902 | Für einen Zeitraum (von–bis) entsteht ein Sammel-PDF aller Wochen in zeitlicher Reihenfolge; jede Woche beginnt auf einer neuen Seite. Ergänzung: Welche Wochen dazugehören, regelt der Abschnitt „PDF-Export“. |
+| AK-903 | Freigegebene Wochen tragen einen Freigabevermerk mit Name des Ausbilders und Datum. Präzisierung: Datum und Uhrzeit der aktuell gültigen Freigabe, z. B. „Freigegeben von Bernd Ausbilder am 05.10.2026, 09:45 Uhr“. |
 | AK-904 | Nicht freigegebene Wochen sind deutlich gekennzeichnet, z. B. „Nicht freigegeben – Status: Entwurf“. |
 | AK-905 | Nach einer Rücknahme (AK-703) enthält ein neu erzeugtes PDF keinen Freigabevermerk mehr. |
-| AK-906 | Der Azubi exportiert nur eigene Berichte, ein Ausbilder die aller Azubis, auch deaktivierter. |
-| AK-907 | Umlaute und lange Texte erscheinen im PDF vollständig, nichts wird abgeschnitten. |
+| AK-906 | Der Azubi exportiert nur eigene Berichte, ein Ausbilder die aller Azubis, auch deaktivierter. Ergänzung: Fremde Berichte ergeben „Zugriff verweigert“ (HTTP 403), unbekannte „Seite nicht gefunden“ (HTTP 404). |
+| AK-907 | Umlaute und lange Texte erscheinen im PDF vollständig, nichts wird abgeschnitten. Ergänzung: Keine automatische Silbentrennung; nur Wörter ohne Leerzeichen mit mehr als 24 Zeichen werden mit Trennstrich am Zeilenende umbrochen. |
 
 ### 10. Benachrichtigungen
 
