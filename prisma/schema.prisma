@@ -64,10 +64,11 @@ model Person {
   createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  reports       WeeklyReport[]
-  comments      Comment[]
-  statusChanges StatusChange[]
-  notifications Notification[]
+  reports          WeeklyReport[]
+  comments         Comment[]
+  statusChanges    StatusChange[]
+  notifications    Notification[]
+  teamsDevMessages TeamsDevMessage[]
 
   @@map("person")
 }
@@ -162,23 +163,50 @@ model StatusChange {
 }
 
 /// Benachrichtigung (Outbox): genau eine pro Ereignis, Empfänger und Kanal (AK-1004).
+/// Kanal „App“: die Zeile ist die Benachrichtigung (sentAt gleich beim Anlegen). E-Mail und Teams
+/// versendet der Worker (`src/lib/notifications/outbox.ts`) und setzt dann sentAt.
 model Notification {
-  id          String        @id @default(uuid()) @db.Uuid
+  id            String        @id @default(uuid()) @db.Uuid
   /// Fachlicher Schlüssel des Ereignisses, z. B. „submitted:<statusChangeId>“.
-  eventKey    String        @map("event_key")
-  recipientId String        @map("recipient_id") @db.Uuid
-  recipient   Person        @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-  channel     Channel
-  reportId    String?       @map("report_id") @db.Uuid
-  report      WeeklyReport? @relation(fields: [reportId], references: [id], onDelete: Cascade)
-  subject     String
-  body        String
-  link        String?
-  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
-  sentAt      DateTime?     @map("sent_at") @db.Timestamptz(3)
-  readAt      DateTime?     @map("read_at") @db.Timestamptz(3)
+  eventKey      String        @map("event_key")
+  recipientId   String        @map("recipient_id") @db.Uuid
+  recipient     Person        @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  channel       Channel
+  reportId      String?       @map("report_id") @db.Uuid
+  report        WeeklyReport? @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  subject       String
+  body          String
+  link          String?
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  sentAt        DateTime?     @map("sent_at") @db.Timestamptz(3)
+  readAt        DateTime?     @map("read_at") @db.Timestamptz(3)
+  /// Versandversuche des Workers; nach einem Fehler erst ab nextAttemptAt erneut.
+  attempts      Int           @default(0)
+  nextAttemptAt DateTime      @default(now()) @map("next_attempt_at") @db.Timestamptz(3)
+  lastError     String?       @map("last_error")
+  /// Endgültig nicht versendet (zu viele Fehlversuche oder Empfänger deaktiviert).
+  failedAt      DateTime?     @map("failed_at") @db.Timestamptz(3)
+
+  teamsDevMessage TeamsDevMessage?
 
   @@unique([eventKey, recipientId, channel])
   @@index([recipientId, readAt])
   @@map("notification")
+}
+
+/// Entwickler-Postfach: simulierter Kanal „Teams“ der Demo (TEAMS_MODE=entwickler-postfach).
+/// Höchstens eine Nachricht pro Benachrichtigung – ein wiederholter Versand legt keine zweite an.
+model TeamsDevMessage {
+  id             String       @id @default(uuid()) @db.Uuid
+  notificationId String       @unique @map("notification_id") @db.Uuid
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  recipientId    String       @map("recipient_id") @db.Uuid
+  recipient      Person       @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  subject        String
+  body           String
+  link           String?
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([recipientId, createdAt])
+  @@map("teams_dev_message")
 }

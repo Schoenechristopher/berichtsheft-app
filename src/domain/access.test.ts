@@ -7,6 +7,7 @@ import {
   homePathFor,
   matchLogin,
   roleLabel,
+  safeReturnPath,
 } from "./access";
 
 describe("Zugangsregeln", () => {
@@ -103,5 +104,33 @@ describe("Zuordnung beim ersten Login (Entscheidung Anlegen über die Firmen-E-M
     expect(matchLogin(verified, null, { ...unbound, active: false })).toEqual({ kind: "none" });
     expect(matchLogin({ ...verified, accountId: null }, null, unbound)).toEqual({ kind: "none" });
     expect(matchLogin(verified, null, null)).toEqual({ kind: "none" });
+  });
+});
+
+describe("Rücksprung nach der Anmeldung", () => {
+  it("AK-1003 Link einer Benachrichtigung: nach der Anmeldung direkt zum Bericht", () => {
+    expect(safeReturnPath("/berichte/3f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f01")).toBe(
+      "/berichte/3f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f01",
+    );
+    expect(safeReturnPath("/ausbilder/pruefliste?filter=alle")).toBe("/ausbilder/pruefliste?filter=alle");
+  });
+
+  it("AK-1003 nur Pfade innerhalb der App, keine fremden Adressen", () => {
+    for (const value of [
+      "https://boese.example/berichte/1",
+      "//boese.example",
+      "/\\boese.example",
+      "berichte/1",
+      "/berichte/1\r\nSet-Cookie: x",
+      "/anmelden",
+      "/api/auth/signout",
+      "/",
+      "",
+      null,
+      undefined,
+      ["/berichte/1"],
+    ]) {
+      expect(safeReturnPath(value)).toBeNull();
+    }
   });
 });

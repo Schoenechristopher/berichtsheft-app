@@ -28,7 +28,7 @@ test.describe("Anmeldung über das Firmenkonto", () => {
   test("AK-101 geschützte Seiten sind ohne Anmeldung nicht erreichbar", async ({ page }) => {
     for (const path of ["/", "/azubi", "/ausbilder"]) {
       await page.goto(path);
-      await expect(page).toHaveURL(/\/anmelden$/);
+      await expect(page).toHaveURL(/\/anmelden(\?ziel=[^&]+)?$/);
     }
     const session = await page.request.get("/api/auth/session");
     expect(await session.json()).toBeNull();

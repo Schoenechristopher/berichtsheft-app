@@ -25,6 +25,11 @@ export type TestAccount = (typeof accounts)[keyof typeof accounts];
 /** Startet die Anmeldung über das Firmenkonto bzw. den Test-Login, bis zurück in der App. */
 export async function login(page: Page, account: TestAccount) {
   await page.goto("/anmelden");
+  await loginOnLoginPage(page, account);
+}
+
+/** Meldet sich auf der gerade angezeigten Anmeldeseite an (z. B. nach Umleitung mit Rücksprungziel). */
+export async function loginOnLoginPage(page: Page, account: TestAccount) {
   if (loginMode === "test") {
     await page
       .getByRole("region", { name: "Test-Login (nur Entwicklung)" })
@@ -167,9 +172,10 @@ export async function deletePersons(...emails: string[]) {
 /** Stellt den Seed-Zustand von Anna, Bernd, Clara und dem Bundesland wieder her. */
 export async function restoreSeedState() {
   await withDatabase(async (db) => {
-    await db.query("UPDATE person SET active = true WHERE email = ANY($1)", [
-      [seedPersons.anna.email, seedPersons.bernd.email, seedPersons.clara.email],
-    ]);
+    await db.query(
+      `UPDATE person SET active = true, channels = ARRAY['EMAIL', 'APP']::"Channel"[] WHERE email = ANY($1)`,
+      [[seedPersons.anna.email, seedPersons.bernd.email, seedPersons.clara.email]],
+    );
     await db.query(
       `UPDATE person SET trainer_id = (SELECT id FROM person WHERE email = $2), training_start = '2026-09-01',
        training_end = NULL, role = 'TRAINEE', name = $3 WHERE email = $1`,
@@ -239,4 +245,44 @@ export async function downloadPdf(page: Page, trigger: () => Promise<void>) {
   const buffer = await readFile(path);
   expect(buffer.subarray(0, 5).toString()).toBe("%PDF-");
   return { fileName: download.suggestedFilename(), ...(await extractPdfText(buffer)) };
+}
+
+/**
+ * Mailpit-API (nur mit vollständigem Compose-Stack, z. B. in CI): Adresse aus E2E_MAILPIT_URL.
+ * Ohne die Variable werden E-Mail- und Worker-Prüfungen übersprungen; lokal deckt sie der
+ * SMTP-Mock in den Vitest-Datenbanktests ab.
+ */
+export const mailpitUrl = process.env.E2E_MAILPIT_URL?.replace(/\/+$/, "") ?? null;
+
+export interface MailpitMessage {
+  ID: string;
+  MessageID: string;
+  Subject: string;
+  To: { Name: string; Address: string }[];
+}
+
+/** Sucht E-Mails in Mailpit, z. B. `to:"emil@berichtsheft.test"`. */
+export async function searchMail(query: string): Promise<MailpitMessage[]> {
+  const response = await fetch(`${mailpitUrl}/api/v1/search?query=${encodeURIComponent(query)}&limit=50`);
+  expect(response.ok).toBe(true);
+  return ((await response.json()) as { messages: MailpitMessage[] }).messages;
+}
+
+/** Text einer E-Mail aus Mailpit. */
+export async function mailText(id: string): Promise<string> {
+  const response = await fetch(`${mailpitUrl}/api/v1/message/${id}`);
+  expect(response.ok).toBe(true);
+  return ((await response.json()) as { Text: string }).Text;
+}
+
+/** Entfernt alle E-Mails an die Adresse aus Mailpit. */
+export async function clearMail(address: string) {
+  const messages = await searchMail(`to:"${address}"`);
+  if (messages.length > 0) {
+    await fetch(`${mailpitUrl}/api/v1/messages`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ IDs: messages.map((message) => message.ID) }),
+    });
+  }
 }
