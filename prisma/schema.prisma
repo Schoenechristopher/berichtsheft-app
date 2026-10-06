@@ -1,0 +1,175 @@
+// Datenmodell der Berichtsheft-App (siehe docs/02-plan.md, Abschnitt „Datenmodell“).
+// Tabellen- und Spaltennamen in snake_case, Code-Bezeichner auf Englisch.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Rolle einer Person: Azubi oder Ausbilder (Ausbilder sind zugleich Admin).
+enum Role {
+  TRAINEE
+  TRAINER
+}
+
+/// Kanal einer Benachrichtigung.
+enum Channel {
+  EMAIL
+  TEAMS
+  APP
+}
+
+/// Status eines Wochenberichts (Statusmodell der Spezifikation).
+enum ReportStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+/// Tagesart (AK-402): genau diese fünf Werte.
+enum DayType {
+  WORK
+  SCHOOL
+  VACATION
+  SICK
+  HOLIDAY
+}
+
+/// Person mit Firmenkonto. Zuordnung beim Login über die stabile Konto-ID (sub/oid).
+/// Ein Azubi braucht Ausbilder und Ausbildungsbeginn (AK-202, per CHECK-Constraint abgesichert).
+model Person {
+  id            String    @id @default(uuid()) @db.Uuid
+  /// Stabile Konto-ID des Firmenkontos (OIDC-Claim `sub`, bei Entra ID `oid`).
+  accountId     String    @unique @map("account_id")
+  email         String    @unique
+  name          String
+  role          Role
+  active        Boolean   @default(true)
+  trainerId     String?   @map("trainer_id") @db.Uuid
+  trainer       Person?   @relation("TrainerTrainees", fields: [trainerId], references: [id], onDelete: NoAction)
+  trainees      Person[]  @relation("TrainerTrainees")
+  trainingStart DateTime? @map("training_start") @db.Date
+  trainingEnd   DateTime? @map("training_end") @db.Date
+  /// Gewählte Kanäle; Voreinstellung E-Mail + App (AK-1012).
+  channels      Channel[] @default([EMAIL, APP])
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  reports       WeeklyReport[]
+  comments      Comment[]
+  statusChanges StatusChange[]
+  notifications Notification[]
+
+  @@map("person")
+}
+
+/// Einstellungen der App; genau eine Zeile (id = 1).
+model Setting {
+  id           Int      @id @default(1)
+  /// Bundesland der Firma für die Feiertage, Kürzel wie in feiertagejs (z. B. „NW“).
+  federalState String   @default("NW") @map("federal_state")
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("setting")
+}
+
+/// Wochenbericht: genau einer pro Azubi und ISO-Woche (AK-304).
+model WeeklyReport {
+  id         String       @id @default(uuid()) @db.Uuid
+  traineeId  String       @map("trainee_id") @db.Uuid
+  trainee    Person       @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  isoYear    Int          @map("iso_year")
+  isoWeek    Int          @map("iso_week")
+  status     ReportStatus @default(DRAFT)
+  /// Versionszähler für bedingte Updates (AK-508).
+  version    Int          @default(0)
+  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  days          ReportDay[]
+  comments      Comment[]
+  statusChanges StatusChange[]
+  notifications Notification[]
+
+  @@unique([traineeId, isoYear, isoWeek])
+  @@map("weekly_report")
+}
+
+/// Tag eines Wochenberichts (Mo–Fr).
+model ReportDay {
+  id              String       @id @default(uuid()) @db.Uuid
+  reportId        String       @map("report_id") @db.Uuid
+  report          WeeklyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  date            DateTime     @db.Date
+  /// Leer, solange der Azubi noch keine Tagesart gewählt hat.
+  dayType         DayType?     @map("day_type")
+  activities      String       @default("")
+  /// Tag liegt vor Beginn oder nach Ende der Ausbildung (AK-305).
+  outsideTraining Boolean      @default(false) @map("outside_training")
+
+  comments Comment[]
+
+  @@unique([reportId, date])
+  @@map("report_day")
+}
+
+/// Kommentar eines Ausbilders: Gesamtkommentar (dayId leer) oder Tageskommentar, je Prüfrunde. Nie änderbar.
+model Comment {
+  id          String       @id @default(uuid()) @db.Uuid
+  reportId    String       @map("report_id") @db.Uuid
+  report      WeeklyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  reviewRound Int          @map("review_round")
+  dayId       String?      @map("day_id") @db.Uuid
+  day         ReportDay?   @relation(fields: [dayId], references: [id], onDelete: Cascade)
+  authorId    String       @map("author_id") @db.Uuid
+  author      Person       @relation(fields: [authorId], references: [id], onDelete: NoAction)
+  text        String
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([reportId])
+  @@map("comment")
+}
+
+/// Historie der Statuswechsel. Nie änderbar: die Datenbank weist UPDATE und DELETE ab,
+/// außer beim endgültigen Löschen der Person per Kaskade (AK-803, Trigger in der Migration).
+model StatusChange {
+  id         String        @id @default(uuid()) @db.Uuid
+  reportId   String        @map("report_id") @db.Uuid
+  report     WeeklyReport  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  fromStatus ReportStatus? @map("from_status")
+  toStatus   ReportStatus  @map("to_status")
+  actorId    String        @map("actor_id") @db.Uuid
+  actor      Person        @relation(fields: [actorId], references: [id], onDelete: NoAction)
+  reason     String?
+  createdAt  DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([reportId])
+  @@map("status_change")
+}
+
+/// Benachrichtigung (Outbox): genau eine pro Ereignis, Empfänger und Kanal (AK-1004).
+model Notification {
+  id          String        @id @default(uuid()) @db.Uuid
+  /// Fachlicher Schlüssel des Ereignisses, z. B. „submitted:<statusChangeId>“.
+  eventKey    String        @map("event_key")
+  recipientId String        @map("recipient_id") @db.Uuid
+  recipient   Person        @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  channel     Channel
+  reportId    String?       @map("report_id") @db.Uuid
+  report      WeeklyReport? @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  subject     String
+  body        String
+  link        String?
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  sentAt      DateTime?     @map("sent_at") @db.Timestamptz(3)
+  readAt      DateTime?     @map("read_at") @db.Timestamptz(3)
+
+  @@unique([eventKey, recipientId, channel])
+  @@index([recipientId, readAt])
+  @@map("notification")
+}

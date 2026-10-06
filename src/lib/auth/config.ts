@@ -1,0 +1,58 @@
+/**
+ * Konfiguration der Anmeldung aus Umgebungsvariablen (siehe .env.example).
+ * Der Identity Provider wird nur hierüber angebunden: Demo Keycloak, später Entra ID.
+ */
+
+export const OIDC_PROVIDER_ID = "firmenkonto";
+export const TEST_PROVIDER_ID = "test-login";
+
+export interface OidcConfig {
+  /** Aussteller-URL, wie der Browser den IdP erreicht (steht auch im Token als `iss`). */
+  issuer: string;
+  /** Optionale interne Adresse für Server-zu-Server-Aufrufe (z. B. http://keycloak:8080). */
+  internalIssuer?: string;
+  clientId: string;
+  clientSecret: string;
+  /** Claim mit der stabilen Konto-ID: `sub` (Keycloak) oder `oid` (Entra ID). */
+  accountIdClaim: string;
+  /** Anzeigename auf dem Login-Knopf. */
+  name: string;
+}
+
+export function oidcConfig(env: Record<string, string | undefined> = process.env): OidcConfig | null {
+  const issuer = env.AUTH_OIDC_ISSUER?.trim();
+  const clientId = env.AUTH_OIDC_CLIENT_ID?.trim();
+  if (!issuer || !clientId) {
+    return null;
+  }
+  return {
+    issuer: issuer.replace(/\/+$/, ""),
+    internalIssuer: env.AUTH_OIDC_INTERNAL_ISSUER?.trim().replace(/\/+$/, "") || undefined,
+    clientId,
+    clientSecret: env.AUTH_OIDC_CLIENT_SECRET ?? "",
+    accountIdClaim: env.AUTH_OIDC_ACCOUNT_ID_CLAIM?.trim() || "sub",
+    name: env.AUTH_OIDC_NAME?.trim() || "Firmenkonto",
+  };
+}
+
+/**
+ * Test-Login ohne Identity Provider – nur für Entwicklung und Tests, wenn Keycloak nicht
+ * verfügbar ist. In Produktion (NODE_ENV=production) ist er immer aus.
+ */
+export function testLoginEnabled(env: Record<string, string | undefined> = process.env): boolean {
+  return env.NODE_ENV !== "production" && env.AUTH_TEST_LOGIN === "true";
+}
+
+/**
+ * Schreibt URLs des öffentlichen Ausstellers auf die interne Adresse um. Damit erreicht der
+ * Server den IdP im Docker-Netz (keycloak:8080), während Browser und Token weiterhin die
+ * öffentliche Adresse (localhost:8080) verwenden.
+ */
+export function toInternalUrl(url: string, config: Pick<OidcConfig, "issuer" | "internalIssuer">): string {
+  if (!config.internalIssuer) {
+    return url;
+  }
+  const publicOrigin = new URL(config.issuer).origin;
+  const internalOrigin = new URL(config.internalIssuer).origin;
+  return url.startsWith(publicOrigin) ? internalOrigin + url.slice(publicOrigin.length) : url;
+}

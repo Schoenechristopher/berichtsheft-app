@@ -1,0 +1,104 @@
+{
+  "realm": "berichtsheft",
+  "displayName": "Berichtsheft (Demo-Firmenkonto)",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "rememberMe": false,
+  "loginWithEmailAllowed": true,
+  "internationalizationEnabled": true,
+  "supportedLocales": ["de"],
+  "defaultLocale": "de",
+  "ssoSessionIdleTimeout": 28800,
+  "ssoSessionMaxLifespan": 36000,
+  "clients": [
+    {
+      "clientId": "berichtsheft-app",
+      "name": "Berichtsheft-App",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "berichtsheft-demo-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "rootUrl": "http://localhost:3000",
+      "baseUrl": "/",
+      "redirectUris": ["http://localhost:3000/*"],
+      "webOrigins": ["http://localhost:3000"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:3000/*"
+      }
+    }
+  ],
+  "users": [
+    {
+      "id": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f03",
+      "username": "anna",
+      "email": "anna@berichtsheft.test",
+      "emailVerified": true,
+      "firstName": "Anna",
+      "lastName": "Azubi",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "anna",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f01",
+      "username": "bernd",
+      "email": "bernd@berichtsheft.test",
+      "emailVerified": true,
+      "firstName": "Bernd",
+      "lastName": "Ausbilder",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "bernd",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f02",
+      "username": "clara",
+      "email": "clara@berichtsheft.test",
+      "emailVerified": true,
+      "firstName": "Clara",
+      "lastName": "Ausbilderin",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "clara",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f09",
+      "username": "dora",
+      "email": "dora@berichtsheft.test",
+      "emailVerified": true,
+      "firstName": "Dora",
+      "lastName": "Ohnezugang",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dora",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

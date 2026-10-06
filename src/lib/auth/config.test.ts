@@ -1,0 +1,53 @@
+import { describe, expect, it } from "vitest";
+import { oidcConfig, testLoginEnabled, toInternalUrl } from "./config";
+
+describe("Anmelde-Konfiguration", () => {
+  it("liest den OIDC-Adapter aus der Umgebung", () => {
+    expect(
+      oidcConfig({
+        AUTH_OIDC_ISSUER: "http://localhost:8080/realms/berichtsheft/",
+        AUTH_OIDC_INTERNAL_ISSUER: "http://keycloak:8080",
+        AUTH_OIDC_CLIENT_ID: "berichtsheft-app",
+        AUTH_OIDC_CLIENT_SECRET: "geheim",
+      }),
+    ).toEqual({
+      issuer: "http://localhost:8080/realms/berichtsheft",
+      internalIssuer: "http://keycloak:8080",
+      clientId: "berichtsheft-app",
+      clientSecret: "geheim",
+      accountIdClaim: "sub",
+      name: "Firmenkonto",
+    });
+  });
+
+  it("Entra ID: Konto-ID aus dem Claim oid", () => {
+    expect(
+      oidcConfig({
+        AUTH_OIDC_ISSUER: "https://login.microsoftonline.com/tenant/v2.0",
+        AUTH_OIDC_CLIENT_ID: "app",
+        AUTH_OIDC_ACCOUNT_ID_CLAIM: "oid",
+      })?.accountIdClaim,
+    ).toBe("oid");
+  });
+
+  it("ohne Aussteller oder Client-ID gibt es keinen OIDC-Provider", () => {
+    expect(oidcConfig({ AUTH_OIDC_CLIENT_ID: "app" })).toBeNull();
+    expect(oidcConfig({ AUTH_OIDC_ISSUER: "http://idp" })).toBeNull();
+  });
+
+  it("Test-Login nur außerhalb von Produktion und nur bei ausdrücklicher Freigabe", () => {
+    expect(testLoginEnabled({ NODE_ENV: "development", AUTH_TEST_LOGIN: "true" })).toBe(true);
+    expect(testLoginEnabled({ NODE_ENV: "test", AUTH_TEST_LOGIN: "true" })).toBe(true);
+    expect(testLoginEnabled({ NODE_ENV: "production", AUTH_TEST_LOGIN: "true" })).toBe(false);
+    expect(testLoginEnabled({ NODE_ENV: "development" })).toBe(false);
+  });
+
+  it("schreibt nur URLs des öffentlichen Ausstellers auf die interne Adresse um", () => {
+    const config = { issuer: "http://localhost:8080/realms/berichtsheft", internalIssuer: "http://keycloak:8080" };
+    expect(toInternalUrl("http://localhost:8080/realms/berichtsheft/.well-known/openid-configuration", config)).toBe(
+      "http://keycloak:8080/realms/berichtsheft/.well-known/openid-configuration",
+    );
+    expect(toInternalUrl("https://example.test/x", config)).toBe("https://example.test/x");
+    expect(toInternalUrl("http://localhost:8080/x", { issuer: config.issuer })).toBe("http://localhost:8080/x");
+  });
+});
