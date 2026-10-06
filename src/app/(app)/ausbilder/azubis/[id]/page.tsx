@@ -18,7 +18,7 @@ export default async function TraineeWeeksPage({ params }: PageProps<"/ausbilder
   }
   const instant = now();
   await ensureReportsForTrainee(db(), id, instant);
-  const overview = await listTraineeWeeks(db(), viewer, id);
+  const overview = await listTraineeWeeks(db(), viewer, id, instant);
   if (!overview) {
     notFound();
   }

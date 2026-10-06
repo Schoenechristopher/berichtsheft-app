@@ -13,7 +13,7 @@ export default async function TraineeHomePage() {
   const person = await requirePerson("TRAINEE");
   const instant = now();
   await ensureReportsForTrainee(db(), person.id, instant);
-  const overview = await listTraineeWeeks(db(), person, person.id);
+  const overview = await listTraineeWeeks(db(), person, person.id, instant);
 
   return (
     <section className="space-y-4">

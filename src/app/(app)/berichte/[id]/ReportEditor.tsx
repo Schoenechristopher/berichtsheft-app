@@ -52,6 +52,7 @@ export function ReportEditor({ days, action }: { days: EditorDay[]; action: Acti
   );
 
   useLeaveWarning(dirty, formRef);
+  useHistoryGuard(dirty);
 
   const dayErrors = state && !state.ok ? (state.dayErrors ?? {}) : {};
   const hasDayErrors = Object.keys(dayErrors).length > 0;
@@ -165,7 +166,7 @@ export function ReportEditor({ days, action }: { days: EditorDay[]; action: Acti
 /**
  * Warnt beim Verlassen mit ungespeicherten Änderungen (AK-408): beim Schließen oder Neuladen
  * über den Browser-Dialog, bei Links und anderen Formularen (z. B. „Abmelden“) in der App über
- * eine Rückfrage.
+ * eine Rückfrage. Zurück und Vor im Browser fängt `useHistoryGuard` ab.
  */
 function useLeaveWarning(dirty: boolean, formRef: React.RefObject<HTMLFormElement | null>) {
   useEffect(() => {
@@ -207,4 +208,44 @@ function useLeaveWarning(dirty: boolean, formRef: React.RefObject<HTMLFormElemen
       document.removeEventListener("submit", onSubmit, true);
     };
   }, [dirty, formRef]);
+}
+
+/**
+ * Zurück/Vor im Browser (AK-408): Innerhalb der App navigiert Next.js dabei ohne `beforeunload`.
+ * Sobald es ungespeicherte Änderungen gibt, legt die Seite deshalb einen Schutzeintrag mit
+ * derselben Adresse in den Verlauf. „Zurück“ verlässt zuerst nur diesen Eintrag – die Seite bleibt –
+ * und fragt nach: Abbrechen legt den Schutzeintrag erneut an, Bestätigen geht wirklich zurück.
+ * Spätere Einträge („Vor“) verwirft der Browser beim Anlegen; dorthin geht also nichts verloren.
+ * Ist nach dem Speichern nichts mehr offen, überspringt „Zurück“ den Schutzeintrag ohne Rückfrage.
+ */
+function useHistoryGuard(dirty: boolean) {
+  const dirtyRef = useRef(dirty);
+  const guardActive = useRef(false);
+  const leaving = useRef(false);
+
+  useEffect(() => {
+    dirtyRef.current = dirty;
+    if (dirty && !guardActive.current && !leaving.current) {
+      window.history.pushState(window.history.state, "", window.location.href);
+      guardActive.current = true;
+    }
+  }, [dirty]);
+
+  useEffect(() => {
+    const onPopState = () => {
+      if (!guardActive.current || leaving.current) {
+        return;
+      }
+      guardActive.current = false;
+      if (dirtyRef.current && !window.confirm(LEAVE_WARNING)) {
+        window.history.pushState(window.history.state, "", window.location.href);
+        guardActive.current = true;
+        return;
+      }
+      leaving.current = true;
+      window.history.back();
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 }

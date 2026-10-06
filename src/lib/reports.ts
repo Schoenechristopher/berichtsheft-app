@@ -9,7 +9,9 @@ import { validateDayInputs, type DayErrors, type DayInput, type DayUpdate } from
 import { canEditReport, canViewReport, type Viewer } from "@/domain/report-access";
 import {
   OPEN_STATUSES,
+  classifyWeek,
   correctOutsideTraining,
+  currentIsoWeek,
   planReportDays,
   weeksDue,
   type TrainingPeriod,
@@ -123,10 +125,12 @@ export async function ensureReportsForAllTrainees(prisma: PrismaClient, now: Dat
 }
 
 /**
- * Übersicht eines Azubis (AK-306): alle Wochen, neueste zuerst. Azubis sehen nur die eigene,
- * Ausbilder die jedes Azubis (nur lesend). Gibt null zurück, wenn der Zugriff nicht erlaubt ist.
+ * Übersicht eines Azubis (AK-306): alle Wochen, neueste zuerst, eingeordnet nach `classifyWeek`.
+ * Unberührte leere Entwürfe ganz außerhalb der Ausbildung fehlen (bestätigte Auslegung zu
+ * AK-203). Azubis sehen nur die eigene Übersicht, Ausbilder die jedes Azubis (nur lesend).
+ * Gibt null zurück, wenn der Zugriff nicht erlaubt ist.
  */
-export async function listTraineeWeeks(prisma: PrismaClient, viewer: Viewer, traineeId: string) {
+export async function listTraineeWeeks(prisma: PrismaClient, viewer: Viewer, traineeId: string, now: Date) {
   if (!canViewReport(viewer, { traineeId })) {
     return null;
   }
@@ -134,14 +138,37 @@ export async function listTraineeWeeks(prisma: PrismaClient, viewer: Viewer, tra
     where: { id: traineeId },
     select: { id: true, name: true, role: true, active: true, trainingStart: true, trainingEnd: true },
   });
-  if (!trainee || trainee.role !== "TRAINEE") {
+  if (!trainee || trainee.role !== "TRAINEE" || !trainee.trainingStart) {
     return null;
   }
-  const reports = await prisma.weeklyReport.findMany({
+  const period: TrainingPeriod = { start: trainee.trainingStart, end: trainee.trainingEnd };
+  const current = currentIsoWeek(now);
+  const stored = await prisma.weeklyReport.findMany({
     where: { traineeId },
-    select: { id: true, isoYear: true, isoWeek: true, status: true },
+    select: {
+      id: true,
+      isoYear: true,
+      isoWeek: true,
+      status: true,
+      days: { select: { dayType: true, activities: true } },
+      _count: { select: { statusChanges: true } },
+    },
     orderBy: [{ isoYear: "desc" }, { isoWeek: "desc" }],
   });
+  const reports = stored
+    .map(({ days, _count, ...report }) => ({
+      ...report,
+      ...classifyWeek(
+        {
+          ...report,
+          hasContent: days.some((day) => day.dayType !== null || day.activities !== ""),
+          hasHistory: _count.statusChanges > 0,
+        },
+        period,
+        current,
+      ),
+    }))
+    .filter((report) => !report.hidden);
   return { trainee, reports };
 }
 

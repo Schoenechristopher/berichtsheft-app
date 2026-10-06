@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { reportStatusLabel, type ReportStatus } from "@/domain/report-access";
-import { isPastOpen } from "@/domain/report-generation";
 import { compareWeeks, weekRangeLabel, type IsoWeek } from "@/domain/weeks";
 import { Badge } from "@/components/ui";
 
@@ -14,19 +13,20 @@ const STATUS_TONES: Record<ReportStatus, "slate" | "blue" | "green" | "amber"> =
 /**
  * Übersicht aller Wochen eines Azubis (AK-306): neueste zuerst, mit KW, Zeitraum und Status.
  * Offene Wochen in der Vergangenheit („Entwurf“ oder „Abgelehnt“ vor der aktuellen Woche) sind
- * deutlich hervorgehoben.
+ * deutlich hervorgehoben. Wochen ganz außerhalb der Ausbildung sind markiert und zählen nicht als
+ * offen; die Einordnung kommt aus `classifyWeek` (Service `listTraineeWeeks`).
  */
 export function WeekOverview({
   reports,
   currentWeek,
 }: {
-  reports: (IsoWeek & { id: string; status: ReportStatus })[];
+  reports: (IsoWeek & { id: string; status: ReportStatus; pastOpen: boolean; outsideTraining: boolean })[];
   currentWeek: IsoWeek;
 }) {
   if (reports.length === 0) {
     return <p className="text-sm text-slate-600">Noch keine Wochenberichte – sie entstehen ab Ausbildungsbeginn.</p>;
   }
-  const pastOpen = reports.filter((report) => isPastOpen(report, currentWeek)).length;
+  const pastOpen = reports.filter((report) => report.pastOpen).length;
 
   return (
     <div className="space-y-3">
@@ -37,10 +37,15 @@ export function WeekOverview({
       ) : null}
       <ul className="space-y-2" aria-label="Wochenberichte">
         {reports.map((report) => {
-          const highlight = isPastOpen(report, currentWeek);
+          const highlight = report.pastOpen;
           const current = compareWeeks(report, currentWeek) === 0;
           return (
-            <li key={report.id} data-testid="week-row" data-past-open={highlight ? "true" : undefined}>
+            <li
+              key={report.id}
+              data-testid="week-row"
+              data-past-open={highlight ? "true" : undefined}
+              data-outside-training={report.outsideTraining ? "true" : undefined}
+            >
               <Link
                 href={`/berichte/${report.id}`}
                 className={`flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 hover:border-blue-400 ${
@@ -56,6 +61,7 @@ export function WeekOverview({
                 </span>
                 <span className="flex flex-wrap items-center gap-2">
                   {highlight ? <Badge tone="amber">noch offen</Badge> : null}
+                  {report.outsideTraining ? <Badge tone="slate">außerhalb der Ausbildung</Badge> : null}
                   <Badge tone={STATUS_TONES[report.status]}>{reportStatusLabel(report.status)}</Badge>
                 </span>
               </Link>

@@ -117,8 +117,53 @@ export function correctOutsideTraining(
 }
 
 /**
+ * Liegt die ganze Woche (Mo–Fr) außerhalb der Ausbildung? Das kommt nur vor, wenn der
+ * Ausbildungszeitraum nachträglich verkürzt oder der Beginn verschoben wurde (AK-203).
+ * Berechnet aus dem aktuellen Zeitraum – wandert der Beginn zurück, gilt die Woche wieder.
+ */
+export function isWeekOutsideTraining(week: IsoWeek, period: TrainingPeriod): boolean {
+  return isoWeekWorkdays(week.isoYear, week.isoWeek).every((date) => isOutsideTraining(date, period));
+}
+
+/** Woche in der Übersicht, soweit für Sichtbarkeit und Hervorhebung nötig. */
+export interface WeekForOverview extends IsoWeek {
+  status: ReportStatus;
+  /** Hat ein Tag eine Tagesart oder einen Text? */
+  hasContent: boolean;
+  /** Gibt es Statuswechsel in der Historie? */
+  hasHistory: boolean;
+}
+
+/** Einordnung einer Woche für Übersicht und (ab Etappe 6) Erinnerung. */
+export interface WeekClassification {
+  /** Unberührter leerer Entwurf ganz außerhalb der Ausbildung: nicht anzeigen. */
+  hidden: boolean;
+  /** Ganze Woche außerhalb der Ausbildung (mit Inhalt oder Historie sichtbar, so markiert). */
+  outsideTraining: boolean;
+  /** Offen und vor der aktuellen Woche: deutlich hervorheben (AK-306). */
+  pastOpen: boolean;
+}
+
+/**
+ * Bestätigte Auslegung zu AK-203/AK-306: Wochen ganz außerhalb der Ausbildung zählen nie als
+ * offen. Unberührte leere Entwürfe (kein Inhalt, keine Historie) werden ausgeblendet; Wochen mit
+ * Inhalt oder Historie bleiben sichtbar und sind als „außerhalb der Ausbildung“ markiert.
+ * Gelöscht wird nichts.
+ */
+export function classifyWeek(week: WeekForOverview, period: TrainingPeriod, current: IsoWeek): WeekClassification {
+  const outsideTraining = isWeekOutsideTraining(week, period);
+  const untouched = week.status === "DRAFT" && !week.hasContent && !week.hasHistory;
+  return {
+    hidden: outsideTraining && untouched,
+    outsideTraining,
+    pastOpen: !outsideTraining && isPastOpen(week, current),
+  };
+}
+
+/**
  * Offene Woche in der Vergangenheit (AK-306): Status „Entwurf“ oder „Abgelehnt“ und vor der
- * aktuellen Woche. Diese Wochen hebt die Übersicht deutlich hervor.
+ * aktuellen Woche. Diese Wochen hebt die Übersicht deutlich hervor. Wochen ganz außerhalb der
+ * Ausbildung schließt `classifyWeek` zusätzlich aus.
  */
 export function isPastOpen(report: IsoWeek & { status: ReportStatus }, current: IsoWeek): boolean {
   return OPEN_STATUSES.includes(report.status) && compareWeeks(report, current) < 0;

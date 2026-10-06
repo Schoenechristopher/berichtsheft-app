@@ -253,6 +253,64 @@ test.describe("Berichte erfassen", () => {
     expect(dialogShown).toBe(false);
   });
 
+  test("AK-408 Zurück und Vor im Browser warnen bei ungespeicherten Änderungen", async ({ page }) => {
+    await login(page, accounts.anna);
+    await openWeek39(page);
+    const monday = () => day(page, "Montag, 21.09.2026").getByLabel("Tätigkeiten");
+    await monday().fill("noch nicht gespeichert");
+
+    // Zurück: Rückfrage; „Abbrechen“ bleibt auf der Seite, die Eingabe bleibt erhalten.
+    const messages: string[] = [];
+    page.once("dialog", async (dialog) => {
+      messages.push(dialog.message());
+      await dialog.dismiss();
+    });
+    await page.evaluate(() => window.history.back());
+    await expect.poll(() => messages.length).toBe(1);
+    expect(messages[0]).toContain("ungespeicherte Änderungen");
+    await expect(page).toHaveURL(/\/berichte\//);
+    await expect(monday()).toHaveValue("noch nicht gespeichert");
+
+    // Erneut zurück und bestätigen: zur Übersicht, die Änderung ist verworfen.
+    page.once("dialog", (dialog) => dialog.accept());
+    await page.evaluate(() => window.history.back());
+    await expect(page).toHaveURL(/\/azubi$/);
+
+    // Vor: wieder im Bericht, ohne die verworfene Änderung.
+    await page.evaluate(() => window.history.forward());
+    await expect(page).toHaveURL(/\/berichte\//);
+    await expect(monday()).toHaveValue("");
+
+    // Erneut ändern; „Vor“ führt nirgendwohin, „Zurück“ fragt wieder nach.
+    await monday().fill("zweiter Versuch");
+    page.once("dialog", async (dialog) => {
+      messages.push(dialog.message());
+      await dialog.dismiss();
+    });
+    await page.evaluate(() => window.history.forward());
+    await page.evaluate(() => window.history.back());
+    await expect.poll(() => messages.length).toBe(2);
+    await expect(page).toHaveURL(/\/berichte\//);
+    await expect(monday()).toHaveValue("zweiter Versuch");
+  });
+
+  test("AK-408 nach dem Speichern führt Zurück ohne Rückfrage zur Übersicht", async ({ page }) => {
+    await login(page, accounts.anna);
+    await openWeek39(page);
+    await day(page, "Montag, 21.09.2026").getByLabel("Tätigkeiten").fill("gespeichert");
+    await page.getByRole("button", { name: "Speichern" }).click();
+    await expect(page.getByTestId("save-status")).toHaveText("Gespeichert.");
+
+    let dialogShown = false;
+    page.on("dialog", async (dialog) => {
+      dialogShown = true;
+      await dialog.dismiss();
+    });
+    await page.evaluate(() => window.history.back());
+    await expect(page).toHaveURL(/\/azubi$/);
+    expect(dialogShown).toBe(false);
+  });
+
   test("AK-306 Ausbilder sehen pro Azubi dieselbe Liste, nur lesend", async ({ page }) => {
     const expected = weeksDue({ start: annaStart, end: null }, now());
     await login(page, accounts.clara);

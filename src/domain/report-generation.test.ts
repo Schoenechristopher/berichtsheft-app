@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { isPublicHoliday } from "./holidays";
 import {
+  classifyWeek,
   correctOutsideTraining,
+  isWeekOutsideTraining,
   currentIsoWeek,
   isOutsideTraining,
   isPastOpen,
@@ -133,5 +135,50 @@ describe("Übersicht", () => {
     expect(isPastOpen({ isoYear: 2026, isoWeek: 39, status: "APPROVED" }, current)).toBe(false);
     expect(isPastOpen({ isoYear: 2026, isoWeek: 41, status: "DRAFT" }, current)).toBe(false);
     expect(isPastOpen({ isoYear: 2025, isoWeek: 52, status: "DRAFT" }, current)).toBe(true);
+  });
+});
+
+describe("Wochen ganz außerhalb der Ausbildung", () => {
+  const current = { isoYear: 2026, isoWeek: 41 };
+  // Beginn von 01.08. auf 01.09.2026 verschoben: KW 31–35 liegen ganz davor.
+  const shifted = period("2026-09-01");
+  const week = (isoWeek: number, extra: Partial<Parameters<typeof classifyWeek>[0]> = {}) => ({
+    isoYear: 2026,
+    isoWeek,
+    status: "DRAFT" as const,
+    hasContent: false,
+    hasHistory: false,
+    ...extra,
+  });
+
+  it("AK-203 unberührter leerer Entwurf ganz außerhalb wird ausgeblendet und zählt nicht als offen", () => {
+    expect(isWeekOutsideTraining({ isoYear: 2026, isoWeek: 35 }, shifted)).toBe(true);
+    expect(classifyWeek(week(35), shifted, current)).toEqual({ hidden: true, outsideTraining: true, pastOpen: false });
+  });
+
+  it("AK-306 Woche ganz außerhalb mit Inhalt oder Historie bleibt sichtbar, markiert, nicht offen", () => {
+    for (const extra of [
+      { hasContent: true },
+      { hasHistory: true },
+      { status: "REJECTED" as const, hasHistory: true },
+    ]) {
+      expect(classifyWeek(week(34, extra), shifted, current)).toEqual({
+        hidden: false,
+        outsideTraining: true,
+        pastOpen: false,
+      });
+    }
+  });
+
+  it("AK-306 Woche teilweise in der Ausbildung bleibt normal; wandert der Beginn zurück, erscheint die Woche wieder", () => {
+    // KW 36: Montag davor, Rest in der Ausbildung.
+    expect(classifyWeek(week(36), shifted, current)).toEqual({ hidden: false, outsideTraining: false, pastOpen: true });
+    expect(classifyWeek(week(35), period("2026-08-01"), current)).toEqual({
+      hidden: false,
+      outsideTraining: false,
+      pastOpen: true,
+    });
+    // Nach dem Ausbildungsende.
+    expect(classifyWeek(week(40), period("2026-09-01", "2026-09-25"), current).hidden).toBe(true);
   });
 });

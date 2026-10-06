@@ -267,12 +267,65 @@ describe("Übersicht", () => {
     });
     await ensureReportsForAllTrainees(prisma, now());
 
-    const own = await listTraineeWeeks(prisma, anna, anna.id);
+    const own = await listTraineeWeeks(prisma, anna, anna.id, now());
     expect(own?.reports.map((r) => r.isoWeek)).toEqual([41, 40, 39, 38, 37, 36]);
-    expect(await listTraineeWeeks(prisma, anna, otto.id)).toBeNull();
+    expect(await listTraineeWeeks(prisma, anna, otto.id, now())).toBeNull();
     for (const trainer of [bernd, clara]) {
-      expect((await listTraineeWeeks(prisma, trainer, anna.id))?.reports).toHaveLength(6);
+      expect((await listTraineeWeeks(prisma, trainer, anna.id, now()))?.reports).toHaveLength(6);
     }
+  });
+
+  it("AK-306 vergangene offene Wochen sind markiert, die aktuelle nicht", async () => {
+    const { anna } = await createPersons(prisma);
+    await ensureReportsForTrainee(prisma, anna.id, now());
+    const weeks = (await listTraineeWeeks(prisma, anna, anna.id, now()))?.reports ?? [];
+    expect(weeks.map((r) => r.pastOpen)).toEqual([false, true, true, true, true, true]);
+  });
+
+  it("AK-203 AK-306 Beginn verschoben: unberührte Wochen ganz außerhalb ausgeblendet, solche mit Inhalt oder Historie markiert, nichts gelöscht; zurückverschoben erscheinen sie wieder", async () => {
+    const { bernd, anna } = await createPersons(prisma);
+    const annaInput = (trainingStart: string) => ({
+      name: "Anna",
+      email: "anna@test.invalid",
+      role: "TRAINEE",
+      trainerId: bernd.id,
+      trainingStart,
+      trainingEnd: "",
+    });
+    // Beginn zunächst 03.08.2026 (KW 32): Wochen KW 32–41 entstehen.
+    await updatePerson(prisma, bernd, anna.id, annaInput("2026-08-03"));
+    await ensureReportsForTrainee(prisma, anna.id, now());
+    // KW 33 bekommt Inhalt, KW 34 Historie (eingereicht und zurückgezogen).
+    const kw33 = await report(prisma, anna.id, 2026, 33);
+    await saveReportDays(prisma, anna, kw33.id, new Map([[kw33.days[0].id, input("WORK", "erfasst")]]));
+    const kw34 = await report(prisma, anna.id, 2026, 34);
+    await prisma.statusChange.create({
+      data: { reportId: kw34.id, fromStatus: "DRAFT", toStatus: "SUBMITTED", actorId: anna.id },
+    });
+    await prisma.statusChange.create({
+      data: { reportId: kw34.id, fromStatus: "SUBMITTED", toStatus: "DRAFT", actorId: anna.id },
+    });
+
+    // Beginn auf 01.09.2026 korrigiert.
+    await updatePerson(prisma, bernd, anna.id, annaInput("2026-09-01"));
+    await ensureReportsForTrainee(prisma, anna.id, now());
+
+    const weeks = (await listTraineeWeeks(prisma, anna, anna.id, now()))?.reports ?? [];
+    expect(weeks.map((r) => r.isoWeek)).toEqual([41, 40, 39, 38, 37, 36, 34, 33]);
+    const byWeek = new Map(weeks.map((r) => [r.isoWeek, r]));
+    for (const isoWeek of [33, 34]) {
+      expect(byWeek.get(isoWeek)).toMatchObject({ outsideTraining: true, pastOpen: false, hidden: false });
+    }
+    expect(byWeek.get(36)).toMatchObject({ outsideTraining: false, pastOpen: true });
+    // Nichts gelöscht.
+    expect(await prisma.weeklyReport.count({ where: { traineeId: anna.id } })).toBe(10);
+
+    // Beginn wieder auf 03.08.2026: ausgeblendete Wochen erscheinen wieder, alle offen.
+    await updatePerson(prisma, bernd, anna.id, annaInput("2026-08-03"));
+    await ensureReportsForTrainee(prisma, anna.id, now());
+    const again = (await listTraineeWeeks(prisma, anna, anna.id, now()))?.reports ?? [];
+    expect(again.map((r) => r.isoWeek)).toEqual([41, 40, 39, 38, 37, 36, 35, 34, 33, 32]);
+    expect(again.filter((r) => r.pastOpen)).toHaveLength(9);
   });
 });
 

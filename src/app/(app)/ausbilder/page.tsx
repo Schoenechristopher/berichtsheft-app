@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { now } from "@/domain/clock";
-import { currentIsoWeek, isPastOpen } from "@/domain/report-generation";
 import { Badge } from "@/components/ui";
 import { db } from "@/lib/db";
 import { trainingPeriod } from "@/lib/people/labels";
-import { ensureReportsForAllTrainees } from "@/lib/reports";
+import { ensureReportsForAllTrainees, listTraineeWeeks } from "@/lib/reports";
 import { requirePerson } from "@/lib/session";
 
 /** Startseite für Ausbilder: Azubis mit ihren Wochenberichten (AK-105, nur lesend), Verwaltung. */
@@ -12,15 +11,17 @@ export default async function TrainerHomePage() {
   const person = await requirePerson("TRAINER");
   const instant = now();
   await ensureReportsForAllTrainees(db(), instant);
-  const currentWeek = currentIsoWeek(instant);
-  const trainees = await db().person.findMany({
+  const people = await db().person.findMany({
     where: { role: "TRAINEE" },
-    include: {
-      trainer: { select: { name: true } },
-      reports: { select: { isoYear: true, isoWeek: true, status: true } },
-    },
+    include: { trainer: { select: { name: true } } },
     orderBy: [{ active: "desc" }, { name: "asc" }],
   });
+  const trainees = await Promise.all(
+    people.map(async (trainee) => ({
+      ...trainee,
+      reports: (await listTraineeWeeks(db(), person, trainee.id, instant))?.reports ?? [],
+    })),
+  );
 
   return (
     <section className="space-y-4">
@@ -45,7 +46,7 @@ export default async function TrainerHomePage() {
       ) : (
         <ul className="space-y-2" aria-label="Azubis">
           {trainees.map((trainee) => {
-            const pastOpen = trainee.reports.filter((report) => isPastOpen(report, currentWeek)).length;
+            const pastOpen = trainee.reports.filter((report) => report.pastOpen).length;
             return (
               <li key={trainee.id}>
                 <Link
