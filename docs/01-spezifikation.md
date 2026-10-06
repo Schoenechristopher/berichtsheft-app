@@ -1,6 +1,6 @@
 # Berichtsheft-App – Anforderungen und Akzeptanzkriterien
 
-Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201 und AK-206 freigegeben am 06.10.2026 (Etappe 2)
+Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201, AK-204, AK-206 bis AK-208 freigegeben am 06.10.2026 (Etappe 2)
 
 Azubis führen ihr Berichtsheft digital als Wochenbericht, Ausbilder prüfen und geben es frei. Diese Spezifikation ist freigegeben und durch die Akzeptanzkriterien (AK) testbar. Technik und Hosting stehen in [02-plan.md](02-plan.md).
 
@@ -65,6 +65,8 @@ Zurückziehen geht nur, solange der Bericht noch nicht geprüft ist. Ablehnung u
 - **Endgültiges Löschen** von Person und Berichten nur bewusst durch den Admin mit Bestätigung. Wer in der Historie von Berichten anderer Azubis vorkommt (Statuswechsel oder Kommentare), lässt sich nur deaktivieren, nicht endgültig löschen.
 - **Anlegen über die Firmen-E-Mail:** Der Admin legt eine Person mit Firmen-E-Mail, Name und Rolle an. Beim ersten Login wird sie über die vom Firmenkonto bestätigte E-Mail zugeordnet; danach zählt nur noch das Firmenkonto selbst, eine spätere Änderung der E-Mail bricht die Zuordnung nicht.
 - Der letzte aktive Ausbilder kann nicht entfernt oder herabgestuft werden; ein Ausbilder mit zugeordneten Azubis erst nach deren Neuzuordnung.
+- **Wieder aktivieren:** Eine deaktivierte Person kann der Admin wieder aktivieren; ein Azubi nur, wenn sein zugeordneter Ausbilder aktiv ist.
+- **Selbstschutz:** Ein Ausbilder kann sich nicht selbst deaktivieren oder löschen und nicht die eigene Rolle ändern; das übernimmt bei Bedarf ein anderer Ausbilder. Ist er der letzte aktive Ausbilder, erscheint die Meldung zu AK-207.
 
 ## Akzeptanzkriterien
 
@@ -88,11 +90,11 @@ Jedes Kriterium ist eine prüfbare Aussage mit eigener ID, damit Testfälle dara
 | AK-201 | Der Admin kann eine Person über ihr Firmenkonto anlegen und ihr die Rolle Azubi oder Ausbilder geben. Präzisierung: Angelegt wird mit Firmen-E-Mail, Name und Rolle; beim ersten Login wird die Person über die vom Identity Provider bestätigte E-Mail (ohne Groß-/Kleinschreibung) zugeordnet und die stabile Konto-ID gespeichert. Danach zählt nur noch die Konto-ID; eine spätere E-Mail-Änderung im Firmenkonto bricht die Zuordnung nicht. |
 | AK-202 | Ein Azubi lässt sich nur mit zugeordnetem Ausbilder und Ausbildungsbeginn speichern; fehlt eines, nennt die Fehlermeldung das Feld. |
 | AK-203 | Der Admin kann Rolle, zugeordneten Ausbilder sowie Ausbildungsbeginn und -ende ändern. |
-| AK-204 | Entfernen deaktiviert die Person: keine Anmeldung mehr (AK-102); ihre Berichte bleiben für Ausbilder lesbar und exportierbar, sind aber nicht mehr änderbar. |
+| AK-204 | Entfernen deaktiviert die Person: keine Anmeldung mehr (AK-102); ihre Berichte bleiben für Ausbilder lesbar und exportierbar, sind aber nicht mehr änderbar. Ergänzung: Der Admin kann eine deaktivierte Person wieder aktivieren; einen Azubi nur, wenn sein zugeordneter Ausbilder aktiv ist. |
 | AK-205 | Deaktivierte Azubis erhalten keine Erinnerungen, und für sie entstehen keine neuen Wochenberichte. |
 | AK-206 | Endgültiges Löschen entfernt Person und alle Berichte, nur nach ausdrücklicher Bestätigung (z. B. Namen eintippen); danach ist kein Bericht mehr auffindbar. Ergänzung: Kommt die Person in der Historie von Berichten anderer Azubis vor (Statuswechsel oder Kommentare), lässt sie sich nur deaktivieren; die Oberfläche erklärt das und bietet „Deaktivieren“ an. |
-| AK-207 | Der letzte aktive Ausbilder kann weder deaktiviert, gelöscht noch zum Azubi herabgestuft werden. |
-| AK-208 | Ein Ausbilder mit zugeordneten Azubis kann erst deaktiviert werden, wenn diese einem anderen Ausbilder zugeordnet sind. |
+| AK-207 | Der letzte aktive Ausbilder kann weder deaktiviert, gelöscht noch zum Azubi herabgestuft werden. Ergänzung: Kein Ausbilder kann sich selbst deaktivieren, löschen oder die eigene Rolle ändern; trifft beides zu, erscheint die Meldung zu AK-207. |
+| AK-208 | Ein Ausbilder mit zugeordneten Azubis kann erst deaktiviert werden, wenn diese einem anderen Ausbilder zugeordnet sind. Präzisierung: Fürs Deaktivieren zählen nur aktive zugeordnete Azubis; fürs endgültige Löschen und fürs Herabstufen zum Azubi zählen alle, auch deaktivierte. |
 | AK-209 | Der Admin kann das Bundesland der Firma für die Feiertage einstellen. |
 
 ### 3. Entstehung der Wochenberichte
@@ -241,6 +243,7 @@ Szenario: Vertretung nimmt Freigabe zurück
 | Offen | Status „Entwurf“ oder „Abgelehnt“; zählt für die Erinnerung als nicht eingereicht |
 | Zugeordneter Ausbilder | der Ausbilder, den der Admin dem Azubi fest zugewiesen hat |
 | Vertretung | jeder andere Ausbilder; darf prüfen, wird aber nicht benachrichtigt |
+| Noch nie angemeldet | Person ist angelegt, ihr Firmenkonto aber noch nicht verknüpft (keine Konto-ID gespeichert); das ändert sich mit dem ersten Login |
 | Kanal | Weg einer Benachrichtigung: E-Mail, Teams oder App |
 
 Bestätigt wurden außerdem: Zuordnung und Bundesland legt nur der Admin fest (AK-202, AK-209); ein Ausbilder mit Azubis wird erst nach Neuzuordnung deaktiviert (AK-208); Tage außerhalb der Ausbildung sind keine Pflicht (AK-305); die wöchentliche Erinnerung läuft bis zur Einreichung weiter (AK-1024); wer alle Kanäle abwählt, bekommt keine Erinnerungen (AK-1013).
