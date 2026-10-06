@@ -1,6 +1,6 @@
 # Plan: Technik und Hosting
 
-Stand: 06.10.2026 · freigegeben · Entscheidungen aus Etappe 1 und 2 ergänzt (freigegeben am 06.10.2026)
+Stand: 06.10.2026 · freigegeben · Entscheidungen aus Etappe 1, 2 und 3 ergänzt (freigegeben am 06.10.2026)
 
 Die erste Version läuft als Demo per Docker Compose auf dem eigenen Rechner: eine TypeScript-Web-App mit PostgreSQL, Test-Login und Test-Mailserver. Für die Übernahme in die Firmeninfrastruktur werden nur Konfiguration und Zielumgebung getauscht, nicht der Code. Anforderungen und Akzeptanzkriterien: [01-spezifikation.md](01-spezifikation.md).
 
@@ -71,7 +71,9 @@ Die fachlichen Regeln liegen in wenigen serverseitigen Modulen ohne Abhängigkei
 ### Regeln und Abläufe
 
 - **Statusübergänge:** Eine einzige Funktion prüft jeden Wechsel gegen die erlaubten Übergänge des Statusmodells. Sie schreibt ihn als bedingtes Update („nur wenn Status und Version noch stimmen“). Trifft das nicht mehr zu, scheitert die Aktion mit Meldung; das deckt das gleichzeitige Zurückziehen und Prüfen ab (AK-508).
-- **Wochenberichte erzeugen:** Fehlende Wochen vom Ausbildungsbeginn bis zur aktuellen Woche werden beim Öffnen der Übersicht und zusätzlich täglich per Job angelegt. Tage außerhalb der Ausbildung werden markiert, Feiertage des Bundeslands per feiertagejs vorbelegt.
+- **Wochenberichte erzeugen:** Fehlende Wochen vom Ausbildungsbeginn bis zur aktuellen Woche (Europe/Berlin) werden beim Öffnen der Übersicht und zusätzlich täglich per Job angelegt (pg-boss, 0:05 Uhr Europe/Berlin, außerdem beim Start des Workers), ebenso direkt nach dem Speichern einer Person und beim Öffnen der Ausbilder-Ansichten. Tage außerhalb der Ausbildung werden markiert, Feiertage des Bundeslands per feiertagejs vorbelegt (nur innerhalb der Ausbildung). Die Eindeutigkeit pro Azubi und Woche bzw. pro Bericht und Datum verhindert Doppelte; alles läuft in einer Transaktion. Regeln in `src/domain/report-generation.ts`, Service in `src/lib/reports.ts`.
+- **Übersicht:** Der Azubi sieht seine Wochen unter `/azubi`; Ausbilder finden auf ihrer Startseite die Azubis und unter `/ausbilder/azubis/[id]` dieselbe Liste nur lesend. Wochen ganz außerhalb der Ausbildung ordnet `classifyWeek` ein (unberührt: ausgeblendet; mit Inhalt oder Historie: markiert; nie offen) – dieselbe Funktion nutzt später die Erinnerung.
+- **Entwurf speichern:** ausdrücklicher „Speichern“-Knopf; der Server prüft `canEditReport` und sperrt den Bericht während des Speicherns (`FOR UPDATE`), damit ein gleichzeitiger Statuswechsel nicht übergangen wird. Die Warnung beim Verlassen deckt Links, Formulare, Schließen/Neuladen (`beforeunload`) und Zurück/Vor (Schutzeintrag im Browser-Verlauf) ab.
 - **Einreichen prüfen:** Die Pflichtfeld-Regel aus AK-501 ist eine Funktion, die Oberfläche und Server gemeinsam nutzen. Der Server prüft immer, die Oberfläche nur zur Vorschau.
 - **Zugriffsschutz:** Jede Serveraktion prüft Rolle und Besitz selbst; ausgeblendete Schaltflächen allein gelten nicht als Schutz (AK-103, AK-104).
 - **Anmeldung und Zuordnung:** Beim Login sucht die App zuerst nach der Konto-ID. Ist keine Person damit verknüpft und hat der Identity Provider die E-Mail bestätigt, wird eine angelegte, aktive und noch nicht verknüpfte Person mit dieser E-Mail (ohne Groß-/Kleinschreibung) einmalig an die Konto-ID gebunden. Eine bereits verknüpfte Person wird nie über die E-Mail umgebunden.

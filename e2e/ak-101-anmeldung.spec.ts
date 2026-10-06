@@ -39,13 +39,13 @@ test.describe("Anmeldung über das Firmenkonto", () => {
     await login(trainer, accounts.bernd);
     await expect(trainer).toHaveURL(/\/ausbilder$/);
     await expect(trainer.getByRole("heading", { name: "Hallo Bernd!" })).toBeVisible();
-    await expect(trainer.getByText("Startseite für Ausbilder")).toBeVisible();
+    await expect(trainer.getByRole("heading", { name: "Wochenberichte der Azubis" })).toBeVisible();
     await trainer.close();
 
     const trainee = await browser.newPage();
     await login(trainee, accounts.anna);
     await expect(trainee).toHaveURL(/\/azubi$/);
-    await expect(trainee.getByText("Startseite für Azubis")).toBeVisible();
+    await expect(trainee.getByRole("heading", { name: "Meine Wochenberichte" })).toBeVisible();
     // Die Ausbilder-Startseite bleibt für Azubis gesperrt.
     await trainee.goto("/ausbilder");
     await expect(trainee).toHaveURL(/\/azubi$/);

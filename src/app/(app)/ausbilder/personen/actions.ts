@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { now } from "@/domain/clock";
 import type { PersonInput } from "@/domain/people";
 import { db } from "@/lib/db";
 import {
@@ -13,6 +14,7 @@ import {
   updatePerson,
   type ActionResult,
 } from "@/lib/people/service";
+import { ensureReportsForTrainee } from "@/lib/reports";
 import { requirePerson } from "@/lib/session";
 
 /**
@@ -62,6 +64,8 @@ export async function updatePersonAction(personId: string, prev: FormState, form
   const values = personInput(formData);
   const result = await updatePerson(db(), actor, personId, values);
   if (result.ok) {
+    // AK-203: geänderten Ausbildungszeitraum sofort auf die Wochenberichte anwenden.
+    await ensureReportsForTrainee(db(), personId, now());
     done(`/ausbilder/personen/${personId}?meldung=gespeichert`);
   }
   return next(prev, result, values);

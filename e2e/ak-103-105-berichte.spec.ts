@@ -14,9 +14,11 @@ test.describe("Zugriff auf Berichte", () => {
     const { reportId: ottosReport } = await insertTrainee({ ...otto, withReport: true });
     await login(page, accounts.anna);
 
-    // Eigener Bericht über die Startseite.
-    await expect(page.getByRole("list", { name: "Berichte" }).getByRole("link")).toHaveCount(1);
-    await page.getByRole("link", { name: /KW 40\/2026/ }).click();
+    // Eigener Bericht über die Startseite; fremde Wochen erscheinen nicht.
+    const weeks = page.getByRole("list", { name: "Wochenberichte" });
+    await expect(weeks.getByRole("link", { name: /KW 40\/2026/ })).toHaveCount(1);
+    await expect(page.locator(`a[href="/berichte/${ottosReport}"]`)).toHaveCount(0);
+    await weeks.getByRole("link", { name: /KW 40\/2026/ }).click();
     await expect(page.getByRole("heading", { name: "KW 40/2026 (28.09.2026 – 02.10.2026)" })).toBeVisible();
     await expect(page.getByTestId("report-trainee")).toHaveText("Anna Azubi");
     await expect(page.getByText("Einführung in die Abteilung")).toBeVisible();
@@ -45,7 +47,7 @@ test.describe("Zugriff auf Berichte", () => {
       const page = await context.newPage();
       await login(page, trainer);
       await expect(page).toHaveURL(/\/ausbilder$/);
-      const list = page.getByRole("list", { name: "Berichte" });
+      const list = page.getByRole("list", { name: "Azubis" });
       await expect(list.getByText("Anna Azubi")).toBeVisible();
       await expect(list.getByText("Otto Fremd")).toBeVisible();
 

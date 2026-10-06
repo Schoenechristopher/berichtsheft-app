@@ -1,6 +1,6 @@
 # Berichtsheft-App – Anforderungen und Akzeptanzkriterien
 
-Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201, AK-204, AK-206 bis AK-208 freigegeben am 06.10.2026 (Etappe 2)
+Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201, AK-204, AK-206 bis AK-208 freigegeben am 06.10.2026 (Etappe 2) · Ergänzungen zu AK-203, AK-305, AK-306, AK-404, AK-406 bis AK-408 freigegeben am 06.10.2026 (Etappe 3)
 
 Azubis führen ihr Berichtsheft digital als Wochenbericht, Ausbilder prüfen und geben es frei. Diese Spezifikation ist freigegeben und durch die Akzeptanzkriterien (AK) testbar. Technik und Hosting stehen in [02-plan.md](02-plan.md).
 
@@ -24,6 +24,8 @@ Ein Bericht umfasst eine Kalenderwoche mit den Tagen Mo–Fr; pro Azubi und Woch
 - **Feiertage** des vom Admin eingestellten Bundeslands sind als „Feiertag“ vorbelegt; der Azubi kann das ändern.
 - **Tage außerhalb der Ausbildung** (vor Beginn, nach Ende in derselben Woche) sind ausgegraut und keine Pflicht.
 - **Nicht enthalten:** Stunden, Abteilung, Lernfeld.
+- **Entwurf speichern:** Ein Entwurf darf unvollständig gespeichert werden, auch ohne Tagesart; Pflicht wird sie erst beim Einreichen. „Tätigkeiten“ fasst bis zu 5.000 Zeichen pro Tag und wird unverändert gespeichert (Zeilenumbrüche einheitlich).
+- **Geänderter Ausbildungszeitraum:** Fehlende Wochen werden ergänzt, in offenen Berichten aktiver Azubis wird „außerhalb der Ausbildung“ neu berechnet. Berichte werden nie automatisch gelöscht; eingetragene Inhalte bleiben, auch wenn der Tag nun außerhalb liegt. Wochen ganz außerhalb der Ausbildung zählen nicht als offen: Unberührte leere Entwürfe sind ausgeblendet, Wochen mit Inhalt oder Historie bleiben sichtbar und sind als „außerhalb der Ausbildung“ markiert. Wandert der Beginn zurück, erscheinen ausgeblendete Wochen wieder.
 
 **Einreichen geht nur, wenn** alle Tage innerhalb der Ausbildung eine Tagesart haben und jeder Tag mit „Betrieb“ oder „Berufsschule“ einen nicht leeren Tätigkeitstext hat. Bei Urlaub, Krank und Feiertag ist kein Text nötig.
 
@@ -89,7 +91,7 @@ Jedes Kriterium ist eine prüfbare Aussage mit eigener ID, damit Testfälle dara
 | --- | --- |
 | AK-201 | Der Admin kann eine Person über ihr Firmenkonto anlegen und ihr die Rolle Azubi oder Ausbilder geben. Präzisierung: Angelegt wird mit Firmen-E-Mail, Name und Rolle; beim ersten Login wird die Person über die vom Identity Provider bestätigte E-Mail (ohne Groß-/Kleinschreibung) zugeordnet und die stabile Konto-ID gespeichert. Danach zählt nur noch die Konto-ID; eine spätere E-Mail-Änderung im Firmenkonto bricht die Zuordnung nicht. |
 | AK-202 | Ein Azubi lässt sich nur mit zugeordnetem Ausbilder und Ausbildungsbeginn speichern; fehlt eines, nennt die Fehlermeldung das Feld. |
-| AK-203 | Der Admin kann Rolle, zugeordneten Ausbilder sowie Ausbildungsbeginn und -ende ändern. |
+| AK-203 | Der Admin kann Rolle, zugeordneten Ausbilder sowie Ausbildungsbeginn und -ende ändern. Ergänzung: Ein geänderter Zeitraum ergänzt fehlende Wochen und berechnet in offenen Berichten „außerhalb der Ausbildung“ neu; gelöscht wird nichts. Ein Tag, der neu in die Ausbildung fällt, ohne Tagesart ist und ein Feiertag ist, wird nach dem aktuell eingestellten Bundesland als „Feiertag“ vorbelegt. Eingereichte und freigegebene Berichte sowie Berichte deaktivierter Azubis bleiben unverändert. Wochen ganz außerhalb der Ausbildung: siehe AK-306. |
 | AK-204 | Entfernen deaktiviert die Person: keine Anmeldung mehr (AK-102); ihre Berichte bleiben für Ausbilder lesbar und exportierbar, sind aber nicht mehr änderbar. Ergänzung: Der Admin kann eine deaktivierte Person wieder aktivieren; einen Azubi nur, wenn sein zugeordneter Ausbilder aktiv ist. |
 | AK-205 | Deaktivierte Azubis erhalten keine Erinnerungen, und für sie entstehen keine neuen Wochenberichte. |
 | AK-206 | Endgültiges Löschen entfernt Person und alle Berichte, nur nach ausdrücklicher Bestätigung (z. B. Namen eintippen); danach ist kein Bericht mehr auffindbar. Ergänzung: Kommt die Person in der Historie von Berichten anderer Azubis vor (Statuswechsel oder Kommentare), lässt sie sich nur deaktivieren; die Oberfläche erklärt das und bietet „Deaktivieren“ an. |
@@ -105,8 +107,8 @@ Jedes Kriterium ist eine prüfbare Aussage mit eigener ID, damit Testfälle dara
 | AK-302 | Für zukünftige Wochen gibt es keine Berichte; mit Beginn einer neuen Woche erscheint ihr Bericht automatisch. |
 | AK-303 | Nach dem Ausbildungsende entstehen keine Berichte mehr. |
 | AK-304 | Manuelles oder doppeltes Anlegen ist nicht möglich; pro Azubi und Woche gibt es immer genau einen Bericht. |
-| AK-305 | Liegen Beginn oder Ende mitten in einer Woche, sind die Tage außerhalb der Ausbildung ausgegraut und brauchen weder Tagesart noch Text. |
-| AK-306 | Die Übersicht des Azubis zeigt alle Wochen mit Status; offene Wochen in der Vergangenheit sind deutlich hervorgehoben. |
+| AK-305 | Liegen Beginn oder Ende mitten in einer Woche, sind die Tage außerhalb der Ausbildung ausgegraut und brauchen weder Tagesart noch Text. Ergänzung: Diese Tage sind auch nicht änderbar. |
+| AK-306 | Die Übersicht des Azubis zeigt alle Wochen mit Status; offene Wochen in der Vergangenheit sind deutlich hervorgehoben. Ergänzung: Ausbilder sehen pro Azubi dieselbe Liste, nur lesend. Wochen ganz außerhalb der Ausbildung (nach Verschiebung von Beginn oder Ende) zählen nie als offen, auch nicht für die Erinnerung; unberührte leere Entwürfe davon sind ausgeblendet, Wochen mit Inhalt oder Historie als „außerhalb der Ausbildung“ markiert. |
 
 ### 4. Bericht erfassen
 
@@ -115,11 +117,11 @@ Jedes Kriterium ist eine prüfbare Aussage mit eigener ID, damit Testfälle dara
 | AK-401 | Jeder Bericht zeigt Mo–Fr mit Datum, pro Tag eine Auswahl der Tagesart und ein Freitextfeld „Tätigkeiten“. |
 | AK-402 | Zur Auswahl stehen genau: Betrieb, Berufsschule, Urlaub, Krank, Feiertag. |
 | AK-403 | Felder für Stunden, Abteilung oder Lernfeld gibt es nicht. |
-| AK-404 | Gesetzliche Feiertage des eingestellten Bundeslands sind als „Feiertag“ vorbelegt. Beispiele: Fr 25.12.2026 ist vorbelegt; Do 27.05.2027 (Fronleichnam) bei Nordrhein-Westfalen ja, bei Niedersachsen nein. |
+| AK-404 | Gesetzliche Feiertage des eingestellten Bundeslands sind als „Feiertag“ vorbelegt. Beispiele: Fr 25.12.2026 ist vorbelegt; Do 27.05.2027 (Fronleichnam) bei Nordrhein-Westfalen ja, bei Niedersachsen nein. Ergänzung: vorbelegt wird beim Anlegen des Berichts und nur an Tagen innerhalb der Ausbildung; eine spätere Änderung des Bundeslands ändert bestehende Berichte nicht. |
 | AK-405 | Der Azubi kann eine vorbelegte Tagesart ändern, z. B. von „Feiertag“ auf „Berufsschule“. |
-| AK-406 | Ein Entwurf lässt sich speichern und später weiterbearbeiten; nach Ab- und erneuter Anmeldung ist der Inhalt unverändert. |
-| AK-407 | Umlaute, Zeilenumbrüche und lange Texte (mindestens 2.000 Zeichen pro Tag) werden unverändert gespeichert und angezeigt. |
-| AK-408 | Wer die Seite mit ungespeicherten Änderungen verlässt, wird gewarnt, oder die Änderungen werden automatisch gespeichert. |
+| AK-406 | Ein Entwurf lässt sich speichern und später weiterbearbeiten; nach Ab- und erneuter Anmeldung ist der Inhalt unverändert. Ergänzung: Gespeichert wird ausdrücklich per „Speichern“; ein Entwurf darf dabei unvollständig sein. |
+| AK-407 | Umlaute, Zeilenumbrüche und lange Texte (mindestens 2.000 Zeichen pro Tag) werden unverändert gespeichert und angezeigt. Präzisierung: Obergrenze 5.000 Zeichen pro Tag (Unicode-Zeichen, ein Zeilenumbruch zählt als eins), bei Überschreitung Meldung am Feld; Zeilenumbrüche werden einheitlich gespeichert, sonst bleibt der Text exakt. |
+| AK-408 | Wer die Seite mit ungespeicherten Änderungen verlässt, wird gewarnt, oder die Änderungen werden automatisch gespeichert. Präzisierung: gewarnt wird bei Links und Formularen der App (z. B. „Abmelden“), beim Schließen und Neuladen sowie bei Zurück und Vor im Browser. |
 
 ### 5. Einreichen und Zurückziehen
 
