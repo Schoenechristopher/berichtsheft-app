@@ -613,7 +613,7 @@ describe("Historie (AK-801 – AK-803)", () => {
   });
 });
 
-describe("Deaktivierter Azubi (Vorschlag zur Bestätigung)", () => {
+describe("AK-602 deaktivierter Azubi (bestätigte Auslegung)", () => {
   it("eingereichter Bericht eines deaktivierten Azubis kann freigegeben, aber nicht abgelehnt werden", async () => {
     const one = await fillWeek(39);
     const two = await fillWeek(40);
@@ -634,7 +634,7 @@ describe("Deaktivierter Azubi (Vorschlag zur Bestätigung)", () => {
   });
 });
 
-describe("Woche ganz außerhalb der Ausbildung (Vorschlag zur Bestätigung)", () => {
+describe("AK-501 Woche ganz außerhalb der Ausbildung (bestätigte Auslegung)", () => {
   it("wird nicht eingereicht, auch mit Inhalt", async () => {
     const report = await fillWeek(36);
     await prisma.person.update({

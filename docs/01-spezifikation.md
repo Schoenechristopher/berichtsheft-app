@@ -1,6 +1,6 @@
 # Berichtsheft-App – Anforderungen und Akzeptanzkriterien
 
-Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201, AK-204, AK-206 bis AK-208 freigegeben am 06.10.2026 (Etappe 2) · Ergänzungen zu AK-203, AK-305, AK-306, AK-404, AK-406 bis AK-408 freigegeben am 06.10.2026 (Etappe 3)
+Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201, AK-204, AK-206 bis AK-208 freigegeben am 06.10.2026 (Etappe 2) · Ergänzungen zu AK-203, AK-305, AK-306, AK-404, AK-406 bis AK-408 freigegeben am 06.10.2026 (Etappe 3) · Ergänzungen zu AK-501, AK-502, AK-505, AK-604 bis AK-606, AK-803 und zum Statusmodell freigegeben am 06.10.2026 (Etappe 4)
 
 Azubis führen ihr Berichtsheft digital als Wochenbericht, Ausbilder prüfen und geben es frei. Diese Spezifikation ist freigegeben und durch die Akzeptanzkriterien (AK) testbar. Technik und Hosting stehen in [02-plan.md](02-plan.md).
 
@@ -43,6 +43,9 @@ stateDiagram-v2
 ```
 
 Zurückziehen geht nur, solange der Bericht noch nicht geprüft ist. Ablehnung und Rücknahme einer Freigabe führen beide nach „Abgelehnt“, und jeder Wechsel landet mit Person und Zeitpunkt in der Historie.
+
+- **Prüfrunde:** Jede Einreichung beginnt eine neue Prüfrunde, auch die erneute Einreichung nach dem Zurückziehen. Ablehnung, Freigabe, Rücknahme und Kommentare gehören zur laufenden Runde; die Rücknahme also zur Runde der Freigabe, das erneute Einreichen danach öffnet die nächste.
+- **Deaktivierter Azubi:** Einen eingereichten Bericht eines deaktivierten Azubis dürfen Ausbilder freigeben, aber nicht ablehnen; eine Freigabe lässt sich dann nicht zurücknehmen (sonst entstünde ein abgelehnter Bericht, den niemand überarbeiten kann). Der Bericht bleibt mit Hinweis „deaktiviert“ in der Prüfliste. Nach dem Wiederaktivieren gilt wieder alles.
 
 ## PDF-Export
 
@@ -127,11 +130,11 @@ Jedes Kriterium ist eine prüfbare Aussage mit eigener ID, damit Testfälle dara
 
 | ID | Kriterium |
 | --- | --- |
-| AK-501 | Ein offener Bericht lässt sich nur einreichen, wenn alle Tage innerhalb der Ausbildung eine Tagesart haben und jeder Tag mit „Betrieb“ oder „Berufsschule“ einen nicht leeren Text hat (nur Leerzeichen gelten als leer). |
-| AK-502 | Ist eine Bedingung aus AK-501 nicht erfüllt, wird nicht eingereicht; die betroffenen Tage werden benannt und markiert. |
+| AK-501 | Ein offener Bericht lässt sich nur einreichen, wenn alle Tage innerhalb der Ausbildung eine Tagesart haben und jeder Tag mit „Betrieb“ oder „Berufsschule“ einen nicht leeren Text hat (nur Leerzeichen gelten als leer). Ergänzung: Wochen ganz außerhalb der Ausbildung lassen sich nicht einreichen, auch mit Inhalt. Die laufende Woche darf schon vor ihrem Ende eingereicht werden, sobald die Pflichtangaben vollständig sind. |
+| AK-502 | Ist eine Bedingung aus AK-501 nicht erfüllt, wird nicht eingereicht; die betroffenen Tage werden benannt und markiert. Ergänzung: Markiert wird am Tag mit „Tagesart fehlt“ bzw. „Tätigkeiten fehlen“. |
 | AK-503 | Bei Urlaub, Krank und Feiertag ist kein Text nötig; ein trotzdem eingetragener Text wird gespeichert und angezeigt. |
 | AK-504 | Auch eine Woche nur aus Urlaub und Feiertagen muss eingereicht werden und zählt bis dahin als offen. |
-| AK-505 | Nach dem Einreichen ist der Status „Eingereicht“ und der Bericht für den Azubi schreibgeschützt. |
+| AK-505 | Nach dem Einreichen ist der Status „Eingereicht“ und der Bericht für den Azubi schreibgeschützt. Ergänzung: Einreichen speichert ungespeicherte Änderungen mit; scheitert die Prüfung auf dem Server, bleiben sie als Entwurf gespeichert. Eingereichte und freigegebene Berichte schützt zusätzlich die Datenbank vor Änderungen. |
 | AK-506 | Der Azubi kann einen eingereichten Bericht zurückziehen: Status wieder „Entwurf“, bearbeitbar, nicht mehr in der Prüfliste. |
 | AK-507 | Ein bereits freigegebener oder abgelehnter Bericht kann nicht zurückgezogen werden; die Schaltfläche fehlt oder ist gesperrt. |
 | AK-508 | Zieht der Azubi zurück, während ein Ausbilder den Bericht offen hat, scheitert dessen Freigabe oder Ablehnung mit „Bericht wurde zurückgezogen“. Umgekehrt scheitert das Zurückziehen mit Meldung, wenn schon geprüft wurde. |
@@ -143,9 +146,9 @@ Jedes Kriterium ist eine prüfbare Aussage mit eigener ID, damit Testfälle dara
 | AK-601 | Die Prüfliste zeigt eingereichte Berichte mit Azubi, Woche und Einreichungsdatum; standardmäßig die der eigenen Azubis, per Filter alle. |
 | AK-602 | Jeder Ausbilder darf jeden eingereichten Bericht freigeben oder ablehnen, auch ohne Zuordnung (Vertretung). |
 | AK-603 | Bei der Freigabe wird der Status „Freigegeben“; Name des Ausbilders sowie Datum und Uhrzeit werden gespeichert. |
-| AK-604 | Ablehnen geht nur mit einem nicht leeren Gesamtkommentar. |
-| AK-605 | Zu jedem Tag kann der Ausbilder zusätzlich einen eigenen, optionalen Kommentar schreiben. |
-| AK-606 | Nach einer Ablehnung ist der Status „Abgelehnt“; der Azubi sieht den Gesamtkommentar und jeden Tageskommentar beim jeweiligen Tag. |
+| AK-604 | Ablehnen geht nur mit einem nicht leeren Gesamtkommentar. Ergänzung: Gesamtkommentar, Tageskommentare und Begründung einer Rücknahme fassen je bis zu 5.000 Zeichen. |
+| AK-605 | Zu jedem Tag kann der Ausbilder zusätzlich einen eigenen, optionalen Kommentar schreiben. Ergänzung: Tageskommentare sind an jedem Tag möglich, auch außerhalb der Ausbildung. Beim Freigeben werden eingetippte Kommentare nicht gespeichert; der Bestätigungsdialog weist darauf hin. |
+| AK-606 | Nach einer Ablehnung ist der Status „Abgelehnt“; der Azubi sieht den Gesamtkommentar und jeden Tageskommentar beim jeweiligen Tag. Ergänzung: Nach einer Rücknahme (AK-703) sieht der Azubi oben die Begründung. Nach dem erneuten Einreichen stehen die Kommentare nur noch in der Historie, nicht mehr beim Tag. |
 | AK-607 | Berichte im Status „Entwurf“ kann der Ausbilder weder freigeben noch ablehnen. |
 
 ### 7. Überarbeiten und Freigabe zurücknehmen
@@ -163,7 +166,7 @@ Jedes Kriterium ist eine prüfbare Aussage mit eigener ID, damit Testfälle dara
 | --- | --- |
 | AK-801 | Jeder Bericht hat eine Historie aller Statuswechsel (Einreichen, Zurückziehen, Freigabe, Ablehnung, Rücknahme) mit Datum, Uhrzeit, Person und neuem Status. |
 | AK-802 | Kommentare und Begründungen früherer Runden bleiben erhalten und sind ihrer Runde zugeordnet. |
-| AK-803 | Historieneinträge kann niemand bearbeiten oder löschen; nur das endgültige Löschen der Person (AK-206) entfernt sie. |
+| AK-803 | Historieneinträge kann niemand bearbeiten oder löschen; nur das endgültige Löschen der Person (AK-206) entfernt sie. Ergänzung: Das gilt für Statuswechsel und Kommentare; die Datenbank weist ihr Ändern und Löschen ab. |
 
 ### 9. PDF-Export
 

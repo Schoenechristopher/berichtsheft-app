@@ -57,7 +57,7 @@ export function ReviewForm({
   action: Action;
   seen: Seen;
   days: ReviewDay[];
-  /** Nein bei deaktiviertem Azubi (Vorschlag zur Bestätigung): dann nur Freigeben. */
+  /** Nein bei deaktiviertem Azubi (bestätigte Auslegung): dann nur Freigeben. */
   canReject: boolean;
 }) {
   const [state, formAction, pending] = useActionState(action, null);

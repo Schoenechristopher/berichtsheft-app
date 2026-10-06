@@ -215,7 +215,7 @@ describe("Pflichttexte", () => {
   });
 });
 
-describe("Deaktivierter Azubi (Vorschlag zur Bestätigung)", () => {
+describe("AK-602 deaktivierter Azubi (bestätigte Auslegung)", () => {
   it("Freigeben geht, Ablehnen und Rücknahme nicht; der Azubi selbst kann nichts mehr", () => {
     const inactive = (status: ReportStatus) => report(status, { traineeActive: false });
     expect(decideTransition({ action: "APPROVE", actor: bernd, report: inactive("SUBMITTED") }).ok).toBe(true);

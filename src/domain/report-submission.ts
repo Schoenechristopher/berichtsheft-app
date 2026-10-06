@@ -65,6 +65,6 @@ export function submissionSummary(issues: readonly SubmissionIssue[]): string {
   return `Nicht eingereicht – bitte ergänzen: ${list}.`;
 }
 
-/** Vorschlag zur Bestätigung (Etappe 4): Wochen ganz außerhalb der Ausbildung werden nicht eingereicht. */
+/** Bestätigte Auslegung (Etappe 4): Wochen ganz außerhalb der Ausbildung werden nicht eingereicht. */
 export const WEEK_OUTSIDE_TRAINING_MESSAGE =
   "Diese Woche liegt ganz außerhalb der Ausbildung und wird nicht eingereicht.";

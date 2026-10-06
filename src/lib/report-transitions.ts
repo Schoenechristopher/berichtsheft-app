@@ -132,7 +132,7 @@ export async function transitionReport(
 
     if (decision.to === "SUBMITTED") {
       const start = report.trainee.trainingStart;
-      // Vorschlag zur Bestätigung: Wochen ganz außerhalb der Ausbildung werden nicht eingereicht.
+      // Bestätigte Auslegung: Wochen ganz außerhalb der Ausbildung werden nicht eingereicht.
       if (start && isWeekOutsideTraining(report, { start, end: report.trainee.trainingEnd })) {
         return { ok: false, formError: WEEK_OUTSIDE_TRAINING_MESSAGE };
       }
