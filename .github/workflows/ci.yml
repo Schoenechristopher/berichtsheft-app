@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, Typecheck, Vitest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: berichtsheft
+          POSTGRES_PASSWORD: berichtsheft
+          POSTGRES_DB: berichtsheft_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U berichtsheft -d berichtsheft_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgresql://berichtsheft:berichtsheft@localhost:5432/berichtsheft_test
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Formatierung
+        run: npm run format:check
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Vitest (Logik und Datenbank)
+        run: npm test
+
+  e2e:
+    name: Docker Compose + Playwright
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      E2E_LOGIN_MODE: keycloak
+      E2E_BASE_URL: http://localhost:3000
+      E2E_DATABASE_URL: postgresql://berichtsheft:berichtsheft@localhost:5432/berichtsheft
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Images bauen
+        run: docker compose build
+      - name: Demo starten (app, worker, db, keycloak, mailpit)
+        run: docker compose up -d --wait --wait-timeout 300
+      - name: Dienste prüfen
+        run: |
+          docker compose ps
+          curl -fsS http://localhost:3000/api/health
+          curl -fsS http://localhost:8080/realms/berichtsheft/.well-known/openid-configuration > /dev/null
+          curl -fsS http://localhost:8025/readyz
+          for i in $(seq 1 30); do docker compose logs worker | grep -q "verbunden mit pg-boss" && break; sleep 2; done
+          docker compose logs worker | grep "verbunden mit pg-boss"
+      - name: Playwright-Browser installieren
+        run: npx playwright install --with-deps chromium
+      - name: Playwright gegen die laufende Demo
+        run: npx playwright test
+      - name: Container-Logs
+        if: failure()
+        run: docker compose logs --no-color
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+      - name: Aufräumen
+        if: always()
+        run: docker compose down -v
