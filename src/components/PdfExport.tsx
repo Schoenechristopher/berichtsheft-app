@@ -66,6 +66,7 @@ export function PdfRangeForm({ action, from, to }: { action: string; from: strin
               defaultValue={from}
               className={inputClass}
               aria-invalid={error === RANGE_MESSAGES.invalidFrom || undefined}
+              aria-describedby={error === RANGE_MESSAGES.invalidFrom ? `${id}-error` : undefined}
             />
           </div>
           <div className="min-w-0 space-y-1">
@@ -80,7 +81,7 @@ export function PdfRangeForm({ action, from, to }: { action: string; from: strin
               defaultValue={to}
               className={inputClass}
               aria-invalid={error !== null && error !== RANGE_MESSAGES.invalidFrom ? true : undefined}
-              aria-describedby={error ? `${id}-error` : undefined}
+              aria-describedby={error !== null && error !== RANGE_MESSAGES.invalidFrom ? `${id}-error` : undefined}
             />
           </div>
         </div>

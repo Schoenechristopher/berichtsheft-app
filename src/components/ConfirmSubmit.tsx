@@ -31,10 +31,12 @@ export function ConfirmSubmit({
   beforeOpen?: () => boolean;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const titleId = useId();
   return (
     <>
       <button
+        ref={buttonRef}
         type="button"
         disabled={disabled}
         className={buttonClass}
@@ -46,9 +48,12 @@ export function ConfirmSubmit({
       >
         {label}
       </button>
+      {/* Tastatur: Der Dialog fokussiert zuerst „Abbrechen“, Escape schließt ihn; danach steht der
+          Fokus wieder auf der auslösenden Schaltfläche (in allen Browsern gleich). */}
       <dialog
         ref={dialogRef}
         aria-labelledby={titleId}
+        onClose={() => buttonRef.current?.focus()}
         className="m-auto w-[calc(100%-2rem)] max-w-md rounded-lg p-0 shadow-xl backdrop:bg-slate-900/50"
       >
         <div className="space-y-3 p-4">

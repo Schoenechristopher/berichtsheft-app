@@ -2,11 +2,26 @@
 
 Digitales Berichtsheft: Azubis erfassen ihre Wochenberichte (Mo–Fr), Ausbilder prüfen, geben frei oder lehnen mit Kommentar ab.
 
-- [Spezifikation und Akzeptanzkriterien](docs/01-spezifikation.md)
-- [Plan: Technik und Hosting](docs/02-plan.md)
-- [Auftrag Etappe 1](AUFTRAG-ETAPPE-1.md), [Auftrag Etappe 2](AUFTRAG-ETAPPE-2.md), [Auftrag Etappe 3](AUFTRAG-ETAPPE-3.md), [Auftrag Etappe 4](AUFTRAG-ETAPPE-4.md), [Auftrag Etappe 5](AUFTRAG-ETAPPE-5.md), [Auftrag Etappe 6](AUFTRAG-ETAPPE-6.md)
+**Status: Demo abnahmefertig (Etappe 7).** Alle 74 Akzeptanzkriterien sind mit benannten Tests belegt, die App ist in Chromium, Firefox und Microsoft Edge sowie bei 375 px Smartphone-Breite getestet.
 
-Status: Etappe 6 (Benachrichtigungen und Erinnerung) – Anmelden und Abmelden über das Firmenkonto; Ausbilder verwalten Personen und das Bundesland; Wochenberichte entstehen automatisch ab Ausbildungsbeginn (Feiertage vorbelegt), Azubis erfassen pro Tag Tagesart und Tätigkeiten und speichern Entwürfe; die Übersicht zeigt alle Wochen mit Status und hebt vergangene offene Wochen hervor. Azubis reichen Berichte ein (Pflichtfelder werden geprüft und am Tag markiert) und ziehen sie zurück; Ausbilder prüfen über die Prüfliste, geben frei, lehnen mit Gesamt- und Tageskommentaren ab oder nehmen eine Freigabe mit Begründung zurück. Jeder Bericht zeigt seine unveränderliche Historie nach Prüfrunden. Jede Woche und jeder frei wählbare Zeitraum lässt sich als PDF herunterladen; freigegebene Wochen tragen den Freigabevermerk, nicht freigegebene sind gekennzeichnet. Einreichen benachrichtigt den zugeordneten Ausbilder, Freigabe, Ablehnung und Rücknahme den Azubi – über die Kanäle, die jede Person unter „Einstellungen“ wählt (E-Mail, Teams, App); die Glocke oben zeigt ungelesene App-Benachrichtigungen. Montags um 9:00 Uhr erinnert die App an offene Wochen und informiert bei überfälligen den zugeordneten Ausbilder; war der Worker zu der Zeit aus, holt er das bis Dienstagabend einmal nach. Nicht zustellbare E-Mail- und Teams-Nachrichten sehen Ausbilder unter „Nicht zustellbar“ im Menü und können sie erneut versuchen.
+| Dokument | Inhalt |
+| --- | --- |
+| [Spezifikation und Akzeptanzkriterien](docs/01-spezifikation.md) | was die App können muss (AK-101 … AK-1102), Beispielszenarien |
+| [Plan: Technik und Hosting](docs/02-plan.md) | Technik, Datenmodell, Etappen, Übernahme in die Firmeninfrastruktur |
+| [Testabdeckung](docs/03-testabdeckung.md) | jedes Akzeptanzkriterium mit seinen Tests und der Testebene (erzeugt mit `npm run ak:abdeckung`) |
+| [Demo-Anleitung](docs/04-demo-anleitung.md) | Start, Testkonten und ein Vorführ-Drehbuch von ca. 15 Minuten |
+
+Aufträge der Etappen: [1](AUFTRAG-ETAPPE-1.md), [2](AUFTRAG-ETAPPE-2.md), [3](AUFTRAG-ETAPPE-3.md), [4](AUFTRAG-ETAPPE-4.md), [5](AUFTRAG-ETAPPE-5.md), [6](AUFTRAG-ETAPPE-6.md), [7](AUFTRAG-ETAPPE-7.md).
+
+## Funktionen im Überblick
+
+- **Anmeldung** ausschließlich über das Firmenkonto (Demo: Keycloak, später Microsoft Entra ID); nur Personen, die ein Ausbilder angelegt hat, erhalten Zugang.
+- **Nutzerverwaltung** für Ausbilder: Personen anlegen, Rollen, Zuordnung Azubi → Ausbilder, Ausbildungszeitraum, Bundesland der Firma, deaktivieren, wieder aktivieren, endgültig löschen.
+- **Wochenberichte** entstehen automatisch ab Ausbildungsbeginn, Feiertage sind vorbelegt; pro Tag Tagesart und Tätigkeiten, Entwürfe speichern, Warnung bei ungespeicherten Änderungen. Die Übersicht hebt vergangene offene Wochen hervor.
+- **Einreichen und Prüfen:** Pflichtfelder werden geprüft und am Tag markiert; Zurückziehen vor der Prüfung; Prüfliste mit Filter, Freigabe, Ablehnung mit Gesamt- und Tageskommentaren, Rücknahme einer Freigabe mit Begründung – auch durch eine Vertretung. Jeder Bericht zeigt seine unveränderliche Historie nach Prüfrunden.
+- **PDF-Export** einer Woche oder eines frei wählbaren Zeitraums, mit Freigabevermerk bzw. Kennzeichnung „Nicht freigegeben“.
+- **Benachrichtigungen** per E-Mail, Teams (in der Demo simuliert) und in der App (Glocke mit Zähler), Kanäle wählt jede Person selbst; montags um 9:00 Uhr Erinnerung an offene Wochen und Information des Ausbilders bei überfälligen. Nicht zustellbare Nachrichten sehen Ausbilder unter „Nicht zustellbar“.
+- **Mobil bedienbar:** alle Funktionen bei 375 px Breite ohne seitliches Scrollen.
 
 ## Demo starten in drei Schritten
 
@@ -31,6 +46,8 @@ Die Anmeldung läuft über Keycloak als Ersatz für das Firmenkonto. Benutzernam
 | `emil` | `emil` | Firmenkonto `emil@berichtsheft.test`, in der App erst nach dem Anlegen durch einen Ausbilder; der erste Login verknüpft das Konto |
 
 Benachrichtigungen ausprobieren: Reicht Anna eine Woche ein, zeigt die Glocke bei Bernd einen Zähler; die E-Mail steht nach wenigen Sekunden in Mailpit (<http://localhost:8025>). Wer unter „Einstellungen“ den Kanal „Teams“ wählt, findet die Nachricht im „Teams-Postfach (Demo)“ (Menü oben). Links in Nachrichten führen nach der Anmeldung direkt zum Bericht.
+
+Eine Schritt-für-Schritt-Vorführung steht in der [Demo-Anleitung](docs/04-demo-anleitung.md).
 
 Ausprobieren: als `anna` anmelden – die Übersicht zeigt alle Wochen seit dem 01.09.2026 (KW 40 mit Beispielinhalt); eine Woche öffnen, Tagesart und Tätigkeiten erfassen, „Speichern“. Als `bernd` oder `clara` erscheinen Annas Wochen auf der Startseite unter „Wochenberichte der Azubis“. Reicht Anna eine Woche ein („Einreichen“), steht sie in Bernds „Prüfliste“ (Clara sieht sie unter „Alle Azubis“); dort freigeben oder mit Kommentar ablehnen. „Als PDF herunterladen“ auf der Berichtsseite exportiert die Woche; über der Wochenliste (Azubi: Startseite, Ausbilder: Ansicht pro Azubi) lässt sich unter „Berichtsheft als PDF herunterladen“ ein Zeitraum exportieren.
 
@@ -91,8 +108,9 @@ Ohne Keycloak (z. B. wenn das Image nicht geladen werden kann): in `.env` `AUTH_
 | `npm test` | Vitest: Fachlogik und PDF-Layout (`src/**/*.test.ts(x)`; PDFs werden erzeugt und wieder ausgelesen) und Datenbank (`tests/db/`, braucht `TEST_DATABASE_URL`; E-Mail-Versand gegen einen SMTP-Mock in `tests/smtp-mock.ts`) |
 | `npm run pdf:beispiel` | erzeugt Beispiel-PDFs aus den Seed-Daten (Einzelwoche mit Freigabevermerk, Sammel-PDF) in `beispiel-pdf/`, ohne Datenbank |
 | `APP_FIXED_NOW=2026-10-12T09:00:00+02:00 npm run erinnerung` | löst den Montags-Job (Erinnerung, Information an den Ausbilder) einmal zum angegebenen Zeitpunkt aus und versendet die Nachrichten gleich (E-Mail an Mailpit) |
-| `npm run test:e2e` | Playwright gegen die laufende Demo (`docker compose up`), Login über Keycloak |
-| `E2E_LOGIN_MODE=test npm run test:e2e` | Playwright mit Test-Login, startet `next dev` selbst (ohne Keycloak) |
+| `npm run ak:abdeckung` | meldet jede AK-ID der Spezifikation ohne Test und schreibt `docs/03-testabdeckung.md` (CI: `-- --pruefen` scheitert bei fehlendem Test oder veralteter Datei) |
+| `npm run test:e2e` | Playwright gegen die laufende Demo (`docker compose up`), Login über Keycloak; Projekte `chromium`, `firefox`, `msedge` (alle Tests) und `smartphone-375` (375 px, `e2e/ak-1102-smartphone.spec.ts`). Browser einmalig installieren: `npx playwright install chromium firefox msedge` |
+| `E2E_LOGIN_MODE=test npm run test:e2e -- --project=chromium --project=smartphone-375` | Playwright mit Test-Login, startet `next dev` selbst (ohne Keycloak); nur mit vorinstalliertem Chromium |
 | `E2E_MAILPIT_URL=http://localhost:8025 npm run test:e2e` | zusätzlich E-Mails über die Mailpit-API und das Teams-Postfach prüfen (braucht laufenden Worker und Mailpit; in CI immer an) |
 
-Tests zu Akzeptanzkriterien beginnen mit der AK-ID, z. B. `AK-102 Firmenkonto ohne Eintrag wird mit Hinweis abgewiesen`. GitHub Actions führt bei jedem Push Lint, Typecheck und Vitest aus, startet dann `docker compose up` und lässt Playwright gegen die laufende Demo laufen. Die Beispiel-PDFs hängen als Artefakt „beispiel-pdf“ am CI-Lauf.
+Tests zu Akzeptanzkriterien beginnen mit der AK-ID, z. B. `AK-102 Firmenkonto ohne Eintrag wird mit Hinweis abgewiesen`. Die Beispielszenarien der Spezifikation stehen wörtlich in `e2e/beispielszenarien.spec.ts`, ihre AK-IDs als Tags. GitHub Actions führt bei jedem Push Lint, Typecheck, Vitest und die Prüfung der Testabdeckung aus, startet dann `docker compose up` und lässt Playwright in Chromium, Firefox, Edge und bei 375 px gegen die laufende Demo laufen. Die Beispiel-PDFs hängen als Artefakt „beispiel-pdf“ am CI-Lauf.

@@ -18,6 +18,8 @@ x-app-environment: &app-environment
   AUTH_OIDC_EMAIL_CLAIM: ${AUTH_OIDC_EMAIL_CLAIM:-email}
   AUTH_OIDC_EMAIL_VERIFIED_CLAIM: ${AUTH_OIDC_EMAIL_VERIFIED_CLAIM:-email_verified}
   AUTH_OIDC_NAME: ${AUTH_OIDC_NAME:-Firmenkonto}
+  # Wirkt im Container nie (NODE_ENV=production); CI setzt es auf true und prüft genau das.
+  AUTH_TEST_LOGIN: ${AUTH_TEST_LOGIN:-false}
   # Benachrichtigungen: E-Mail an Mailpit im Docker-Netz, Teams ins Entwickler-Postfach (Demo).
   # Host und Port fest, damit eine lokale .env (SMTP_HOST=localhost) die Demo nicht umlenkt.
   SMTP_HOST: mailpit

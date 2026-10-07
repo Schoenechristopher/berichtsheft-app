@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { now } from "@/domain/clock";
 import { currentIsoWeek } from "@/domain/report-generation";
@@ -11,6 +12,8 @@ import { trainingPeriod } from "@/lib/people/labels";
 import { exportRangeDefaults } from "@/lib/report-export";
 import { ensureReportsForTrainee, listTraineeWeeks } from "@/lib/reports";
 import { requirePerson } from "@/lib/session";
+
+export const metadata: Metadata = { title: "Wochenberichte eines Azubis" };
 
 /** Wochenübersicht eines Azubis für Ausbilder (AK-105, AK-306): dieselbe Liste, nur lesend. */
 export default async function TraineeWeeksPage({ params }: PageProps<"/ausbilder/azubis/[id]">) {

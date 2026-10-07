@@ -35,6 +35,6 @@ TypeScript · Next.js (App Router) · Tailwind CSS · PostgreSQL + Prisma · Aut
 - PostgreSQL 16 und Playwright-Chromium sind im Container vorinstalliert.
 - Bewährter Ablauf (Etappe 1 und 2): Container lassen sich in der Sandbox nicht starten (weder Image-Build noch `docker run`), daher alles nativ:
   - PostgreSQL: `service postgresql start`, dann Rolle `berichtsheft` (Passwort `berichtsheft`, CREATEDB) und die Datenbanken `berichtsheft` und `berichtsheft_test` anlegen; `cp .env.example .env`, `npm ci`, `npm run db:migrate && npm run db:seed`.
-  - Schnellster Browser-Test: `E2E_LOGIN_MODE=test npm run test:e2e` (startet `next dev` mit Test-Login, ohne Keycloak).
+  - Schnellster Browser-Test: `E2E_LOGIN_MODE=test npm run test:e2e -- --project=chromium --project=smartphone-375` (startet `next dev` mit Test-Login, ohne Keycloak; Firefox und Edge nur in CI).
   - Echter OIDC-Login: Keycloak aus dem Release-Archiv (`https://github.com/keycloak/keycloak/releases/download/26.4.0/keycloak-26.4.0.tar.gz`, Java 21 ist vorhanden), `keycloak/realm-berichtsheft.json` nach `data/import/` kopieren, mit leerem `JAVA_TOOL_OPTIONS` und `KC_BOOTSTRAP_ADMIN_USERNAME/PASSWORD=admin` `bin/kc.sh start-dev --import-realm --http-port 8080` starten. App als Produktions-Build: `npm run build`, dann `NODE_ENV=production sh docker/start-app.sh`; danach `E2E_LOGIN_MODE=keycloak npm run test:e2e`.
   - Den vollständigen Compose-Stack (Images, Keycloak 26.8, Mailpit, Healthchecks) prüft nur GitHub Actions; im PR vermerken.

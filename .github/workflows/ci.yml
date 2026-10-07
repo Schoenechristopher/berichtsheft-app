@@ -48,6 +48,8 @@ jobs:
         run: npm run typecheck
       - name: Vitest (Logik, PDF und Datenbank)
         run: npm test
+      - name: Testabdeckung der Akzeptanzkriterien (keine AK-ID ohne Test, docs/03-testabdeckung.md aktuell)
+        run: npm run ak:abdeckung -- --pruefen
       - name: Beispiel-PDFs aus den Seed-Daten
         run: npm run pdf:beispiel
       - uses: actions/upload-artifact@v4
@@ -57,11 +59,13 @@ jobs:
           retention-days: 14
 
   e2e:
-    name: Docker Compose + Playwright
+    name: Docker Compose + Playwright (Chromium, Firefox, Edge, 375 px)
     needs: checks
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
+      # Prüft, dass der Produktions-Build den Test-Login trotzdem nicht anbietet (e2e/produktionsmodus.spec.ts).
+      AUTH_TEST_LOGIN: "true"
       E2E_LOGIN_MODE: keycloak
       E2E_BASE_URL: http://localhost:3000
       E2E_DATABASE_URL: postgresql://berichtsheft:berichtsheft@localhost:5432/berichtsheft
@@ -86,9 +90,13 @@ jobs:
           curl -fsS http://localhost:8025/readyz
           for i in $(seq 1 30); do docker compose logs worker | grep -q "verbunden mit pg-boss" && break; sleep 2; done
           docker compose logs worker | grep "verbunden mit pg-boss"
-      - name: Playwright-Browser installieren
-        run: npx playwright install --with-deps chromium
-      - name: Playwright gegen die laufende Demo
+      - name: Playwright-Browser installieren (Chromium, Firefox, Microsoft Edge)
+        run: |
+          npx playwright install --with-deps chromium firefox
+          # Edge ist auf den GitHub-Runnern meist vorinstalliert; sonst installiert Playwright es.
+          command -v microsoft-edge-stable || npx playwright install --with-deps msedge
+          microsoft-edge-stable --version
+      - name: Playwright gegen die laufende Demo (alle Projekte)
         run: npx playwright test
       - name: Container-Logs
         if: failure()

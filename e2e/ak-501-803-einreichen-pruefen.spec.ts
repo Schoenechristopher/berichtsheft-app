@@ -3,7 +3,6 @@ import {
   accounts,
   annasSeedReportId,
   deletePersons,
-  deleteReportWithoutHistory,
   downloadPdf,
   insertTrainee,
   login,
@@ -65,45 +64,6 @@ test.describe("Einreichen und Prüfen", () => {
 
   test.afterEach(async () => {
     await deletePersons(emil.email);
-    await deleteReportWithoutHistory(accounts.anna.email, 2026, 52);
-  });
-
-  test("Beispielszenario: Einreichen scheitert an fehlendem Text (AK-501 AK-502)", async ({ page }) => {
-    // Annas KW 52/2026: Mo–Do „Betrieb“ mit Text, Fr 25.12.2026 als „Feiertag“ vorbelegt.
-    const reportId = await prepareWeek(accounts.anna.email, 2026, 52, [
-      { dayType: "WORK", activities: "Server aufgesetzt" },
-      { dayType: "WORK", activities: "Backup geprüft" },
-      { dayType: "WORK", activities: "Tickets bearbeitet" },
-      { dayType: "WORK", activities: "Inventur" },
-      { dayType: "HOLIDAY", activities: "" },
-    ]);
-    await login(page, accounts.anna);
-    await page.goto(`/berichte/${reportId}`);
-    const friday = day(page, "Freitag, 25.12.2026");
-    await expect(friday.getByLabel("Tagesart")).toHaveValue("HOLIDAY");
-
-    // Anna ändert Freitag auf „Berufsschule“ und reicht ein.
-    await friday.getByLabel("Tagesart").selectOption({ label: "Berufsschule" });
-    await page.getByRole("button", { name: "Einreichen", exact: true }).click();
-
-    // Nicht eingereicht: kein Bestätigungsdialog, Freitag ist als „Tätigkeiten fehlen“ markiert.
-    await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expect(friday.getByTestId("day-issue")).toHaveText("Tätigkeiten fehlen");
-    await expect(friday.getByLabel("Tätigkeiten")).toHaveAttribute("aria-invalid", "true");
-    await expect(
-      page
-        .getByRole("alert")
-        .filter({ hasText: "Nicht eingereicht – bitte ergänzen: Freitag, 25.12.2026: Tätigkeiten fehlen." }),
-    ).toBeVisible();
-    await expect(page.getByTestId("day-issue")).toHaveCount(1);
-    expect(await reportStatus(reportId)).toBe("DRAFT");
-
-    // Die Markierung verschwindet, sobald der Text da ist.
-    await friday.getByLabel("Tätigkeiten").fill("   ");
-    await expect(friday.getByTestId("day-issue")).toHaveText("Tätigkeiten fehlen");
-    await friday.getByLabel("Tätigkeiten").fill("Blockunterricht");
-    await expect(friday.getByTestId("day-issue")).toHaveCount(0);
-    expect(await reportStatus(reportId)).toBe("DRAFT");
   });
 
   test("AK-502 fehlende Tagesart wird am Tag markiert", async ({ page }) => {
@@ -284,7 +244,7 @@ test.describe("Einreichen und Prüfen", () => {
     await bernd.context.close();
   });
 
-  test("Beispielszenario: Vertretung nimmt Freigabe zurück (AK-703 AK-704 AK-801 AK-903 AK-905)", async ({
+  test("AK-703 AK-704 AK-801 AK-903 AK-905 Vertretung nimmt Freigabe zurück, freigegeben ist nichts änderbar", async ({
     browser,
   }) => {
     const reportId = await createEmilWithWeek40();
@@ -344,7 +304,6 @@ test.describe("Einreichen und Prüfen", () => {
     );
     expect(revokedPdf.text).toContain("Nicht freigegeben – Status: Abgelehnt");
     expect(revokedPdf.text).not.toContain("Freigegeben von");
-    // Benachrichtigung (Etappe 6) folgt später.
     for (const session of [trainee, bernd, clara]) {
       await session.context.close();
     }

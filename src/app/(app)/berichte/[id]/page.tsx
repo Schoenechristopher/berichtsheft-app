@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ACCESS_DENIED_MESSAGE, canEditReport, canViewReport, reportStatusLabel } from "@/domain/report-access";
 import { DAY_TYPE_LABELS } from "@/domain/report-days";
@@ -16,6 +17,8 @@ import { requirePerson } from "@/lib/session";
 import { saveReportAction, transitionAction } from "./actions";
 import { ReportEditor } from "./ReportEditor";
 import { ReviewForm, RevokeForm, WithdrawForm } from "./ReviewForms";
+
+export const metadata: Metadata = { title: "Wochenbericht" };
 
 /**
  * Bericht ansehen, erfassen, einreichen und prüfen. Azubis sehen nur eigene Berichte, fremde ergeben

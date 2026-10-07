@@ -97,6 +97,7 @@ export function ReviewForm({
                     value={dayComments[day.id] ?? ""}
                     onChange={(event) => setDayComments((current) => ({ ...current, [day.id]: event.target.value }))}
                     aria-invalid={error ? true : undefined}
+                    aria-describedby={error ? `${id}-error` : undefined}
                     className={`${inputClass} resize-y`}
                   />
                 </Field>

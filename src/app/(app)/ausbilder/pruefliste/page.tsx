@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { formatDateTime } from "@/domain/report-history";
 import { weekRangeLabel } from "@/domain/weeks";
@@ -5,6 +6,8 @@ import { Badge } from "@/components/ui";
 import { db } from "@/lib/db";
 import { listReviewQueue, type ReviewScope } from "@/lib/reports";
 import { requirePerson } from "@/lib/session";
+
+export const metadata: Metadata = { title: "Prüfliste" };
 
 /**
  * Prüfliste (AK-601): eingereichte Berichte mit Azubi, Woche und Einreichungsdatum, älteste zuerst.
@@ -41,7 +44,9 @@ export default async function ReviewQueuePage({ searchParams }: PageProps<"/ausb
       </nav>
       {reports.length === 0 ? (
         <p className="text-sm text-slate-600" data-testid="review-queue-empty">
-          {scope === "mine" ? "Keine eingereichten Berichte Ihrer Azubis." : "Keine eingereichten Berichte."}
+          {scope === "mine"
+            ? "Keine Berichte Ihrer Azubis zur Prüfung. Berichte anderer Azubis (Vertretung) zeigt der Filter „Alle Azubis“."
+            : "Keine Berichte zur Prüfung."}
         </p>
       ) : (
         <ul className="space-y-2" aria-label="Eingereichte Berichte">

@@ -1,5 +1,8 @@
 import { expect, type Page } from "@playwright/test";
+import { execFile } from "node:child_process";
 import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { promisify } from "node:util";
 import pg from "pg";
 import { extractPdfText } from "../tests/pdf-text";
 import { isoWeekWorkdays, toDateInput } from "../src/domain/weeks";
@@ -285,4 +288,44 @@ export async function clearMail(address: string) {
       body: JSON.stringify({ IDs: messages.map((message) => message.ID) }),
     });
   }
+}
+
+const repoRoot = path.resolve(__dirname, "..");
+
+/** Führt ein Skript des Repositorys mit tsx gegen die Datenbank der Demo aus. */
+async function runScript(script: string, env: Record<string, string> = {}) {
+  const databaseUrl = process.env.E2E_DATABASE_URL ?? process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    throw new Error("E2E_DATABASE_URL oder DATABASE_URL muss gesetzt sein.");
+  }
+  const { stdout } = await promisify(execFile)("npx", ["tsx", script], {
+    cwd: repoRoot,
+    env: { ...process.env, DATABASE_URL: databaseUrl, ...env },
+  });
+  return stdout;
+}
+
+/**
+ * Montags-Job wie `npm run erinnerung` zum angegebenen Zeitpunkt (Uhr per APP_FIXED_NOW gestellt):
+ * schreibt Erinnerungen und Informationen und versendet sie gleich (E-Mail an Mailpit, falls da).
+ */
+export async function runReminderJob(at: string) {
+  return runScript("src/worker/run-reminders.ts", { APP_FIXED_NOW: at });
+}
+
+/**
+ * Setzt Anna auf den Seed-Zustand zurück: Historie ist unlöschbar (AK-803), deshalb wird Anna
+ * samt Berichten, Historie und Benachrichtigungen endgültig gelöscht und per Seed neu angelegt
+ * (gleiches Firmenkonto). Auch Informationen an Bernd über Annas Wochen verschwinden.
+ */
+export async function reseedAnna() {
+  await withDatabase(async (db) => {
+    const anna = await db.query("SELECT id FROM person WHERE email = $1", [seedPersons.anna.email]);
+    if (anna.rows[0]) {
+      await db.query("DELETE FROM notification WHERE event_key LIKE $1", [`%:${anna.rows[0].id}`]);
+    }
+    await db.query("DELETE FROM person WHERE email = $1", [seedPersons.anna.email]);
+  });
+  await runScript("prisma/seed.ts");
+  await restoreSeedState();
 }
