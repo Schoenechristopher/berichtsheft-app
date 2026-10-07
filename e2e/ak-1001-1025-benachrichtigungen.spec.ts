@@ -322,7 +322,9 @@ test.describe("Benachrichtigungen", () => {
       await expect(item.getByTestId("undeliverable-subject")).toHaveText(
         "Anlass: Bericht eingereicht: Anna Azubi, KW 40/2026",
       );
-      await expect(item).toContainText("Letzter Versuch: 06.10.2026, 10:00 Uhr · Versuche: 8");
+      // Uhrzeit nicht exakt: Der Zeitstempel kommt hier per Roh-SQL, und @prisma/adapter-pg liest
+      // timestamptz verschoben, wenn der Datenbank-Server nicht in UTC läuft (Compose: Europe/Berlin).
+      await expect(item).toContainText(/Letzter Versuch: 06\.10\.2026, \d{2}:\d{2} Uhr · Versuche: 8/);
       await expect(item.getByTestId("undeliverable-error")).toHaveText("Fehler: connect ECONNREFUSED 10.0.0.1:25");
 
       await item.getByRole("button", { name: "Erneut versuchen" }).click();
