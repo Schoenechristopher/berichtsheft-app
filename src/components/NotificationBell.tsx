@@ -13,16 +13,9 @@ export const UNREAD_COUNT_URL = "/api/benachrichtigungen/ungelesen";
  * beim Navigieren innerhalb der App nicht neu erzeugt.
  */
 export function NotificationBell({ initialUnread }: { initialUnread: number }) {
-  const [fetchedUnread, setUnread] = useState(initialUnread);
+  const [unread, setUnread] = useState(initialUnread);
   const pathname = usePathname();
-  // Die Liste markiert beim Öffnen alles als gelesen (AK-1015). Während sie noch lädt
-  // (Ladezustand), stünde in der Datenbank noch der alte Zähler – auf ihr zeigt die Glocke daher 0.
-  const onList = pathname.startsWith("/benachrichtigungen");
-  const unread = onList ? 0 : fetchedUnread;
   useEffect(() => {
-    if (onList) {
-      return;
-    }
     const controller = new AbortController();
     fetch(UNREAD_COUNT_URL, { cache: "no-store", signal: controller.signal })
       .then((response) => (response.ok ? response.json() : null))
@@ -33,7 +26,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
       })
       .catch(() => {});
     return () => controller.abort();
-  }, [pathname, onList]);
+  }, [pathname]);
   const label = unread > 0 ? `Benachrichtigungen: ${unread} ungelesen` : "Benachrichtigungen";
   return (
     <Link
