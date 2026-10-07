@@ -194,7 +194,7 @@ test.describe("Benachrichtigungen", () => {
     });
   });
 
-  test("Beispielszenario: Vertretung nimmt Freigabe zurück – Benachrichtigung an den Azubi (AK-1002 AK-1013)", async ({
+  test("AK-1002 AK-1013 Rücknahme durch die Vertretung benachrichtigt den Azubi über alle gewählten Kanäle", async ({
     browser,
   }) => {
     const reportId = await createEmilWithWeek40(["EMAIL", "TEAMS", "APP"]);

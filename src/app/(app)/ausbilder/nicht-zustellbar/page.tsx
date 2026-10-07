@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { CHANNEL_LABELS } from "@/domain/notifications";
 import { formatDateTime } from "@/domain/report-history";
 import { Badge, Notice, secondaryButtonClass } from "@/components/ui";
@@ -5,6 +6,8 @@ import { db } from "@/lib/db";
 import { listUndeliverable } from "@/lib/notifications/service";
 import { requirePerson } from "@/lib/session";
 import { retryAction } from "./actions";
+
+export const metadata: Metadata = { title: "Nicht zustellbare Nachrichten" };
 
 /**
  * Nicht zustellbare Nachrichten (bestätigte Auslegung 12): nur für Ausbilder. E-Mail und Teams,

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { now } from "@/domain/clock";
 import { currentIsoWeek } from "@/domain/report-generation";
 import { PdfRangeForm } from "@/components/PdfExport";
@@ -7,6 +8,8 @@ import { db } from "@/lib/db";
 import { exportRangeDefaults } from "@/lib/report-export";
 import { ensureReportsForTrainee, listTraineeWeeks } from "@/lib/reports";
 import { requirePerson } from "@/lib/session";
+
+export const metadata: Metadata = { title: "Meine Wochenberichte" };
 
 /**
  * Startseite für Azubis: Übersicht aller eigenen Wochen (AK-306). Beim Öffnen entstehen fehlende

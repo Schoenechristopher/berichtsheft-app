@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { formatDateTime } from "@/domain/report-history";
 import { MessageText } from "@/components/MessageText";
@@ -6,6 +7,8 @@ import { db } from "@/lib/db";
 import { devMailboxEnabled } from "@/lib/notifications/config";
 import { listDevMailbox } from "@/lib/notifications/service";
 import { requirePerson } from "@/lib/session";
+
+export const metadata: Metadata = { title: "Teams-Postfach (Demo)" };
 
 /**
  * Entwickler-Postfach: simulierter Kanal „Teams“ der Demo (TEAMS_MODE=entwickler-postfach).

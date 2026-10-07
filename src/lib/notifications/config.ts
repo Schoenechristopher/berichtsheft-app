@@ -45,8 +45,13 @@ export function appBaseUrl(env: Record<string, string | undefined> = process.env
   return (env.APP_URL?.trim() || env.AUTH_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
 }
 
+/**
+ * Ohne TEAMS_MODE gilt außerhalb von Produktion das Entwickler-Postfach. Im Produktionsmodus muss
+ * es ausdrücklich eingeschaltet sein (Demo per Docker Compose: TEAMS_MODE=entwickler-postfach);
+ * sonst gilt „graph“, damit eine produktive Installation das Postfach nie aus Versehen anbietet.
+ */
 export function teamsMode(env: Record<string, string | undefined> = process.env): TeamsMode {
-  const mode = env.TEAMS_MODE?.trim() || "entwickler-postfach";
+  const mode = env.TEAMS_MODE?.trim() || (env.NODE_ENV === "production" ? "graph" : "entwickler-postfach");
   if (mode !== "entwickler-postfach" && mode !== "graph") {
     throw new Error(`TEAMS_MODE „${mode}“ ist unbekannt (erlaubt: entwickler-postfach, graph).`);
   }

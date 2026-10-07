@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { federalStateName } from "@/domain/federal-states";
 import { ChannelSettingsForm } from "@/components/ChannelSettingsForm";
@@ -9,6 +10,8 @@ import { requirePerson } from "@/lib/session";
 import { updateChannelsAction } from "../../einstellungen/actions";
 import { updateSettingsAction } from "../personen/actions";
 import { SettingsForm } from "./SettingsForm";
+
+export const metadata: Metadata = { title: "Einstellungen" };
 
 /**
  * Einstellungen für Ausbilder: Bundesland der Firma für die Feiertage (AK-209) und die eigenen

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { roleLabel } from "@/domain/access";
 import { Badge, Notice, primaryButtonClass } from "@/components/ui";
@@ -5,6 +6,8 @@ import { db } from "@/lib/db";
 import { SUCCESS_MESSAGES, trainingPeriod } from "@/lib/people/labels";
 import { listPeople } from "@/lib/people/service";
 import { requirePerson } from "@/lib/session";
+
+export const metadata: Metadata = { title: "Personen" };
 
 /** Nutzerverwaltung: Liste aller Personen (nur Ausbilder, AK-104). */
 export default async function PeoplePage({ searchParams }: PageProps<"/ausbilder/personen">) {

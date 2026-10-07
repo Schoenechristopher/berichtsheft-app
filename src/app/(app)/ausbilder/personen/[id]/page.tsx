@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { roleLabel } from "@/domain/access";
@@ -10,6 +11,8 @@ import { requirePerson } from "@/lib/session";
 import { deactivatePersonAction, deletePersonAction, reactivatePersonAction, updatePersonAction } from "../actions";
 import { DeleteForm, StatusButton } from "../PersonActions";
 import { PersonForm } from "../PersonForm";
+
+export const metadata: Metadata = { title: "Person bearbeiten" };
 
 /** Person bearbeiten (AK-203), deaktivieren (AK-204) und endgültig löschen (AK-206). */
 export default async function PersonPage({ params, searchParams }: PageProps<"/ausbilder/personen/[id]">) {

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { now } from "@/domain/clock";
 import { formatDateTime } from "@/domain/report-history";
@@ -6,6 +7,8 @@ import { Badge, Notice } from "@/components/ui";
 import { db } from "@/lib/db";
 import { openNotifications } from "@/lib/notifications/service";
 import { requirePerson } from "@/lib/session";
+
+export const metadata: Metadata = { title: "Benachrichtigungen" };
 
 /**
  * Eigene Benachrichtigungen des Kanals „App“ (AK-1015), neueste zuerst, mit Link zum Bericht.

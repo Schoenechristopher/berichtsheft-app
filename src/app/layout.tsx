@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Berichtsheft",
+  // Seitentitel: „Prüfliste · Berichtsheft“; Seiten ohne eigenen Titel heißen „Berichtsheft“.
+  title: { default: "Berichtsheft", template: "%s · Berichtsheft" },
   description: "Digitales Berichtsheft für Azubis und Ausbilder",
 };
 

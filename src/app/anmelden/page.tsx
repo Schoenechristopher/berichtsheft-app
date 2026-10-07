@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { signIn } from "@/auth";
 import { AuthCard } from "@/components/AuthCard";
@@ -5,6 +6,8 @@ import { homePathFor, safeReturnPath } from "@/domain/access";
 import { OIDC_PROVIDER_ID, TEST_PROVIDER_ID, oidcConfig, testLoginEnabled } from "@/lib/auth/config";
 import { getCurrentPerson } from "@/lib/session";
 import { testAccounts } from "@/lib/seed-data";
+
+export const metadata: Metadata = { title: "Anmelden" };
 
 /** Anmeldeseite (AK-101): nur über das Firmenkonto, kein eigenes Passwort in der App. */
 export default async function LoginPage({ searchParams }: PageProps<"/anmelden">) {

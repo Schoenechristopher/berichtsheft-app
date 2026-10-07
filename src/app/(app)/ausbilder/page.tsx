@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { now } from "@/domain/clock";
 import { Badge } from "@/components/ui";
@@ -5,6 +6,8 @@ import { db } from "@/lib/db";
 import { trainingPeriod } from "@/lib/people/labels";
 import { ensureReportsForAllTrainees, listReviewQueue, listTraineeWeeks } from "@/lib/reports";
 import { requirePerson } from "@/lib/session";
+
+export const metadata: Metadata = { title: "Start" };
 
 /** Startseite für Ausbilder: Prüfliste (AK-601), Azubis mit ihren Wochenberichten (AK-105), Verwaltung. */
 export default async function TrainerHomePage() {

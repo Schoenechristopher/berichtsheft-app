@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { ChannelSettingsForm } from "@/components/ChannelSettingsForm";
 import { requirePerson } from "@/lib/session";
 import { updateChannelsAction } from "./actions";
+
+export const metadata: Metadata = { title: "Einstellungen" };
 
 /** Einstellungen des Azubis: Kanäle für Benachrichtigungen (AK-1011). Ausbilder haben ihre eigene Seite. */
 export default async function PersonalSettingsPage() {

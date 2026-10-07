@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { AuthCard } from "@/components/AuthCard";
 import { NO_ACCESS_MESSAGE } from "@/domain/access";
 import { switchAccount } from "@/lib/auth/logout";
+
+export const metadata: Metadata = { title: "Kein Zugang" };
 
 /** Hinweis für abgewiesene Konten (AK-102). */
 export default function NoAccessPage() {

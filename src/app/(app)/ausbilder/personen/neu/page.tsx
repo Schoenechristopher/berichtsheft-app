@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { BackLink } from "@/components/ui";
 import { db } from "@/lib/db";
 import { requirePerson } from "@/lib/session";
 import { createPersonAction } from "../actions";
 import { PersonForm } from "../PersonForm";
+
+export const metadata: Metadata = { title: "Person anlegen" };
 
 /** Person anlegen (AK-201): Firmen-E-Mail, Name und Rolle; beim ersten Login wird das Konto gebunden. */
 export default async function NewPersonPage() {
