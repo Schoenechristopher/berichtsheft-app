@@ -18,6 +18,7 @@ TypeScript · Next.js (App Router) · Tailwind CSS · PostgreSQL + Prisma · Aut
 - Jeder Test zu einem Akzeptanzkriterium beginnt mit der AK-ID im Namen, z. B. `AK-102 abgewiesenes Konto sieht Hinweis`.
 - Fachregeln (Status, Pflichtfelder, Wochen, Erinnerung) liegen als reine Funktionen unter `src/domain/`, ohne Abhängigkeit zu UI oder Datenbank.
 - „Jetzt“ kommt ausschließlich aus dem Uhr-Modul (`src/domain/clock.ts`), nie direkt aus `new Date()` in Fachlogik.
+- Datenbankverbindungen nur über `createPrismaClient` (`src/lib/db.ts`): Sie laufen fest in UTC, weil `@prisma/adapter-pg` `timestamptz` sonst bei einem Server in Europe/Berlin verschoben liest. Nach dem Update eine bestehende Demo-Datenbank einmal mit `docker compose down -v` zurücksetzen.
 - Jede Serveraktion prüft Rolle und Besitz selbst; UI-Ausblendung ist kein Schutz.
 - Externe Dienste (Login, E-Mail, Teams) nur über Adapter, konfiguriert per Umgebungsvariablen (`.env.example` pflegen, keine Geheimnisse committen).
 - Nur Testdaten (Anna, Bernd, Clara aus dem Seed), keine echten Personendaten.
