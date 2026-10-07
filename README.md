@@ -47,6 +47,8 @@ Neue Person: als `bernd` unter „Personen“ → „Person anlegen“ Emil Neu 
 
 Beenden mit `Strg+C` bzw. `docker compose down`; `docker compose down -v` löscht zusätzlich die Datenbank.
 
+**Einmalig nach dem Update auf die Zeitzonen-Korrektur:** Eine bereits bestehende Demo-Datenbank bitte einmal mit `docker compose down -v` zurücksetzen. Die App liest und schreibt Zeitstempel jetzt immer in UTC; in älteren Demo-Daten wären Zeitpunkte (z. B. Freigaben) sonst um eine bzw. zwei Stunden verschoben.
+
 ## Aufbau
 
 | Dienst | Aufgabe |
@@ -58,7 +60,7 @@ Beenden mit `Strg+C` bzw. `docker compose down`; `docker compose down -v` lösch
 | `mailpit` | fängt alle E-Mails ab |
 
 - Fachregeln liegen als reine Funktionen in `src/domain/`; „jetzt“ kommt nur aus dem Uhr-Modul `src/domain/clock.ts`.
-- Datenmodell: `prisma/schema.prisma`, Migrationen in `prisma/migrations/`. Die Historie (`status_change`) ist per Datenbank-Trigger unveränderlich.
+- Datenmodell: `prisma/schema.prisma`, Migrationen in `prisma/migrations/`. Jede Datenbankverbindung läuft in UTC (`createPrismaClient` in `src/lib/db.ts`), unabhängig von der Zeitzone des Datenbank-Servers. Die Historie (`status_change`) ist per Datenbank-Trigger unveränderlich.
 - Anmeldung: Auth.js mit OpenID Connect (`src/auth.ts`). Personen werden über die stabile Konto-ID (`sub`, bei Entra ID `oid`) zugeordnet, nicht über Namen. Neu angelegte Personen haben noch keine Konto-ID; der erste Login ordnet sie über die vom Identity Provider bestätigte E-Mail zu und speichert die Konto-ID (`src/lib/auth/login.ts`). Für Microsoft Entra ID werden nur Umgebungsvariablen getauscht (`AUTH_OIDC_*`, siehe `.env.example`).
 - Wochenberichte: Erzeugung, Feiertage und Hervorhebung als reine Funktionen in `src/domain/report-generation.ts` und `src/domain/holidays.ts` (feiertagejs), Regeln zum Erfassen in `src/domain/report-days.ts`, Server-Teil in `src/lib/reports.ts`. Berichte entstehen beim Öffnen der Übersicht und täglich im Worker; die Eindeutigkeit pro Azubi und Woche verhindert Doppelte. Erfassen unter `/berichte/[id]`, Übersicht unter `/azubi`, für Ausbilder `/ausbilder/azubis/[id]`.
 - Einreichen und Prüfen: Statusmodell (`decideTransition`) in `src/domain/report-status.ts`, Pflichtfelder in `src/domain/report-submission.ts`, Historie nach Prüfrunden in `src/domain/report-history.ts`. Jeder Statuswechsel läuft über `transitionReport` in `src/lib/report-transitions.ts`: Rolle und Besitz prüfen, bedingtes Update auf Status und Version (Gleichzeitigkeit), Historieneintrag und Kommentare in derselben Transaktion; dort hängt Etappe 6 die Benachrichtigungen ein. Kommentare und Statuswechsel sind per Datenbank-Trigger unveränderlich, Tage eingereichter und freigegebener Berichte schreibgeschützt. Prüfliste unter `/ausbilder/pruefliste`.

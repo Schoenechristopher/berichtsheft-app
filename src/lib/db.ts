@@ -1,9 +1,16 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 
-/** Erzeugt einen Prisma-Client für die angegebene Datenbank. */
+/**
+ * Jede Verbindung läuft in UTC. Der Treiber-Adapter liest `timestamptz` sonst falsch, sobald der
+ * Datenbank-Server in einer anderen Zeitzone läuft (z. B. TZ=Europe/Berlin im Compose-Stack):
+ * Zeitstempel aus `now()` oder Roh-SQL wären dann um die Zeitzonendifferenz verschoben.
+ */
+export const DB_SESSION_OPTIONS = "-c TimeZone=UTC";
+
+/** Erzeugt einen Prisma-Client für die angegebene Datenbank (App, Worker, Seed und Tests). */
 export function createPrismaClient(connectionString: string): PrismaClient {
-  return new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+  return new PrismaClient({ adapter: new PrismaPg({ connectionString, options: DB_SESSION_OPTIONS }) });
 }
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
