@@ -127,3 +127,30 @@ export function matchLogin(
   }
   return { kind: "none" };
 }
+
+/** Name des Parameters für den Rücksprung nach der Anmeldung (AK-1003), z. B. `/anmelden?ziel=/berichte/…`. */
+export const RETURN_PARAM = "ziel";
+
+/**
+ * Rücksprungziel nach der Anmeldung (AK-1003: Der Link einer Benachrichtigung führt nach der
+ * Anmeldung direkt zum Bericht). Erlaubt sind nur Pfade innerhalb der App – keine fremden
+ * Adressen (`//host`, `https://…`), keine Steuerzeichen, nicht die Anmeldung selbst und nicht die
+ * Auth-Schnittstelle. Sonst null (dann geht es zur Startseite).
+ */
+export function safeReturnPath(value: unknown): string | null {
+  if (typeof value !== "string" || value.length > 2000) {
+    return null;
+  }
+  if (!value.startsWith("/") || value.startsWith("//") || value.startsWith("/\\")) {
+    return null;
+  }
+  // Steuerzeichen (z. B. Zeilenumbrüche) sind in einem Rücksprungziel nie gültig.
+  if (/[\u0000-\u001f\u007f\\]/.test(value)) {
+    return null;
+  }
+  const path = value.split(/[?#]/)[0];
+  if (path === "/" || path === "/anmelden" || path === "/kein-zugang" || path.startsWith("/api/")) {
+    return null;
+  }
+  return value;
+}

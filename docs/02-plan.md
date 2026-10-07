@@ -1,6 +1,6 @@
 # Plan: Technik und Hosting
 
-Stand: 06.10.2026 · freigegeben · Entscheidungen aus Etappe 1 bis 5 ergänzt (freigegeben am 06.10.2026)
+Stand: 07.10.2026 · freigegeben · Entscheidungen aus Etappe 1 bis 5 ergänzt (freigegeben am 06.10.2026), aus Etappe 6 ergänzt (freigegeben am 07.10.2026)
 
 Die erste Version läuft als Demo per Docker Compose auf dem eigenen Rechner: eine TypeScript-Web-App mit PostgreSQL, Test-Login und Test-Mailserver. Für die Übernahme in die Firmeninfrastruktur werden nur Konfiguration und Zielumgebung getauscht, nicht der Code. Anforderungen und Akzeptanzkriterien: [01-spezifikation.md](01-spezifikation.md).
 
@@ -66,7 +66,9 @@ Die fachlichen Regeln liegen in wenigen serverseitigen Modulen ohne Abhängigkei
 | Tag | Bericht, Datum, Tagesart, Tätigkeiten, außerhalb der Ausbildung ja/nein | Tagesart nur aus den fünf Werten (AK-402) |
 | Kommentar | Bericht, Prüfrunde, Tag (leer = Gesamtkommentar), Person, Text, Zeitpunkt | nie änderbar |
 | Statuswechsel | Bericht, alter und neuer Status, Person, Zeitpunkt, Begründung | nie änderbar; die Datenbank weist UPDATE und DELETE ab (AK-803) |
-| Benachrichtigung | Ereignis, Empfänger, Kanal, Inhalt, gesendet am, gelesen am | eindeutig pro Ereignis und Kanal (AK-1004) |
+| Benachrichtigung | Ereignis, Empfänger, Kanal, Inhalt, Link, gesendet am, gelesen am, Versuche, nächster Versuch, letzter Fehler, aufgegeben am | eindeutig pro Ereignis, Empfänger und Kanal (AK-1004); Kanal „App“ gilt beim Anlegen als zugestellt |
+| Teams-Postfach (Demo) | Benachrichtigung, Empfänger, Inhalt | höchstens eine Nachricht pro Benachrichtigung |
+| Erinnerungslauf | ISO-Woche des Stichtags, Zeitpunkt, Anzahl | höchstens ein Lauf pro Woche |
 
 ### Regeln und Abläufe
 
@@ -81,8 +83,12 @@ Die fachlichen Regeln liegen in wenigen serverseitigen Modulen ohne Abhängigkei
 - **Anmeldung und Zuordnung:** Beim Login sucht die App zuerst nach der Konto-ID. Ist keine Person damit verknüpft und hat der Identity Provider die E-Mail bestätigt, wird eine angelegte, aktive und noch nicht verknüpfte Person mit dieser E-Mail (ohne Groß-/Kleinschreibung) einmalig an die Konto-ID gebunden. Eine bereits verknüpfte Person wird nie über die E-Mail umgebunden.
 - **Löschen und Historie:** Endgültiges Löschen entfernt Person, Berichte und deren Historie per Kaskade. Kommt die Person in der Historie von Berichten anderer Azubis vor (Statuswechsel oder Kommentare), lässt sie sich nur deaktivieren; die Nutzerverwaltung prüft das vorher und erklärt es, die Datenbank weist das Löschen zusätzlich ab.
 - **Regeln der Nutzerverwaltung:** reine Funktionen in `src/domain/people.ts`, serverseitig in jeder Aktion geprüft (in einer serialisierbaren Transaktion, damit gleichzeitige Änderungen den letzten aktiven Ausbilder nicht umgehen): letzter aktiver Ausbilder (AK-207); zugeordnete Azubis – fürs Deaktivieren nur aktive, fürs Löschen und Herabstufen alle (AK-208); kein Ausbilder deaktiviert, löscht oder stuft sich selbst um; Reaktivieren eines Azubis nur mit aktivem Ausbilder.
-- **Benachrichtigungen:** Ein Statuswechsel schreibt in derselben Transaktion seine Benachrichtigungen in die Tabelle (Outbox). Der Worker versendet sie je Kanal über einen eigenen Adapter: E-Mail, Teams, App. Geht der Wechsel schief, entsteht auch keine Nachricht.
-- **Erinnerung:** Ein Job läuft montags um 9:00 Uhr Europe/Berlin. Für jeden aktiven Azubi sammelt er alle offenen Wochen vor der aktuellen und schickt eine Nachricht mit allen (AK-1025). Ist eine davon älter als eine Woche, geht zusätzlich eine Information an den zugeordneten Ausbilder.
+- **Benachrichtigungen:** Ein Statuswechsel schreibt in derselben Transaktion seine Benachrichtigungen in die Tabelle (Outbox), eine Zeile pro Ereignis, Empfänger und gewähltem Kanal; geht der Wechsel schief, entsteht auch keine Nachricht. Wer was bekommt und mit welchem Text, entscheiden reine Funktionen in `src/domain/notifications.ts`; der Einhängepunkt ist `recordNotifications` in `transitionReport`. Links führen auf `APP_URL`; ohne Sitzung leitet jede geschützte Seite mit Rücksprungziel zur Anmeldung (`src/proxy.ts`, `/anmelden?ziel=…`, nur Pfade innerhalb der App).
+  - **Versand:** Der Worker prüft die Outbox alle 5 Sekunden (`NOTIFICATION_POLL_SECONDS`). Jede Zeile wird in einer eigenen Transaktion mit `FOR NO KEY UPDATE SKIP LOCKED` geholt, über den Adapter ihres Kanals versendet und in derselben Transaktion als gesendet markiert; parallele Worker überspringen gesperrte Zeilen. Fehlversuche werden mit wachsender Wartezeit wiederholt (30 s bis 1 h), nach 8 Versuchen (`NOTIFICATION_MAX_ATTEMPTS`) oder bei deaktiviertem Empfänger wird aufgegeben. Ausbilder sehen aufgegebene Nachrichten unter `/ausbilder/nicht-zustellbar` (Zähler im Menü) und können sie erneut versuchen.
+  - **Absturz zwischen Senden und Markieren:** Die Zeile bleibt offen und wird erneut versendet („mindestens einmal“, Zeitfenster nur der Commit). Duplikate minimiert: das Teams-Postfach ist pro Benachrichtigung eindeutig, jede E-Mail trägt eine feste Message-ID pro Benachrichtigung.
+  - **Adapter** (`src/lib/notifications/adapters.ts`): E-Mail per SMTP (Nodemailer; Demo Mailpit, produktiv Exchange Online über `SMTP_*`). Teams per `TEAMS_MODE`: `entwickler-postfach` (Demo, Seite `/entwickler-postfach`; Azubis sehen eigene, Ausbilder alle Nachrichten) oder `graph` (Microsoft Graph, Zugangsdaten `TEAMS_GRAPH_*`; Weg mit der IT zu klären, bis dahin meldet der Adapter einen Fehler). App ohne Versand: Glocke mit Zähler in der Kopfzeile, Liste unter `/benachrichtigungen`, Öffnen der Liste markiert als gelesen.
+  - **Kanäle:** Jede Person stellt sie selbst ein (Azubis `/einstellungen`, Ausbilder `/ausbilder/einstellungen`); sie gelten ab dem nächsten Ereignis.
+- **Erinnerung:** Ein Job läuft montags um 9:00 Uhr Europe/Berlin (pg-boss). Lief er nicht, holt der Worker ihn einmal nach – beim Start und alle 10 Minuten –, solange es noch Montag 9:00 Uhr bis Dienstag 23:59 Uhr derselben Woche ist; Stichtag bleibt der Montag (`reminderSchedule`). Jede Woche läuft höchstens einmal (Tabelle `reminder_run`, in derselben Transaktion wie die Benachrichtigungen). Für jeden aktiven Azubi sammelt `planReminders` mit `classifyWeek` alle offenen Wochen vor der laufenden und schickt eine Nachricht mit allen (AK-1025). Liegt eine davon vor der Vorwoche, geht zusätzlich eine Information an den zugeordneten Ausbilder, eine pro Azubi. Ereignisschlüssel pro Woche des Stichtags verhindern Doppelte. `npm run erinnerung` löst den Job für Demo und Entwicklung von Hand aus.
 - **PDF:** Je eine Serverroute für eine Woche (`/berichte/[id]/pdf`) und für einen Zeitraum (`/azubis/[id]/pdf?von=…&bis=…`), mit denselben Zugriffsregeln wie die Berichtsseite (`canViewReport`; fremd 403, unbekannt 404). Was gedruckt wird (Wochen des Zeitraums, Freigabevermerk der aktuell gültigen Freigabe bzw. Kennzeichnung, Dateiname), entscheiden reine Funktionen in `src/domain/report-pdf.ts`; das Layout ist eine eigene Einheit in `src/pdf/` (Daten rein, PDF raus), das Laden in `src/lib/report-export.ts`. Das PDF entsteht bei jedem Aufruf neu (`Cache-Control: no-store`), damit nach einer Rücknahme kein Vermerk bleibt. Messung: 150 Wochen (300 Seiten) in rund 6 s.
 - **Zeit:** Alle Regeln holen „jetzt“ aus einem Uhr-Modul. Tests stellen damit Montag 9:00 Uhr oder einen Feiertag gezielt ein.
 
@@ -93,8 +99,8 @@ Jedes Akzeptanzkriterium bekommt mindestens einen Test, dessen Name mit der AK-I
 | Ebene | Werkzeug | Prüft vor allem |
 | --- | --- | --- |
 | Logik | Vitest | Statusübergänge, Pflichtfelder, Wochen erzeugen, Feiertage, Erinnerungsregel (AK-3xx, AK-501–504, AK-1021–1025) |
-| Server mit Datenbank | Vitest gegen PostgreSQL im Container | Zugriffsschutz, Historie unveränderbar, Benachrichtigung genau einmal, Gleichzeitigkeit (AK-103, AK-508, AK-803, AK-1004) |
-| Browser | Playwright gegen die laufende Demo | komplette Abläufe und die drei Beispielszenarien; Login über Keycloak, Mails in Mailpit nachgesehen |
+| Server mit Datenbank | Vitest gegen PostgreSQL im Container | Zugriffsschutz, Historie unveränderbar, Benachrichtigung genau einmal (zwei parallele Worker-Durchläufe), Gleichzeitigkeit, E-Mail über einen SMTP-Mock (AK-103, AK-508, AK-803, AK-1004) |
+| Browser | Playwright gegen die laufende Demo | komplette Abläufe und die drei Beispielszenarien; Login über Keycloak, Mails über die Mailpit-API geprüft (`E2E_MAILPIT_URL`) |
 | Geräte und Browser | Playwright-Projekte für Chromium, Firefox, Edge und 375 px Breite | AK-1101, AK-1102 |
 | PDF | Vitest: PDF erzeugen, Text mit pdfjs-dist auslesen | Inhalt, Freigabevermerk, Umlaute, langer Text (AK-901–907); Beispiel-PDFs als CI-Artefakt (`npm run pdf:beispiel`) |
 

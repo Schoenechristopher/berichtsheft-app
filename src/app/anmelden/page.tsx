@@ -1,25 +1,27 @@
 import { redirect } from "next/navigation";
 import { signIn } from "@/auth";
 import { AuthCard } from "@/components/AuthCard";
-import { homePathFor } from "@/domain/access";
+import { homePathFor, safeReturnPath } from "@/domain/access";
 import { OIDC_PROVIDER_ID, TEST_PROVIDER_ID, oidcConfig, testLoginEnabled } from "@/lib/auth/config";
 import { getCurrentPerson } from "@/lib/session";
 import { testAccounts } from "@/lib/seed-data";
 
 /** Anmeldeseite (AK-101): nur über das Firmenkonto, kein eigenes Passwort in der App. */
 export default async function LoginPage({ searchParams }: PageProps<"/anmelden">) {
+  const params = await searchParams;
+  // AK-1003: Rücksprung zum Ziel eines Benachrichtigungs-Links nach der Anmeldung.
+  const target = safeReturnPath(params.ziel) ?? "/";
   const person = await getCurrentPerson();
   if (person) {
-    redirect(homePathFor(person.role));
+    redirect(target === "/" ? homePathFor(person.role) : target);
   }
 
-  const params = await searchParams;
   const oidc = oidcConfig();
   const showTestLogin = testLoginEnabled();
 
   async function loginWithCompanyAccount() {
     "use server";
-    await signIn(OIDC_PROVIDER_ID, { redirectTo: "/" });
+    await signIn(OIDC_PROVIDER_ID, { redirectTo: target });
   }
 
   async function loginWithTestAccount(formData: FormData) {
@@ -27,7 +29,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/anmelden">
     if (!testLoginEnabled()) {
       redirect("/anmelden");
     }
-    await signIn(TEST_PROVIDER_ID, { accountId: String(formData.get("accountId") ?? ""), redirectTo: "/" });
+    await signIn(TEST_PROVIDER_ID, { accountId: String(formData.get("accountId") ?? ""), redirectTo: target });
   }
 
   return (
@@ -40,6 +42,12 @@ export default async function LoginPage({ searchParams }: PageProps<"/anmelden">
       {params.error ? (
         <p role="alert" className="rounded-md bg-red-50 p-3 text-sm text-red-800">
           Die Anmeldung ist fehlgeschlagen. Bitte erneut versuchen.
+        </p>
+      ) : null}
+
+      {target !== "/" ? (
+        <p role="status" className="rounded-md bg-slate-100 p-3 text-sm text-slate-700">
+          Bitte melden Sie sich an. Danach geht es direkt zur aufgerufenen Seite.
         </p>
       ) : null}
 

@@ -15,7 +15,7 @@ test.describe("Abgewiesene Konten", () => {
     // Es entsteht keine Sitzung.
     expect(await (await page.request.get("/api/auth/session")).json()).toBeNull();
     await page.goto("/azubi");
-    await expect(page).toHaveURL(/\/anmelden$/);
+    await expect(page).toHaveURL(/\/anmelden(\?ziel=[^&]+)?$/);
   });
 
   test("AK-102 deaktivierte Person wird mit Hinweis abgewiesen", async ({ page }) => {

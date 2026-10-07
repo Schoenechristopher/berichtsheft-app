@@ -29,6 +29,8 @@ import {
 } from "@/domain/report-submission";
 import type { Prisma, PrismaClient } from "@/generated/prisma/client";
 import { isUuid } from "@/lib/ids";
+import { appBaseUrl } from "@/lib/notifications/config";
+import { recordTransitionNotifications } from "@/lib/notifications/service";
 
 export interface TransitionInput {
   action: ReportAction;
@@ -60,7 +62,7 @@ export type TransitionResult =
       savedDraft?: boolean;
     };
 
-/** Ereignis eines erfolgreichen Statuswechsels – Grundlage für die Benachrichtigungen (Etappe 6). */
+/** Ereignis eines erfolgreichen Statuswechsels – Grundlage für die Benachrichtigungen. */
 export interface TransitionEvent {
   statusChangeId: string;
   action: ReportAction;
@@ -73,13 +75,12 @@ export interface TransitionEvent {
 }
 
 /**
- * Einhängepunkt für Etappe 6: Hier schreibt der Statuswechsel seine Benachrichtigungen in die
- * Outbox (Tabelle `notification`), in derselben Transaktion – scheitert der Wechsel, entsteht
- * auch keine Nachricht. In Etappe 4 bewusst noch ohne Wirkung.
+ * Benachrichtigungen zum Statuswechsel (Etappe 6, AK-1001 – AK-1003): in derselben Transaktion in
+ * die Outbox (Tabelle `notification`) – scheitert der Wechsel, entsteht auch keine Nachricht. Wer
+ * was bekommt, entscheidet `planTransitionNotifications`; der Worker versendet E-Mail und Teams.
  */
 async function recordNotifications(tx: Prisma.TransactionClient, event: TransitionEvent): Promise<void> {
-  void tx;
-  void event;
+  await recordTransitionNotifications(tx, event, { now: now(), baseUrl: appBaseUrl() });
 }
 
 const NOT_FOUND = "Bericht nicht gefunden.";

@@ -1,6 +1,6 @@
 # Berichtsheft-App – Anforderungen und Akzeptanzkriterien
 
-Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201, AK-204, AK-206 bis AK-208 freigegeben am 06.10.2026 (Etappe 2) · Ergänzungen zu AK-203, AK-305, AK-306, AK-404, AK-406 bis AK-408 freigegeben am 06.10.2026 (Etappe 3) · Ergänzungen zu AK-501, AK-502, AK-505, AK-604 bis AK-606, AK-803 und zum Statusmodell freigegeben am 06.10.2026 (Etappe 4) · Ergänzungen zu AK-901 bis AK-907 und zum PDF-Export freigegeben am 06.10.2026 (Etappe 5)
+Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201, AK-204, AK-206 bis AK-208 freigegeben am 06.10.2026 (Etappe 2) · Ergänzungen zu AK-203, AK-305, AK-306, AK-404, AK-406 bis AK-408 freigegeben am 06.10.2026 (Etappe 3) · Ergänzungen zu AK-501, AK-502, AK-505, AK-604 bis AK-606, AK-803 und zum Statusmodell freigegeben am 06.10.2026 (Etappe 4) · Ergänzungen zu AK-901 bis AK-907 und zum PDF-Export freigegeben am 06.10.2026 (Etappe 5) · Ergänzungen zu AK-1001 bis AK-1025 und zu Benachrichtigungen und Erinnerung freigegeben am 07.10.2026 (Etappe 6)
 
 Azubis führen ihr Berichtsheft digital als Wochenbericht, Ausbilder prüfen und geben es frei. Diese Spezifikation ist freigegeben und durch die Akzeptanzkriterien (AK) testbar. Technik und Hosting stehen in [02-plan.md](02-plan.md).
 
@@ -65,6 +65,15 @@ Zurückziehen geht nur, solange der Bericht noch nicht geprüft ist. Ablehnung u
 | Dieselbe Woche am folgenden Montag 9:00 Uhr immer noch offen | Azubi und zugeordneter Ausbilder, danach jeden Montag erneut bis zur Einreichung |
 
 - **Kanäle:** Jede Person wählt selbst eine beliebige Kombination aus E-Mail, Teams und App, auch keinen. Voreinstellung für neue Personen: E-Mail + App. Wer alles abwählt, bekommt auch keine Erinnerungen.
+- **Weitere Anlässe:** Erneutes Einreichen (nach Ablehnung oder Rücknahme) benachrichtigt den zugeordneten Ausbilder wie das erste Einreichen. Zurückziehen löst keine Benachrichtigung aus.
+- **Inhalt:** Betreff mit Anlass, Azubi und Woche; der Text nennt Anlass, Azubi und Woche mit Zeitraum und verlinkt den Bericht. Kommentar- und Begründungstexte stehen nicht in der Nachricht, nur der Hinweis, dass sie im Bericht stehen. Nennt eine Nachricht mehrere Wochen, steht im Text jede Woche mit eigenem Link; der Link in der App führt dann zur Übersicht.
+- **Rücksprung nach der Anmeldung:** Wer ohne Anmeldung eine geschützte Seite aufruft (z. B. über den Link einer Benachrichtigung), landet nach der Anmeldung direkt dort. Fremde Adressen als Ziel werden ignoriert.
+- **„Überfällig“ für den Ausbilder:** eine Woche, die am Stichtag (Montag 9:00 Uhr) offen ist und vor der Vorwoche liegt, also schon am Montag davor offen war; das gilt auch für abgelehnte Wochen. Es zählt der Status am Stichtag. Der Ausbilder erhält eine Nachricht pro Azubi mit allen überfälligen Wochen dieses Azubis.
+- **Ohne Kanal:** Ein Azubi ohne Kanal bekommt keine Erinnerung; sein Ausbilder wird trotzdem über seine eigenen Kanäle informiert.
+- **Verpasster Montag:** Lief die Erinnerung um 9:00 Uhr nicht (z. B. Worker oder Rechner aus), wird sie einmal nachgeholt, sobald der Worker zwischen Montag 9:00 Uhr und Dienstag 23:59 Uhr derselben Woche läuft; Stichtag bleibt der Montag. Danach wird nicht mehr nachgeholt. Jede Woche läuft höchstens einmal.
+- **Noch nicht versendete Nachrichten:** Geänderte Kanäle wirken erst ab dem nächsten Ereignis; bereits angelegte Nachrichten gehen über den ursprünglichen Kanal raus. An einen inzwischen deaktivierten Empfänger wird nichts mehr versendet.
+- **Nicht zustellbare Nachrichten:** E-Mail- und Teams-Nachrichten, die nach mehreren Fehlversuchen aufgegeben werden oder deren Empfänger deaktiviert ist, sehen Ausbilder in der Liste „Nicht zustellbare Nachrichten“ mit Empfänger, Kanal, Anlass, Zeitpunkt des letzten Versuchs und Fehlermeldung, dazu einen Zähler im Menü. Mit „Erneut versuchen“ wird eine Nachricht an einen aktiven Empfänger noch einmal versendet. Azubis sehen die Liste nicht.
+- **Teams in der Demo:** Bis zur Anbindung an Microsoft Teams landen Teams-Nachrichten im „Teams-Postfach (Demo)“ in der App; Azubis sehen dort ihre eigenen Nachrichten, Ausbilder alle.
 
 ## Nutzerverwaltung
 
@@ -188,16 +197,16 @@ Jedes Kriterium ist eine prüfbare Aussage mit eigener ID, damit Testfälle dara
 | ID | Kriterium |
 | --- | --- |
 | AK-1001 | Beim Einreichen wird der zugeordnete Ausbilder benachrichtigt, andere Ausbilder nicht. |
-| AK-1002 | Bei Freigabe, Ablehnung und Rücknahme einer Freigabe wird der Azubi benachrichtigt. |
-| AK-1003 | Jede Benachrichtigung nennt Azubi, Woche und Anlass und verlinkt den Bericht; der Link führt nach der Anmeldung direkt dorthin. |
-| AK-1004 | Pro Ereignis und Kanal geht genau eine Nachricht raus, ohne Duplikate. |
+| AK-1002 | Bei Freigabe, Ablehnung und Rücknahme einer Freigabe wird der Azubi benachrichtigt. Ergänzung: Erneutes Einreichen benachrichtigt den zugeordneten Ausbilder wie das erste Einreichen; Zurückziehen benachrichtigt niemanden. |
+| AK-1003 | Jede Benachrichtigung nennt Azubi, Woche und Anlass und verlinkt den Bericht; der Link führt nach der Anmeldung direkt dorthin. Ergänzung: Kommentar- und Begründungstexte stehen nicht in der Nachricht. Bei mehreren Wochen steht im Text jede Woche mit eigenem Link, der Link in der App führt zur Übersicht. Der Rücksprung nach der Anmeldung gilt für jede geschützte Seite; fremde Adressen werden ignoriert. |
+| AK-1004 | Pro Ereignis und Kanal geht genau eine Nachricht raus, ohne Duplikate. Ergänzung: Scheitert der Versand, wird er mit Wartezeit wiederholt; nach mehreren Fehlversuchen oder bei deaktiviertem Empfänger wird aufgegeben, und die Nachricht erscheint für Ausbilder unter „Nicht zustellbare Nachrichten“ (mit „Erneut versuchen“). |
 | AK-1011 | Jede Person kann E-Mail, Teams und App beliebig kombinieren, auch alle abwählen. |
 | AK-1012 | Neue Personen haben die Voreinstellung E-Mail + App. |
 | AK-1013 | Benachrichtigt wird nur über die gewählten Kanäle; ohne Kanal geht keine Nachricht raus, der Status bleibt in der App sichtbar. |
-| AK-1014 | Geänderte Kanal-Einstellungen gelten ab dem nächsten Ereignis. |
-| AK-1015 | Der Kanal „App“ zeigt ungelesene Benachrichtigungen mit Zähler; nach dem Öffnen gelten sie als gelesen. |
-| AK-1021 | Ist die Vorwoche am Montag um 9:00 Uhr noch offen, erhält der Azubi eine Erinnerung. |
-| AK-1022 | Ist dieselbe Woche am folgenden Montag um 9:00 Uhr noch offen, wird zusätzlich der zugeordnete Ausbilder informiert. |
+| AK-1014 | Geänderte Kanal-Einstellungen gelten ab dem nächsten Ereignis. Ergänzung: Bereits angelegte, noch nicht versendete Nachrichten gehen über den ursprünglichen Kanal raus. |
+| AK-1015 | Der Kanal „App“ zeigt ungelesene Benachrichtigungen mit Zähler; nach dem Öffnen gelten sie als gelesen. Präzisierung: Das Öffnen der Liste der Benachrichtigungen markiert alle als gelesen; die bis dahin ungelesenen sind dabei noch als „Neu“ hervorgehoben. |
+| AK-1021 | Ist die Vorwoche am Montag um 9:00 Uhr noch offen, erhält der Azubi eine Erinnerung. Ergänzung: Lief der Job um 9:00 Uhr nicht, wird er einmal nachgeholt, sobald der Worker bis Dienstag 23:59 Uhr derselben Woche läuft; Stichtag bleibt der Montag. |
+| AK-1022 | Ist dieselbe Woche am folgenden Montag um 9:00 Uhr noch offen, wird zusätzlich der zugeordnete Ausbilder informiert. Präzisierung: Das gilt für jede Woche, die am Stichtag offen ist und vor der Vorwoche liegt, auch abgelehnte; eine Nachricht pro Azubi. Ein Azubi ohne Kanal bekommt keine Erinnerung, der Ausbilder wird trotzdem informiert. |
 | AK-1023 | Für eingereichte oder freigegebene Wochen und für die laufende Woche kommt keine Erinnerung. |
 | AK-1024 | Danach gehen Erinnerung und Information jeden Montag erneut raus, bis die Woche eingereicht ist. |
 | AK-1025 | Sind mehrere Wochen offen, nennt die Erinnerung alle offenen Wochen in einer Nachricht. |

@@ -125,7 +125,9 @@ describe("Datenbank-Regeln des Datenmodells", () => {
     await prisma.notification.create({ data });
 
     await expect(prisma.notification.create({ data })).rejects.toThrow();
-    await prisma.notification.create({ data: { ...data, channel: "APP" } });
+    // Kanal „App“: kein Versand, die Zeile gilt beim Anlegen als zugestellt (Etappe 6).
+    await expect(prisma.notification.create({ data: { ...data, channel: "APP" } })).rejects.toThrow();
+    await prisma.notification.create({ data: { ...data, channel: "APP", sentAt: new Date() } });
     expect(await prisma.notification.count()).toBe(2);
   });
 });

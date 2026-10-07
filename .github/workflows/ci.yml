@@ -65,6 +65,8 @@ jobs:
       E2E_LOGIN_MODE: keycloak
       E2E_BASE_URL: http://localhost:3000
       E2E_DATABASE_URL: postgresql://berichtsheft:berichtsheft@localhost:5432/berichtsheft
+      # E-Mails über die Mailpit-API prüfen (Etappe 6); der Worker im Compose-Stack versendet sie.
+      E2E_MAILPIT_URL: http://localhost:8025
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5

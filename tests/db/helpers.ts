@@ -15,6 +15,7 @@ export async function resetDatabase(prisma: TestDb) {
   await prisma.person.deleteMany({ where: { role: "TRAINEE" } });
   await prisma.person.deleteMany();
   await prisma.setting.deleteMany();
+  await prisma.reminderRun.deleteMany();
 }
 
 /** Legt Bernd (Ausbilder), Clara (Vertretung) und Anna (Azubi, zugeordnet Bernd) an. */

@@ -313,7 +313,7 @@ test.describe("Nutzerverwaltung", () => {
     await expect(page.getByLabel("Bundesland der Firma")).toHaveValue("NW");
 
     await page.getByLabel("Bundesland der Firma").selectOption({ label: "Niedersachsen" });
-    await page.getByRole("button", { name: "Speichern" }).click();
+    await page.getByRole("button", { name: "Speichern", exact: true }).click();
     await expect(page.getByRole("status")).toHaveText("Gespeichert: Bundesland Niedersachsen.");
 
     await page.reload();

@@ -19,7 +19,7 @@ test.describe("Abmelden", () => {
     // Geschützte Seiten führen zur Anmeldung.
     for (const path of ["/", "/ausbilder", "/azubi"]) {
       await page.goto(path);
-      await expect(page).toHaveURL(/\/anmelden$/);
+      await expect(page).toHaveURL(/\/anmelden(\?ziel=[^&]+)?$/);
     }
 
     if (loginMode === "keycloak") {
