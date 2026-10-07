@@ -4,7 +4,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { logout } from "@/lib/auth/logout";
 import { db } from "@/lib/db";
 import { devMailboxEnabled } from "@/lib/notifications/config";
-import { countUnread } from "@/lib/notifications/service";
+import { countUndeliverable, countUnread } from "@/lib/notifications/service";
 import { currentPath, requirePerson } from "@/lib/session";
 
 const navLinkClass = "text-blue-700 hover:underline";
@@ -17,6 +17,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const onNotifications = (await currentPath())?.startsWith("/benachrichtigungen") ?? false;
   const unread = onNotifications ? 0 : await countUnread(db(), person.id);
   const devMailbox = devMailboxEnabled();
+  // Nicht zustellbare Nachrichten: Hinweis nur für Ausbilder (bestätigte Auslegung 12).
+  const undeliverable = await countUndeliverable(db(), person);
 
   return (
     <>
@@ -65,6 +67,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                     Einstellungen
                   </Link>
                 </li>
+                {undeliverable > 0 ? (
+                  <li>
+                    <Link
+                      href="/ausbilder/nicht-zustellbar"
+                      className="font-medium text-red-700 hover:underline"
+                      data-testid="undeliverable-count"
+                    >
+                      Nicht zustellbar ({undeliverable})
+                    </Link>
+                  </li>
+                ) : null}
               </>
             ) : (
               <>

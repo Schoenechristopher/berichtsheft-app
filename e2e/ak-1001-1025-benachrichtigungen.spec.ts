@@ -295,6 +295,59 @@ test.describe("Benachrichtigungen", () => {
     await trainee.context.close();
   });
 
+  test("Nicht zustellbare Nachrichten: Ausbilder sehen Liste und Zähler und versuchen erneut; Azubis nicht", async ({
+    browser,
+  }) => {
+    const eventKey = "e2e:nicht-zustellbar";
+    await withDatabase((db) =>
+      db.query(
+        `INSERT INTO notification (id, event_key, recipient_id, channel, subject, body, link, attempts,
+           last_error, failed_at, next_attempt_at)
+         VALUES (gen_random_uuid(), $1, (SELECT id FROM person WHERE email = $2), 'EMAIL',
+           'Bericht eingereicht: Anna Azubi, KW 40/2026', 'Text', '/azubi', 8,
+           'connect ECONNREFUSED 10.0.0.1:25', '2026-10-06T10:00:00+02:00', now())`,
+        [eventKey, accounts.bernd.email],
+      ),
+    );
+    try {
+      const trainer = await newSession(browser, accounts.clara);
+      const nav = trainer.page.getByRole("navigation", { name: "Hauptmenü" });
+      await expect(nav.getByTestId("undeliverable-count")).toHaveText("Nicht zustellbar (1)");
+      await nav.getByTestId("undeliverable-count").click();
+      await expect(trainer.page.getByRole("heading", { name: "Nicht zustellbare Nachrichten" })).toBeVisible();
+      const item = trainer.page.getByTestId("undeliverable");
+      await expect(item).toHaveCount(1);
+      await expect(item).toContainText("E-Mail");
+      await expect(item).toContainText("An Bernd Ausbilder");
+      await expect(item.getByTestId("undeliverable-subject")).toHaveText(
+        "Anlass: Bericht eingereicht: Anna Azubi, KW 40/2026",
+      );
+      await expect(item).toContainText("Letzter Versuch: 06.10.2026, 10:00 Uhr · Versuche: 8");
+      await expect(item.getByTestId("undeliverable-error")).toHaveText("Fehler: connect ECONNREFUSED 10.0.0.1:25");
+
+      await item.getByRole("button", { name: "Erneut versuchen" }).click();
+      await expect(
+        trainer.page.getByText("Die Nachricht wird beim nächsten Durchlauf erneut versendet."),
+      ).toBeVisible();
+      await expect(trainer.page.getByTestId("undeliverable")).toHaveCount(0);
+      await expect(trainer.page.getByTestId("undeliverable-count")).toHaveCount(0);
+      expect(await queryOne("SELECT failed_at, attempts FROM notification WHERE event_key = $1", [eventKey])).toEqual({
+        failed_at: null,
+        attempts: 0,
+      });
+      await trainer.context.close();
+
+      // Azubis erreichen die Liste nicht, auch nicht per URL.
+      const anna = await newSession(browser, accounts.anna);
+      await anna.page.goto("/ausbilder/nicht-zustellbar");
+      await expect(anna.page).toHaveURL(/\/azubi$/);
+      await expect(anna.page.getByTestId("undeliverable-count")).toHaveCount(0);
+      await anna.context.close();
+    } finally {
+      await withDatabase((db) => db.query("DELETE FROM notification WHERE event_key = $1", [eventKey]));
+    }
+  });
+
   test("AK-1102 Glocke, Benachrichtigungen, Einstellungen und Teams-Postfach bei 375 px ohne horizontales Scrollen", async ({
     browser,
   }) => {

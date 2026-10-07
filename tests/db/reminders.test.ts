@@ -7,7 +7,7 @@ import { afterAll, afterEach, beforeEach, describe, expect, it } from "vitest";
 import { now, resetClock, setFixedNow } from "@/domain/clock";
 import { createEmailAdapter } from "@/lib/notifications/adapters";
 import { deliverPendingNotifications } from "@/lib/notifications/outbox";
-import { runWeeklyReminders } from "@/lib/notifications/service";
+import { runDueReminders, runWeeklyReminders } from "@/lib/notifications/service";
 import { deactivatePerson } from "@/lib/people/service";
 import { ensureReportsForTrainee } from "@/lib/reports";
 import { startSmtpMock } from "../smtp-mock";
@@ -171,5 +171,59 @@ describe("Erinnerung montags 9:00 Uhr", () => {
     } finally {
       await smtp.close();
     }
+  });
+});
+
+describe("Verpasste Erinnerung nachholen (bestätigte Auslegung 11)", () => {
+  /** Start des Workers bzw. regelmäßige Prüfung zum angegebenen Zeitpunkt. */
+  async function workerCheck(at: string) {
+    setFixedNow(at);
+    return runDueReminders(prisma, { now: now(), baseUrl: BASE });
+  }
+
+  it("AK-1021 Start Montag 10:00 Uhr: der verpasste Lauf von 9:00 Uhr wird nachgeholt, Stichtag bleibt Montag", async () => {
+    expect(await workerCheck("2026-10-12T10:00:00+02:00")).toEqual({ ran: true, created: 2 });
+    const reminder = await messages("reminder:2026-W42");
+    expect(reminder.map((row) => row.who)).toEqual(["Anna:EMAIL", "Anna:APP"]);
+    expect(reminder[0].subject).toBe("Erinnerung: Wochenbericht noch offen – KW 41/2026");
+    expect(await prisma.reminderRun.findMany()).toMatchObject([{ isoYear: 2026, isoWeek: 42, created: 2 }]);
+  });
+
+  it("AK-1022 Start Dienstag 23:59 Uhr: Information an den Ausbilder wird mit Stichtag Montag nachgeholt", async () => {
+    await setStatus([42], "SUBMITTED");
+    expect(await workerCheck("2026-10-20T23:59:00+02:00")).toEqual({ ran: true, created: 4 });
+    const info = await messages("trainer-info:2026-W43");
+    expect(info[0].body).toContain("Stichtag: 19.10.2026");
+  });
+
+  it("AK-1021 Start Mittwoch: nicht mehr nachholen", async () => {
+    expect(await workerCheck("2026-10-14T00:00:00+02:00")).toEqual({ ran: false, reason: "nicht-faellig" });
+    expect(await workerCheck("2026-10-14T10:00:00+02:00")).toEqual({ ran: false, reason: "nicht-faellig" });
+    expect(await prisma.notification.count()).toBe(0);
+  });
+
+  it("AK-1021 vor Montag 9:00 Uhr läuft noch nichts", async () => {
+    expect(await workerCheck("2026-10-12T08:59:00+02:00")).toEqual({ ran: false, reason: "nicht-faellig" });
+  });
+
+  it("AK-1024 zweimal Start am Montag (auch gleichzeitig): nur ein Lauf, keine zweite Nachricht", async () => {
+    const [first, parallel] = await Promise.all([
+      workerCheck("2026-10-12T10:00:00+02:00"),
+      runDueReminders(prisma, { now: now(), baseUrl: BASE }),
+    ]);
+    expect([first, parallel]).toContainEqual({ ran: true, created: 2 });
+    expect([first, parallel]).toContainEqual({ ran: false, reason: "schon-erledigt" });
+    expect(await workerCheck("2026-10-12T15:00:00+02:00")).toEqual({ ran: false, reason: "schon-erledigt" });
+    expect(await prisma.notification.count()).toBe(2);
+  });
+
+  it("AK-1024 pünktlicher Lauf um 9:00 Uhr, danach findet die Prüfung nichts mehr nachzuholen – auch wenn inzwischen eine Woche offen ist", async () => {
+    await setStatus([41], "SUBMITTED");
+    expect(await workerCheck("2026-10-12T09:00:00+02:00")).toEqual({ ran: true, created: 0 });
+    await setStatus([41], "REJECTED");
+    expect(await workerCheck("2026-10-12T09:10:00+02:00")).toEqual({ ran: false, reason: "schon-erledigt" });
+    expect(await prisma.notification.count()).toBe(0);
+    // Am nächsten Montag gilt der neue Stand wieder.
+    expect((await workerCheck("2026-10-19T09:00:00+02:00")).ran).toBe(true);
   });
 });

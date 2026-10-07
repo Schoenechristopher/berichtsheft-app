@@ -210,3 +210,16 @@ model TeamsDevMessage {
   @@index([recipientId, createdAt])
   @@map("teams_dev_message")
 }
+
+/// Erledigte Montags-Läufe der Erinnerung, einer pro ISO-Woche des Stichtags. Pünktlicher Lauf und
+/// Nachholen (bis Dienstag 23:59 Uhr) prüfen hier, ob die Woche schon erledigt ist.
+model ReminderRun {
+  isoYear Int      @map("iso_year")
+  isoWeek Int      @map("iso_week")
+  ranAt   DateTime @map("ran_at") @db.Timestamptz(3)
+  /// Anzahl der dabei angelegten Benachrichtigungen.
+  created Int      @default(0)
+
+  @@id([isoYear, isoWeek])
+  @@map("reminder_run")
+}

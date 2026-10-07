@@ -11,7 +11,7 @@ import { createPrismaClient } from "../lib/db";
 import { createDeliveryAdapters } from "../lib/notifications/adapters";
 import { notificationConfig } from "../lib/notifications/config";
 import { deliverPendingNotifications } from "../lib/notifications/outbox";
-import { runWeeklyReminders } from "../lib/notifications/service";
+import { runDueReminders } from "../lib/notifications/service";
 import { ensureReportsForAllTrainees } from "../lib/reports";
 
 /** Queue für den Lebenszeichen-Job, mit dem der Worker die Verbindung prüft. */
@@ -28,6 +28,10 @@ export const WEEKLY_REMINDERS_QUEUE = "weekly-reminders";
 
 /** Montags um 9:00 Uhr Europe/Berlin. */
 export const WEEKLY_REMINDERS_CRON = "0 9 * * 1";
+
+/** Regelmäßige Prüfung, ob ein verpasster Montags-Lauf nachzuholen ist (bis Dienstag 23:59 Uhr). */
+export const REMINDERS_CATCH_UP_QUEUE = "weekly-reminders-catch-up";
+export const REMINDERS_CATCH_UP_CRON = "*/10 * * * *";
 
 async function main() {
   const connectionString = process.env.DATABASE_URL;
@@ -58,15 +62,23 @@ async function main() {
   await boss.schedule(GENERATE_REPORTS_QUEUE, GENERATE_REPORTS_CRON, null, { tz: APP_TIME_ZONE });
   await boss.send(GENERATE_REPORTS_QUEUE, { reason: "start" });
 
-  // Erinnerung montags 9:00 Uhr. Die Ereignisschlüssel enthalten die Woche des Stichtags: Läuft der
-  // Job doppelt (z. B. zwei Worker), entsteht keine zweite Nachricht.
+  // Erinnerung montags 9:00 Uhr. Lief der Job nicht (Worker oder Rechner aus), holt der Worker ihn
+  // einmal nach – beim Start und alle 10 Minuten –, solange es noch Montag oder Dienstag dieser Woche
+  // ist (bestätigte Auslegung 11). Jede Woche läuft nur einmal (`reminder_run`), auch mit zwei Workern.
   const config = notificationConfig();
+  const runReminders = async (reason: string) => {
+    const result = await runDueReminders(prisma, { now: now(), baseUrl: config.baseUrl });
+    if (result.ran) {
+      console.log(`[worker] Erinnerungen (${reason}): ${result.created} Benachrichtigungen angelegt.`);
+    }
+  };
   await boss.createQueue(WEEKLY_REMINDERS_QUEUE);
-  await boss.work(WEEKLY_REMINDERS_QUEUE, async () => {
-    const result = await runWeeklyReminders(prisma, { now: now(), baseUrl: config.baseUrl });
-    console.log(`[worker] Erinnerungen: ${result.created} Benachrichtigungen angelegt.`);
-  });
+  await boss.work(WEEKLY_REMINDERS_QUEUE, () => runReminders("Montag 9:00 Uhr"));
   await boss.schedule(WEEKLY_REMINDERS_QUEUE, WEEKLY_REMINDERS_CRON, null, { tz: APP_TIME_ZONE });
+  await boss.createQueue(REMINDERS_CATCH_UP_QUEUE);
+  await boss.work(REMINDERS_CATCH_UP_QUEUE, () => runReminders("nachgeholt"));
+  await boss.schedule(REMINDERS_CATCH_UP_QUEUE, REMINDERS_CATCH_UP_CRON, null, { tz: APP_TIME_ZONE });
+  await boss.send(REMINDERS_CATCH_UP_QUEUE, { reason: "start" });
 
   // Outbox versenden (AK-1004): sicher auch bei mehreren Workern (FOR UPDATE SKIP LOCKED).
   if (config.teamsMode === "graph") {

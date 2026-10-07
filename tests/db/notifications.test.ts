@@ -15,7 +15,14 @@ import {
   type OutgoingMessage,
 } from "@/lib/notifications/adapters";
 import { RECIPIENT_INACTIVE, deliverPendingNotifications } from "@/lib/notifications/outbox";
-import { countUnread, openNotifications, updateOwnChannels } from "@/lib/notifications/service";
+import {
+  countUndeliverable,
+  countUnread,
+  listUndeliverable,
+  openNotifications,
+  retryUndeliverable,
+  updateOwnChannels,
+} from "@/lib/notifications/service";
 import { transitionReport, type TransitionInput } from "@/lib/report-transitions";
 import { ensureReportsForTrainee, listTraineeWeeks, loadReportHistory } from "@/lib/reports";
 import { startSmtpMock, type SmtpMock } from "../smtp-mock";
@@ -453,5 +460,72 @@ describe("E-Mail über SMTP (AK-1003, AK-1004)", () => {
     expect((await deliverPendingNotifications(prisma, adapters(emailAdapter()), deliveryOptions)).sent).toBe(1);
     expect(smtp.received).toHaveLength(1);
     expect(smtp.received[0].headers["message-id"]).toMatch(/^<notification-[0-9a-f-]+@example\.test>$/);
+  });
+});
+
+describe("Nicht zustellbare Nachrichten (bestätigte Auslegung 12)", () => {
+  /** Eine E-Mail an Bernd, die der Worker nach drei Fehlversuchen aufgibt. */
+  async function failedEmail() {
+    await act(persons.anna, (await filledReport(40)).id, { action: "SUBMIT" });
+    const broken = recordingAdapter({ failTimes: 99 }).adapter;
+    for (const at of ["10:00:00", "10:01:00", "10:03:00"]) {
+      setFixedNow(`2026-10-06T${at}+02:00`);
+      await deliverPendingNotifications(prisma, adapters(broken), deliveryOptions);
+    }
+    return prisma.notification.findFirstOrThrow({ where: { channel: "EMAIL" } });
+  }
+
+  it("Ausbilder sehen Empfänger, Kanal, Anlass, letzten Versuch und Fehlermeldung; Azubis nicht", async () => {
+    const failed = await failedEmail();
+    expect(failed.failedAt).toEqual(new Date("2026-10-06T10:03:00+02:00"));
+
+    expect(await countUndeliverable(prisma, persons.clara)).toBe(1);
+    expect(await listUndeliverable(prisma, persons.clara)).toEqual([
+      {
+        id: failed.id,
+        channel: "EMAIL",
+        subject: "Bericht eingereicht: Anna, KW 40/2026",
+        link: failed.link,
+        attempts: 3,
+        lastError: "Server nicht erreichbar",
+        failedAt: new Date("2026-10-06T10:03:00+02:00"),
+        recipient: { name: "Bernd", email: "bernd@test.invalid", active: true },
+      },
+    ]);
+    // Azubis und deaktivierte Personen sehen nichts.
+    expect(await listUndeliverable(prisma, persons.anna)).toBeNull();
+    expect(await countUndeliverable(prisma, persons.anna)).toBe(0);
+    expect(await listUndeliverable(prisma, { ...persons.clara, active: false })).toBeNull();
+    // App-Benachrichtigungen und versendete Nachrichten zählen nicht.
+    expect(await prisma.notification.count()).toBe(2);
+  });
+
+  it("auch Nachrichten an inzwischen deaktivierte Empfänger erscheinen, ohne „Erneut versuchen“", async () => {
+    await act(persons.anna, (await filledReport(40)).id, { action: "SUBMIT" });
+    await prisma.person.update({ where: { id: persons.bernd.id }, data: { active: false } });
+    await deliverPendingNotifications(prisma, adapters(recordingAdapter().adapter), deliveryOptions);
+
+    const [item] = (await listUndeliverable(prisma, persons.clara)) ?? [];
+    expect(item).toMatchObject({ lastError: RECIPIENT_INACTIVE, recipient: { active: false } });
+    expect(await retryUndeliverable(prisma, persons.clara, item.id, now())).toMatchObject({ ok: false });
+  });
+
+  it("„Erneut versuchen“: Der Worker versendet die Nachricht beim nächsten Durchlauf genau einmal", async () => {
+    const failed = await failedEmail();
+    // Nur Ausbilder.
+    expect(await retryUndeliverable(prisma, persons.anna, failed.id, now())).toEqual({
+      ok: false,
+      formError: "Zugriff verweigert",
+    });
+    expect(await retryUndeliverable(prisma, persons.clara, "kein-uuid", now())).toMatchObject({ ok: false });
+
+    setFixedNow("2026-10-06T11:00:00+02:00");
+    expect(await retryUndeliverable(prisma, persons.clara, failed.id, now())).toEqual({ ok: true });
+    expect(await countUndeliverable(prisma, persons.clara)).toBe(0);
+    const { adapter, sent } = recordingAdapter();
+    expect((await deliverPendingNotifications(prisma, adapters(adapter), deliveryOptions)).sent).toBe(1);
+    expect(sent.map((message) => message.notificationId)).toEqual([failed.id]);
+    // Schon versendet: kein zweites „Erneut versuchen“.
+    expect(await retryUndeliverable(prisma, persons.clara, failed.id, now())).toMatchObject({ ok: false });
   });
 });

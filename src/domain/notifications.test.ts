@@ -7,6 +7,7 @@ import {
   parseChannels,
   planReminders,
   planTransitionNotifications,
+  reminderSchedule,
   reminderWeeks,
   retryDelaySeconds,
   type Channel,
@@ -267,5 +268,27 @@ describe("Erinnerung montags 9:00 Uhr (AK-1021 – AK-1025, AK-205)", () => {
 describe("Versand", () => {
   it("AK-1004 Wartezeit zwischen Versuchen wächst, höchstens eine Stunde", () => {
     expect([1, 2, 3, 4, 10, 20].map(retryDelaySeconds)).toEqual([30, 60, 120, 240, 3600, 3600]);
+  });
+});
+
+describe("Zeitplan und Nachholen der Erinnerung (bestätigte Auslegung 11)", () => {
+  const at = (instant: string) => reminderSchedule(new Date(instant));
+
+  it("AK-1021 Stichtag ist Montag 9:00 Uhr Europe/Berlin, Sommer- und Winterzeit", () => {
+    expect(at("2026-10-14T12:00:00+02:00").dueAt.toISOString()).toBe("2026-10-12T07:00:00.000Z");
+    // Nach der Zeitumstellung (25.10.2026): 9:00 Uhr MEZ = 8:00 Uhr UTC.
+    expect(at("2026-10-26T12:00:00+01:00").dueAt.toISOString()).toBe("2026-10-26T08:00:00.000Z");
+    expect(at("2026-10-26T12:00:00+01:00").catchUpUntil.toISOString()).toBe("2026-10-27T23:00:00.000Z");
+  });
+
+  it("AK-1021 nachgeholt wird nur zwischen Montag 9:00 Uhr und Dienstag 23:59 Uhr derselben Woche", () => {
+    expect(at("2026-10-12T08:59:00+02:00").due).toBe(false);
+    expect(at("2026-10-12T09:00:00+02:00").due).toBe(true);
+    expect(at("2026-10-12T10:00:00+02:00").due).toBe(true);
+    expect(at("2026-10-13T23:59:00+02:00").due).toBe(true);
+    expect(at("2026-10-14T00:00:00+02:00").due).toBe(false);
+    expect(at("2026-10-14T10:00:00+02:00").due).toBe(false);
+    expect(at("2026-10-18T23:59:00+02:00").due).toBe(false);
+    expect(at("2026-10-12T10:00:00+02:00").week).toEqual({ isoYear: 2026, isoWeek: 42 });
   });
 });

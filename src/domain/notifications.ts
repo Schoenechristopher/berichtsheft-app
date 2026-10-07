@@ -11,7 +11,14 @@
  * - Pro Ereignis, Empfänger und Kanal genau eine Zeile; der Ereignisschlüssel macht sie eindeutig.
  */
 import type { ReportAction } from "./report-status";
-import { classifyWeek, currentIsoWeek, today, type TrainingPeriod, type WeekForOverview } from "./report-generation";
+import {
+  APP_TIME_ZONE,
+  classifyWeek,
+  currentIsoWeek,
+  today,
+  type TrainingPeriod,
+  type WeekForOverview,
+} from "./report-generation";
 import { compareWeeks, formatDate, isoWeekMonday, isoWeekOf, weekRangeLabel, type IsoWeek } from "./weeks";
 
 /** Kanal einer Benachrichtigung (wie `Channel` im Datenmodell). */
@@ -368,4 +375,51 @@ export function planReminders(input: ReminderInput): NotificationDraft[] {
  */
 export function retryDelaySeconds(attempts: number): number {
   return Math.min(30 * 2 ** Math.max(attempts - 1, 0), 3600);
+}
+
+// ---------------------------------------------------------------------------
+// Zeitplan der Erinnerung und Nachholen (bestätigte Auslegung 11)
+// ---------------------------------------------------------------------------
+
+/** Zeitpunkt (UTC) zur Uhrzeit `hour`:00 an einem Kalendertag in der Zeitzone der Firma. */
+function zonedInstant(date: Date, hour: number): Date {
+  const guess = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), hour));
+  // Abstand der Zeitzone zu UTC an diesem Tag (Sommer- oder Winterzeit), aus der Ortszeit der Schätzung.
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: APP_TIME_ZONE,
+    hourCycle: "h23",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).formatToParts(guess);
+  const part = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  const local = Date.UTC(part("year"), part("month") - 1, part("day"), part("hour"), part("minute"));
+  return new Date(guess.getTime() - (local - guess.getTime()));
+}
+
+/** Zeitplan der Erinnerung in der Woche eines Zeitpunkts. */
+export interface ReminderSchedule {
+  /** Woche des Stichtags (laufende Woche). */
+  week: IsoWeek;
+  /** Stichtag: Montag dieser Woche, 9:00 Uhr Europe/Berlin. */
+  dueAt: Date;
+  /** Bis hier wird ein verpasster Lauf nachgeholt: Dienstag 23:59 Uhr (also vor Mittwoch 0:00 Uhr). */
+  catchUpUntil: Date;
+  /** Liegt der Zeitpunkt zwischen Stichtag und Ende des Nachholens? */
+  due: boolean;
+}
+
+/**
+ * Bestätigte Auslegung 11: Der Montags-Job läuft montags um 9:00 Uhr Europe/Berlin. Lief er nicht
+ * (Worker oder Rechner aus), holt der Worker ihn einmal nach, sobald er zwischen Montag 9:00 Uhr
+ * und Dienstag 23:59 Uhr derselben Woche läuft; Stichtag bleibt der Montag. Danach nicht mehr.
+ */
+export function reminderSchedule(now: Date): ReminderSchedule {
+  const week = currentIsoWeek(now);
+  const monday = isoWeekMonday(week.isoYear, week.isoWeek);
+  const dueAt = zonedInstant(monday, 9);
+  const catchUpUntil = zonedInstant(new Date(monday.getTime() + 2 * 86_400_000), 0);
+  return { week, dueAt, catchUpUntil, due: now >= dueAt && now < catchUpUntil };
 }
