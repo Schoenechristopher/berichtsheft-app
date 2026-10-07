@@ -1,6 +1,6 @@
 # Berichtsheft-App – Anforderungen und Akzeptanzkriterien
 
-Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201, AK-204, AK-206 bis AK-208 freigegeben am 06.10.2026 (Etappe 2) · Ergänzungen zu AK-203, AK-305, AK-306, AK-404, AK-406 bis AK-408 freigegeben am 06.10.2026 (Etappe 3) · Ergänzungen zu AK-501, AK-502, AK-505, AK-604 bis AK-606, AK-803 und zum Statusmodell freigegeben am 06.10.2026 (Etappe 4) · Ergänzungen zu AK-901 bis AK-907 und zum PDF-Export freigegeben am 06.10.2026 (Etappe 5) · Ergänzungen zu AK-1001 bis AK-1025 und zu Benachrichtigungen und Erinnerung freigegeben am 07.10.2026 (Etappe 6)
+Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201, AK-204, AK-206 bis AK-208 freigegeben am 06.10.2026 (Etappe 2) · Ergänzungen zu AK-203, AK-305, AK-306, AK-404, AK-406 bis AK-408 freigegeben am 06.10.2026 (Etappe 3) · Ergänzungen zu AK-501, AK-502, AK-505, AK-604 bis AK-606, AK-803 und zum Statusmodell freigegeben am 06.10.2026 (Etappe 4) · Ergänzungen zu AK-901 bis AK-907 und zum PDF-Export freigegeben am 06.10.2026 (Etappe 5) · Ergänzungen zu AK-1001 bis AK-1025 und zu Benachrichtigungen und Erinnerung freigegeben am 07.10.2026 (Etappe 6) · Ergänzungen zu AK-1101, AK-1102, zum Teams-Postfach und zum Beispielszenario „Erinnerung“ freigegeben am 07.10.2026 (Etappe 7)
 
 Azubis führen ihr Berichtsheft digital als Wochenbericht, Ausbilder prüfen und geben es frei. Diese Spezifikation ist freigegeben und durch die Akzeptanzkriterien (AK) testbar. Technik und Hosting stehen in [02-plan.md](02-plan.md).
 
@@ -73,7 +73,7 @@ Zurückziehen geht nur, solange der Bericht noch nicht geprüft ist. Ablehnung u
 - **Verpasster Montag:** Lief die Erinnerung um 9:00 Uhr nicht (z. B. Worker oder Rechner aus), wird sie einmal nachgeholt, sobald der Worker zwischen Montag 9:00 Uhr und Dienstag 23:59 Uhr derselben Woche läuft; Stichtag bleibt der Montag. Danach wird nicht mehr nachgeholt. Jede Woche läuft höchstens einmal.
 - **Noch nicht versendete Nachrichten:** Geänderte Kanäle wirken erst ab dem nächsten Ereignis; bereits angelegte Nachrichten gehen über den ursprünglichen Kanal raus. An einen inzwischen deaktivierten Empfänger wird nichts mehr versendet.
 - **Nicht zustellbare Nachrichten:** E-Mail- und Teams-Nachrichten, die nach mehreren Fehlversuchen aufgegeben werden oder deren Empfänger deaktiviert ist, sehen Ausbilder in der Liste „Nicht zustellbare Nachrichten“ mit Empfänger, Kanal, Anlass, Zeitpunkt des letzten Versuchs und Fehlermeldung, dazu einen Zähler im Menü. Mit „Erneut versuchen“ wird eine Nachricht an einen aktiven Empfänger noch einmal versendet. Azubis sehen die Liste nicht.
-- **Teams in der Demo:** Bis zur Anbindung an Microsoft Teams landen Teams-Nachrichten im „Teams-Postfach (Demo)“ in der App; Azubis sehen dort ihre eigenen Nachrichten, Ausbilder alle.
+- **Teams in der Demo:** Bis zur Anbindung an Microsoft Teams landen Teams-Nachrichten im „Teams-Postfach (Demo)“ in der App; Azubis sehen dort ihre eigenen Nachrichten, Ausbilder alle. Eine produktive Installation bietet das Postfach nur an, wenn es ausdrücklich eingeschaltet ist (wie in der Demo); einen Test-Login ohne Firmenkonto gibt es im Produktionsbetrieb nie.
 
 ## Nutzerverwaltung
 
@@ -215,8 +215,8 @@ Jedes Kriterium ist eine prüfbare Aussage mit eigener ID, damit Testfälle dara
 
 | ID | Kriterium |
 | --- | --- |
-| AK-1101 | Die Web-App funktioniert in den aktuellen Versionen von Edge, Chrome und Firefox. |
-| AK-1102 | Bei 375 px Breite sind alle Kernfunktionen ohne horizontales Scrollen bedienbar: erfassen, einreichen, zurückziehen, prüfen, kommentieren, exportieren, Einstellungen. |
+| AK-1101 | Die Web-App funktioniert in den aktuellen Versionen von Edge, Chrome und Firefox. Ergänzung: Nachgewiesen, indem alle Browser-Tests in allen drei Browsern laufen. |
+| AK-1102 | Bei 375 px Breite sind alle Kernfunktionen ohne horizontales Scrollen bedienbar: erfassen, einreichen, zurückziehen, prüfen, kommentieren, exportieren, Einstellungen. Ergänzung: Das gilt auch für die übrigen Seiten (Übersicht, Prüfliste, Nutzerverwaltung, Benachrichtigungen, Nicht zustellbar, Anmelden, Kein Zugang). |
 
 ## Beispielszenarien
 
@@ -233,6 +233,8 @@ Szenario: Erinnerung und Information an den Ausbilder
   Dann erhält Anna erneut eine Erinnerung
   Und Bernd wird über die offene KW 41 informiert
 ```
+
+Präzisierung (Etappe 7): Annas Wochen vor KW 41 (KW 36–40) sind eingereicht oder freigegeben. Sonst wären sie am 12.10.2026 bereits überfällig, und Bernd würde schon dann informiert.
 
 ```gherkin
 Szenario: Einreichen scheitert an fehlendem Text
