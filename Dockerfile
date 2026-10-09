@@ -20,6 +20,8 @@ ENV NODE_ENV=production \
     PORT=3000 \
     HOSTNAME=0.0.0.0
 COPY --from=build --chown=node:node /app ./
+# Falls das Repository mit CRLF ausgecheckt wurde (Windows), Startskript auf LF bringen.
+RUN sed -i 's/\r$//' docker/start-app.sh
 USER node
 EXPOSE 3000
 CMD ["sh", "docker/start-app.sh"]

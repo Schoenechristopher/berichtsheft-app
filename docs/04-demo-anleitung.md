@@ -131,3 +131,4 @@ Wie die App in die Firmeninfrastruktur übernommen wird (Firmen-VM oder Azure, E
 | Anmeldung hängt oder meldet einen Fehler | Keycloak braucht nach dem Start bis zu einer Minute. Kurz warten, Seite neu laden. |
 | Daten der letzten Vorführung stören | `docker compose down -v`, danach `docker compose up --build`. |
 | Keine E-Mail in Mailpit | Der Worker versendet alle 5 Sekunden; kurz warten. Die Glocke in der App zeigt die Nachricht sofort. |
+| Windows: App startet nicht, im Log steht `docker/start-app.sh: set: … illegal option -` | Git hat die Dateien mit Windows-Zeilenenden (CRLF) ausgecheckt. Seit der `.gitattributes` im Repository passiert das nicht mehr; ein älterer Klon wird einmal neu ausgecheckt: `git pull`, dann `git rm -r --cached -q .` und `git reset --hard`, danach `docker compose up --build`. |
