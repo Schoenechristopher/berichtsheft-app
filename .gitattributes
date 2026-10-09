@@ -1,0 +1,14 @@
+# Zeilenenden: Im Repository und beim Auschecken immer LF – auch unter Windows.
+# Sonst bricht z. B. docker/start-app.sh im Container mit „set: illegal option -“ ab,
+# weil Git unter Windows (core.autocrlf=true) CRLF auscheckt.
+* text=auto eol=lf
+
+# Binärdateien nie umwandeln
+*.png binary
+*.jpg binary
+*.ico binary
+*.pdf binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
