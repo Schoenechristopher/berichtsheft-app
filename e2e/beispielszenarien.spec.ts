@@ -216,6 +216,9 @@ test.describe("Beispielszenarien", () => {
       // Geteilte Prüfansicht: nach der Freigabe Toast und der nächste Bericht (hier keiner mehr, UI-AK-11).
       await confirmAction(berndSession.page, "Freigeben", "Bericht freigeben?");
       await expect(berndSession.page.getByRole("status").filter({ hasText: "Bericht freigegeben" })).toBeVisible();
+      // Erst den Sprung zum nächsten Bericht abwarten (hier: leere Liste), sonst bricht goto ihn ab.
+      await expect(berndSession.page).toHaveURL(/\/ausbilder\/pruefliste$/);
+      await expect(berndSession.page.getByTestId("review-queue-empty")).toBeVisible();
       await berndSession.page.goto(`/berichte/${reportId}`);
       await expect(berndSession.page.getByTestId("report-status")).toHaveText("Status: Freigegeben");
       await expect(berndSession.page.getByTestId("approval-note")).toContainText("Freigegeben von Bernd Ausbilder");

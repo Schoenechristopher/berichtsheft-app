@@ -227,6 +227,7 @@ test.describe("Einreichen und Prüfen", () => {
     await bernd.page.getByTestId("review-row").getByRole("link").click();
     await expect(bernd.page.getByText("IPv4-Subnetting")).toBeVisible();
     await confirmAction(bernd.page, "Freigeben", "Bericht freigeben?");
+    await expect(bernd.page).toHaveURL(/\/ausbilder\/pruefliste$/);
     await expect(bernd.page.getByTestId("review-queue-empty")).toBeVisible();
     await bernd.page.goto(`/berichte/${reportId}`);
     await expect(bernd.page.getByTestId("report-status")).toHaveText("Status: Freigegeben");
