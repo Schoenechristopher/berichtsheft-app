@@ -20,7 +20,8 @@
     "db:migrate": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "postinstall": "prisma generate",
-    "ak:abdeckung": "tsx scripts/ak-abdeckung/index.ts"
+    "ak:abdeckung": "tsx scripts/ak-abdeckung/index.ts",
+    "pruefumfang": "node scripts/pruefumfang/index.mjs"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",

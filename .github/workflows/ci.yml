@@ -1,20 +1,56 @@
 name: CI
 
+# Umfang der Prüfung nach docs/ci-richtlinie.md: Der Job „Umfang“ ordnet die Änderungen den Klassen zu
+# (scripts/pruefumfang), die übrigen Jobs laufen nur, wenn ihr Umfang ausgelöst ist. Pflicht-Check im Regelsatz
+# für main ist allein „Prüfung abgeschlossen“ (CI-36).
 on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
   push:
     branches: [main]
-  pull_request:
+  merge_group:
+  schedule:
+    # CI-14: Wochenlauf montags früh (04:17 UTC).
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+    inputs:
+      umfang:
+        description: "voll: alle Konfigurationen (CI-35); klassen: Umfang nach den Änderungen gegenüber main"
+        type: choice
+        options: [voll, klassen]
+        default: voll
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  # CI-15: Ein neuer Push bricht die laufende Prüfung desselben PRs ab; Wochenlauf und Warteschlange nicht.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  umfang:
+    name: Umfang
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      schnell: ${{ steps.umfang.outputs.schnell }}
+      e2e: ${{ steps.umfang.outputs.e2e }}
+      browser_voll: ${{ steps.umfang.outputs.browser_voll }}
+      liferay625: ${{ steps.umfang.outputs.liferay625 }}
+      liferay72: ${{ steps.umfang.outputs.liferay72 }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Änderungsklassen und Umfang bestimmen (CI-32 bis CI-35)
+        id: umfang
+        run: node scripts/pruefumfang/index.mjs
+
   checks:
     name: Lint, Typecheck, Vitest
+    needs: umfang
+    if: needs.umfang.outputs.schnell == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     services:
@@ -50,6 +86,8 @@ jobs:
         run: npm test
       - name: Testabdeckung der Akzeptanzkriterien (keine AK-ID ohne Test, docs/03-testabdeckung.md aktuell)
         run: npm run ak:abdeckung -- --pruefen
+      - name: Jede Datei gehört einer Änderungsklasse an (CI-34)
+        run: npm run pruefumfang -- --pruefen
       - name: Beispiel-PDFs aus den Seed-Daten
         run: npm run pdf:beispiel
       - uses: actions/upload-artifact@v4
@@ -59,10 +97,12 @@ jobs:
           retention-days: 14
 
   e2e:
-    name: Docker Compose + Playwright (Chromium, Firefox, Edge, 375 px, axe, Screenshots)
-    needs: checks
+    name: Docker Compose + Playwright
+    needs: [umfang, checks]
+    if: needs.umfang.outputs.e2e == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # Volle Prüfung normal ca. 20 Minuten (CI-17).
+    timeout-minutes: 40
     env:
       # Prüft, dass der Produktions-Build den Test-Login trotzdem nicht anbietet (e2e/produktionsmodus.spec.ts).
       AUTH_TEST_LOGIN: "true"
@@ -90,30 +130,45 @@ jobs:
           curl -fsS http://localhost:8025/readyz
           for i in $(seq 1 30); do docker compose logs worker | grep -q "verbunden mit pg-boss" && break; sleep 2; done
           docker compose logs worker | grep "verbunden mit pg-boss"
+      # CI-19: heruntergeladene Browser aus dem Actions-Cache (Schlüssel: Playwright-Version aus dem Lockfile).
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ needs.umfang.outputs.browser_voll }}-${{ hashFiles('package-lock.json') }}
+      - name: Playwright-Browser installieren (Chromium)
+        if: needs.umfang.outputs.browser_voll != 'true'
+        run: npx playwright install --with-deps chromium
       - name: Playwright-Browser installieren (Chromium, Firefox, Microsoft Edge)
+        if: needs.umfang.outputs.browser_voll == 'true'
         run: |
           npx playwright install --with-deps chromium firefox
           # Edge ist auf den GitHub-Runnern meist vorinstalliert; sonst installiert Playwright es.
           command -v microsoft-edge-stable || npx playwright install --with-deps msedge
           microsoft-edge-stable --version
+      # Klasse L und P: Chromium und 375 px (docs/ci-richtlinie.md, Abschnitt 7).
+      - name: Playwright gegen die laufende Demo (Chromium, 375 px)
+        if: needs.umfang.outputs.browser_voll != 'true'
+        run: npx playwright test --project=chromium --project=smartphone-375
+      # Klasse O, I und unbekannte Pfade: alle Browser (AK-1101).
       - name: Playwright gegen die laufende Demo (Chromium, Firefox, Edge, 375 px)
+        if: needs.umfang.outputs.browser_voll == 'true'
         run: npx playwright test --project=chromium --project=firefox --project=msedge --project=smartphone-375
       # UI-AK-16: axe auf allen Seiten, hell und dunkel, 1280 und 375 px (Chromium). Normal ca. 4 Minuten (CI-17).
       - name: Barrierefreiheit (axe)
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && needs.umfang.outputs.browser_voll == 'true' }}
         timeout-minutes: 10
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/a11y
         run: npx playwright test --project=a11y
       # Screenshots der vier Hauptseiten (Desktop/Handy, hell/dunkel). Normal unter 1 Minute (CI-17).
       - name: Screenshots der Hauptseiten
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && needs.umfang.outputs.browser_voll == 'true' }}
         timeout-minutes: 3
         env:
           PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/screenshots
         run: npx playwright test --project=screenshots
       - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && needs.umfang.outputs.browser_voll == 'true' }}
         with:
           name: screenshots
           path: screenshots/
@@ -122,8 +177,9 @@ jobs:
       - name: Container-Logs
         if: failure()
         run: docker compose logs --no-color
+      # CI-20: Testspuren nur bei einem Fehlschlag, höchstens 7 Tage.
       - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+        if: failure()
         with:
           name: playwright-report
           path: playwright-report/
@@ -131,3 +187,27 @@ jobs:
       - name: Aufräumen
         if: always()
         run: docker compose down -v
+
+  abschluss:
+    # CI-36: einziger Pflicht-Check. Ein übersprungener Job zählt bei GitHub als bestanden; dieser Job prüft
+    # deshalb selbst, dass jeder für den Umfang nötige Job grün ist.
+    name: Prüfung abgeschlossen
+    needs: [umfang, checks, e2e]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Ergebnisse der nötigen Jobs prüfen
+        env:
+          UMFANG: ${{ needs.umfang.result }}
+          SCHNELL: ${{ needs.umfang.outputs.schnell }}
+          CHECKS: ${{ needs.checks.result }}
+          E2E_NOETIG: ${{ needs.umfang.outputs.e2e }}
+          E2E: ${{ needs.e2e.result }}
+        run: |
+          fehler=0
+          [ "$UMFANG" = success ] || { echo "Umfang: $UMFANG"; fehler=1; }
+          if [ "$SCHNELL" = true ] && [ "$CHECKS" != success ]; then echo "Schnelle Prüfung: $CHECKS"; fehler=1; fi
+          if [ "$E2E_NOETIG" = true ] && [ "$E2E" != success ]; then echo "Docker Compose + Playwright: $E2E"; fehler=1; fi
+          [ "$fehler" = 0 ] && echo "Alle nötigen Jobs sind grün (Umfang: $UMFANG, schnell: $CHECKS, e2e: $E2E)."
+          exit "$fehler"

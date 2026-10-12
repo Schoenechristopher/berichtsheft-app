@@ -1,72 +1,63 @@
-# CI-Richtlinie für alle Repositories von Chris
+# CI-Richtlinie für berichtsheft-app
 
-Stand: 11.10.2026 · Status: **Entwurf zur Freigabe** · Gilt für jedes Repository des Kontos `schoenechristopher96-lgtm`
-mit GitHub Actions. Diese Datei liegt als identische Kopie in jedem Repository unter `docs/ci-richtlinie.md`. Ändert
-sich etwas, werden alle Kopien gemeinsam angepasst.
+Stand: 12.10.2026 · Status: **Entwurf zur Freigabe** · Gilt für `Schoenechristopher/berichtsheft-app`
+
+Diese Datei ist aus der gemeinsamen CI-Richtlinie vom 11.10.2026 abgeleitet. Seit das Repository in der Organisation
+`Schoenechristopher` liegt und öffentlich ist, gelten hier eigene Bedingungen: kostenlose Standard-Runner von GitHub,
+kein VPS. Die Regelnummern bleiben gleich, damit Verweise in Aufträgen und PRs stimmen; entfallene Regeln sind markiert.
+Angaben zu anderen Repositories stehen bewusst nicht in dieser öffentlichen Datei.
 
 ## 1. Warum
 
-- **Kontingent:** Das Konto hat GitHub Free. Private Repositories teilen sich **2.000 Actions-Minuten pro Monat**,
-  und zwar für alle Repositories zusammen. Der Zähler beginnt am Monatsersten neu. Eine Linux-Minute darüber hinaus
-  kostet 0,006 $ (Abrechnung Oktober 2026).
-- **Oktober 2026:**
-  - Das Kontingent war am 10.10. aufgebraucht, nach vier Entwicklungstagen.
-  - Verbrauch: ImmobilienSoftware 1.730 Minuten, davon 25 für die WebKit-Schleife, berichtsheft-app 270 Minuten.
-  - Spitzentag war der 8.10. mit 867 Minuten.
-  - Danach brach GitHub jeden Job nach 2 Sekunden ab, ohne Runner und ohne Log. Etappe 8 wurde deshalb ohne
-    WebKit- und Firefox-Prüfung gemergt.
-- **Ausblick:**
-  - Chris arbeitet zunehmend spezifikationsgetrieben mit Claude Code. Es entstehen weitere Projekte, darunter ein
-    Liferay-Update mit Migration: ein Java-Anwendungsserver mit Datenbank und Suchdienst, mit langen Testläufen.
-  - Der Bedarf an CI-Minuten wächst also weiter.
-  - Ein Runner auf dem Homelab kommt nicht in Frage, weil dessen Arbeitsspeicher knapp ist und die Last andere Dienste
-    stört (E-059).
+- **Kosten:** Für öffentliche Repositories sind die Standard-Runner von GitHub kostenlos und ohne Minutengrenze. Die
+  3.000 Freiminuten der Organisation gelten nur für private Repositories; dieses Repository verbraucht sie nicht.
+- **Trotzdem sparsam:**
+  - Laufzeit ist Wartezeit: Jede Minute CI verzögert die Rückmeldung an die Sitzung und an Chris.
+  - Die Zahl gleichzeitiger Jobs ist für die ganze Organisation begrenzt.
+  - Liferay-Läufe werden lang (geschätzt 20 bis 40 Minuten, der Upgrade-Test 45 bis 90 Minuten; gemessen wird in P00).
+- **Öffentlich heißt sichtbar:** Logs, Artefakte und PRs kann jeder lesen, und fremde PRs können Workflows starten.
+  Abschnitt 4 regelt das.
 - **Ziel:**
   - Die CI findet Fehler **vor** dem Merge.
-  - Sie steht nie wegen eines leeren Kontingents still.
-  - Sie liefert spürbar schneller Ergebnisse.
-  - Sie kostet planbar wenig.
+  - Sie liefert schnell Ergebnisse.
+  - Sie lässt sich von außen nicht missbrauchen.
   - Das Ziel wird gemessen (Abschnitt 6).
 
 ## 2. Begriffe
 
+- **Standard-Runner:** Linux-Runner von GitHub (`ubuntu-latest`). Für öffentliche Repositories: 4 Kerne, 16 GB RAM,
+  14 GB SSD.
 - **Schnelle Prüfung:** Unit-Tests, Build, Lint, Typecheck, Formatierung, AK-Abdeckung, also alles ohne Browser,
   Container-Stack oder Anwendungsserver. Ziel: höchstens 3 Minuten.
 - **Volle Prüfung:** Browser- bzw. End-to-End-Tests in allen Pflicht-Konfigurationen, gegebenenfalls mit Container-Stack,
-  Anwendungsserver oder Migrationstest.
-- **Kern-Prüfung:** Die volle Prüfung, beschränkt auf die wichtigste Konfiguration des Repositorys (Abschnitt 7).
+  Anwendungsserver oder Upgrade-Test.
+- **Kern-Prüfung:** Die volle Prüfung, beschränkt auf die wichtigste Konfiguration (Abschnitt 7).
 - **Schwerer Job:** Ein Job, der länger als 5 Minuten läuft oder Browser, einen Container-Stack oder einen
   Anwendungsserver braucht.
-- **Doku-Änderung:** Ein Push, der nur Dateien der Doku-Pfade des Repositorys ändert (Abschnitt 7).
-- **VPS:** Der gemietete Server, auf dem die selbst betriebenen Runner laufen (Abschnitt 4).
+- **Doku-Änderung:** Ein Push, der nur Dateien der Doku-Pfade ändert (Abschnitt 7).
+- **Änderungsklasse:** Einordnung eines PRs nach den Pfaden, die er gegenüber seinem Ziel-Branch ändert (Abschnitt 7).
+  Sie bestimmt den Umfang der vollen Prüfung.
 
 ## 3. Regeln
 
 ### Wo was läuft
 
-- **CI-01 Zwei Arten von Runnern:** Schnelle Prüfungen laufen auf den Runnern von GitHub. Sie starten parallel und
-  verbrauchen kaum Minuten. Schwere Jobs laufen auf dem VPS und verbrauchen keine GitHub-Minuten.
-- **CI-02 Zuordnung je Repository:** Ein Repository bekommt einen Runner auf dem VPS, sobald es einen schweren Job hat.
-  Repositories ohne schwere Jobs bleiben ganz auf den Runnern von GitHub. Die Zuordnung steht in Abschnitt 7.
-- **CI-03 Ein Runner je Repository:** Das Konto hat keine Organisation, deshalb ist jeder selbst betriebene Runner an
-  genau ein Repository gebunden. Alle Runner laufen auf demselben VPS. Ein neues Repository mit schweren Jobs bekommt
-  seinen Runner durch einen Eintrag in der Repository-Liste des Ansible-Playbooks (Abschnitt 4).
-- **CI-04 Gleichzeitigkeit begrenzt:** Auf dem VPS laufen höchstens so viele schwere Jobs gleichzeitig, wie die
-  Ausstattung trägt, anfangs **2**. Weitere Jobs warten, bis ein Platz frei ist. Wie die Grenze umgesetzt wird,
-  entscheidet die Einrichtung.
-- **CI-05 Ausweichen bei Ausfall:** Ist der VPS nicht erreichbar, lässt sich jede volle Prüfung von Hand auf den
-  Runnern von GitHub starten (`workflow_dispatch` mit Auswahl des Runners). Das bezahlt das Budget (CI-06).
+- **CI-01 Nur Standard-Runner:** Alle Jobs laufen auf den Standard-Runnern von GitHub. Größere, kostenpflichtige Runner
+  nur nach Entscheidung von Chris.
+- **CI-02** entfällt (Zuordnung zum VPS).
+- **CI-03 Kein selbst betriebener Runner:** Dieses Repository bekommt nie einen selbst betriebenen Runner. Ein Workflow
+  aus einem fremden PR könnte dort beliebigen Code auf dem Rechner ausführen.
+- **CI-04 Gleichzeitigkeit begrenzt:** Ein schwerer Liferay-Job läuft je Plattform höchstens einmal gleichzeitig
+  (`concurrency`-Gruppe je Plattform). Weitere Läufe warten oder brechen den älteren nach CI-15 ab.
+- **CI-05** entfällt (Ausweichen bei Ausfall des VPS).
 
 ### Budget und Überwachung
 
-- **CI-06 Budget:** Für GitHub Actions gilt ein Budget von **25 $ pro Monat**, bis der VPS läuft. Danach sind es
-  **10 $** als Reserve. Bei Erreichen stoppt Actions; mehr wird nie abgebucht. Chris stellt es unter Settings →
-  Billing and plans → Budgets and alerts ein (Entscheidung 11.10.2026).
-- **CI-07 Warnungen:** Für das Budget sind E-Mail-Warnungen bei 75 % und 90 % eingeschaltet. Erreicht der
-  GitHub-Verbrauch vor dem 20. des Monats das Freikontingent, sagt die Steuerung Chris Bescheid.
+- **CI-06 Kein Budget nötig:** Solange das Repository öffentlich ist, kosten Standard-Runner nichts. Wird es wieder
+  privat, wird diese Richtlinie vor dem nächsten Push überarbeitet.
+- **CI-07** entfällt (Warnungen zum Kontingent).
 - **CI-08 Monatsrückblick:** Am Monatsanfang erfasst die Steuerung die Kennzahlen aus Abschnitt 6 für den Vormonat,
-  also Kosten, Laufzeiten, Wartezeiten und Ausfälle. Weicht ein Wert vom Ziel ab, schlägt sie eine Änderung vor:
-  Ausstattung anpassen, Zuordnung ändern oder Regeln nachschärfen.
+  also Laufzeiten, Wartezeiten und Ausfälle. Weicht ein Wert vom Ziel ab, schlägt sie eine Änderung vor.
 
 ### Wann was läuft
 
@@ -82,7 +73,8 @@ sich etwas, werden alle Kopien gemeinsam angepasst.
   - Einmal pro Woche, montags früh, läuft die volle Prüfung auf `main` nach Zeitplan.
   - Gab es seit dem letzten Wochenlauf keinen neuen Commit auf `main`, endet der Lauf nach dem Vergleich ohne Tests.
   - Er lässt sich außerdem jederzeit von Hand starten (`workflow_dispatch`).
-  - Mehrere Repositories starten ihren Wochenlauf zeitversetzt, damit sie sich auf dem VPS nicht stauen.
+  - GitHub schaltet Zeitpläne in öffentlichen Repositories nach 60 Tagen ohne Aktivität ab. Der Monatsrückblick (CI-08)
+    prüft, ob der Wochenlauf noch aktiv ist.
   - So fallen Wechselwirkungen zwischen PRs und schleichende Ausfälle spätestens nach einer Woche auf (Entscheidung
     11.10.2026).
 - **CI-15 Alte Läufe abbrechen:** Ein neuer Push auf denselben PR bricht dessen noch laufende Prüfung ab
@@ -90,20 +82,38 @@ sich etwas, werden alle Kopien gemeinsam angepasst.
 - **CI-16 Diagnose nur von Hand:** Workflows zur Fehlersuche (z. B. Wiederholungsschleifen) starten nur von Hand und
   haben eine Obergrenze für Wiederholungen (höchstens 20). Sie laufen nie automatisch.
 
+### Umfang der Prüfung
+
+- **CI-32 Umfang nach Änderungsklasse:** Die volle Prüfung prüft nur, was die Änderung erreichen kann. Welche Pfade
+  welche Klasse auslösen und welche Jobs dazugehören, steht in Abschnitt 7. Ändert ein PR Dateien mehrerer Klassen,
+  gilt die Vereinigung aller ausgelösten Jobs.
+- **CI-33 Ganzer PR, nicht letzter Push:** Die Klasse ergibt sich aus allen Änderungen des PRs gegenüber dem
+  Ziel-Branch, nicht nur aus dem letzten Push. So geht keine Änderung verloren, wenn später nur noch Doku folgt.
+- **CI-34 Im Zweifel voll:** Ein Pfad, der zu keiner Klasse passt, löst die volle Prüfung in allen Konfigurationen der
+  TypeScript-App aus. Eine neue Datei oder ein neuer Ordner wird beim ersten Mal in Abschnitt 7 eingeordnet.
+- **CI-35 Voll erzwingen:** Die volle Prüfung in allen Konfigurationen läuft unabhängig von der Klasse
+  - im Wochenlauf (CI-14), dort auch für jede Liferay-Umsetzung,
+  - bei einem PR mit dem Label `volle-pruefung`,
+  - beim Start von Hand (`workflow_dispatch` mit Auswahl „voll“).
+- **CI-36 Abschluss-Job:** Ein letzter Job „Prüfung abgeschlossen“ prüft, dass jeder für die Klasse nötige Job grün
+  ist. Nur dieser Job ist im Regelsatz für `main` Pflicht. Grund: Ein übersprungener Job zählt bei GitHub als
+  bestanden, ein Pflicht-Check je Job würde also nichts absichern.
+- **CI-37 Auswahl nach Modul (geplant):** Sobald die Code-Landkarte jede Datei unter `src/` einem Modul zuordnet (ab G2),
+  laufen bei Logik- und Serveränderungen nur die Prüffälle der betroffenen Module und der Module, die nach dem
+  Abhängigkeitsgraph davon abhängen. Der genaue Ablauf wird in G3 festgelegt; bis dahin gilt CI-32 mit den Klassen
+  aus Abschnitt 7.
+
 ### Sparsam und schnell bauen
 
 - **CI-17 Zeitlimit:** Jeder Job hat `timeout-minutes` von höchstens dem Doppelten eines normalen Laufs. Ein Hänger
-  blockiert so keinen Platz auf dem VPS länger als nötig.
+  blockiert so keinen Platz in der Organisation länger als nötig.
 - **CI-18 Keine automatischen Wiederholungen:** In der CI gilt `retries: 0`. Ein unzuverlässiger Test wird
   untersucht, nicht verdeckt. Einen Lauf von Hand neu zu starten ist höchstens einmal erlaubt, und nur bei einem
   Abbruch vor dem ersten Test (Infrastruktur).
-- **CI-19 Zwischenspeicher nutzen:** Auf dem VPS bleiben zwischen den Läufen erhalten:
-  - Docker-Images und -Schichten
-  - Paket-Caches (npm, Maven/Gradle)
-  - Browser-Images
-
-  Auf den Runnern von GitHub kommen Abhängigkeiten aus dem Cache (z. B. `cache: npm`). Browser kommen aus einem
-  fertigen Image, statt in jedem Lauf installiert zu werden.
+- **CI-19 Zwischenspeicher nutzen:** Abhängigkeiten kommen aus dem Actions-Cache (höchstens 10 GB je Repository):
+  - Paket-Caches (npm, Gradle, Ivy/Ant)
+  - Playwright-Browser
+  - Liferay-Bundles und Java-Laufzeiten, sobald es Liferay-Jobs gibt
 - **CI-20 Artefakte:** Testspuren werden nur bei einem Fehlschlag hochgeladen und höchstens 7 Tage aufbewahrt.
 
 ### Arbeitsweise der Claude-Sitzungen
@@ -115,102 +125,110 @@ sich etwas, werden alle Kopien gemeinsam angepasst.
   zweimal je PR.
 - **CI-23 Kein Lauf ohne Grund:** Keine leeren Commits, kein Schließen und Wiederöffnen eines PRs, um die CI
   anzustoßen. Kein Neustart über CI-18 hinaus.
-- **CI-24 Notfall:** Läuft die CI nicht, weil VPS und Budget gleichzeitig ausfallen oder GitHub ausfällt, darf Chris
-  trotzdem mergen, wenn:
+- **CI-24 Notfall:** Läuft die CI nicht, weil GitHub ausfällt, darf Chris trotzdem mergen, wenn:
   - die lokale Prüfung grün ist,
   - der PR das vermerkt und
   - die volle Prüfung auf `main` beim nächsten möglichen Lauf von Hand nachgeholt wird.
 
   Befunde daraus werden sofort behoben (Entscheidung 11.10.2026).
-- **CI-25 Neues Repository:** Ein neues Projekt übernimmt diese Datei und ordnet sich in Abschnitt 7 ein, bevor sein
-  erster Workflow läuft. Hat es schwere Jobs, bekommt es seinen Runner auf dem VPS (CI-03).
+- **CI-25 Neue Teile im Repository:** Eine neue Umsetzung (z. B. `liferay-625/`, `liferay-72/`) ordnet sich in
+  Abschnitt 7 ein, bevor ihr erster Workflow läuft.
 
-## 4. Der VPS
+## 4. Öffentliches Repository: Sicherheit
 
-- **Anbieter und Ausstattung:**
-  - Host Unlimited „vServer KVM“ mit 4 vCores (Xeon), 24 GB RAM, 120 GB SSD (RAID), Ubuntu 24.04 LTS Server.
-  - Standort Deutschland, prepaid, ohne Mindestlaufzeit, jederzeit kündbar.
-  - Kosten: 14,39 € im Monat (Stand 11.10.2026).
-  - Die Traffic-Flatrate gilt nach Fair Use. Für CI braucht es nur einige GB im Monat.
-- **Warum diese Größe:**
-  - Zwei schwere Jobs gleichzeitig, z. B. Browser-Tests in drei Browsern und ein Docker-Stack.
-  - Der RAM reicht auch für einen Liferay-Test mit Datenbank und Suchdienst (6 bis 10 GB).
-  - Abgelehnt wurde IONOS VPS Linux XXL+: nach drei Monaten 59 € statt 17 € im Monat.
-- **Einrichtung nur per Ansible:**
-  - Das Playbook liegt in einem eigenen privaten Repository.
-  - Es setzt den Server jederzeit gleich neu auf:
-    - Updates, automatische Sicherheitsupdates
-    - SSH nur mit Schlüssel, Firewall ohne offene Ports außer SSH
-    - Docker
-    - ein Runner je Repository aus einer Liste, als Dienst unter einem eigenen Benutzer ohne root-Rechte
-    - Grenze für gleichzeitige schwere Jobs (CI-04)
-    - wöchentliches Aufräumen alter Images und Arbeitsordner, damit die 120 GB reichen
-  - Von Hand wird am Server nichts verändert.
-- **Sicherheit:**
-  - Auf dem VPS läuft Code aus jedem PR. Das ist vertretbar, weil nur Chris und seine Claude-Sitzungen in die privaten
-    Repositories pushen. Ein öffentliches Repository bekommt nie einen Runner auf dem VPS.
-  - Auf dem VPS liegen keine echten Kundendaten und keine Produktionszugänge. Tests, auch Migrationstests, nutzen nur
-    erfundene oder anonymisierte Daten.
-  - Zugangsdaten stehen nie im Repository oder im Chat.
-- **Wachsen:**
-  - Werden die Ziele für die Wartezeit dauerhaft verfehlt (Abschnitt 6), wird das Paket beim selben Anbieter größer
-    gebucht (bis 12 vCores und 64 GB) und die Grenze in CI-04 angehoben.
-  - Reicht das nicht, kommt ein zweiter VPS mit demselben Playbook dazu.
-  - Ein Snapshot vor jeder größeren Änderung sichert den Stand.
+- **CI-26 Workflows aus Forks nur nach Freigabe:** Unter Settings → Actions → General ist „Require approval for all
+  external contributors“ gesetzt. Ein fremder PR startet keinen Job, bevor Chris ihn freigibt.
+- **CI-27 Rechte knapp halten:** Jeder Workflow setzt `permissions: contents: read`. Mehr Rechte gibt es nur je Job und
+  mit Begründung im PR. `pull_request_target` und `workflow_run` mit Code aus einem PR sind verboten.
+- **CI-28 Keine Geheimnisse in Workflows:** Workflows nutzen nur Demo-Werte (`.env.example`, `docker-compose.yml`,
+  Keycloak-Realm). Braucht ein Job je ein echtes Secret, läuft er nie für PRs aus Forks und wird vorher mit Chris
+  abgestimmt.
+- **CI-29 Logs und Artefakte sind öffentlich:** Darin stehen nur Testdaten. Kein Ausgeben von Umgebungsvariablen
+  (`env`, `printenv`), keine echten Adressen, keine Datenbankabzüge außer aus dem Seed.
+- **CI-30 Fremde Actions:** Nur Actions von GitHub (`actions/*`). Andere nur auf einen Commit-SHA festgelegt und nach
+  Prüfung im PR.
+- **CI-31 Fremdsoftware nicht einchecken:** Liferay-Bundles, JDKs und Datenbank-Abzüge kommen aus ihrer Bezugsquelle
+  oder dem Cache, nie ins Repository.
+- **Einstellungen im Repository** (setzt Chris einmalig):
+  - Regelsatz für `main`: nur per PR, kein Force-Push, schnelle Prüfung muss grün sein.
+  - Code security: Secret Scanning mit Push Protection, Dependabot-Warnungen, „Private vulnerability reporting“.
+  - Im eigenen GitHub-Konto: „Keep my email addresses private“ und „Block command line pushes that expose my email“.
 
 ## 5. Erwartete Wirkung
 
-- **GitHub-Minuten:**
-  - Fallen nur noch für schnelle Prüfungen an, etwa 1 bis 3 Minuten je Push.
-  - Ein Monat wie der Oktober 2026 hätte so grob 300 bis 500 Minuten gebraucht statt 2.000.
-  - Das Freikontingent reicht dann auch für deutlich mehr Projekte.
-- **Kosten:**
-  - Der VPS kostet fest 14,39 €. Das entspricht etwa 2.600 GitHub-Minuten zu 0,006 $.
-  - Schon die schweren Jobs des Oktobers (rund 1.700 Minuten) und erst recht Liferay-Migrationstests (20 bis 45 Minuten
-    je Lauf) liegen darüber.
-- **Tempo:**
-  - Auf dem VPS entfallen das Laden des Browser-Images (etwa 2 GB), der Neubau von Docker-Stacks und die Installation
-    von Paketen, weil der Zwischenspeicher erhalten bleibt (CI-19).
-  - Erwartet wird, dass die volle Prüfung von ImmobilienSoftware von rund 15 auf höchstens 10 Minuten sinkt. Das wird
-    gemessen, nicht angenommen.
+- **Kosten:** keine für dieses Repository.
+- **Liferay:** Auf den größeren Runnern öffentlicher Repositories ist ein Liferay-Test mit Datenbank und Suchdienst
+  voraussichtlich machbar. Am engsten wird Liferay 7.2 mit Elasticsearch; P00 der Plattform misst Speicher und Laufzeit.
+- **Tempo:** Ohne Zwischenspeicher zwischen den Läufen müssen Docker-Stacks und Liferay jedes Mal neu starten. Der
+  Actions-Cache (CI-19) spart Downloads, nicht den Start.
 
-## 6. Ziele und Wirtschaftlichkeitsprüfung
+## 6. Ziele
 
 | Nr. | Ziel | Messung |
 |---|---|---|
-| Z-1 | Kein Stillstand der CI wegen Kontingent oder Budget | Läufe, die ohne Runner abgebrochen wurden: 0 |
-| Z-2 | Volle Prüfung ImmobilienSoftware schneller | Dauer vom Push bis zum Ergebnis im Median ≤ 10 Min. (Oktober: ~15 Min.) |
-| Z-3 | Kurze Wartezeit auf dem VPS | Wartezeit eines schweren Jobs auf einen freien Platz im Median ≤ 5 Min. |
-| Z-4 | Planbare Kosten | VPS + GitHub zusammen ≤ 25 € im Monat |
-| Z-5 | Wenig Pflege | Handarbeit am VPS ≤ 1 Stunde im Monat (Updates laufen automatisch) |
+| Z-1 | Kein Stillstand der CI | Läufe, die ohne Runner abgebrochen wurden: 0 |
+| Z-2 | Schnelle Prüfung schnell | Dauer im Median ≤ 3 Min. |
+| Z-3 | Volle Prüfung TypeScript in vertretbarer Zeit | Dauer im Median ≤ 20 Min. |
+| Z-4 | Volle Prüfung Liferay in vertretbarer Zeit | Dauer je Plattform im Median ≤ 45 Min. (Wert wird in P00 bestätigt) |
+| Z-5 | Kein Lauf aus Forks ohne Freigabe | Läufe aus Forks ohne Freigabe: 0 |
 
-- **Wirtschaftlichkeitsprüfung:** Nach zwei vollen Monaten mit VPS, also Anfang Januar 2027 für November und Dezember, vergleicht die Steuerung
-  zwei Zahlen:
-  1. die tatsächlichen Kosten von VPS und GitHub,
-  2. was dieselben Laufzeiten nur auf GitHub gekostet hätten (Laufzeit der VPS-Jobs aus der Actions-Historie ×
-     0,006 $).
-- **Ergebnis der Prüfung:**
-  - Sind Z-1 bis Z-4 erreicht und ist der VPS nicht teurer als die Rechnung nur mit GitHub, bleibt er.
-  - Sonst schlägt die Steuerung vor, das Paket zu verkleinern oder zu vergrößern oder den VPS zu kündigen. Wegen
-    prepaid ist das zum Monatsende möglich.
-  - Chris entscheidet.
+## 7. Umsetzung in diesem Repository
 
-## 7. Umsetzung je Repository
+### Änderungsklassen (CI-32)
 
-| Repository | Schnelle Prüfung (GitHub) | Kern-Prüfung im Draft | Volle Prüfung | Runner für schwere Jobs | Doku-Pfade |
-|---|---|---|---|---|---|
-| ImmobilienSoftware | `npm test`, `npm run build`, `npm run ak -- --pruefen` | Playwright `webkit-iphone` (Firefox auf dem iPhone, Hauptgerät) | Playwright `webkit-iphone`, `firefox-rechner`, `chromium-rechner` | VPS | `docs/**`, `auftraege/**`, `*.md` |
-| berichtsheft-app | Lint, Formatierung, Typecheck, Vitest mit PostgreSQL, AK-Abdeckung, Beispiel-PDF | keine; die Sitzungen testen lokal mit Test-Login | Docker Compose + Playwright (Chromium, Firefox, Edge, 375 px) | VPS | `docs/**`, `*.md` |
-| Liferay-Update und Migration (geplant) | wird mit der Spezifikation des Projekts festgelegt | wird festgelegt | Liferay mit Datenbank und Suchdienst, Migrationstest mit erfundenen Daten | VPS | wird festgelegt |
-| weitere Projekte | nach CI-02 und CI-25 | | | VPS nur bei schweren Jobs | |
-| Übungs-Repos mit fremden Workflows | unverändert | – | – | GitHub | – |
+Die volle Prüfung läuft erst, wenn der PR „bereit“ ist (CI-10, CI-11). Die schnelle Prüfung läuft immer (CI-09).
+
+| Klasse | Pfade | Volle Prüfung bei bereitem PR | Begründung |
+|---|---|---|---|
+| D Doku | `docs/**`, `profile/**`, `playbooks/**`, `specs/**/*.md`, `*.md` | keine (CI-12) | ändert kein Verhalten |
+| P Prüffälle | `specs/pruefung/**` | TypeScript: wie Klasse L; Liferay: nur im Wochenlauf oder mit Label `volle-pruefung` | der Prüf-Runner der schnellen Prüfung führt die Fachlogik-Fälle schon aus |
+| L Logik und Server | `src/domain/**`, `src/lib/**`, `src/pdf/**`, `src/worker/**`, `src/auth.ts`, `src/proxy.ts`, `prisma/**`, `scripts/**`, `tests/**` | Docker Compose + Playwright `chromium` und `smartphone-375` | Verhalten ändert sich, die Darstellung im Browser nicht |
+| O Oberfläche | `src/app/**`, `src/components/**`, `assets/**`, `public/**`, `e2e/**`, `playwright.config.ts`, `next.config.ts`, `postcss.config.mjs` | zusätzlich `firefox`, `msedge`, `a11y`, `screenshots` | Darstellung und Barrierefreiheit können je Browser abweichen |
+| I Infrastruktur und Abhängigkeiten | `package.json`, `package-lock.json`, `Dockerfile`, `docker/**`, `docker-compose.yml`, `keycloak/**`, `.github/**`, `.claude/**`, `.env.example`, `.dockerignore`, `.gitattributes`, `.gitignore`, `.prettierignore`, `.prettierrc.json`, `tsconfig.json`, `eslint.config.mjs`, `vitest.config.ts`, `prisma.config.ts` | alle Konfigurationen der TypeScript-App | wirkt auf alles, z. B. neue Bibliotheksversionen |
+| L62 Liferay 6.2.5 | `liferay-625/**` | Liferay-6.2.5-Job | eigene Umsetzung |
+| L72 Liferay 7.2 | `liferay-72/**` | Liferay-7.2-Job | eigene Umsetzung |
+| U Upgrade | – | nur von Hand (`workflow_dispatch`) | sehr lang, nur bei U-PRs nötig |
+| sonstige Pfade | alles, was oben fehlt | alle Konfigurationen der TypeScript-App (CI-34) | im Zweifel voll |
+
+Beispiele: Ein PR, der nur `docs/` und `src/domain/weeks.ts` ändert, ist Klasse L und läuft mit Chromium und 375 px.
+Ein PR mit einer neuen Komponente ist Klasse O und läuft in allen Browsern. Ein Dependabot-PR ist Klasse I.
+
+Festlegung des Umfangs (12.10.2026, von Chris an Claude übertragen):
+
+- **Klasse L nur mit Chromium und 375 px:** Logik, Datenbank, PDF und Worker laufen auf dem Server und sind vom Browser
+  unabhängig. Chromium prüft die Abläufe, 375 px die mobile Bedienung (AK-1102). Abweichungen in Firefox oder Edge
+  entstehen in Darstellung und Bedienung, also in Klasse O.
+- **Testdateien (`e2e/**`) in Klasse O:** AK-1101 verlangt jeden Browser-Test in Chromium, Firefox und Edge. Ein
+  geänderter Test muss daher in allen dreien laufen, sonst fällt ein Fehler erst im Wochenlauf auf.
+- **Restrisiko:** Was die Auswahl übersieht, findet der Wochenlauf (CI-14) mit allen Konfigurationen spätestens nach
+  einer Woche. Wer unsicher ist, setzt das Label `volle-pruefung` (CI-35).
+- **Automatisches Mergen:** Ein PR, der automatisch gemergt werden soll, braucht mindestens den Umfang der Klasse L
+  (`docs/07-spec-automatisches-mergen.md`, AM-R08).
+
+### Prüfungen je Teil
+
+| Teil | Schnelle Prüfung | Kern-Prüfung im Draft | Volle Prüfung | Doku-Pfade |
+|---|---|---|---|---|
+| TypeScript-App | Lint, Formatierung, Typecheck, Vitest mit PostgreSQL, AK-Abdeckung, Beispiel-PDF | keine; die Sitzungen testen lokal mit Test-Login | Docker Compose + Playwright (Chromium, Firefox, Edge, 375 px, axe, Screenshots); Umfang nach Änderungsklasse | siehe Klasse D |
+| Specs und Prüffälle (ab G1) | Prüf-Runner für TypeScript, AK-Abdeckung | keine | wie TypeScript-App | `specs/**/*.md` |
+| Liferay 6.2.5 (ab L62) | wird in P00 festgelegt (Build, JUnit) | keine | Liferay mit Datenbank, Prüffälle mit Playwright (Chromium); nur bei Änderungen unter `liferay-625/` | wird in P00 festgelegt |
+| Liferay 7.2 (ab L72) | wird in P00 festgelegt (Gradle, JUnit) | keine | Liferay mit Datenbank und Elasticsearch, Prüffälle mit Playwright (Chromium); nur bei Änderungen unter `liferay-72/` | wird in P00 festgelegt |
+| Upgrade 6.2.5 → 7.2 (ab U) | – | – | nur von Hand (`workflow_dispatch`): 6.2.5 befüllen, Upgrade, 7.2 prüfen | – |
 
 ## 8. Reihenfolge der Umsetzung
 
-1. Chris setzt das Budget von 25 $ (CI-06). Damit läuft die CI sofort wieder.
-2. Die Workflows von ImmobilienSoftware und berichtsheft-app setzen CI-09 bis CI-20 um, je Repository ein PR, noch
-   auf den Runnern von GitHub.
-3. Chris bestellt den VPS. Die Steuerung schreibt den Auftrag für das Ansible-Repository mit Anleitung. Eine Sitzung
-   setzt es um, und Chris führt es einmal aus.
-4. Die schweren Jobs wechseln auf den VPS (`runs-on` mit dem Label des VPS). Das Budget sinkt auf 10 $.
-5. Erster Monatsrückblick (CI-08) Anfang Dezember 2026, Wirtschaftlichkeitsprüfung Anfang Januar 2027.
+1. Chris gibt diese Richtlinie frei, setzt den E-Mail-Schutz im eigenen Konto und stellt das Repository auf öffentlich.
+2. Chris setzt die Einstellungen aus Abschnitt 4.
+3. Ein PR setzt CI-09 bis CI-20, CI-27 und CI-32 bis CI-36 im Workflow um. Die Zuordnung der Pfade steht an einer
+   Stelle im Workflow, und ein Test der schnellen Prüfung meldet Dateien im Repository, die keiner Klasse angehören.
+   Die Workflows reagieren zusätzlich auf `merge_group`, damit die Merge-Warteschlange aus
+   `docs/07-spec-automatisches-mergen.md` prüfen kann.
+   **Umgesetzt am 12.10.2026:**
+   - Die Zuordnung steht in `scripts/pruefumfang/pruefumfang.mjs`, mit Tests.
+   - Der Job „Umfang“ bestimmt den Umfang je Lauf und zeigt ihn in der Zusammenfassung des Laufs.
+   - „Prüfung abgeschlossen“ ist der Abschluss-Job.
+   - `npm run pruefumfang -- --pruefen` in der schnellen Prüfung meldet Dateien ohne Klasse.
+   - Jedes neue Label an einem PR startet die Prüfung neu. So stammt das Ergebnis am Commit immer aus einer
+     vollständigen Auswertung und nie aus einem übersprungenen Lauf.
+4. Liferay-Jobs kommen mit L62 bzw. L72 dazu (CI-25).
+5. Erster Monatsrückblick (CI-08) Anfang Dezember 2026.
