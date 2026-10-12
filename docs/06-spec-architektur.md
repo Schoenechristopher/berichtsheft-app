@@ -289,7 +289,7 @@ eigenen Claude-Code-Sitzungen mit frischem Kontext, wie bei den Etappen 1 bis 8.
 | --- | --- |
 | Steuerungsinstanz | liest Fach-Specs, Profil und Playbooks; schneidet Arbeitspakete; schreibt je Paket einen Auftrag nach `vorlage-arbeitspaket.md`; startet die Entwicklersitzungen; prüft PR, CI und Prüffälle; führt die Fortschrittsdatei; gibt Rückfragen gesammelt an Chris weiter |
 | Entwicklersitzung | setzt genau ein Arbeitspaket nach Playbook um: Branch, Tests, Draft-PR mit AK-Tabelle und „Bitte bestätigen“; meldet Ergebnis und offene Punkte an die Steuerung |
-| Chris | gibt Auslegungen frei und mergt; im Blindtest übernimmt die Steuerungsinstanz das Mergen in Wegwerf-Branches |
+| Chris | gibt Auslegungen frei und mergt alles, was nach `docs/07-spec-automatisches-mergen.md` nicht automatisch gemergt werden darf; im Blindtest übernimmt die Steuerungsinstanz das Mergen in Wegwerf-Branches |
 
 - **Arbeitspaket:** in der Regel ein Playbook (P00 bis P10, U00 bis U06). Große Playbooks teilt die Steuerung nach den
   Regeln in `00-steuerung.md`.
@@ -356,8 +356,9 @@ Freigabe durch Chris, wie bei Etappe 1 bis 8.
 | G2 Zerlegung Fachlogik | M02 bis M08: Fach-Specs, Landkarte, Prüffälle; TypeScript besteht alle | Fachlogik vollständig neutral beschrieben | G1 |
 | G3 Oberfläche und Abläufe | M09, Q, Ablauf-Prüffälle, Szenarien, Abdeckungsprüfung | Fach-Specs werden maßgeblich, `CLAUDE.md` angepasst | G2 |
 | G4 Profile und Playbooks | Profile für TypeScript, 6.2.5 und 7.2; alle Reihen P00 bis P10, U00 bis U06, Vorlage, Datenübernahme | Anleitung vollständig, noch unerprobt | G3 |
-| L62 Liferay 6.2.5 | Komplette App nach Playbooks in `liferay-625/` | alle Prüffälle grün auf 6.2.5 | G4 |
-| L72 Liferay 7.2 | Komplette App nach Playbooks in `liferay-72/` | alle Prüffälle grün auf 7.2 | G4 |
+| A Automatisches Mergen | Workflow nach Änderungsklassen, Merge-Kriterien als Check, Schattenbetrieb (`docs/07-spec-automatisches-mergen.md`) | Arbeitspakete der Liferay-Etappen werden ohne Klick von Chris gemergt, wenn sie die Kriterien erfüllen | parallel zu G1–G4, fertig vor L62 |
+| L62 Liferay 6.2.5 | Komplette App nach Playbooks in `liferay-625/` | alle Prüffälle grün auf 6.2.5 | G4, A |
+| L72 Liferay 7.2 | Komplette App nach Playbooks in `liferay-72/` | alle Prüffälle grün auf 7.2 | G4, A |
 | U Upgrade | Befüllte 6.2.5-Instanz nach U00 bis U06 auf 7.2 | Upgrade-Prüffälle und alle Prüffälle grün | L62, L72 |
 | B Blindtests | Je eine frische Steuerungsinstanz für TypeScript, 6.2.5, 7.2 und Upgrade, nur mit einem Satz als Auftrag; sie startet ihre Entwicklersitzungen selbst; Ergebnis in Wegwerf-Branches | Nachweis „ein Satz an die Steuerung reicht“ | U |
 | G5 Nachschärfen | Erkenntnisse aus L62, L72, U und B in Specs, Profile und Playbooks | geprüfte, wiederholbare Anleitung | B |

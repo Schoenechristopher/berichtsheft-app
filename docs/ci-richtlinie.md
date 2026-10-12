@@ -193,6 +193,18 @@ Die volle Prüfung läuft erst, wenn der PR „bereit“ ist (CI-10, CI-11). Die
 Beispiele: Ein PR, der nur `docs/` und `src/domain/weeks.ts` ändert, ist Klasse L und läuft mit Chromium und 375 px.
 Ein PR mit einer neuen Komponente ist Klasse O und läuft in allen Browsern. Ein Dependabot-PR ist Klasse I.
 
+Festlegung des Umfangs (12.10.2026, von Chris an Claude übertragen):
+
+- **Klasse L nur mit Chromium und 375 px:** Logik, Datenbank, PDF und Worker laufen auf dem Server und sind vom Browser
+  unabhängig. Chromium prüft die Abläufe, 375 px die mobile Bedienung (AK-1102). Abweichungen in Firefox oder Edge
+  entstehen in Darstellung und Bedienung, also in Klasse O.
+- **Testdateien (`e2e/**`) in Klasse O:** AK-1101 verlangt jeden Browser-Test in Chromium, Firefox und Edge. Ein
+  geänderter Test muss daher in allen dreien laufen, sonst fällt ein Fehler erst im Wochenlauf auf.
+- **Restrisiko:** Was die Auswahl übersieht, findet der Wochenlauf (CI-14) mit allen Konfigurationen spätestens nach
+  einer Woche. Wer unsicher ist, setzt das Label `volle-pruefung` (CI-35).
+- **Automatisches Mergen:** Ein PR, der automatisch gemergt werden soll, braucht mindestens den Umfang der Klasse L
+  (`docs/07-spec-automatisches-mergen.md`, AM-R08).
+
 ### Prüfungen je Teil
 
 | Teil | Schnelle Prüfung | Kern-Prüfung im Draft | Volle Prüfung | Doku-Pfade |
@@ -209,5 +221,7 @@ Ein PR mit einer neuen Komponente ist Klasse O und läuft in allen Browsern. Ein
 2. Chris setzt die Einstellungen aus Abschnitt 4.
 3. Ein PR setzt CI-09 bis CI-20, CI-27 und CI-32 bis CI-36 im Workflow um. Die Zuordnung der Pfade steht an einer
    Stelle im Workflow, und ein Test der schnellen Prüfung meldet Dateien im Repository, die keiner Klasse angehören.
+   Die Workflows reagieren zusätzlich auf `merge_group`, damit die Merge-Warteschlange aus
+   `docs/07-spec-automatisches-mergen.md` prüfen kann.
 4. Liferay-Jobs kommen mit L62 bzw. L72 dazu (CI-25).
 5. Erster Monatsrückblick (CI-08) Anfang Dezember 2026.
