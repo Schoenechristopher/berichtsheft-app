@@ -167,5 +167,6 @@ nachvollziehbar bleibt.
 
 - [ ] Ob die Plattform den Denkaufwand je Entwicklersitzung einstellen lässt oder nur je Hilfsagent. Sonst gilt MW-R06
       nur für Hilfsagenten, und die Steuerung wählt allein über die Stufe.
-- [ ] Ob die Plattform den Verbrauch je Sitzung meldet. Sonst arbeitet MW-R10 mit Dauer und Zahl der Runden als
-      Näherung.
+- [x] Die Plattform meldet den Verbrauch je Sitzung: Die Sitzungsdaten, die die Steuerung für eine
+      Entwicklersitzung abrufen kann, enthalten Eingabe-, Ausgabe- und Zwischenspeicher-Token sowie die Kosten in US-Dollar
+      (festgestellt am 12.10.2026). Die Steuerung liest sie nach Ende des Pakets und trägt sie ein.
