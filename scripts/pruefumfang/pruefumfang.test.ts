@@ -105,6 +105,15 @@ describe("bestimmeUmfang (CI-10 bis CI-14, CI-35)", () => {
     ).toMatchObject({ schnell: true, e2e: true, browserVoll: true, liferay625: true, liferay72: true });
   });
 
+  it("Label automerge: mindestens Chromium und 375 px, auch bei reiner Doku (AM-R08)", () => {
+    expect(
+      bestimmeUmfang({ ereignis: "pull_request", entwurf: false, labels: ["automerge"], dateien: ["docs/a.md"] }),
+    ).toMatchObject({ schnell: true, e2e: true, browserVoll: false });
+    expect(
+      bestimmeUmfang({ ereignis: "pull_request", entwurf: false, labels: ["automerge"], dateien: ["src/app/x.tsx"] }),
+    ).toMatchObject({ e2e: true, browserVoll: true });
+  });
+
   it("main nach dem Merge: nur schnelle Prüfung (CI-13)", () => {
     expect(bestimmeUmfang({ ereignis: "push", dateien: ["src/app/page.tsx"] })).toMatchObject({
       schnell: true,

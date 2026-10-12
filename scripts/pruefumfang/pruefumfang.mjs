@@ -164,6 +164,16 @@ export function bestimmeUmfang(anlass) {
       if (anlass.entwurf) {
         return umfang({ schnell: true }, "Entwurf: nur schnelle Prüfung (CI-10)");
       }
+      if ((anlass.labels ?? []).includes("automerge")) {
+        // AM-R08: Wer automatisch gemergt werden soll, braucht mindestens den Umfang der Klasse L.
+        const nachKlassen = umfangNachKlassen(dateien);
+        return nachKlassen.e2e
+          ? nachKlassen
+          : umfang(
+              { ...nachKlassen, e2e: true },
+              `${nachKlassen.grund}; Label automerge: mindestens Klasse L (AM-R08)`,
+            );
+      }
       return umfangNachKlassen(dateien);
     case "merge_group":
       return umfangNachKlassen(dateien);

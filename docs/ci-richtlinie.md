@@ -203,7 +203,9 @@ Festlegung des Umfangs (12.10.2026, von Chris an Claude übertragen):
 - **Restrisiko:** Was die Auswahl übersieht, findet der Wochenlauf (CI-14) mit allen Konfigurationen spätestens nach
   einer Woche. Wer unsicher ist, setzt das Label `volle-pruefung` (CI-35).
 - **Automatisches Mergen:** Ein PR, der automatisch gemergt werden soll, braucht mindestens den Umfang der Klasse L
-  (`docs/07-spec-automatisches-mergen.md`, AM-R08).
+  (`docs/07-spec-automatisches-mergen.md`, AM-R08). Der Job „Umfang“ setzt das um: Mit dem Label `automerge` läuft
+  mindestens Compose mit Chromium und 375 px. Der Workflow „Merge-Kriterien“ (nur lesende Rechte, CI-27) wertet den
+  Antrag aus.
 
 ### Prüfungen je Teil
 
