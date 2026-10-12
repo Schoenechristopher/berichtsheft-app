@@ -28,7 +28,7 @@ TypeScript · Next.js (App Router) · Tailwind CSS · PostgreSQL + Prisma · Aut
 
 - Pro Etappe ein Branch und ein Draft-PR; die PR-Beschreibung listet die abgedeckten AK-IDs und wie sie getestet sind.
 - Vor jedem Push: Lint, Typecheck und Tests lokal grün.
-- GitHub-Actions-Minuten sind knapp und gelten für alle Repos gemeinsam: `docs/ci-richtlinie.md` beachten (erst lokal prüfen, gebündelt pushen, PR erst auf „bereit“, wenn lokal alles grün ist).
+- CI nach `docs/ci-richtlinie.md`: erst lokal prüfen, gebündelt pushen, PR erst auf „bereit“, wenn lokal alles grün ist. Das Repository ist öffentlich: Logs und Artefakte enthalten nur Testdaten, Workflows nutzen keine Geheimnisse.
 
 ## Cloud-Sitzungen (Claude Code im Web)
 
