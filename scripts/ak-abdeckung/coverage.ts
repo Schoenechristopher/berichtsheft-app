@@ -195,8 +195,15 @@ function levelsCell(row: CoverageRow): string {
   return LEVEL_ORDER.filter((level) => row.tests.some((test) => test.level === level)).join(", ") || "–";
 }
 
+/** Kennzeichnung einer AK mit Ebene `Ablauf, G3` ohne Prüffall in `docs/03`. */
+export const PENDING_LABEL = "Prüffall folgt (G3)";
+
 /** Tabellen für `docs/03-testabdeckung.md`: AK-IDs, darunter ein eigener Abschnitt für die UI-AK-IDs. */
-export function renderMarkdown(rows: CoverageRow[], uiRows: CoverageRow[] = []): string {
+export function renderMarkdown(
+  rows: CoverageRow[],
+  uiRows: CoverageRow[] = [],
+  pending: ReadonlySet<string> = new Set(),
+): string {
   const covered = rows.filter((row) => row.tests.length > 0).length;
   const lines = [
     "# Testabdeckung der Akzeptanzkriterien",
@@ -207,11 +214,15 @@ export function renderMarkdown(rows: CoverageRow[], uiRows: CoverageRow[] = []):
     "",
     `Abgedeckt: ${covered} von ${rows.length} Akzeptanzkriterien.`,
     "",
-    "| AK-ID | Kurztext | Tests | Ebene |",
-    "| --- | --- | --- | --- |",
+    `Spalte „${PENDING_LABEL}“: Die Fach-Spec führt die AK mit Ebene \`${DEFERRED_LEVEL}\` (nur im Ablauf prüfbar), und es gibt noch keinen Prüffall. Das ist in G2 kein Fehler; ab G3 braucht sie einen (Entscheidung E1).`,
+    "",
+    `| AK-ID | Kurztext | Tests | Ebene | ${PENDING_LABEL} |`,
+    "| --- | --- | --- | --- | --- |",
   ];
   for (const row of rows) {
-    lines.push(`| ${row.id} | ${escapeCell(shortText(row.text))} | ${testsCell(row)} | ${levelsCell(row)} |`);
+    lines.push(
+      `| ${row.id} | ${escapeCell(shortText(row.text))} | ${testsCell(row)} | ${levelsCell(row)} | ${pending.has(row.id) ? "ja" : ""} |`,
+    );
   }
   if (uiRows.length > 0) {
     const uiCovered = uiRows.filter((row) => row.tests.length > 0).length;
@@ -223,12 +234,12 @@ export function renderMarkdown(rows: CoverageRow[], uiRows: CoverageRow[] = []):
       "",
       `Abgedeckt: ${uiCovered} von ${uiRows.length} UI-Akzeptanzkriterien.`,
       "",
-      "| UI-AK-ID | Kurztext | Tests | Ebene (Soll) | Ebene |",
-      "| --- | --- | --- | --- | --- |",
+      `| UI-AK-ID | Kurztext | Tests | Ebene (Soll) | Ebene | ${PENDING_LABEL} |`,
+      "| --- | --- | --- | --- | --- | --- |",
     );
     for (const row of uiRows) {
       lines.push(
-        `| ${row.id} | ${escapeCell(shortText(row.text))} | ${testsCell(row)} | ${escapeCell(row.level ?? "–")} | ${levelsCell(row)} |`,
+        `| ${row.id} | ${escapeCell(shortText(row.text))} | ${testsCell(row)} | ${escapeCell(row.level ?? "–")} | ${levelsCell(row)} | ${pending.has(row.id) ? "ja" : ""} |`,
       );
     }
   }
@@ -257,11 +268,32 @@ export function moduleOfSpecFile(fileName: string): string | null {
 }
 
 /**
- * AK- und UI-AK-IDs aus der Tabelle des Abschnitts „Akzeptanzkriterien“ einer Fach-Spec
- * (`## 4. Akzeptanzkriterien`, Zeilen `| AK-404 | … |`).
+ * Ebenen der AK-Tabelle einer Fach-Spec (fünfte Spalte „Ebene“, `specs/vorlage-fach-spec.md`). `Ablauf, G3`
+ * markiert eine AK, die sich nur im Ablauf (Browser) prüfen lässt; ihr Prüffall folgt in G3 (Entscheidung E1).
  */
-export function parseModuleCriteria(markdown: string): string[] {
-  const ids: string[] = [];
+export const SPEC_LEVELS = ["Fachlogik", "Daten", "Ablauf, G3"] as const;
+/** Ebene „Ablauf, Prüffall folgt in G3“ (Entscheidung E1). */
+export const DEFERRED_LEVEL = "Ablauf, G3";
+/**
+ * Schalter „ab G3 Pflicht“ (Entscheidung E1): In G2 ist eine AK mit Ebene `Ablauf, G3` ohne Prüffall kein Fehler.
+ * Ab G3 auf `true` stellen; dann braucht auch sie einen Prüffall.
+ */
+export const DEFERRED_CASES_REQUIRED = false;
+
+/** AK einer Fach-Spec mit ihrer Ebene (fehlt bei einer Tabelle mit vier Spalten). */
+export interface ModuleCriterion {
+  id: string;
+  level?: string;
+}
+
+/**
+ * Liest die Tabelle des Abschnitts „Akzeptanzkriterien“ einer Fach-Spec (`## 4. Akzeptanzkriterien`,
+ * Zeilen `| AK-404 | Kurzfassung | Regeln | Prüffälle | Ebene |`). Eine Tabelle mit vier Spalten (ohne „Ebene“)
+ * bleibt lesbar; eine Zeile mit anderer Spaltenzahl oder einem unbekannten Wert in „Ebene“ ist ein Fehler.
+ */
+export function parseModuleTable(markdown: string): { criteria: ModuleCriterion[]; errors: string[] } {
+  const criteria: ModuleCriterion[] = [];
+  const errors: string[] = [];
   let inSection = false;
   for (const line of markdown.split("\n")) {
     if (/^##\s/.test(line)) {
@@ -269,11 +301,35 @@ export function parseModuleCriteria(markdown: string): string[] {
       continue;
     }
     const match = inSection ? /^\|\s*((?:UI-)?AK-\d{2,4})\s*\|/.exec(line) : null;
-    if (match && !ids.includes(match[1])) {
-      ids.push(match[1]);
+    if (!match || criteria.some((criterion) => criterion.id === match[1])) {
+      continue;
+    }
+    // Zellen ohne die leeren Ränder vor dem ersten und nach dem letzten „|“; „\|“ trennt keine Zelle.
+    const cells = line
+      .trim()
+      .replace(/^\|/, "")
+      .replace(/(?<!\\)\|$/, "")
+      .split(/(?<!\\)\|/)
+      .map((cell) => cell.trim());
+    if (cells.length === 5) {
+      const level = cells[4];
+      if (!(SPEC_LEVELS as readonly string[]).includes(level)) {
+        errors.push(`${match[1]}: unbekannte Ebene „${level}“ (erlaubt: ${SPEC_LEVELS.join("; ")}).`);
+      }
+      criteria.push({ id: match[1], level });
+    } else if (cells.length === 4) {
+      criteria.push({ id: match[1] });
+    } else {
+      errors.push(`${match[1]}: Zeile hat ${cells.length} statt 4 oder 5 Spalten.`);
+      criteria.push({ id: match[1] });
     }
   }
-  return ids;
+  return { criteria, errors };
+}
+
+/** Nur die AK- und UI-AK-IDs der Tabelle „Akzeptanzkriterien“ einer Fach-Spec. */
+export function parseModuleCriteria(markdown: string): string[] {
+  return parseModuleTable(markdown).criteria.map((criterion) => criterion.id);
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -344,12 +400,15 @@ export function criterionOfCase(id: string): string | null {
 /**
  * Prüft die Prüffälle gegen Spezifikation und Fach-Specs: eindeutige IDs, bekannte AK-ID, AK gehört
  * zum `modul` des Prüffalls, jede AK gehört höchstens einem Modul, und jede AK eines beschriebenen
- * Moduls hat mindestens einen Prüffall.
+ * Moduls hat mindestens einen Prüffall. Ausnahme bis G3: AKs in `deferred` (Ebene `Ablauf, G3`), solange
+ * `deferredRequired` (Vorgabe `DEFERRED_CASES_REQUIRED`) nicht gesetzt ist.
  */
 export function checkCases(
   cases: CheckCase[],
   criteria: Criterion[],
   moduleCriteria: ReadonlyMap<string, readonly string[]>,
+  deferred: ReadonlySet<string> = new Set(),
+  deferredRequired: boolean = DEFERRED_CASES_REQUIRED,
 ): string[] {
   const errors: string[] = [];
   const known = new Set(criteria.map((criterion) => criterion.id));
@@ -384,7 +443,7 @@ export function checkCases(
   }
   const covered = new Set(cases.map((entry) => criterionOfCase(entry.id)));
   for (const [module, ids] of moduleCriteria) {
-    for (const id of ids.filter((id) => !covered.has(id))) {
+    for (const id of ids.filter((id) => !covered.has(id) && (deferredRequired || !deferred.has(id)))) {
       errors.push(`Modul ${module}: ${id} hat keinen Prüffall.`);
     }
   }
@@ -394,4 +453,10 @@ export function checkCases(
 /** Prüffälle als Tests der Ebene „Prüffall“ (der Runner erzeugt ihre Testnamen, `parseTests` sieht sie nicht). */
 export function casesAsTests(cases: CheckCase[]): TestCase[] {
   return cases.map((entry) => ({ file: entry.file, name: entry.id, level: "Prüffall" }));
+}
+
+/** AKs mit Ebene `Ablauf, G3` ohne Prüffall: Ihr Prüffall folgt in G3 (eigene Kennzeichnung im Bericht). */
+export function pendingCriteria(deferred: ReadonlySet<string>, cases: CheckCase[]): string[] {
+  const covered = new Set(cases.map((entry) => criterionOfCase(entry.id)));
+  return [...deferred].filter((id) => !covered.has(id));
 }
