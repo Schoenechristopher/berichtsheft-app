@@ -22,8 +22,10 @@ Claude-Code-Entwicklersitzungen umsetzen.
 - **Fertig-Kriterium:** Eine Plattform ist fertig, wenn alle neutralen Prüffälle auf ihr grün sind. Das Upgrade ist
   fertig, wenn zusätzlich die Upgrade-Prüffälle grün sind.
 - **Nachweis:** Je Plattform und für das Upgrade ein Blindtest. Eine frische Steuerungsinstanz bekommt nur das
-  Repository und einen Satz wie „Baue die App auf Liferay 6.2.5 nach den Playbooks“. Bestanden ist er, wenn alle
-  Prüffälle grün sind und keine Rückfrage nötig war.
+  Repository und einen Satz wie „Baue die App auf Liferay 6.2.5 nach den Playbooks“. Sie fragt nicht nach: Stößt sie
+  auf eine Lücke in Spec oder Playbook, trifft sie eine Annahme, vermerkt beides in einer Lückenliste und baut weiter.
+  Bestanden ist der Blindtest, wenn alle Prüffälle grün sind und die Lückenliste leer ist. Sonst schließt G5 die
+  Lücken, und der Blindtest wird wiederholt (Entscheidung 12.10.2026).
 - **Nicht im Umfang:** Liferay 7.4 (später über die Vorlage für neue Plattformen), Datenübernahme aus der
   TypeScript-App nach Liferay (optionales Playbook), Produktivbetrieb auf Liferay 6.2 oder 7.2.
 - **Ablage:** alles im Repository `Schoenechristopher/berichtsheft-app`. `docs/01`, `docs/02` und `docs/05` bleiben als
@@ -98,7 +100,7 @@ dem vorhandenen Code. Gebaut wird in der Reihenfolge M01 bis M09, weil jedes Mod
 
 | Modul | Inhalt | AK-IDs | Code heute | Hängt ab von | Empfohlener Weg |
 | --- | --- | --- | --- | --- | --- |
-| M01 Kalender und Zeit | Uhr-Modul, ISO-Wochen in Europe/Berlin, Bundesländer, Feiertage | AK-404, Teile von AK-301 bis 304 | `src/domain/clock`, `weeks`, `holidays`, `federal-states` | – | A Quellcode |
+| M01 Kalender und Zeit | Uhr-Modul, ISO-Wochen in Europe/Berlin, Bundesländer, Feiertage | AK-404; Hilfsfunktionen für AK-301 bis 304 (gehören M03) | `src/domain/clock`, `weeks`, `holidays`, `federal-states` | – | A Quellcode |
 | M02 Personen und Zugang | Rollen, Anmeldung, Zuordnung und Vertretung, Deaktivieren, Nutzerverwaltung | AK-101 ff., AK-201 ff. | `src/domain/people`, `access`; `src/lib/auth`, `src/lib/people` | – | B Spec (Liferay-Konten und -Rollen) |
 | M03 Wochenberichte entstehen | Automatische Wochen ab Ausbildungsbeginn, außerhalb der Ausbildung, Definition „offen“ | AK-301 bis 306 | `src/domain/report-generation` | M01, M02 | A Quellcode |
 | M04 Bericht erfassen | Tagesarten, Tätigkeiten, Längengrenze, Speichern, Bearbeitungsrechte | AK-401 bis 408 | `src/domain/report-days`, `src/lib/reports` | M03 | A für Regeln, B für Formular |
@@ -232,6 +234,8 @@ führt sie über einen eigenen Adapter aus. Jede Prüffall-ID beginnt mit der AK
   übersetzen, aber kein Ergebnis umdeuten.
 - **Plattformgrenzen:** Wo eine Plattform eine Regel bewusst anders erfüllt (z. B. Anmeldung mit Liferay-Konten), steht
   das im Profil, und der Fall ist dort als „abweichend, begründet“ markiert. Ein stilles Überspringen gibt es nicht.
+  Ein solcher Fall zählt für das Fertig-Kriterium als erfüllt, wenn Chris die Abweichung im Profil freigegeben hat;
+  Berichte weisen ihn getrennt aus (Entscheidung 12.10.2026).
 - **Abdeckung:** `npm run ak:abdeckung` meldet jede AK-ID ohne Prüffall und jeden Prüffall ohne AK-ID.
 
 ## Plattform-Profile
@@ -311,8 +315,8 @@ eigenen Claude-Code-Sitzungen mit frischem Kontext, wie bei den Etappen 1 bis 8.
 6. **Empfehlung:** welcher Weg für dieses Modul und warum. Auf ausdrücklichen Auftrag geht die Sitzung den anderen Weg.
 7. **Schritte:** nummeriert, jeder mit einem kurzen Prüfschritt.
 8. **Prüfung:** Befehle und erwartete Ausgabe.
-9. **Abschluss:** Commit, Eintrag in der Fortschrittsdatei, Notizen für den PR (AK-Tabelle, Abweichungen, „Bitte
-   bestätigen“).
+9. **Abschluss:** Commit, Notizen für den PR (AK-Tabelle, Abweichungen, „Bitte bestätigen“), Bericht an die
+   Steuerung. Den Eintrag in der Fortschrittsdatei schreibt die Steuerung.
 10. **Typische Fehler** und was dann zu tun ist.
 
 **Reihe je Plattform (typescript, liferay-625, liferay-72):**
@@ -336,8 +340,9 @@ eigenen Claude-Code-Sitzungen mit frischem Kontext, wie bei den Etappen 1 bis 8.
 | U06 | Abnahme: Upgrade-Prüffälle (Berichte, Statuswechsel, Kommentare unverändert) und alle Prüffälle auf 7.2 grün |
 
 **Fortschrittsdatei:** Jede Umsetzung führt `FORTSCHRITT.md` mit Playbook, Stand, Datum, Commit und offenen Punkten.
-Nach jedem Playbook gibt es einen Commit. Die Steuerungsinstanz führt die Datei: Sie sieht jederzeit, welche Pakete
-fertig sind, und vergibt das nächste. Bricht eine Entwicklersitzung ab, startet sie für das offene Paket eine neue.
+Nach jedem Playbook gibt es einen Commit. Nur die Steuerungsinstanz schreibt die Datei, nach dem Merge eines Pakets;
+Entwicklersitzungen melden ihr Ergebnis per Bericht. So kollidieren parallele PRs nicht (Entscheidung 12.10.2026). Die
+Steuerung sieht jederzeit, welche Pakete fertig sind, und vergibt das nächste. Bricht eine Entwicklersitzung ab, startet sie für das offene Paket eine neue.
 
 **Weitere Dateien:**
 
@@ -361,12 +366,12 @@ Freigabe durch Chris, wie bei Etappe 1 bis 8.
 | L62 Liferay 6.2.5 | Komplette App nach Playbooks in `liferay-625/` | alle Prüffälle grün auf 6.2.5 | G4, A |
 | L72 Liferay 7.2 | Komplette App nach Playbooks in `liferay-72/` | alle Prüffälle grün auf 7.2 | G4, A |
 | U Upgrade | Befüllte 6.2.5-Instanz nach U00 bis U06 auf 7.2 | Upgrade-Prüffälle und alle Prüffälle grün | L62, L72 |
-| B Blindtests | Je eine frische Steuerungsinstanz für TypeScript, 6.2.5, 7.2 und Upgrade, nur mit einem Satz als Auftrag; sie startet ihre Entwicklersitzungen selbst; Ergebnis in Wegwerf-Branches | Nachweis „ein Satz an die Steuerung reicht“ | U |
+| B Blindtests | Je eine frische Steuerungsinstanz für TypeScript, 6.2.5, 7.2 und Upgrade, nur mit einem Satz als Auftrag; sie startet ihre Entwicklersitzungen selbst; Ergebnis in Wegwerf-Branches, für TypeScript in einem Branch ohne `src/`, `prisma/`, `e2e/` und `tests/` | Nachweis „ein Satz an die Steuerung reicht“ | U |
 | G5 Nachschärfen | Erkenntnisse aus L62, L72, U und B in Specs, Profile und Playbooks | geprüfte, wiederholbare Anleitung | B |
 
-- **Parallel möglich:** L62 und L72 können gleichzeitig in zwei Sitzungen laufen, sobald die Profile (G4) für beide
-  dieselben App-Tabellen festlegen. Sonst muss U03 Unterschiede zwischen den beiden Umsetzungen ausgleichen, die gar
-  nicht fachlich begründet sind.
+- **Parallel möglich:** L62 und L72 können gleichzeitig in zwei Sitzungen laufen. Beide Profile legen dafür in G4
+  dasselbe Schema der App-Tabellen fest (Tabellen, Spalten, Versionsspalten), sodass U03 nur Liferay-eigene
+  Unterschiede ausgleicht (Entscheidung 12.10.2026).
 - **Aufteilung:** L62 und L72 werden voraussichtlich in mehrere PRs geteilt (z. B. P00 bis P04, P05 bis P08, P09 bis
   P10), damit Reviews überschaubar bleiben.
 - **CI:** Das Repository ist öffentlich, die Standard-Runner von GitHub kosten dafür keine Minuten. G1 bis G4 brauchen
@@ -400,15 +405,12 @@ U00 klären sie zuerst, bevor gebaut wird.
 - [ ] Ob Liferay-Bundles, Java 8/11 und die Bezugsquellen in der Cloud-Sitzung erreichbar sind (P00).
 - [ ] Ob OpenID Connect auf 7.2 CE optional mitgeliefert wird (Profil 7.2).
 - [ ] Umfang des Dunkelmodus auf 6.2.5 (Profil 6.2.5).
-- [ ] AK-301 bis 304 stehen bei M01 („Teile von“) und bei M03. Wem gehören sie nach der Regel „gehört dem Modul, das die
-      Regel besitzt“? (G1)
-- [ ] Der Blindtest verlangt „keine Rückfrage“, `CLAUDE.md` verlangt „nachfragen, nicht raten“. Wie verhält sich die
-      Steuerungsinstanz im Blindtest bei einer echten Lücke: anhalten und als „nicht bestanden“ werten oder die Lücke
-      vermerken und mit einer Annahme weiterbauen? (G4, `00-steuerung.md`)
-- [ ] Wo baut der TypeScript-Blindtest: in einem leeren Wegwerf-Branch oder in einem Unterordner? Das Wurzelverzeichnis
-      ist von der Referenz belegt. (G4)
-- [ ] Wer schreibt `FORTSCHRITT.md`: nur die Steuerung, oder auch die Entwicklersitzung im Abschluss-Schritt? Bei
-      parallelen Paketen drohen sonst Merge-Konflikte. (G4)
-- [ ] Zählt ein Prüffall „abweichend, begründet“ für das Fertig-Kriterium „alle Prüffälle grün“? (G1, `format.md`)
-- [ ] Gleiche App-Tabellen, Spalten und Versionsspalten in `liferay-625/` und `liferay-72/`, damit U03 nur die
-      Liferay-eigenen Unterschiede ausgleicht. (G4, beide Profile)
+- [x] AK-301 bis 304 gehören M03; M01 liefert Hilfsfunktionen, auf die M03 verweist (12.10.2026).
+- [x] Blindtest bei einer Lücke: nicht fragen, Annahme treffen und in der Lückenliste vermerken; bestanden nur mit
+      grünen Prüffällen und leerer Lückenliste (12.10.2026).
+- [x] Der TypeScript-Blindtest baut in einem Wegwerf-Branch ohne `src/`, `prisma/`, `e2e/` und `tests/` (12.10.2026).
+- [x] `FORTSCHRITT.md` schreibt nur die Steuerung (12.10.2026).
+- [x] „Abweichend, begründet“ zählt als erfüllt, wenn Chris die Abweichung im Profil freigegeben hat (12.10.2026).
+- [x] Beide Liferay-Umsetzungen haben dasselbe Schema der App-Tabellen, festgelegt in den Profilen (12.10.2026).
+- [x] `v1.0`: Der Stand von `main` nach Etappe 8 gilt als abgenommen; das Tag `v1.0` folgt nach dem grünen vollen
+      CI-Lauf (12.10.2026).

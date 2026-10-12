@@ -163,6 +163,8 @@ Entwicklersitzungen **mit möglichst wenig Verbrauch zu einem abgenommenen Ergeb
 
 ## Offene Punkte
 
-- [ ] Ob die Plattform den Verbrauch je Sitzung meldet. Sonst messen KE-R18 und KZ-5 mit Dauer und Zahl der Runden.
+- [x] Die Plattform meldet den Verbrauch je Sitzung: Die Sitzungsdaten, die die Steuerung für eine
+      Entwicklersitzung abrufen kann, enthalten Eingabe-, Ausgabe- und Zwischenspeicher-Token sowie die Kosten in US-Dollar
+      (festgestellt am 12.10.2026). Die Steuerung liest sie nach Ende des Pakets und trägt sie ein.
 - [x] Startskript als Hook im Repository (`.claude/hooks/session-start.sh`), nicht über die Umgebung; damit ist es
       versioniert und geschützter Pfad (AM-R04).
