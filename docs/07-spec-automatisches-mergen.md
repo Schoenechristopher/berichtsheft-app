@@ -50,7 +50,8 @@ bei einem Fehler passiert.**
 
 - **AM-R04 Geschützte Pfade:** Ändert der PR eine dieser Dateien, ist automatisches Mergen ausgeschlossen:
   - Regeln und Auslegungen: `docs/01-spezifikation.md`, `docs/02-plan.md`, `docs/05-ui-spezifikation.md`,
-    `docs/06-spec-architektur.md`, diese Spec, `docs/ci-richtlinie.md`, `specs/**` außer `specs/code-landkarte.md`,
+    `docs/06-spec-architektur.md`, diese Spec, `docs/08-spec-modellwahl.md`, `docs/09-spec-kosteneffizienz.md`,
+    `docs/ci-richtlinie.md`, `specs/**` außer `specs/code-landkarte.md`,
     `profile/**`, `playbooks/**`.
   - Anweisungen an Sitzungen: `CLAUDE.md`, `AGENTS.md`, `.claude/**`. Abgelegte Aufträge (`AUFTRAG-*.md`) sind nicht
     geschützt, sie dokumentieren nur, was die Steuerung beauftragt hat.

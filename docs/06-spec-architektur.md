@@ -287,7 +287,7 @@ eigenen Claude-Code-Sitzungen mit frischem Kontext, wie bei den Etappen 1 bis 8.
 
 | Rolle | Aufgaben |
 | --- | --- |
-| Steuerungsinstanz | liest Fach-Specs, Profil und Playbooks; schneidet Arbeitspakete; schreibt je Paket einen Auftrag nach `vorlage-arbeitspaket.md`; startet die Entwicklersitzungen; prüft PR, CI und Prüffälle; führt die Fortschrittsdatei; gibt Rückfragen gesammelt an Chris weiter |
+| Steuerungsinstanz | liest Fach-Specs, Profil und Playbooks; schneidet Arbeitspakete; schreibt je Paket einen Auftrag nach `vorlage-arbeitspaket.md`; wählt je Paket Modell und Denkaufwand (`docs/08-spec-modellwahl.md`); startet die Entwicklersitzungen; prüft PR, CI und Prüffälle; führt die Fortschrittsdatei; gibt Rückfragen gesammelt an Chris weiter |
 | Entwicklersitzung | setzt genau ein Arbeitspaket nach Playbook um: Branch, Tests, Draft-PR mit AK-Tabelle und „Bitte bestätigen“; meldet Ergebnis und offene Punkte an die Steuerung |
 | Chris | gibt Auslegungen frei und mergt alles, was nach `docs/07-spec-automatisches-mergen.md` nicht automatisch gemergt werden darf; im Blindtest übernimmt die Steuerungsinstanz das Mergen in Wegwerf-Branches |
 
@@ -295,8 +295,9 @@ eigenen Claude-Code-Sitzungen mit frischem Kontext, wie bei den Etappen 1 bis 8.
   Regeln in `00-steuerung.md`.
 - **Reihenfolge und Parallelität:** folgt dem Abhängigkeitsgraph. Pakete ohne gegenseitige Abhängigkeit laufen
   parallel, z. B. M01 und M02 oder M06 und M08.
-- **Auftrag an eine Entwicklersitzung:** Ziel und Fertig-Kriterium, Playbook, Eingaben, Branch, empfohlener Weg, Regeln
-  zur CI (`docs/ci-richtlinie.md`), erwartete Rückmeldung.
+- **Auftrag an eine Entwicklersitzung:** Ziel und Fertig-Kriterium, Playbook, Eingaben, Branch, empfohlener Weg, Stufe
+  und Denkaufwand (`docs/08-spec-modellwahl.md`), Budget und Abbruchkriterium (`docs/09-spec-kosteneffizienz.md`),
+  Regeln zur CI (`docs/ci-richtlinie.md`), erwartete Rückmeldung.
 - **Abnahme eines Pakets:** Die Steuerung nimmt ein Paket erst an, wenn seine Prüffälle grün sind und die vorher
   fertigen Pakete grün bleiben.
 

@@ -13,6 +13,8 @@ Digitales Berichtsheft: Azubis erfassen ihre Wochenberichte (Mo–Fr), Ausbilder
 | [UI-Spezifikation](docs/05-ui-spezifikation.md) | Gestaltung der Oberfläche: Design-Tokens (Petrol, hell/dunkel), Komponenten, Navigation, Seiten, Barrierefreiheit, UI-AK-01 … UI-AK-20 |
 | [Spec-Architektur](docs/06-spec-architektur.md) | Entwurf: Fach-Specs, Prüffälle, Profile und Playbooks, um die App auf TypeScript, Liferay 6.2.5 und 7.2 zu bauen und 6.2.5 auf 7.2 zu heben |
 | [Automatisches Mergen](docs/07-spec-automatisches-mergen.md) | Entwurf: wann ein PR ohne Klick von Chris gemergt werden darf, Absicherung und Rücknahme |
+| [Modellwahl](docs/08-spec-modellwahl.md) | Entwurf: wie die Steuerung je Arbeitspaket Modell und Denkaufwand aus den verfügbaren Modellen wählt |
+| [Kosteneffizienz](docs/09-spec-kosteneffizienz.md) | Entwurf: wie Steuerung und Entwicklersitzungen mit wenig Verbrauch zu abgenommenen Ergebnissen kommen |
 | [CI-Richtlinie](docs/ci-richtlinie.md) | Regeln für GitHub Actions in diesem öffentlichen Repository |
 
 Aufträge der Etappen: [1](AUFTRAG-ETAPPE-1.md), [2](AUFTRAG-ETAPPE-2.md), [3](AUFTRAG-ETAPPE-3.md), [4](AUFTRAG-ETAPPE-4.md), [5](AUFTRAG-ETAPPE-5.md), [6](AUFTRAG-ETAPPE-6.md), [7](AUFTRAG-ETAPPE-7.md), [8](AUFTRAG-ETAPPE-8.md).
