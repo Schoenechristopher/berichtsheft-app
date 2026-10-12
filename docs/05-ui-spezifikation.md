@@ -1,6 +1,6 @@
 # UI-Spezifikation Berichtsheft-App
 
-Stand: 11.10.2026 · freigegeben am 12.10.2026 · Entwurf: [UI-Entwurf Berichtsheft-App](https://claude.ai/artifact/6w5J64847JtG9CRZ3uVsTp) (sieben klickbare Ansichten, Hell/Dunkel je Ansicht über die Tweaks)
+Stand: 11.10.2026 · freigegeben am 12.10.2026 · bestätigte Auslegungen aus Etappe 8 eingetragen am 12.10.2026 · Entwurf: [UI-Entwurf Berichtsheft-App](https://claude.ai/artifact/6w5J64847JtG9CRZ3uVsTp) (sieben klickbare Ansichten, Hell/Dunkel je Ansicht über die Tweaks)
 
 ## Ziel und Geltungsbereich
 
@@ -43,6 +43,10 @@ Alle Farben, Schriften und Abstände stehen als CSS-Variablen in `src/app/global
 | `--on-accent` | Text auf `--accent` | #FFFFFF | #0B1F20 |
 | `--focus` | Fokusring (2 px, 2 px Abstand) | #0F6B6F | #7DD0D2 |
 | `--danger` | Fehlermeldungen, Ablehnen, Löschen | #B42318 | #F97066 |
+| `--danger-hover` | Hover/gedrückt bei Gefahr-Knöpfen | #912018 | #FDA29B |
+| `--on-danger` | Text auf `--danger` | #FFFFFF | #1F0D0B |
+| `--border-strong` | Rahmen von Eingabefeldern und Schaltern (mindestens 3 : 1) | #7D8A8C | #6F7F82 |
+| `--backdrop` | abgedunkelter Hintergrund hinter Dialog und Schublade | #0F1415 mit 50 % | #000000 mit 65 % |
 
 ### Statusfarben
 
@@ -129,7 +133,7 @@ Alle Seiten bauen auf denselben Komponenten in `src/components/ui/` auf; eine Se
 - **Laden:** Platzhalter-Balken in der Form des Inhalts (Skeleton), kein Ladekreis über der ganzen Seite. Erscheint erst nach 300 ms.
 - **Leer:** ein Satz, was hier erscheinen wird, und wenn sinnvoll ein Knopf. Beispiele: „Keine Berichte zur Prüfung. Neue Einreichungen erscheinen hier.“ · „Keine Benachrichtigungen.“
 - **Fehler:** „Die Daten konnten nicht geladen werden.“ mit Knopf „Erneut versuchen“; Serverfehler bei Aktionen als Fehler-Toast mit der Meldung aus der Fachlogik (z. B. AK-508 „Der Bericht wurde inzwischen geändert …“).
-- **Kein Zugriff / nicht gefunden:** eine gemeinsame Seite „Bericht nicht gefunden“, wie bisher für fremde und unbekannte IDs gleich.
+- **Kein Zugriff / nicht gefunden:** Es gelten weiter die Meldungen nach AK-103: ein fremder Bericht zeigt „Zugriff verweigert“, eine unbekannte Adresse „Seite nicht gefunden“ (Korrektur vom 12.10.2026).
 
 ## Seiten im Detail
 
@@ -137,7 +141,7 @@ Vier Seiten tragen die Neugestaltung und sind im Entwurf gezeigt: Start Azubi, W
 
 ### Start Azubi (`/azubi`)
 
-1. **Begrüßung:** „Hallo Anna“, darunter Ausbildungsberuf und Zeitraum in `--text-muted`.
+1. **Begrüßung:** „Hallo Anna“, darunter der Ausbildungszeitraum in `--text-muted`.
 2. **Aktuelle Woche (große Karte):** „Diese Woche · KW 41/2026 · 05.10.–09.10.“, Status-Chip, fünf kleine Tagesmarken Mo–Fr (ausgefüllt / leer / außerhalb), Fortschritt „3 von 5 Tagen ausgefüllt“, Hauptknopf „Weiter erfassen“ (bei „Eingereicht“: „Ansehen“).
 3. **Zu erledigen:** alle offenen Wochen vor der aktuellen (Definition „offen“ aus der Spezifikation), älteste zuerst. Abgelehnte Wochen oben mit Chip „Abgelehnt“ und erster Zeile des Gesamtkommentars, überfällige Entwürfe mit Chip „Überfällig“. Leer: „Alles erledigt – keine offenen Wochen.“ mit Haken.
 4. **Zuletzt:** die nächsten 5 Wochen (eingereicht oder freigegeben) mit Link „Alle Wochen anzeigen“ zu Meine Wochen.
@@ -170,7 +174,7 @@ Vollständige Liste wie bisher (AK-306): KW, Zeitraum, Status, neueste zuerst, o
 
 Eine Seite mit Abschnitten als Karten; Ausbilder sehen zusätzliche Abschnitte. Bisher getrennte Seite `/ausbilder/einstellungen` wird dort zusammengeführt (alte Adresse leitet um).
 
-1. **Benachrichtigungen:** drei Schalter E-Mail, Teams, App mit je einem Satz Erklärung; sind alle aus, Warnleiste „Du bekommst keine Benachrichtigungen und keine Erinnerungen.“ (AK-1011, AK-1012). Speichern-Knopf je Abschnitt.
+1. **Benachrichtigungen:** drei Schalter E-Mail, Teams, App mit je einem Satz Erklärung; sind alle aus, Warnleiste „Sie bekommen keine Benachrichtigungen und keine Erinnerungen.“ (AK-1011, AK-1012). Speichern-Knopf je Abschnitt.
 2. **Darstellung:** „System / Hell / Dunkel“ als Segment-Auswahl; wirkt sofort und wird am Konto gespeichert (Geräteübergreifend), vor dem Laden aus einem Cookie, damit nichts aufblitzt.
 3. **Konto (nur lesend):** Name, Firmen-E-Mail, Rolle, zugeordneter Ausbilder bzw. Vertretung.
 4. **Nur Ausbilder – Zustellung:** bisherige Inhalte von `/ausbilder/einstellungen` unverändert.
@@ -248,7 +252,29 @@ Die Neugestaltung wird Etappe 8 in einer eigenen Entwickler-Sitzung, mit Branch 
 6. axe (`@axe-core/playwright`) als Prüfschritt in CI für alle Seiten, hell und dunkel, Chromium und 375 px.
 7. Screenshots der vier Hauptseiten (Desktop/Handy, hell/dunkel) hängen als CI-Artefakt am PR.
 
+### Bestätigte Auslegungen (Etappe 8, bestätigt am 12.10.2026)
+
+1. **Liste / Tabelle:** technisch eine benannte Liste (`ul`), die ab 768 px als Tabelle mit Kopfzeile und sichtbarer Sortierung erscheint; keine `table`-Semantik. Jede Zeile hat genau einen Link.
+2. **Glocke:** ab 1024 px ein Knopf mit Vorschau der letzten 5 als Ausklappmenü (Escape und Klick daneben schließen), darunter direkt die Seite Benachrichtigungen. Die Vorschau markiert nichts als gelesen; das tut erst die Liste (AK-1015). `aria-label` „Benachrichtigungen, 3 ungelesen“ mit der genauen Zahl.
+3. **Kontomenü:** Ausklappmenü mit Name, Rolle, „Einstellungen“ und „Abmelden“.
+4. **Kein Zugriff / nicht gefunden:** wie AK-103 (siehe „Zustände“); AK-103 bleibt unverändert.
+5. **Ausbildungsberuf:** kein eigenes Feld; Start Azubi zeigt nur den Zeitraum.
+6. **Ansprache:** die App bleibt beim „Sie“.
+7. **Zusätzliche Tokens:** `--border-strong`, `--danger-hover`, `--on-danger`, `--backdrop` (Tabelle „Farben“).
+8. **Tagesart:** Segment-Auswahl nur zwischen 768 und 1279 px, als Optionsgruppe aus Knöpfen (keine zusätzlichen Formularfelder, AK-403); ab 1280 px und am Handy Ausklappliste.
+9. **Fußleiste:** „Gespeichert“ auch direkt nach dem Laden.
+10. **Ablehnen und Freigabe zurücknehmen:** Gesamtkommentar bzw. Begründung stehen im Dialog; ohne Text bleibt der Dialog offen, die Meldung steht am Feld.
+11. **Einstellungen:** Abschnitt „Zustellung“ enthält das Bundesland der Firma und den Link „Nicht zustellbare Nachrichten“. „Konto“ zeigt bei Ausbildern die zugeordneten Azubis, bei Azubis den Ausbilder und „Vertretung: jeder andere Ausbilder“.
+12. **Start Azubi:** Kacheln unter „Zu erledigen“ mit zweitrangigem Knopf (Hauptaktion bleibt die aktuelle Woche); abgelehnte Wochen mit „Überarbeiten“.
+13. **Prüfliste:** „Erneut eingereicht“, sobald der Bericht schon einmal abgelehnt wurde (auch nach Rücknahme). Leerzustand bei „Meine Azubis“ mit Hinweis auf „Alle Azubis“, bei „Alle Azubis“ „Keine Berichte zur Prüfung.“
+14. **Berichtsseite für Ausbilder:** „← Prüfliste“ bei eingereichten Berichten, sonst „← Zurück zu &lt;Azubi&gt;“; der Azubi-Name steht im Kopf, auch für Azubis.
+15. **Ladezustände:** Platzhalter über Suspense innerhalb der Seiten und in der Glocken-Vorschau; kein seitenweites `loading.tsx`, damit Weiterleitungen auf dem Server bleiben.
+16. **Woche erfassen:** Die Felder sind gesperrt, bis die Seite im Browser interaktiv ist, damit keine frühe Eingabe verloren geht.
+17. **Handprüfung** mit Tastatur und NVDA: macht Chris selbst; sie blockiert die Abnahme der Etappe nicht.
+
 ### Offene Punkte
+
+- [ ] Handprüfung mit Tastatur und Screenreader (NVDA) durch Chris.
 
 - [ ] Firmenfarbe und Logo, falls die App übernommen wird (Tausch nur in den Tokens).
 - [ ] Ob ein Schriftzug mit Firmenname gewünscht ist.
