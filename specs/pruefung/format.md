@@ -101,6 +101,61 @@ Die Signaturen stehen in `specs/M01-kalender-und-zeit.md`, Abschnitt 6.
 `betrieb` sagt, ob die Plattform im Produktivbetrieb läuft. `gestellt` ist `true`, wenn „jetzt“ danach den vorgegebenen
 Zeitpunkt liefert.
 
+## Schnittstellen von M02 (Fachlogik)
+
+Die Signaturen stehen in `specs/M02-personen-und-zugang.md`, Abschnitt 6. Personen werden über ihren `schluessel` aus
+`testdaten.json` benannt (`anna`, `bernd`, `clara`, `dora`, `emil`); weitere Schlüssel sind erlaubt, z. B. ein
+unbekannter Ausbilder.
+
+**Datenformate von M02:**
+
+| Art | Format | Beispiel |
+| --- | --- | --- |
+| Rolle | `azubi` oder `ausbilder` | `azubi` |
+| Person | `{ "schluessel": <Text>, "rolle": <Rolle>, "aktiv": <Wahrheitswert> }` | `{ "schluessel": "anna", "rolle": "azubi", "aktiv": true }` |
+| Personenstand | Liste von `{ "schluessel", "name", "rolle", "aktiv", "ausbilder": <Schlüssel> \| null }`; `ausbilder` nur bei Azubis | alle Personen mit Rolle, Zustand und Zuordnung |
+| Konto | `{ "kontoId": <Text> \| null, "email": <Text> \| null, "emailBestaetigt": <Wahrheitswert> }` | Angaben des Anmeldedienstes beim Login |
+| Kandidat | `{ "schluessel": <Text>, "kontoId": <Text> \| null, "aktiv": <Wahrheitswert> }` oder `null` | Person, die über Konto-ID bzw. E-Mail gefunden wurde |
+| Bericht | `{ "azubi": <Schlüssel>, "azubiAktiv": <Wahrheitswert> }` | Ausschnitt eines Berichts für die Zugriffsprüfung |
+| Formulardaten | `{ "name", "email", "rolle", "ausbilder", "ausbildungsbeginn", "ausbildungsende" }`, jeweils Text; fehlendes Feld = leer | Eingabe des Admins, noch ungeprüft; `rolle` darf hier jeder Text sein |
+
+| Schnittstelle | `eingabe` | `erwartet` (Erfolg) | Fehlercodes |
+| --- | --- | --- | --- |
+| `zugangPruefen` | `{ "person": <Person> \| null }` (`null` = Firmenkonto ohne Person) | `{ "zugang": true }` | `konto_unbekannt`, `person_deaktiviert` |
+| `anmeldungZuordnen` | `{ "konto": <Konto>, "ueberKontoId": <Kandidat>, "ueberEmail": <Kandidat> }` | `{ "zuordnung": "bekannt", "person": <Schlüssel> }`, `{ "zuordnung": "binden", "person": <Schlüssel>, "kontoId": <Text> }` oder `{ "zuordnung": "keine" }` | – |
+| `darfBerichtSehen` | `{ "person": <Person>, "bericht": <Bericht> }` | `{ "erlaubt": true }` | `zugriff_verweigert` |
+| `darfVerwalten` | `{ "person": <Person> \| null }` (`null` = nicht angemeldet) | `{ "erlaubt": true }` | `zugriff_verweigert` |
+| `personPruefen` | `{ "daten": <Formulardaten>, "personen": <Personenstand>, "ziel": <Schlüssel> }`; `ziel` nur beim Ändern, die Person steht dann im Personenstand | `{ "person": { "name", "email", "rolle", "ausbilder", "ausbildungsbeginn", "ausbildungsende" } }`, leere Felder als `null` | `eingabe_ungueltig` mit `"felder"` |
+| `aenderungPruefen` | `{ "personen": <Personenstand>, "ziel": <Schlüssel>, "handelnd": <Schlüssel>, "rolle": <Rolle> }` (neue Rolle) | `{ "erlaubt": true }` | `letzter_ausbilder`, `azubis_zugeordnet`, `eigene_person` |
+| `deaktivierenPruefen` | `{ "personen": <Personenstand>, "ziel": <Schlüssel>, "handelnd": <Schlüssel> }` | `{ "erlaubt": true }` | `bereits_deaktiviert`, `letzter_ausbilder`, `azubis_zugeordnet`, `eigene_person` |
+| `reaktivierenPruefen` | `{ "personen": <Personenstand>, "ziel": <Schlüssel> }` | `{ "erlaubt": true }` | `bereits_aktiv`, `ausbilder_deaktiviert` |
+| `loeschenPruefen` | `{ "personen": <Personenstand>, "ziel": <Schlüssel>, "handelnd": <Schlüssel>, "fremdeHistorie": <Wahrheitswert> }` | `{ "erlaubt": true }` | `letzter_ausbilder`, `azubis_zugeordnet`, `eigene_person`, `fremde_historie` (mit `"deaktivierenAnbieten": true`, wenn die Person aktiv ist) |
+| `namenBestaetigen` | `{ "eingabe": <Text>, "name": <Text> }` | `{ "bestaetigt": <Wahrheitswert> }` | – |
+| `bundeslandEinstellen` | `{ "person": <Person> \| null, "bundesland": <Text> }` | `{ "bundesland": <Bundesland> }` | `zugriff_verweigert`, `bundesland_unbekannt` |
+
+**Fehlerergebnis mit Zusatzfeldern:** Bei `eingabe_ungueltig` nennt `"felder"` die betroffenen Felder der Formulardaten
+in der Reihenfolge `name`, `email`, `rolle`, `ausbilder`, `ausbildungsbeginn`, `ausbildungsende`, z. B.
+`{ "fehler": "eingabe_ungueltig", "felder": ["ausbilder", "ausbildungsbeginn"] }`. Bei `fremde_historie` steht
+`"deaktivierenAnbieten": true`, wenn die Person noch aktiv ist. Sonst trägt ein Fehlerergebnis nur `"fehler"`.
+
+**Fehlercodes von M02:**
+
+| Code | Bedeutung | AK |
+| --- | --- | --- |
+| `konto_unbekannt` | Zum Firmenkonto gibt es keine Person. | AK-102 |
+| `person_deaktiviert` | Die Person ist deaktiviert. | AK-102, AK-204 |
+| `zugriff_verweigert` | Die Person darf das nicht sehen oder tun (Rolle, Besitz, deaktiviert). | AK-103, AK-104, AK-209 |
+| `eingabe_ungueltig` | Formulardaten einer Person verletzen eine Pflicht- oder Formatregel; `"felder"` nennt die Felder. | AK-201 bis AK-203 |
+| `bereits_deaktiviert` | Die Person ist schon deaktiviert. | AK-204 |
+| `bereits_aktiv` | Die Person ist schon aktiv. | AK-204 |
+| `ausbilder_deaktiviert` | Der zugeordnete Ausbilder des Azubis ist deaktiviert; er wird nicht wieder aktiviert. | AK-204 |
+| `fremde_historie` | Die Person kommt in der Historie von Berichten anderer Azubis vor; nur deaktivierbar. | AK-206 |
+| `letzter_ausbilder` | Die Person ist der letzte aktive Ausbilder. | AK-207 |
+| `eigene_person` | Die handelnde Person würde sich selbst deaktivieren, löschen oder die eigene Rolle ändern. | AK-207 |
+| `azubis_zugeordnet` | Dem Ausbilder sind noch Azubis zugeordnet (fürs Deaktivieren nur aktive). | AK-208 |
+
+`bundesland_unbekannt` ist der Fehlercode aus M01 (AK-1205).
+
 ## Fehlercodes
 
 | Code | Bedeutung | AK |

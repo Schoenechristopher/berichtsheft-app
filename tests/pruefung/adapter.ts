@@ -21,6 +21,22 @@ import {
   type IsoWeek,
 } from "@/domain/weeks";
 
+import { decideAccess, matchLogin, type LoginCandidate, type Role } from "@/domain/access";
+import {
+  checkDeactivate,
+  checkDelete,
+  checkFederalStateSetting,
+  checkReactivate,
+  checkUpdate,
+  confirmsName,
+  validatePerson,
+  type PersonField,
+  type PersonSnapshot,
+  type RuleReason,
+  type RuleResult,
+} from "@/domain/people";
+import { canManagePeople, canViewReport, type Viewer } from "@/domain/report-access";
+
 export type Input = Record<string, unknown>;
 export type Result = Record<string, unknown>;
 
@@ -117,6 +133,216 @@ export function formatInstant(instant: Date): string {
   return `${local}${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(abs % 60).padStart(2, "0")}`;
 }
 
+function bool(input: Input, name: string): boolean {
+  const value = field(input, name);
+  if (typeof value !== "boolean") {
+    throw new CaseFormatError(`Eingabe „${name}“ muss ein Wahrheitswert sein.`);
+  }
+  return value;
+}
+
+function object(input: Input, name: string): Input {
+  const value = field(input, name);
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    throw new CaseFormatError(`Eingabe „${name}“ muss ein Objekt sein.`);
+  }
+  return value as Input;
+}
+
+function objectOrNull(input: Input, name: string): Input | null {
+  return field(input, name) === null ? null : object(input, name);
+}
+
+function textOrNull(input: Input, name: string): string | null {
+  return field(input, name) === null ? null : text(input, name);
+}
+
+// ---------------------------------------------------------------------------
+// M02 Personen und Zugang
+// ---------------------------------------------------------------------------
+
+/** Rollen der Prüffälle (`azubi`, `ausbilder`) und der App. */
+const ROLES: Record<string, Role> = { azubi: "TRAINEE", ausbilder: "TRAINER" };
+const ROLE_NAMES: Record<Role, string> = { TRAINEE: "azubi", TRAINER: "ausbilder" };
+
+function role(input: Input, name: string): Role {
+  const value = text(input, name);
+  if (!Object.hasOwn(ROLES, value)) {
+    throw new CaseFormatError(`Rolle muss „azubi“ oder „ausbilder“ sein: ${value}`);
+  }
+  return ROLES[value];
+}
+
+/** Person für Zugriffsprüfungen: `{ schluessel, rolle, aktiv }`. */
+function viewer(input: Input): Viewer {
+  return { id: text(input, "schluessel"), role: role(input, "rolle"), active: bool(input, "aktiv") };
+}
+
+/** Personenstand: Liste von `{ schluessel, name, rolle, aktiv, ausbilder? }`. */
+function persons(input: Input): PersonSnapshot[] {
+  const list = field(input, "personen");
+  if (!Array.isArray(list)) {
+    throw new CaseFormatError("Eingabe „personen“ muss eine Liste sein.");
+  }
+  return list.map((entry: unknown) => {
+    if (typeof entry !== "object" || entry === null) {
+      throw new CaseFormatError("Jede Person muss ein Objekt sein.");
+    }
+    const person = entry as Input;
+    return {
+      id: text(person, "schluessel"),
+      name: text(person, "name"),
+      role: role(person, "rolle"),
+      active: bool(person, "aktiv"),
+      trainerId: "ausbilder" in person ? textOrNull(person, "ausbilder") : null,
+    };
+  });
+}
+
+function loginCandidate(input: Input | null): LoginCandidate | null {
+  return (
+    input && { id: text(input, "schluessel"), accountId: textOrNull(input, "kontoId"), active: bool(input, "aktiv") }
+  );
+}
+
+/** Feste Fehlercodes aus `format.md` je Ablehnungsgrund der Nutzerverwaltung. */
+const RULE_CODES: Record<RuleReason, string> = {
+  "already-inactive": "bereits_deaktiviert",
+  "already-active": "bereits_aktiv",
+  "last-active-trainer": "letzter_ausbilder",
+  "has-trainees": "azubis_zugeordnet",
+  self: "eigene_person",
+  "foreign-history": "fremde_historie",
+  "trainer-inactive": "ausbilder_deaktiviert",
+};
+
+function ruleResult(result: RuleResult): Result {
+  if (result.allowed) {
+    return { erlaubt: true };
+  }
+  return result.offerDeactivate
+    ? { fehler: RULE_CODES[result.reason], deaktivierenAnbieten: true }
+    : { fehler: RULE_CODES[result.reason] };
+}
+
+/** Felder des Personen-Formulars in den Prüffällen, in fester Reihenfolge. */
+const PERSON_FIELDS: [PersonField, string][] = [
+  ["name", "name"],
+  ["email", "email"],
+  ["role", "rolle"],
+  ["trainerId", "ausbilder"],
+  ["trainingStart", "ausbildungsbeginn"],
+  ["trainingEnd", "ausbildungsende"],
+];
+
+function optionalText(input: Input, name: string): string | null {
+  return name in input ? textOrNull(input, name) : null;
+}
+
+const peopleOperations: Record<string, (input: Input) => Result> = {
+  zugangPruefen: (input) => {
+    const person = objectOrNull(input, "person");
+    const decision = decideAccess(person && { role: role(person, "rolle"), active: bool(person, "aktiv") });
+    if (decision.allowed) {
+      return { zugang: true };
+    }
+    return { fehler: decision.reason === "inactive" ? "person_deaktiviert" : "konto_unbekannt" };
+  },
+  anmeldungZuordnen: (input) => {
+    const account = object(input, "konto");
+    const match = matchLogin(
+      {
+        accountId: textOrNull(account, "kontoId"),
+        email: textOrNull(account, "email"),
+        emailVerified: bool(account, "emailBestaetigt"),
+      },
+      loginCandidate(objectOrNull(input, "ueberKontoId")),
+      loginCandidate(objectOrNull(input, "ueberEmail")),
+    );
+    switch (match.kind) {
+      case "known":
+        return { zuordnung: "bekannt", person: match.personId };
+      case "bind":
+        return { zuordnung: "binden", person: match.personId, kontoId: match.accountId };
+      case "none":
+        return { zuordnung: "keine" };
+    }
+  },
+  darfBerichtSehen: (input) => {
+    const report = object(input, "bericht");
+    const access = { traineeId: text(report, "azubi"), traineeActive: bool(report, "azubiAktiv") };
+    return canViewReport(viewer(object(input, "person")), access)
+      ? { erlaubt: true }
+      : { fehler: "zugriff_verweigert" };
+  },
+  darfVerwalten: (input) => {
+    const person = objectOrNull(input, "person");
+    return canManagePeople(person && viewer(person)) ? { erlaubt: true } : { fehler: "zugriff_verweigert" };
+  },
+  personPruefen: (input) => {
+    const data = object(input, "daten");
+    const all = persons(input);
+    const targetId = "ziel" in input ? text(input, "ziel") : undefined;
+    const target = all.find((person) => person.id === targetId);
+    if (targetId !== undefined && !target) {
+      throw new CaseFormatError(`Ziel „${targetId}“ steht nicht in „personen“.`);
+    }
+    const rawRole = optionalText(data, "rolle");
+    const validation = validatePerson(
+      {
+        name: optionalText(data, "name"),
+        email: optionalText(data, "email"),
+        role: rawRole !== null && Object.hasOwn(ROLES, rawRole) ? ROLES[rawRole] : rawRole,
+        trainerId: optionalText(data, "ausbilder"),
+        trainingStart: optionalText(data, "ausbildungsbeginn"),
+        trainingEnd: optionalText(data, "ausbildungsende"),
+      },
+      { persons: all, targetId, targetActive: target?.active },
+    );
+    if (!validation.ok) {
+      return {
+        fehler: "eingabe_ungueltig",
+        felder: PERSON_FIELDS.filter(([key]) => key in validation.fieldErrors).map(([, name]) => name),
+      };
+    }
+    const value = validation.value;
+    return {
+      person: {
+        name: value.name,
+        email: value.email,
+        rolle: ROLE_NAMES[value.role],
+        ausbilder: value.trainerId,
+        ausbildungsbeginn: value.trainingStart,
+        ausbildungsende: value.trainingEnd,
+      },
+    };
+  },
+  aenderungPruefen: (input) => {
+    const result = checkUpdate(persons(input), text(input, "ziel"), text(input, "handelnd"), {
+      role: role(input, "rolle"),
+    });
+    return result.allowed ? { erlaubt: true } : { fehler: RULE_CODES[result.reason] };
+  },
+  deaktivierenPruefen: (input) =>
+    ruleResult(checkDeactivate(persons(input), text(input, "ziel"), text(input, "handelnd"))),
+  reaktivierenPruefen: (input) => ruleResult(checkReactivate(persons(input), text(input, "ziel"))),
+  loeschenPruefen: (input) =>
+    ruleResult(
+      checkDelete(persons(input), text(input, "ziel"), text(input, "handelnd"), {
+        hasForeignHistory: bool(input, "fremdeHistorie"),
+      }),
+    ),
+  namenBestaetigen: (input) => ({ bestaetigt: confirmsName(text(input, "eingabe"), text(input, "name")) }),
+  bundeslandEinstellen: (input) => {
+    const person = objectOrNull(input, "person");
+    const setting = checkFederalStateSetting(person && viewer(person), text(input, "bundesland"));
+    if (setting.ok) {
+      return { bundesland: setting.federalState };
+    }
+    return { fehler: setting.reason === "forbidden" ? "zugriff_verweigert" : "bundesland_unbekannt" };
+  },
+};
+
 const operations: Record<string, (input: Input) => Result> = {
   jetzt: () => ({ zeitpunkt: formatInstant(now()) }),
   uhrVorgeben: (input) => {
@@ -157,6 +383,7 @@ const operations: Record<string, (input: Input) => Result> = {
   feiertage: (input) => ({
     feiertage: [...publicHolidays(integer(input, "jahr"), text(input, "bundesland"))].sort(),
   }),
+  ...peopleOperations,
 };
 
 /** Namen aller Schnittstellen, die der Adapter kennt. */

@@ -101,7 +101,7 @@ dem vorhandenen Code. Gebaut wird in der Reihenfolge M01 bis M09, weil jedes Mod
 | Modul | Inhalt | AK-IDs | Code heute | Hängt ab von | Empfohlener Weg |
 | --- | --- | --- | --- | --- | --- |
 | M01 Kalender und Zeit | Uhr-Modul, ISO-Wochen in Europe/Berlin, Bundesländer, Feiertage | AK-404, AK-1201 bis AK-1206; Hilfsfunktionen für AK-301 bis 304 (gehören M03) | `src/domain/clock`, `weeks`, `holidays`, `federal-states` | – | A Quellcode |
-| M02 Personen und Zugang | Rollen, Anmeldung, Zuordnung und Vertretung, Deaktivieren, Nutzerverwaltung | AK-101 ff., AK-201 ff. | `src/domain/people`, `access`; `src/lib/auth`, `src/lib/people` | – | B Spec (Liferay-Konten und -Rollen) |
+| M02 Personen und Zugang | Rollen, Anmeldung, Zuordnung und Vertretung, Deaktivieren, Nutzerverwaltung | AK-101 bis AK-106, AK-201 bis AK-209 (AK-101, AK-106, AK-205: Prüffall folgt in G3) | `src/domain/people`, `access`, `report-access` (`canViewReport`, `canManagePeople`); `src/lib/auth`, `src/lib/people`, `src/lib/session` | – | B Spec (Liferay-Konten und -Rollen) |
 | M03 Wochenberichte entstehen | Automatische Wochen ab Ausbildungsbeginn, außerhalb der Ausbildung, Definition „offen“ | AK-301 bis 306 | `src/domain/report-generation` | M01, M02 | A Quellcode |
 | M04 Bericht erfassen | Tagesarten, Tätigkeiten, Längengrenze, Speichern, Bearbeitungsrechte | AK-401 bis 408 | `src/domain/report-days`, `src/lib/reports` | M03 | A für Regeln, B für Formular |
 | M05 Status und Prüfung | Statusmodell, Pflichtfelder, Einreichen, Zurückziehen, Freigeben, Ablehnen, Rücknahme, Gleichzeitigkeit | AK-501 bis 508, 601 bis 607, 701 bis 704 | `src/domain/report-status`, `report-submission`, `report-access`; `src/lib/report-transitions` | M02, M04 | A, Transaktion und Sperre nach Profil |
@@ -228,7 +228,9 @@ führt sie über einen eigenen Adapter aus. Jede Prüffall-ID beginnt mit der AK
 
 - **Feste Begriffe:** Aktionen, Fehlercodes und Status sind in `format.md` abschließend aufgezählt. Meldungstexte prüft
   nur der Ablauf, und nur auf ihren Kern.
-- **Uhr:** Jeder Fall nennt seine Uhrzeit; jede Plattform muss die Uhr für Tests stellen können.
+- **Uhr:** Ein Fall, dessen Ergebnis von „jetzt“ abhängt, nennt seine Uhrzeit (`uhr`); bei Ablauf-Fällen ist sie
+  Pflicht, ebenso bei Daten-Fällen, die von „jetzt“ abhängen. Ein Fachlogik-Fall ohne `uhr` hängt nicht von „jetzt“ ab
+  (`specs/pruefung/format.md`). Jede Plattform muss die Uhr für Tests stellen können.
 - **Testdaten:** gemeinsam in `testdaten.json` (Anna, Bernd, Clara, Dora, Emil); jede Plattform lädt sie über ihren Seed.
 - **Adapter:** TypeScript unter `tests/pruefung/`, Liferay je Umsetzung unter `…/pruefung/`. Ein Adapter darf Aktionen
   übersetzen, aber kein Ergebnis umdeuten.

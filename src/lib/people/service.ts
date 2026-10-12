@@ -6,11 +6,11 @@
  * Oberfläche anzeigt. Geschrieben wird in einer serialisierbaren Transaktion, damit zwei
  * gleichzeitige Änderungen nicht gemeinsam eine Regel umgehen (z. B. den letzten Ausbilder).
  */
-import { isFederalState } from "@/domain/federal-states";
 import { isTheme, type Theme } from "@/domain/theme";
 import {
   checkDeactivate,
   checkDelete,
+  checkFederalStateSetting,
   checkReactivate,
   checkUpdate,
   confirmsName,
@@ -290,16 +290,14 @@ export async function updateFederalState(
   actor: Viewer,
   federalState: string | null | undefined,
 ): Promise<ActionResult> {
-  if (!canManagePeople(actor)) {
-    return FORBIDDEN;
-  }
-  if (!isFederalState(federalState)) {
-    return { ok: false, formError: "Bitte ein Bundesland auswählen." };
+  const setting = checkFederalStateSetting(actor, federalState);
+  if (!setting.ok) {
+    return setting.reason === "forbidden" ? FORBIDDEN : { ok: false, formError: "Bitte ein Bundesland auswählen." };
   }
   await prisma.setting.upsert({
     where: { id: 1 },
-    create: { id: 1, federalState },
-    update: { federalState },
+    create: { id: 1, federalState: setting.federalState },
+    update: { federalState: setting.federalState },
   });
   return { ok: true };
 }

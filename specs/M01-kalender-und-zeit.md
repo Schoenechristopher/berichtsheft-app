@@ -176,13 +176,10 @@ den Modulen, die sie brauchen (M03, M08).
 | 07.10.2026 | Ein fester Zeitpunkt aus der Konfiguration gilt nur außerhalb des Produktivbetriebs (Demo, Browser-Tests, Erinnerung von Hand). | `docs/02-plan.md`, Etappe 6 |
 | 12.10.2026 | Regeln zu Uhr, Kalendertag, Woche, Bundesländern und Feiertagen bekommen eigene AK-IDs (AK-1201 bis AK-1206); AK-404 gehört M01. | Entscheidung Chris, Plan G1 |
 | 12.10.2026 | Soll-Verhalten in die Spec, Code wird angepasst: ungültige Wochen werden abgewiesen (AK-1204), einmalige landesweite Feiertage zählen (AK-1206). | Entscheidung Chris, Plan G1 |
+| 12.10.2026 | Mariä Himmelfahrt (15.08.) zählt in Bayern als Feiertag für das ganze Land („landesweit“ heißt: im Gesetz des Landes genannt, nicht nur kommunal). | bestätigt von Chris mit dem Merge von #16 |
 
 ## 10. Offene Punkte
 
-- [ ] **Bitte bestätigen:** Mariä Himmelfahrt (15.08.) gilt in Bayern nur in Gemeinden mit überwiegend katholischer
-      Bevölkerung, also regional. Heute zählt die App den Tag für ganz Bayern als Feiertag. Nach M01-R17 dürfte er
-      nicht zählen; praktisch hat ihn der größte Teil Bayerns. Vorschlag: so lassen und als bestätigte Auslegung
-      aufnehmen („landesweit“ heißt hier: im Gesetz des Landes genannt, nicht nur kommunal).
 - [ ] **Bitte bestätigen:** Der 17.06.2028 (Berlin) fällt auf einen Samstag und wirkt sich auf Mo–Fr nicht aus; er steht
       der Vollständigkeit halber in der Liste.
 - [ ] Neue einmalige Feiertage kommen nur mit Rechtsquelle in die Liste in Abschnitt 5; wer die Liste pflegt, legt G4

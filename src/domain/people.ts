@@ -5,6 +5,8 @@
  * aktuellen Stand aller Personen und prüfen jede Änderung hier, bevor sie schreiben.
  */
 import type { Role } from "./access";
+import { isFederalState, type FederalState } from "./federal-states";
+import { canManagePeople, type Viewer } from "./report-access";
 
 /** Ausschnitt einer Person, den die Regeln brauchen. */
 export interface PersonSnapshot {
@@ -156,13 +158,32 @@ export function validatePerson(
   };
 }
 
-/** Ergebnis einer Regelprüfung: erlaubt oder abgelehnt mit verständlicher Meldung. */
-export type RuleResult = { allowed: true } | { allowed: false; message: string; offerDeactivate?: boolean };
+/**
+ * Grund einer Ablehnung, unabhängig vom Meldungstext (für die neutralen Prüffälle):
+ * - `already-inactive` / `already-active`: Person ist schon deaktiviert bzw. aktiv.
+ * - `last-active-trainer`: letzter aktiver Ausbilder (AK-207).
+ * - `has-trainees`: Ausbilder mit zugeordneten Azubis (AK-208).
+ * - `self`: eigene Person (AK-207, Ergänzung „Selbstschutz“).
+ * - `foreign-history`: Person kommt in der Historie fremder Berichte vor (AK-206).
+ * - `trainer-inactive`: zugeordneter Ausbilder ist deaktiviert (AK-204, Wieder aktivieren).
+ */
+export type RuleReason =
+  | "already-inactive"
+  | "already-active"
+  | "last-active-trainer"
+  | "has-trainees"
+  | "self"
+  | "foreign-history"
+  | "trainer-inactive";
+
+/** Ergebnis einer Regelprüfung: erlaubt oder abgelehnt mit Grund und verständlicher Meldung. */
+export type RuleResult =
+  { allowed: true } | { allowed: false; reason: RuleReason; message: string; offerDeactivate?: boolean };
 
 const ALLOWED: RuleResult = { allowed: true };
 
-function deny(message: string, offerDeactivate = false): RuleResult {
-  return offerDeactivate ? { allowed: false, message, offerDeactivate } : { allowed: false, message };
+function deny(reason: RuleReason, message: string, offerDeactivate = false): RuleResult {
+  return offerDeactivate ? { allowed: false, reason, message, offerDeactivate } : { allowed: false, reason, message };
 }
 
 function findTarget(persons: readonly PersonSnapshot[], targetId: string): PersonSnapshot {
@@ -209,21 +230,25 @@ function names(persons: readonly PersonSnapshot[]): string {
 export function checkDeactivate(persons: readonly PersonSnapshot[], targetId: string, actorId: string): RuleResult {
   const target = findTarget(persons, targetId);
   if (!target.active) {
-    return deny(`${target.name} ist bereits deaktiviert.`);
+    return deny("already-inactive", `${target.name} ist bereits deaktiviert.`);
   }
   if (isLastActiveTrainer(persons, targetId)) {
-    return deny(`${target.name} ist der letzte aktive Ausbilder und kann nicht deaktiviert werden.`);
+    return deny(
+      "last-active-trainer",
+      `${target.name} ist der letzte aktive Ausbilder und kann nicht deaktiviert werden.`,
+    );
   }
   if (target.role === "TRAINER") {
     const trainees = assignedTrainees(persons, targetId, { activeOnly: true });
     if (trainees.length > 0) {
       return deny(
+        "has-trainees",
         `${target.name} sind noch Azubis zugeordnet (${names(trainees)}). Bitte diese zuerst einem anderen Ausbilder zuordnen.`,
       );
     }
   }
   if (targetId === actorId) {
-    return deny("Sie können sich nicht selbst deaktivieren.");
+    return deny("self", "Sie können sich nicht selbst deaktivieren.");
   }
   return ALLOWED;
 }
@@ -234,12 +259,13 @@ export function checkDeactivate(persons: readonly PersonSnapshot[], targetId: st
 export function checkReactivate(persons: readonly PersonSnapshot[], targetId: string): RuleResult {
   const target = findTarget(persons, targetId);
   if (target.active) {
-    return deny(`${target.name} ist bereits aktiv.`);
+    return deny("already-active", `${target.name} ist bereits aktiv.`);
   }
   if (target.role === "TRAINEE") {
     const trainer = persons.find((person) => person.id === target.trainerId);
     if (!trainer?.active) {
       return deny(
+        "trainer-inactive",
         `Der zugeordnete Ausbilder${trainer ? ` ${trainer.name}` : ""} ist deaktiviert. Bitte ${target.name} zuerst einem aktiven Ausbilder zuordnen.`,
       );
     }
@@ -264,21 +290,25 @@ export function checkDelete(
 ): RuleResult {
   const target = findTarget(persons, targetId);
   if (isLastActiveTrainer(persons, targetId)) {
-    return deny(`${target.name} ist der letzte aktive Ausbilder und kann nicht gelöscht werden.`);
+    return deny(
+      "last-active-trainer",
+      `${target.name} ist der letzte aktive Ausbilder und kann nicht gelöscht werden.`,
+    );
   }
   if (target.role === "TRAINER") {
     const trainees = assignedTrainees(persons, targetId);
     if (trainees.length > 0) {
       return deny(
+        "has-trainees",
         `${target.name} sind noch Azubis zugeordnet (${names(trainees)}). Bitte diese zuerst einem anderen Ausbilder zuordnen.`,
       );
     }
   }
   if (targetId === actorId) {
-    return deny("Sie können sich nicht selbst löschen.");
+    return deny("self", "Sie können sich nicht selbst löschen.");
   }
   if (facts.hasForeignHistory) {
-    return deny(foreignHistoryMessage(target.name, target.active), target.active);
+    return deny("foreign-history", foreignHistoryMessage(target.name, target.active), target.active);
   }
   return ALLOWED;
 }
@@ -308,12 +338,13 @@ export function checkUpdate(
   targetId: string,
   actorId: string,
   next: Pick<ValidPerson, "role">,
-): { allowed: true } | { allowed: false; field: PersonField; message: string } {
+): { allowed: true } | { allowed: false; reason: RuleReason; field: PersonField; message: string } {
   const target = findTarget(persons, targetId);
   if (target.role === "TRAINER" && next.role === "TRAINEE") {
     if (isLastActiveTrainer(persons, targetId)) {
       return {
         allowed: false,
+        reason: "last-active-trainer",
         field: "role",
         message: `${target.name} ist der letzte aktive Ausbilder und kann nicht zum Azubi herabgestuft werden.`,
       };
@@ -322,13 +353,31 @@ export function checkUpdate(
     if (trainees.length > 0) {
       return {
         allowed: false,
+        reason: "has-trainees",
         field: "role",
         message: `${target.name} sind noch Azubis zugeordnet (${names(trainees)}). Bitte diese zuerst einem anderen Ausbilder zuordnen.`,
       };
     }
   }
   if (targetId === actorId && next.role !== target.role) {
-    return { allowed: false, field: "role", message: "Sie können Ihre eigene Rolle nicht ändern." };
+    return { allowed: false, reason: "self", field: "role", message: "Sie können Ihre eigene Rolle nicht ändern." };
   }
   return { allowed: true };
+}
+
+export type FederalStateSetting =
+  { ok: true; federalState: FederalState } | { ok: false; reason: "forbidden" | "unknown-federal-state" };
+
+/**
+ * AK-209: Bundesland der Firma einstellen – nur ein aktiver Ausbilder (Admin) und nur eines der
+ * 16 Bundesländer (AK-1205).
+ */
+export function checkFederalStateSetting(actor: Viewer | null | undefined, value: unknown): FederalStateSetting {
+  if (!canManagePeople(actor)) {
+    return { ok: false, reason: "forbidden" };
+  }
+  if (!isFederalState(value)) {
+    return { ok: false, reason: "unknown-federal-state" };
+  }
+  return { ok: true, federalState: value };
 }

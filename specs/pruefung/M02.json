@@ -1,0 +1,2436 @@
+[
+  {
+    "id": "AK-102-01",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Firmenkonto ohne Eintrag in der App (Dora) wird abgewiesen.",
+    "schnittstelle": "zugangPruefen",
+    "eingabe": {
+      "person": null
+    },
+    "erwartet": {
+      "fehler": "konto_unbekannt"
+    }
+  },
+  {
+    "id": "AK-102-02",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Deaktivierte Azubi wird abgewiesen.",
+    "schnittstelle": "zugangPruefen",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": false
+      }
+    },
+    "erwartet": {
+      "fehler": "person_deaktiviert"
+    }
+  },
+  {
+    "id": "AK-102-03",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Deaktivierter Ausbilder wird abgewiesen.",
+    "schnittstelle": "zugangPruefen",
+    "eingabe": {
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": false
+      }
+    },
+    "erwartet": {
+      "fehler": "person_deaktiviert"
+    }
+  },
+  {
+    "id": "AK-102-04",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Aktive Azubi erhält Zugang.",
+    "schnittstelle": "zugangPruefen",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      }
+    },
+    "erwartet": {
+      "zugang": true
+    }
+  },
+  {
+    "id": "AK-102-05",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Aktiver Ausbilder erhält Zugang.",
+    "schnittstelle": "zugangPruefen",
+    "eingabe": {
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      }
+    },
+    "erwartet": {
+      "zugang": true
+    }
+  },
+  {
+    "id": "AK-102-06",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Firmenkonto, zu dem es weder Konto-ID noch E-Mail gibt, wird keiner Person zugeordnet.",
+    "schnittstelle": "anmeldungZuordnen",
+    "eingabe": {
+      "konto": {
+        "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f09",
+        "email": "dora@berichtsheft.test",
+        "emailBestaetigt": true
+      },
+      "ueberKontoId": null,
+      "ueberEmail": null
+    },
+    "erwartet": {
+      "zuordnung": "keine"
+    }
+  },
+  {
+    "id": "AK-102-07",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Deaktivierte, noch nie angemeldete Person wird beim ersten Login nicht gebunden.",
+    "schnittstelle": "anmeldungZuordnen",
+    "eingabe": {
+      "konto": {
+        "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f05",
+        "email": "emil@berichtsheft.test",
+        "emailBestaetigt": true
+      },
+      "ueberKontoId": null,
+      "ueberEmail": {
+        "schluessel": "emil",
+        "kontoId": null,
+        "aktiv": false
+      }
+    },
+    "erwartet": {
+      "zuordnung": "keine"
+    }
+  },
+  {
+    "id": "AK-102-08",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ohne Konto-ID gibt es keine Zuordnung, auch nicht über die E-Mail.",
+    "schnittstelle": "anmeldungZuordnen",
+    "eingabe": {
+      "konto": {
+        "kontoId": null,
+        "email": "emil@berichtsheft.test",
+        "emailBestaetigt": true
+      },
+      "ueberKontoId": null,
+      "ueberEmail": {
+        "schluessel": "emil",
+        "kontoId": null,
+        "aktiv": true
+      }
+    },
+    "erwartet": {
+      "zuordnung": "keine"
+    }
+  },
+  {
+    "id": "AK-102-09",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Eine deaktivierte Person sieht nichts, auch nicht den eigenen Bericht.",
+    "schnittstelle": "darfBerichtSehen",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": false
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": false
+      }
+    },
+    "erwartet": {
+      "fehler": "zugriff_verweigert"
+    }
+  },
+  {
+    "id": "AK-103-01",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Azubi sieht den eigenen Bericht.",
+    "schnittstelle": "darfBerichtSehen",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true
+      }
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-103-02",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Fremder Bericht ergibt „Zugriff verweigert“.",
+    "schnittstelle": "darfBerichtSehen",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "emil",
+        "azubiAktiv": true
+      }
+    },
+    "erwartet": {
+      "fehler": "zugriff_verweigert"
+    }
+  },
+  {
+    "id": "AK-103-03",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Auch der Bericht eines deaktivierten fremden Azubis bleibt verborgen.",
+    "schnittstelle": "darfBerichtSehen",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "emil",
+        "azubiAktiv": false
+      }
+    },
+    "erwartet": {
+      "fehler": "zugriff_verweigert"
+    }
+  },
+  {
+    "id": "AK-104-01",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Azubi erreicht keine Admin-Funktionen.",
+    "schnittstelle": "darfVerwalten",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      }
+    },
+    "erwartet": {
+      "fehler": "zugriff_verweigert"
+    }
+  },
+  {
+    "id": "AK-104-02",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Aktiver Ausbilder erreicht die Admin-Funktionen.",
+    "schnittstelle": "darfVerwalten",
+    "eingabe": {
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      }
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-104-03",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Deaktivierter Ausbilder erreicht keine Admin-Funktionen.",
+    "schnittstelle": "darfVerwalten",
+    "eingabe": {
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": false
+      }
+    },
+    "erwartet": {
+      "fehler": "zugriff_verweigert"
+    }
+  },
+  {
+    "id": "AK-104-04",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ohne Anmeldung keine Admin-Funktionen.",
+    "schnittstelle": "darfVerwalten",
+    "eingabe": {
+      "person": null
+    },
+    "erwartet": {
+      "fehler": "zugriff_verweigert"
+    }
+  },
+  {
+    "id": "AK-105-01",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Zugeordneter Ausbilder sieht den Bericht.",
+    "schnittstelle": "darfBerichtSehen",
+    "eingabe": {
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true
+      }
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-105-02",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Vertretung (nicht zugeordneter Ausbilder) sieht den Bericht auch.",
+    "schnittstelle": "darfBerichtSehen",
+    "eingabe": {
+      "person": {
+        "schluessel": "clara",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true
+      }
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-105-03",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Jeder Ausbilder sieht die Berichte aller Azubis.",
+    "schnittstelle": "darfBerichtSehen",
+    "eingabe": {
+      "person": {
+        "schluessel": "clara",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "emil",
+        "azubiAktiv": true
+      }
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-201-01",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Azubi mit Firmen-E-Mail, Name und Rolle anlegen; E-Mail wird klein und ohne Leerzeichen am Rand gespeichert.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Emil Neu",
+        "email": "Emil@Berichtsheft.test ",
+        "rolle": "azubi",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": ""
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ]
+    },
+    "erwartet": {
+      "person": {
+        "name": "Emil Neu",
+        "email": "emil@berichtsheft.test",
+        "rolle": "azubi",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": null
+      }
+    }
+  },
+  {
+    "id": "AK-201-02",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ausbilder anlegen: Zuordnung und Ausbildungszeitraum entfallen.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Emil Neu",
+        "email": "Emil@Berichtsheft.test ",
+        "rolle": "ausbilder",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": "2029-08-31"
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ]
+    },
+    "erwartet": {
+      "person": {
+        "name": "Emil Neu",
+        "email": "emil@berichtsheft.test",
+        "rolle": "ausbilder",
+        "ausbilder": null,
+        "ausbildungsbeginn": null,
+        "ausbildungsende": null
+      }
+    }
+  },
+  {
+    "id": "AK-201-03",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Name, Firmen-E-Mail und Rolle sind Pflicht.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "  ",
+        "email": "",
+        "rolle": ""
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "eingabe_ungueltig",
+      "felder": ["name", "email", "rolle"]
+    }
+  },
+  {
+    "id": "AK-201-04",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ungültige Firmen-E-Mail wird abgewiesen.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Emil Neu",
+        "email": "emil-at-berichtsheft.test",
+        "rolle": "azubi",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": ""
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "eingabe_ungueltig",
+      "felder": ["email"]
+    }
+  },
+  {
+    "id": "AK-201-05",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Es gibt nur die Rollen Azubi und Ausbilder.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Emil Neu",
+        "email": "Emil@Berichtsheft.test ",
+        "rolle": "admin",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": ""
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "eingabe_ungueltig",
+      "felder": ["rolle"]
+    }
+  },
+  {
+    "id": "AK-201-06",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Erster Login: angelegte Person wird über die bestätigte E-Mail an die Konto-ID gebunden.",
+    "schnittstelle": "anmeldungZuordnen",
+    "eingabe": {
+      "konto": {
+        "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f05",
+        "email": "emil@berichtsheft.test",
+        "emailBestaetigt": true
+      },
+      "ueberKontoId": null,
+      "ueberEmail": {
+        "schluessel": "emil",
+        "kontoId": null,
+        "aktiv": true
+      }
+    },
+    "erwartet": {
+      "zuordnung": "binden",
+      "person": "emil",
+      "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f05"
+    }
+  },
+  {
+    "id": "AK-201-07",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Eine unbestätigte E-Mail wird nie zur Zuordnung verwendet.",
+    "schnittstelle": "anmeldungZuordnen",
+    "eingabe": {
+      "konto": {
+        "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f05",
+        "email": "emil@berichtsheft.test",
+        "emailBestaetigt": false
+      },
+      "ueberKontoId": null,
+      "ueberEmail": {
+        "schluessel": "emil",
+        "kontoId": null,
+        "aktiv": true
+      }
+    },
+    "erwartet": {
+      "zuordnung": "keine"
+    }
+  },
+  {
+    "id": "AK-201-08",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Nach der Bindung zählt nur die Konto-ID, auch wenn sich die E-Mail im Firmenkonto geändert hat.",
+    "schnittstelle": "anmeldungZuordnen",
+    "eingabe": {
+      "konto": {
+        "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f03",
+        "email": "anna.neu@berichtsheft.test",
+        "emailBestaetigt": true
+      },
+      "ueberKontoId": {
+        "schluessel": "anna",
+        "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f03",
+        "aktiv": true
+      },
+      "ueberEmail": null
+    },
+    "erwartet": {
+      "zuordnung": "bekannt",
+      "person": "anna"
+    }
+  },
+  {
+    "id": "AK-201-09",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Eine an ein anderes Konto gebundene Person wird nicht über die E-Mail umgebunden.",
+    "schnittstelle": "anmeldungZuordnen",
+    "eingabe": {
+      "konto": {
+        "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f05",
+        "email": "anna@berichtsheft.test",
+        "emailBestaetigt": true
+      },
+      "ueberKontoId": null,
+      "ueberEmail": {
+        "schluessel": "anna",
+        "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f03",
+        "aktiv": true
+      }
+    },
+    "erwartet": {
+      "zuordnung": "keine"
+    }
+  },
+  {
+    "id": "AK-201-10",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Die Zuordnung über die Konto-ID gilt auch für eine deaktivierte Person; den Zugang entscheidet zugangPruefen (AK-102).",
+    "schnittstelle": "anmeldungZuordnen",
+    "eingabe": {
+      "konto": {
+        "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f03",
+        "email": "anna@berichtsheft.test",
+        "emailBestaetigt": true
+      },
+      "ueberKontoId": {
+        "schluessel": "anna",
+        "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f03",
+        "aktiv": false
+      },
+      "ueberEmail": null
+    },
+    "erwartet": {
+      "zuordnung": "bekannt",
+      "person": "anna"
+    }
+  },
+  {
+    "id": "AK-201-11",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Zweiter Login desselben Kontos: bekannt, nicht erneut gebunden.",
+    "schnittstelle": "anmeldungZuordnen",
+    "eingabe": {
+      "konto": {
+        "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f05",
+        "email": "emil@berichtsheft.test",
+        "emailBestaetigt": true
+      },
+      "ueberKontoId": {
+        "schluessel": "emil",
+        "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f05",
+        "aktiv": true
+      },
+      "ueberEmail": {
+        "schluessel": "emil",
+        "kontoId": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f05",
+        "aktiv": true
+      }
+    },
+    "erwartet": {
+      "zuordnung": "bekannt",
+      "person": "emil"
+    }
+  },
+  {
+    "id": "AK-202-01",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Azubi ohne Ausbilder: die Meldung nennt das Feld.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Emil Neu",
+        "email": "Emil@Berichtsheft.test ",
+        "rolle": "azubi",
+        "ausbilder": "",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": ""
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "eingabe_ungueltig",
+      "felder": ["ausbilder"]
+    }
+  },
+  {
+    "id": "AK-202-02",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Azubi ohne Ausbildungsbeginn: die Meldung nennt das Feld.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Emil Neu",
+        "email": "Emil@Berichtsheft.test ",
+        "rolle": "azubi",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "",
+        "ausbildungsende": ""
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "eingabe_ungueltig",
+      "felder": ["ausbildungsbeginn"]
+    }
+  },
+  {
+    "id": "AK-202-03",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Azubi ohne beides: beide Felder werden genannt.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Emil Neu",
+        "email": "emil@berichtsheft.test",
+        "rolle": "azubi"
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "eingabe_ungueltig",
+      "felder": ["ausbilder", "ausbildungsbeginn"]
+    }
+  },
+  {
+    "id": "AK-202-04",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Zugeordnet werden kann nur ein Ausbilder, keine Azubi.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Emil Neu",
+        "email": "Emil@Berichtsheft.test ",
+        "rolle": "azubi",
+        "ausbilder": "anna",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": ""
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "eingabe_ungueltig",
+      "felder": ["ausbilder"]
+    }
+  },
+  {
+    "id": "AK-202-05",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein unbekannter Ausbilder wird abgewiesen.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Emil Neu",
+        "email": "Emil@Berichtsheft.test ",
+        "rolle": "azubi",
+        "ausbilder": "xaver",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": ""
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "eingabe_ungueltig",
+      "felder": ["ausbilder"]
+    }
+  },
+  {
+    "id": "AK-202-06",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein deaktivierter Ausbilder kann einer aktiven Person nicht zugeordnet werden.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Emil Neu",
+        "email": "Emil@Berichtsheft.test ",
+        "rolle": "azubi",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": ""
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": false
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "eingabe_ungueltig",
+      "felder": ["ausbilder"]
+    }
+  },
+  {
+    "id": "AK-202-07",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Niemand ist sein eigener Ausbilder.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Bernd Ausbilder",
+        "email": "bernd@berichtsheft.test",
+        "rolle": "azubi",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01"
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "bernd"
+    },
+    "erwartet": {
+      "fehler": "eingabe_ungueltig",
+      "felder": ["ausbilder"]
+    }
+  },
+  {
+    "id": "AK-202-08",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Eine deaktivierte Azubi lässt sich mit ihrem deaktivierten Ausbilder weiter speichern.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Anna Azubi",
+        "email": "anna@berichtsheft.test",
+        "rolle": "azubi",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01"
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": false
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": false,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "anna"
+    },
+    "erwartet": {
+      "person": {
+        "name": "Anna Azubi",
+        "email": "anna@berichtsheft.test",
+        "rolle": "azubi",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": null
+      }
+    }
+  },
+  {
+    "id": "AK-202-09",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Ausbildungsbeginn, den es nicht gibt, wird abgewiesen.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Emil Neu",
+        "email": "Emil@Berichtsheft.test ",
+        "rolle": "azubi",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-02-30",
+        "ausbildungsende": ""
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "eingabe_ungueltig",
+      "felder": ["ausbildungsbeginn"]
+    }
+  },
+  {
+    "id": "AK-203-01",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Admin ändert Ausbilder, Beginn und Ende.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Anna Azubi",
+        "email": "anna@berichtsheft.test",
+        "rolle": "azubi",
+        "ausbilder": "clara",
+        "ausbildungsbeginn": "2026-08-01",
+        "ausbildungsende": "2029-07-31"
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "anna"
+    },
+    "erwartet": {
+      "person": {
+        "name": "Anna Azubi",
+        "email": "anna@berichtsheft.test",
+        "rolle": "azubi",
+        "ausbilder": "clara",
+        "ausbildungsbeginn": "2026-08-01",
+        "ausbildungsende": "2029-07-31"
+      }
+    }
+  },
+  {
+    "id": "AK-203-02",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Das Ausbildungsende liegt nicht vor dem Beginn.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Anna Azubi",
+        "email": "anna@berichtsheft.test",
+        "rolle": "azubi",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": "2026-08-31"
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "anna"
+    },
+    "erwartet": {
+      "fehler": "eingabe_ungueltig",
+      "felder": ["ausbildungsende"]
+    }
+  },
+  {
+    "id": "AK-203-03",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Grenze: Ende am Tag des Beginns ist erlaubt.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Anna Azubi",
+        "email": "anna@berichtsheft.test",
+        "rolle": "azubi",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": "2026-09-01"
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "anna"
+    },
+    "erwartet": {
+      "person": {
+        "name": "Anna Azubi",
+        "email": "anna@berichtsheft.test",
+        "rolle": "azubi",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": "2026-09-01"
+      }
+    }
+  },
+  {
+    "id": "AK-203-04",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Ausbildungsende, das es nicht gibt, wird abgewiesen.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Anna Azubi",
+        "email": "anna@berichtsheft.test",
+        "rolle": "azubi",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": "2029-13-01"
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "anna"
+    },
+    "erwartet": {
+      "fehler": "eingabe_ungueltig",
+      "felder": ["ausbildungsende"]
+    }
+  },
+  {
+    "id": "AK-203-05",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Rollenwechsel Azubi → Ausbilder: Zuordnung und Ausbildungszeitraum entfallen.",
+    "schnittstelle": "personPruefen",
+    "eingabe": {
+      "daten": {
+        "name": "Anna Azubi",
+        "email": "anna@berichtsheft.test",
+        "rolle": "ausbilder",
+        "ausbilder": "bernd",
+        "ausbildungsbeginn": "2026-09-01",
+        "ausbildungsende": ""
+      },
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "anna"
+    },
+    "erwartet": {
+      "person": {
+        "name": "Anna Azubi",
+        "email": "anna@berichtsheft.test",
+        "rolle": "ausbilder",
+        "ausbilder": null,
+        "ausbildungsbeginn": null,
+        "ausbildungsende": null
+      }
+    }
+  },
+  {
+    "id": "AK-203-06",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Rollenwechsel Azubi → Ausbilder ist erlaubt.",
+    "schnittstelle": "aenderungPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "anna",
+      "handelnd": "bernd",
+      "rolle": "ausbilder"
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-203-07",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Ausbilder ohne zugeordnete Azubis wird zum Azubi, solange ein anderer aktiver Ausbilder bleibt.",
+    "schnittstelle": "aenderungPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "clara",
+      "handelnd": "bernd",
+      "rolle": "azubi"
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-204-01",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Aktive Azubi lässt sich deaktivieren.",
+    "schnittstelle": "deaktivierenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "anna",
+      "handelnd": "bernd"
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-204-02",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Aktiver Ausbilder ohne Azubis lässt sich deaktivieren.",
+    "schnittstelle": "deaktivierenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "clara",
+      "handelnd": "bernd"
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-204-03",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Eine deaktivierte Person wird nicht noch einmal deaktiviert.",
+    "schnittstelle": "deaktivierenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": false,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "anna",
+      "handelnd": "bernd"
+    },
+    "erwartet": {
+      "fehler": "bereits_deaktiviert"
+    }
+  },
+  {
+    "id": "AK-204-04",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Nach dem Deaktivieren keine Anmeldung mehr.",
+    "schnittstelle": "zugangPruefen",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": false
+      }
+    },
+    "erwartet": {
+      "fehler": "person_deaktiviert"
+    }
+  },
+  {
+    "id": "AK-204-05",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Berichte einer deaktivierten Azubi bleiben für Ausbilder lesbar.",
+    "schnittstelle": "darfBerichtSehen",
+    "eingabe": {
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": false
+      }
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-204-06",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "… auch für die Vertretung.",
+    "schnittstelle": "darfBerichtSehen",
+    "eingabe": {
+      "person": {
+        "schluessel": "clara",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": false
+      }
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-204-07",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Deaktivierte Azubi mit aktivem Ausbilder lässt sich wieder aktivieren.",
+    "schnittstelle": "reaktivierenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": false,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "anna"
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-204-08",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ist ihr Ausbilder deaktiviert, wird die Azubi nicht wieder aktiviert.",
+    "schnittstelle": "reaktivierenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": false
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": false,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "anna"
+    },
+    "erwartet": {
+      "fehler": "ausbilder_deaktiviert"
+    }
+  },
+  {
+    "id": "AK-204-09",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein deaktivierter Ausbilder lässt sich immer wieder aktivieren.",
+    "schnittstelle": "reaktivierenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": false
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": false,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "bernd"
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-204-10",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Eine aktive Person wird nicht noch einmal aktiviert.",
+    "schnittstelle": "reaktivierenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "anna"
+    },
+    "erwartet": {
+      "fehler": "bereits_aktiv"
+    }
+  },
+  {
+    "id": "AK-206-01",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Azubi ohne Einträge in fremder Historie lässt sich endgültig löschen.",
+    "schnittstelle": "loeschenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "anna",
+      "handelnd": "bernd",
+      "fremdeHistorie": false
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-206-02",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Person in der Historie fremder Berichte: nicht löschen, „Deaktivieren“ anbieten.",
+    "schnittstelle": "loeschenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "clara",
+      "handelnd": "bernd",
+      "fremdeHistorie": true
+    },
+    "erwartet": {
+      "fehler": "fremde_historie",
+      "deaktivierenAnbieten": true
+    }
+  },
+  {
+    "id": "AK-206-03",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ist sie schon deaktiviert, wird kein Deaktivieren angeboten.",
+    "schnittstelle": "loeschenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": false
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "clara",
+      "handelnd": "bernd",
+      "fremdeHistorie": true
+    },
+    "erwartet": {
+      "fehler": "fremde_historie"
+    }
+  },
+  {
+    "id": "AK-206-04",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Eine deaktivierte Person ohne fremde Historie lässt sich löschen.",
+    "schnittstelle": "loeschenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": false
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "clara",
+      "handelnd": "bernd",
+      "fremdeHistorie": false
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-206-05",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Bestätigung durch Eintippen des Namens; Leerzeichen am Rand zählen nicht.",
+    "schnittstelle": "namenBestaetigen",
+    "eingabe": {
+      "eingabe": " Anna Azubi ",
+      "name": "Anna Azubi"
+    },
+    "erwartet": {
+      "bestaetigt": true
+    }
+  },
+  {
+    "id": "AK-206-06",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Groß- und Kleinschreibung muss stimmen.",
+    "schnittstelle": "namenBestaetigen",
+    "eingabe": {
+      "eingabe": "anna azubi",
+      "name": "Anna Azubi"
+    },
+    "erwartet": {
+      "bestaetigt": false
+    }
+  },
+  {
+    "id": "AK-206-07",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ohne Eingabe keine Bestätigung.",
+    "schnittstelle": "namenBestaetigen",
+    "eingabe": {
+      "eingabe": "",
+      "name": "Anna Azubi"
+    },
+    "erwartet": {
+      "bestaetigt": false
+    }
+  },
+  {
+    "id": "AK-207-01",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Der letzte aktive Ausbilder kann nicht deaktiviert werden.",
+    "schnittstelle": "deaktivierenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": false
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": false,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "bernd",
+      "handelnd": "clara"
+    },
+    "erwartet": {
+      "fehler": "letzter_ausbilder"
+    }
+  },
+  {
+    "id": "AK-207-02",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Deaktiviert er sich selbst und ist der letzte, gilt die Meldung zu AK-207.",
+    "schnittstelle": "deaktivierenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": false
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": false,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "bernd",
+      "handelnd": "bernd"
+    },
+    "erwartet": {
+      "fehler": "letzter_ausbilder"
+    }
+  },
+  {
+    "id": "AK-207-03",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Der letzte aktive Ausbilder kann nicht gelöscht werden, auch nicht von sich selbst.",
+    "schnittstelle": "loeschenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": false
+        }
+      ],
+      "ziel": "bernd",
+      "handelnd": "bernd",
+      "fremdeHistorie": false
+    },
+    "erwartet": {
+      "fehler": "letzter_ausbilder"
+    }
+  },
+  {
+    "id": "AK-207-04",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Der letzte aktive Ausbilder wird nicht zum Azubi herabgestuft.",
+    "schnittstelle": "aenderungPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": false
+        }
+      ],
+      "ziel": "bernd",
+      "handelnd": "clara",
+      "rolle": "azubi"
+    },
+    "erwartet": {
+      "fehler": "letzter_ausbilder"
+    }
+  },
+  {
+    "id": "AK-207-05",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Niemand deaktiviert sich selbst.",
+    "schnittstelle": "deaktivierenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "clara",
+      "handelnd": "clara"
+    },
+    "erwartet": {
+      "fehler": "eigene_person"
+    }
+  },
+  {
+    "id": "AK-207-06",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Niemand löscht sich selbst.",
+    "schnittstelle": "loeschenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "clara",
+      "handelnd": "clara",
+      "fremdeHistorie": false
+    },
+    "erwartet": {
+      "fehler": "eigene_person"
+    }
+  },
+  {
+    "id": "AK-207-07",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Niemand ändert die eigene Rolle.",
+    "schnittstelle": "aenderungPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "clara",
+      "handelnd": "clara",
+      "rolle": "azubi"
+    },
+    "erwartet": {
+      "fehler": "eigene_person"
+    }
+  },
+  {
+    "id": "AK-207-08",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Die eigene Person ohne Rollenwechsel zu speichern ist erlaubt.",
+    "schnittstelle": "aenderungPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "clara",
+      "handelnd": "clara",
+      "rolle": "ausbilder"
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-208-01",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ausbilder mit aktiver zugeordneter Azubi wird nicht deaktiviert.",
+    "schnittstelle": "deaktivierenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "bernd",
+      "handelnd": "clara"
+    },
+    "erwartet": {
+      "fehler": "azubis_zugeordnet"
+    }
+  },
+  {
+    "id": "AK-208-02",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Nach der Neuzuordnung lässt er sich deaktivieren.",
+    "schnittstelle": "deaktivierenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "clara"
+        }
+      ],
+      "ziel": "bernd",
+      "handelnd": "clara"
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-208-03",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Fürs Deaktivieren zählen nur aktive zugeordnete Azubis.",
+    "schnittstelle": "deaktivierenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": false,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "bernd",
+      "handelnd": "clara"
+    },
+    "erwartet": {
+      "erlaubt": true
+    }
+  },
+  {
+    "id": "AK-208-04",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Fürs endgültige Löschen zählen auch deaktivierte zugeordnete Azubis.",
+    "schnittstelle": "loeschenPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": false,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "bernd",
+      "handelnd": "clara",
+      "fremdeHistorie": false
+    },
+    "erwartet": {
+      "fehler": "azubis_zugeordnet"
+    }
+  },
+  {
+    "id": "AK-208-05",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Fürs Herabstufen zum Azubi zählen auch deaktivierte zugeordnete Azubis.",
+    "schnittstelle": "aenderungPruefen",
+    "eingabe": {
+      "personen": [
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true
+        },
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": false,
+          "ausbilder": "bernd"
+        }
+      ],
+      "ziel": "bernd",
+      "handelnd": "clara",
+      "rolle": "azubi"
+    },
+    "erwartet": {
+      "fehler": "azubis_zugeordnet"
+    }
+  },
+  {
+    "id": "AK-209-01",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Der Admin (aktiver Ausbilder) stellt das Bundesland der Firma ein.",
+    "schnittstelle": "bundeslandEinstellen",
+    "eingabe": {
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bundesland": "BY"
+    },
+    "erwartet": {
+      "bundesland": "BY"
+    }
+  },
+  {
+    "id": "AK-209-02",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Eine Azubi stellt das Bundesland nicht ein.",
+    "schnittstelle": "bundeslandEinstellen",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bundesland": "BY"
+    },
+    "erwartet": {
+      "fehler": "zugriff_verweigert"
+    }
+  },
+  {
+    "id": "AK-209-03",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein deaktivierter Ausbilder stellt das Bundesland nicht ein.",
+    "schnittstelle": "bundeslandEinstellen",
+    "eingabe": {
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": false
+      },
+      "bundesland": "BY"
+    },
+    "erwartet": {
+      "fehler": "zugriff_verweigert"
+    }
+  },
+  {
+    "id": "AK-209-04",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Nur eines der 16 Bundesländer ist einstellbar.",
+    "schnittstelle": "bundeslandEinstellen",
+    "eingabe": {
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bundesland": "AUGSBURG"
+    },
+    "erwartet": {
+      "fehler": "bundesland_unbekannt"
+    }
+  },
+  {
+    "id": "AK-209-05",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Die Kürzel sind in Großbuchstaben fest.",
+    "schnittstelle": "bundeslandEinstellen",
+    "eingabe": {
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bundesland": "nw"
+    },
+    "erwartet": {
+      "fehler": "bundesland_unbekannt"
+    }
+  }
+]
