@@ -166,7 +166,8 @@ Ablauf-Kriterien werden einmal an echten Test-PRs geprüft und im PR der Umsetzu
 
 ## Einführung
 
-1. Workflow-Umbau nach `docs/ci-richtlinie.md` (Änderungsklassen, Abschluss-Job, `merge_group`), eigener PR.
+1. Workflow-Umbau nach `docs/ci-richtlinie.md` (Änderungsklassen, Abschluss-Job, `merge_group`); umgesetzt am
+   12.10.2026.
 2. AM-S01 mit Unit-Tests zu AM-AK-01 bis AM-AK-10 und der Job aus AM-S02, eigener PR; `.github/automerge.yml` mit
    `aktiv: false`.
 3. Chris setzt die Einstellungen aus AM-S03.

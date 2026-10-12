@@ -223,5 +223,12 @@ Festlegung des Umfangs (12.10.2026, von Chris an Claude übertragen):
    Stelle im Workflow, und ein Test der schnellen Prüfung meldet Dateien im Repository, die keiner Klasse angehören.
    Die Workflows reagieren zusätzlich auf `merge_group`, damit die Merge-Warteschlange aus
    `docs/07-spec-automatisches-mergen.md` prüfen kann.
+   **Umgesetzt am 12.10.2026:**
+   - Die Zuordnung steht in `scripts/pruefumfang/pruefumfang.mjs`, mit Tests.
+   - Der Job „Umfang“ bestimmt den Umfang je Lauf und zeigt ihn in der Zusammenfassung des Laufs.
+   - „Prüfung abgeschlossen“ ist der Abschluss-Job.
+   - `npm run pruefumfang -- --pruefen` in der schnellen Prüfung meldet Dateien ohne Klasse.
+   - Jedes neue Label an einem PR startet die Prüfung neu. So stammt das Ergebnis am Commit immer aus einer
+     vollständigen Auswertung und nie aus einem übersprungenen Lauf.
 4. Liferay-Jobs kommen mit L62 bzw. L72 dazu (CI-25).
 5. Erster Monatsrückblick (CI-08) Anfang Dezember 2026.
