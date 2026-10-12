@@ -25,12 +25,12 @@ describe("Zugangsregeln", () => {
     expect(NO_ACCESS_MESSAGE).toBe("Kein Zugang – bitte an den Ausbilder wenden");
   });
 
-  it("aktive Personen beider Rollen erhalten Zugang", () => {
+  it("AK-102 aktive Personen beider Rollen erhalten Zugang", () => {
     expect(decideAccess({ role: "TRAINEE", active: true })).toEqual({ allowed: true });
     expect(decideAccess({ role: "TRAINER", active: true })).toEqual({ allowed: true });
   });
 
-  it("Konto-ID kommt aus dem konfigurierten Claim, nicht aus Name oder E-Mail", () => {
+  it("AK-201 Konto-ID kommt aus dem konfigurierten Claim, nicht aus Name oder E-Mail", () => {
     const claims = { sub: "kc-123", oid: "entra-456", name: "Anna", email: "anna@example.test" };
     expect(extractAccountId(claims)).toBe("kc-123");
     expect(extractAccountId(claims, "oid")).toBe("entra-456");

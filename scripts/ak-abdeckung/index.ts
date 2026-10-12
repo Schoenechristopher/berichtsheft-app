@@ -2,7 +2,9 @@
  * `npm run ak:abdeckung`: meldet jede AK-ID der Spezifikation und jede UI-AK-ID der
  * UI-Spezifikation ohne Test und schreibt `docs/03-testabdeckung.md`. Prüffälle aus
  * `specs/pruefung/*.json` zählen als Tests der Ebene „Prüffall“; Formfehler, unbekannte AK-IDs,
- * falsche Module und AKs beschriebener Module (`specs/Mxx-*.md`) ohne Prüffall lassen es scheitern. Mit `--pruefen` (CI) wird nichts geschrieben; das Skript scheitert,
+ * falsche Module, unbekannte Ebenen in den AK-Tabellen der Fach-Specs und AKs beschriebener Module
+ * (`specs/Mxx-*.md`) ohne Prüffall lassen es scheitern; AKs mit Ebene `Ablauf, G3` sind davon bis G3 ausgenommen
+ * (`DEFERRED_CASES_REQUIRED`) und stehen in einer eigenen Spalte. Mit `--pruefen` (CI) wird nichts geschrieben; das Skript scheitert,
  * wenn die Datei nicht aktuell ist. Ohne Test für eine AK-ID scheitert es immer.
  */
 import { readFile, readdir, writeFile } from "node:fs/promises";
@@ -14,7 +16,10 @@ import {
   levelOf,
   moduleOfSpecFile,
   parseCheckCases,
-  parseModuleCriteria,
+  parseModuleTable,
+  pendingCriteria,
+  DEFERRED_CASES_REQUIRED,
+  DEFERRED_LEVEL,
   parseCriteria,
   parseUiCriteria,
   parseTests,
@@ -52,16 +57,33 @@ async function readCheckCases(): Promise<{ cases: CheckCase[]; errors: string[] 
   return { cases, errors };
 }
 
-/** AK-IDs je beschriebenem Modul aus `specs/Mxx-*.md` und `specs/Q-*.md`. */
-async function readModuleCriteria(): Promise<Map<string, string[]>> {
+/**
+ * AK-IDs je beschriebenem Modul aus `specs/Mxx-*.md` und `specs/Q-*.md`, dazu die AKs mit Ebene `Ablauf, G3`
+ * und Formfehler der AK-Tabellen.
+ */
+async function readModuleCriteria(): Promise<{
+  modules: Map<string, string[]>;
+  deferred: Set<string>;
+  errors: string[];
+}> {
   const modules = new Map<string, string[]>();
+  const deferred = new Set<string>();
+  const errors: string[] = [];
   for (const file of (await listDir(SPECS)).sort()) {
     const moduleId = moduleOfSpecFile(file);
     if (moduleId) {
-      modules.set(moduleId, parseModuleCriteria(await readFile(path.join(root, SPECS, file), "utf8")));
+      const table = parseModuleTable(await readFile(path.join(root, SPECS, file), "utf8"));
+      modules.set(
+        moduleId,
+        table.criteria.map((criterion) => criterion.id),
+      );
+      for (const criterion of table.criteria.filter((criterion) => criterion.level === DEFERRED_LEVEL)) {
+        deferred.add(criterion.id);
+      }
+      errors.push(...table.errors.map((error) => `${SPECS}/${file}: ${error}`));
     }
   }
-  return modules;
+  return { modules, deferred, errors };
 }
 
 async function listTestFiles(dir: string): Promise<string[]> {
@@ -88,24 +110,32 @@ async function main() {
 
   const testCount = tests.length;
   const caseFiles = await readCheckCases();
-  const moduleCriteria = await readModuleCriteria();
+  const specs = await readModuleCriteria();
+  const moduleCriteria = specs.modules;
   tests.push(...casesAsTests(caseFiles.cases));
   const caseErrors = [
     ...caseFiles.errors,
-    ...checkCases(caseFiles.cases, [...criteria, ...uiCriteria], moduleCriteria),
+    ...specs.errors,
+    ...checkCases(caseFiles.cases, [...criteria, ...uiCriteria], moduleCriteria, specs.deferred),
   ];
+  const pending = pendingCriteria(specs.deferred, caseFiles.cases);
 
   const rows = buildCoverage(criteria, tests);
   const uiRows = buildCoverage(uiCriteria, tests);
   const missing = [...rows, ...uiRows].filter((row) => row.tests.length === 0).map((row) => row.id);
   const unknown = unknownIds([...criteria, ...uiCriteria], tests);
-  const markdown = renderMarkdown(rows, uiRows);
+  const markdown = renderMarkdown(rows, uiRows, new Set(pending));
 
   console.log(
     `${criteria.length} Akzeptanzkriterien und ${uiCriteria.length} UI-Akzeptanzkriterien, ${testCount} Tests in ` +
       `${files.length} Dateien, ${caseFiles.cases.length} Prüffälle; beschriebene Module: ${[...moduleCriteria.keys()].join(", ") || "keine"}; ` +
       `ohne Test: ${missing.length === 0 ? "keine" : missing.join(", ")}.`,
   );
+  if (pending.length > 0) {
+    console.log(
+      `Ebene „${DEFERRED_LEVEL}“, Prüffall folgt in G3 (${DEFERRED_CASES_REQUIRED ? "Pflicht" : "in G2 kein Fehler"}): ${pending.join(", ")}.`,
+    );
+  }
   let failed = missing.length > 0;
   if (caseErrors.length > 0) {
     console.error(`Fehler in den Prüffällen:\n- ${caseErrors.join("\n- ")}`);

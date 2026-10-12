@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   checkDeactivate,
   checkDelete,
+  checkFederalStateSetting,
   checkReactivate,
   checkUpdate,
   confirmsName,
@@ -139,6 +140,7 @@ describe("Personen anlegen und bearbeiten", () => {
     const onlyBernd = [bernd, { ...clara, active: false }];
     expect(checkUpdate(onlyBernd, "bernd", "clara", { role: "TRAINEE" })).toEqual({
       allowed: false,
+      reason: "last-active-trainer",
       field: "role",
       message: "Bernd Ausbilder ist der letzte aktive Ausbilder und kann nicht zum Azubi herabgestuft werden.",
     });
@@ -147,6 +149,7 @@ describe("Personen anlegen und bearbeiten", () => {
   it("AK-208 Ausbilder mit zugeordneten Azubis wird nicht zum Azubi", () => {
     expect(checkUpdate(persons, "bernd", "clara", { role: "TRAINEE" })).toEqual({
       allowed: false,
+      reason: "has-trainees",
       field: "role",
       message:
         "Bernd Ausbilder sind noch Azubis zugeordnet (Anna Azubi). Bitte diese zuerst einem anderen Ausbilder zuordnen.",
@@ -154,8 +157,11 @@ describe("Personen anlegen und bearbeiten", () => {
     expect(checkUpdate(persons, "clara", "bernd", { role: "TRAINEE" })).toEqual({ allowed: true });
   });
 
-  it("eigene Rolle kann man nicht ändern", () => {
-    expect(checkUpdate(persons, "clara", "clara", { role: "TRAINEE" })).toMatchObject({ allowed: false });
+  it("AK-207 eigene Rolle kann man nicht ändern", () => {
+    expect(checkUpdate(persons, "clara", "clara", { role: "TRAINEE" })).toMatchObject({
+      allowed: false,
+      reason: "self",
+    });
     expect(checkUpdate(persons, "clara", "clara", { role: "TRAINER" })).toEqual({ allowed: true });
   });
 });
@@ -171,6 +177,7 @@ describe("Deaktivieren", () => {
     expect(isLastActiveTrainer(onlyBernd, "bernd")).toBe(true);
     expect(checkDeactivate(onlyBernd, "bernd", "bernd")).toEqual({
       allowed: false,
+      reason: "last-active-trainer",
       message: "Bernd Ausbilder ist der letzte aktive Ausbilder und kann nicht deaktiviert werden.",
     });
     expect(isLastActiveTrainer(persons, "bernd")).toBe(false);
@@ -179,6 +186,7 @@ describe("Deaktivieren", () => {
   it("AK-208 Ausbilder mit zugeordneten Azubis erst nach Neuzuordnung", () => {
     expect(checkDeactivate(persons, "bernd", "clara")).toEqual({
       allowed: false,
+      reason: "has-trainees",
       message:
         "Bernd Ausbilder sind noch Azubis zugeordnet (Anna Azubi). Bitte diese zuerst einem anderen Ausbilder zuordnen.",
     });
@@ -191,24 +199,27 @@ describe("Deaktivieren", () => {
     expect(checkDeactivate(annaInactive, "bernd", "clara")).toEqual({ allowed: true });
   });
 
-  it("niemand deaktiviert sich selbst, bereits deaktivierte nicht erneut", () => {
+  it("AK-207 AK-204 niemand deaktiviert sich selbst, bereits deaktivierte nicht erneut", () => {
     expect(checkDeactivate(persons, "clara", "clara")).toEqual({
       allowed: false,
+      reason: "self",
       message: "Sie können sich nicht selbst deaktivieren.",
     });
     expect(checkDeactivate([bernd, clara, { ...anna, active: false }], "anna", "bernd")).toMatchObject({
       allowed: false,
+      reason: "already-inactive",
     });
   });
 
-  it("Reaktivieren eines Azubis nur mit aktivem Ausbilder", () => {
+  it("AK-204 Reaktivieren eines Azubis nur mit aktivem Ausbilder", () => {
     const state = [{ ...bernd, active: false }, clara, { ...anna, active: false }];
     expect(checkReactivate(state, "anna")).toMatchObject({
       allowed: false,
+      reason: "trainer-inactive",
       message: expect.stringContaining("Bernd Ausbilder ist deaktiviert"),
     });
     expect(checkReactivate(state, "bernd")).toEqual({ allowed: true });
-    expect(checkReactivate(persons, "anna")).toMatchObject({ allowed: false });
+    expect(checkReactivate(persons, "anna")).toMatchObject({ allowed: false, reason: "already-active" });
   });
 });
 
@@ -227,6 +238,7 @@ describe("Endgültig löschen", () => {
     const onlyBernd = [bernd, { ...clara, active: false }];
     expect(checkDelete(onlyBernd, "bernd", "clara", noHistory)).toEqual({
       allowed: false,
+      reason: "last-active-trainer",
       message: "Bernd Ausbilder ist der letzte aktive Ausbilder und kann nicht gelöscht werden.",
     });
   });
@@ -235,6 +247,7 @@ describe("Endgültig löschen", () => {
     const annaInactive = [bernd, clara, { ...anna, active: false }];
     expect(checkDelete(annaInactive, "bernd", "clara", noHistory)).toMatchObject({
       allowed: false,
+      reason: "has-trainees",
       message: expect.stringContaining("sind noch Azubis zugeordnet (Anna Azubi)"),
     });
   });
@@ -242,6 +255,7 @@ describe("Endgültig löschen", () => {
   it("AK-206 Person mit Einträgen in fremder Historie nur deaktivierbar (Entscheidung Ausbilder mit Historie)", () => {
     expect(checkDelete(persons, "clara", "bernd", { hasForeignHistory: true })).toEqual({
       allowed: false,
+      reason: "foreign-history",
       offerDeactivate: true,
       message:
         "Clara Ausbilderin kommt in der Historie von Berichten anderer Azubis vor (Statuswechsel oder Kommentare). " +
@@ -250,14 +264,31 @@ describe("Endgültig löschen", () => {
     const claraInactive = [bernd, { ...clara, active: false }, anna];
     expect(checkDelete(claraInactive, "clara", "bernd", { hasForeignHistory: true })).toEqual({
       allowed: false,
+      reason: "foreign-history",
       message: expect.stringContaining("Sie ist bereits deaktiviert."),
     });
   });
 
-  it("niemand löscht sich selbst", () => {
+  it("AK-207 niemand löscht sich selbst", () => {
     expect(checkDelete(persons, "clara", "clara", noHistory)).toEqual({
       allowed: false,
+      reason: "self",
       message: "Sie können sich nicht selbst löschen.",
     });
+  });
+});
+
+describe("Bundesland der Firma", () => {
+  it("AK-209 nur ein aktiver Ausbilder stellt das Bundesland ein, und nur eines der 16", () => {
+    const viewer = (person: PersonSnapshot) => ({ id: person.id, role: person.role, active: person.active });
+    expect(checkFederalStateSetting(viewer(bernd), "BY")).toEqual({ ok: true, federalState: "BY" });
+    expect(checkFederalStateSetting(viewer(anna), "BY")).toEqual({ ok: false, reason: "forbidden" });
+    expect(checkFederalStateSetting(viewer({ ...bernd, active: false }), "BY")).toEqual({
+      ok: false,
+      reason: "forbidden",
+    });
+    expect(checkFederalStateSetting(null, "BY")).toEqual({ ok: false, reason: "forbidden" });
+    expect(checkFederalStateSetting(viewer(bernd), "AUGSBURG")).toEqual({ ok: false, reason: "unknown-federal-state" });
+    expect(checkFederalStateSetting(viewer(bernd), "by")).toEqual({ ok: false, reason: "unknown-federal-state" });
   });
 });
