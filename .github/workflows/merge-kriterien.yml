@@ -1,0 +1,34 @@
+name: Merge-Kriterien
+
+# docs/07-spec-automatisches-mergen.md (AM-S02): wertet die Merge-Kriterien aus. Ohne Label `automerge` immer grün
+# („kein Antrag“). Liest nur; setzt nie Labels und mergt nie.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled, edited]
+  merge_group:
+
+# CI-27: nur lesende Rechte. pull-requests/issues für die Kommentare (Abnahme der Steuerung, AM-R07),
+# actions für den Status der letzten Prüfung auf main (AM-R11).
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+  actions: read
+
+concurrency:
+  group: merge-kriterien-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  merge-kriterien:
+    name: Merge-Kriterien
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Merge-Kriterien auswerten
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/merge-kriterien/index.mjs

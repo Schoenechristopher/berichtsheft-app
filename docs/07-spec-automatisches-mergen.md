@@ -26,7 +26,7 @@ bei einem Fehler passiert.**
 - **Merge-Kriterien:** Der Check gleichen Namens. Er wertet die Regeln dieser Spec aus und nennt jeden Verstoß einzeln.
 - **Geschützter Pfad:** Eine Datei, deren Änderung immer Chris freigibt (AM-R04).
 - **Abnahme der Steuerung:** Ein Kommentar der Steuerungsinstanz mit dem Ergebnis ihrer Prüfliste (AM-R07). Er trägt die
-  Markierung `<!-- abnahme-steuerung -->`.
+  Markierung `<!-- abnahme-steuerung sha=<Commit> -->` mit dem Stand des PRs, für den die Abnahme gilt.
 - **Merge-Warteschlange:** Die Merge-Queue von GitHub. Sie prüft jeden PR noch einmal zusammen mit dem aktuellen `main`,
   bevor er gemergt wird.
 - **Schalter:** Die Datei `.github/automerge.yml` mit `aktiv: true` oder `aktiv: false`. Sie ist selbst ein geschützter
@@ -78,15 +78,18 @@ bei einem Fehler passiert.**
 
 ### Was erfüllt sein muss
 
-- **AM-R07 Abnahme der Steuerung:** Am PR steht ein Abnahme-Kommentar mit `<!-- abnahme-steuerung -->` von einem Konto mit
-  Schreibrecht, jünger als der letzte Push. Die Prüfliste darin umfasst:
+- **AM-R07 Abnahme der Steuerung:** Am PR steht ein Abnahme-Kommentar mit `<!-- abnahme-steuerung sha=<Commit> -->` von
+  einem Konto mit Schreibrecht, und `<Commit>` ist der aktuelle Stand des PRs (mindestens 7 Zeichen). Nach jedem Push
+  ist eine neue Abnahme nötig. Schreibrecht heißt: Eigentümer, Mitglied der Organisation oder Mitarbeitender des
+  Repositorys. Die Prüfliste darin umfasst:
   - Arbeitspaket nach Playbook erledigt.
   - Prüffälle des Pakets grün, vorher fertige Pakete weiter grün.
   - Keine Abweichung von Fach-Spec oder Profil ohne Freigabe; auf Liferay entsprechen Tabellen und Spalten dem Profil.
   - Review-Befunde eingearbeitet.
 - **AM-R08 CI grün:** Der Abschluss-Job „Prüfung abgeschlossen“ (`docs/ci-richtlinie.md`, CI-36) ist auf dem aktuellen
   Stand grün, und zwar mit dem Umfang der Änderungsklasse (CI-32), mindestens aber der Klasse L. Ein PR, der nur Doku
-  ändert, braucht also trotzdem einmal Chromium und 375 px, wenn er automatisch gemergt werden soll.
+  ändert, braucht also trotzdem einmal Chromium und 375 px, wenn er automatisch gemergt werden soll. Umgesetzt im Job
+  „Umfang“: Mit dem Label `automerge` läuft mindestens der Umfang der Klasse L; das Label startet die Prüfung neu.
 - **AM-R09 Dependabot:** Ein Dependabot-PR darf trotz AM-R04 automatisch gemergt werden, wenn er nur Patch- oder
   Minor-Versionen von Entwicklungsabhängigkeiten oder nur Patch-Versionen von Laufzeitabhängigkeiten anhebt und die
   volle Prüfung aller Konfigurationen grün ist. Major-Versionen und Minor-Versionen von Laufzeitabhängigkeiten gibt
@@ -147,13 +150,16 @@ Ablauf-Kriterien werden einmal an echten Test-PRs geprüft und im PR der Umsetzu
   - Nicht bei `issue_comment`: Solche Läufe gehören zum Stand von `main` und melden kein Ergebnis am PR. Deshalb
     schreibt die Steuerung die Abnahme vor dem Label. Kommt danach ein Push, ist die Abnahme veraltet (AM-R07); die
     Steuerung nimmt dann neu ab und setzt das Label erneut.
-  - Er sammelt die Eingaben über die GitHub-API mit `permissions: contents: read, pull-requests: read` und ruft AM-S01
-    auf.
+  - Er sammelt die Eingaben und ruft AM-S01 auf. Dateien, Zeilen, Tests je AK-ID (`docs/03-testabdeckung.md`) und
+    Prüffälle liest er aus dem Test-Merge des PRs, Kommentare und den Status von `main` aus der GitHub-API, mit
+    `permissions: contents: read, pull-requests: read, issues: read, actions: read`.
   - Er setzt nie selbst Labels und mergt nie selbst. Ein Merge mit dem `GITHUB_TOKEN` würde die Prüfung auf `main` nicht
     auslösen.
   - Bei `merge_group` meldet er Erfolg, weil die Warteschlange nur PRs aufnimmt, deren Pflicht-Checks schon grün waren.
 - **AM-S03 Einstellungen** (setzt Chris):
-  - Regelsatz für `main` mit den Pflicht-Checks „Prüfung abgeschlossen“ und „Merge-Kriterien“.
+  - Regelsatz für `main` mit dem Pflicht-Check „Prüfung abgeschlossen“. „Merge-Kriterien“ wird erst Pflicht-Check,
+    wenn Chris den Schalter auf `aktiv: true` stellt: Im Schattenbetrieb ist der Check mit Antrag immer rot (AM-R12)
+    und würde sonst auch das Mergen von Hand blockieren.
   - Merge-Warteschlange mit Merge-Commit.
   - „Allow auto-merge“ einschalten.
   - Die Workflows reagieren zusätzlich auf `merge_group` (CI-Richtlinie, Abschnitt 8).
@@ -169,7 +175,7 @@ Ablauf-Kriterien werden einmal an echten Test-PRs geprüft und im PR der Umsetzu
 1. Workflow-Umbau nach `docs/ci-richtlinie.md` (Änderungsklassen, Abschluss-Job, `merge_group`); umgesetzt am
    12.10.2026.
 2. AM-S01 mit Unit-Tests zu AM-AK-01 bis AM-AK-10 und der Job aus AM-S02, eigener PR; `.github/automerge.yml` mit
-   `aktiv: false`.
+   `aktiv: false`. Umgesetzt am 12.10.2026 in `scripts/merge-kriterien/` und `.github/workflows/merge-kriterien.yml`.
 3. Chris setzt die Einstellungen aus AM-S03.
 4. Schattenbetrieb (AM-R14) ab G1, Ablauf-Kriterien AM-AK-11 bis AM-AK-14 an Test-PRs prüfen.
 5. Chris setzt `aktiv: true`. Spätestens vor L62.
@@ -181,3 +187,7 @@ Ablauf-Kriterien werden einmal an echten Test-PRs geprüft und im PR der Umsetzu
       up to date“).
 - [ ] Ob Etappen-PRs (G1 bis G5) nach der Freigabe durch Chris ebenfalls über die Warteschlange laufen sollen, damit
       auch dort mit dem aktuellen `main` geprüft wird.
+- [ ] Liferay-spezifische Teile von AM-R04 ergänzen, sobald die Profile sie benennen (G4, P00): sicherheitsrelevante
+      Dateien, Pfad der Upgrade-Schritte der Reihe U, Liste der freigegebenen externen Bibliotheken. Bis dahin prüft
+      `scripts/merge-kriterien/` nur die Build-Dateien im Wurzelordner der Liferay-Umsetzungen.
+- [ ] AM-AK-01 bis AM-AK-14 in `npm run ak:abdeckung` aufnehmen, damit die Testabdeckung auch diese IDs zählt.
