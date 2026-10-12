@@ -6,6 +6,7 @@ Digitales Berichtsheft: Azubis erfassen Wochenberichte (Mo–Fr), Ausbilder prü
 
 - `docs/01-spezifikation.md`: freigegebene Anforderungen und Akzeptanzkriterien (AK-101 … AK-1102). Das ist die Quelle der Wahrheit für Verhalten.
 - `docs/02-plan.md`: freigegebener Technik-Plan, Datenmodell, Etappen.
+- `docs/05-ui-spezifikation.md`: freigegebene UI-Spezifikation (Tokens, Komponenten, Seiten, UI-AK-01 … UI-AK-20).
 - Weicht etwas davon ab oder ist unklar: nachfragen, nicht raten. Spezifikation und Plan nur nach Freigabe ändern.
 
 ## Stack
