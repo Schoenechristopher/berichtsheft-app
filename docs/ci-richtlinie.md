@@ -35,6 +35,8 @@ Angaben zu anderen Repositories stehen bewusst nicht in dieser öffentlichen Dat
 - **Schwerer Job:** Ein Job, der länger als 5 Minuten läuft oder Browser, einen Container-Stack oder einen
   Anwendungsserver braucht.
 - **Doku-Änderung:** Ein Push, der nur Dateien der Doku-Pfade ändert (Abschnitt 7).
+- **Änderungsklasse:** Einordnung eines PRs nach den Pfaden, die er gegenüber seinem Ziel-Branch ändert (Abschnitt 7).
+  Sie bestimmt den Umfang der vollen Prüfung.
 
 ## 3. Regeln
 
@@ -79,6 +81,27 @@ Angaben zu anderen Repositories stehen bewusst nicht in dieser öffentlichen Dat
   (`concurrency` mit `cancel-in-progress`). Der Wochenlauf wird nicht abgebrochen.
 - **CI-16 Diagnose nur von Hand:** Workflows zur Fehlersuche (z. B. Wiederholungsschleifen) starten nur von Hand und
   haben eine Obergrenze für Wiederholungen (höchstens 20). Sie laufen nie automatisch.
+
+### Umfang der Prüfung
+
+- **CI-32 Umfang nach Änderungsklasse:** Die volle Prüfung prüft nur, was die Änderung erreichen kann. Welche Pfade
+  welche Klasse auslösen und welche Jobs dazugehören, steht in Abschnitt 7. Ändert ein PR Dateien mehrerer Klassen,
+  gilt die Vereinigung aller ausgelösten Jobs.
+- **CI-33 Ganzer PR, nicht letzter Push:** Die Klasse ergibt sich aus allen Änderungen des PRs gegenüber dem
+  Ziel-Branch, nicht nur aus dem letzten Push. So geht keine Änderung verloren, wenn später nur noch Doku folgt.
+- **CI-34 Im Zweifel voll:** Ein Pfad, der zu keiner Klasse passt, löst die volle Prüfung in allen Konfigurationen der
+  TypeScript-App aus. Eine neue Datei oder ein neuer Ordner wird beim ersten Mal in Abschnitt 7 eingeordnet.
+- **CI-35 Voll erzwingen:** Die volle Prüfung in allen Konfigurationen läuft unabhängig von der Klasse
+  - im Wochenlauf (CI-14), dort auch für jede Liferay-Umsetzung,
+  - bei einem PR mit dem Label `volle-pruefung`,
+  - beim Start von Hand (`workflow_dispatch` mit Auswahl „voll“).
+- **CI-36 Abschluss-Job:** Ein letzter Job „Prüfung abgeschlossen“ prüft, dass jeder für die Klasse nötige Job grün
+  ist. Nur dieser Job ist im Regelsatz für `main` Pflicht. Grund: Ein übersprungener Job zählt bei GitHub als
+  bestanden, ein Pflicht-Check je Job würde also nichts absichern.
+- **CI-37 Auswahl nach Modul (geplant):** Sobald die Code-Landkarte jede Datei unter `src/` einem Modul zuordnet (ab G2),
+  laufen bei Logik- und Serveränderungen nur die Prüffälle der betroffenen Module und der Module, die nach dem
+  Abhängigkeitsgraph davon abhängen. Der genaue Ablauf wird in G3 festgelegt; bis dahin gilt CI-32 mit den Klassen
+  aus Abschnitt 7.
 
 ### Sparsam und schnell bauen
 
@@ -151,9 +174,30 @@ Angaben zu anderen Repositories stehen bewusst nicht in dieser öffentlichen Dat
 
 ## 7. Umsetzung in diesem Repository
 
+### Änderungsklassen (CI-32)
+
+Die volle Prüfung läuft erst, wenn der PR „bereit“ ist (CI-10, CI-11). Die schnelle Prüfung läuft immer (CI-09).
+
+| Klasse | Pfade | Volle Prüfung bei bereitem PR | Begründung |
+|---|---|---|---|
+| D Doku | `docs/**`, `profile/**`, `playbooks/**`, `specs/**/*.md`, `*.md` | keine (CI-12) | ändert kein Verhalten |
+| P Prüffälle | `specs/pruefung/**` | TypeScript: wie Klasse L; Liferay: nur im Wochenlauf oder mit Label `volle-pruefung` | der Prüf-Runner der schnellen Prüfung führt die Fachlogik-Fälle schon aus |
+| L Logik und Server | `src/domain/**`, `src/lib/**`, `src/pdf/**`, `src/worker/**`, `src/auth.ts`, `src/proxy.ts`, `prisma/**`, `scripts/**`, `tests/**` | Docker Compose + Playwright `chromium` und `smartphone-375` | Verhalten ändert sich, die Darstellung im Browser nicht |
+| O Oberfläche | `src/app/**`, `src/components/**`, `assets/**`, `public/**`, `e2e/**`, `playwright.config.ts`, `next.config.ts`, `postcss.config.mjs` | zusätzlich `firefox`, `msedge`, `a11y`, `screenshots` | Darstellung und Barrierefreiheit können je Browser abweichen |
+| I Infrastruktur und Abhängigkeiten | `package.json`, `package-lock.json`, `Dockerfile`, `docker/**`, `docker-compose.yml`, `keycloak/**`, `.github/**`, `.env.example`, `.dockerignore`, `.gitattributes`, `.gitignore`, `.prettierignore`, `.prettierrc.json`, `tsconfig.json`, `eslint.config.mjs`, `vitest.config.ts`, `prisma.config.ts` | alle Konfigurationen der TypeScript-App | wirkt auf alles, z. B. neue Bibliotheksversionen |
+| L62 Liferay 6.2.5 | `liferay-625/**` | Liferay-6.2.5-Job | eigene Umsetzung |
+| L72 Liferay 7.2 | `liferay-72/**` | Liferay-7.2-Job | eigene Umsetzung |
+| U Upgrade | – | nur von Hand (`workflow_dispatch`) | sehr lang, nur bei U-PRs nötig |
+| sonstige Pfade | alles, was oben fehlt | alle Konfigurationen der TypeScript-App (CI-34) | im Zweifel voll |
+
+Beispiele: Ein PR, der nur `docs/` und `src/domain/weeks.ts` ändert, ist Klasse L und läuft mit Chromium und 375 px.
+Ein PR mit einer neuen Komponente ist Klasse O und läuft in allen Browsern. Ein Dependabot-PR ist Klasse I.
+
+### Prüfungen je Teil
+
 | Teil | Schnelle Prüfung | Kern-Prüfung im Draft | Volle Prüfung | Doku-Pfade |
 |---|---|---|---|---|
-| TypeScript-App | Lint, Formatierung, Typecheck, Vitest mit PostgreSQL, AK-Abdeckung, Beispiel-PDF | keine; die Sitzungen testen lokal mit Test-Login | Docker Compose + Playwright (Chromium, Firefox, Edge, 375 px) | `docs/**`, `profile/**`, `playbooks/**`, `*.md` |
+| TypeScript-App | Lint, Formatierung, Typecheck, Vitest mit PostgreSQL, AK-Abdeckung, Beispiel-PDF | keine; die Sitzungen testen lokal mit Test-Login | Docker Compose + Playwright (Chromium, Firefox, Edge, 375 px, axe, Screenshots); Umfang nach Änderungsklasse | siehe Klasse D |
 | Specs und Prüffälle (ab G1) | Prüf-Runner für TypeScript, AK-Abdeckung | keine | wie TypeScript-App | `specs/**/*.md` |
 | Liferay 6.2.5 (ab L62) | wird in P00 festgelegt (Build, JUnit) | keine | Liferay mit Datenbank, Prüffälle mit Playwright (Chromium); nur bei Änderungen unter `liferay-625/` | wird in P00 festgelegt |
 | Liferay 7.2 (ab L72) | wird in P00 festgelegt (Gradle, JUnit) | keine | Liferay mit Datenbank und Elasticsearch, Prüffälle mit Playwright (Chromium); nur bei Änderungen unter `liferay-72/` | wird in P00 festgelegt |
@@ -163,6 +207,7 @@ Angaben zu anderen Repositories stehen bewusst nicht in dieser öffentlichen Dat
 
 1. Chris gibt diese Richtlinie frei, setzt den E-Mail-Schutz im eigenen Konto und stellt das Repository auf öffentlich.
 2. Chris setzt die Einstellungen aus Abschnitt 4.
-3. Ein PR setzt CI-09 bis CI-20 und CI-27 im Workflow um.
+3. Ein PR setzt CI-09 bis CI-20, CI-27 und CI-32 bis CI-36 im Workflow um. Die Zuordnung der Pfade steht an einer
+   Stelle im Workflow, und ein Test der schnellen Prüfung meldet Dateien im Repository, die keiner Klasse angehören.
 4. Liferay-Jobs kommen mit L62 bzw. L72 dazu (CI-25).
 5. Erster Monatsrückblick (CI-08) Anfang Dezember 2026.
