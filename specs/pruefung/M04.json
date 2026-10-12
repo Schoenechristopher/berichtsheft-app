@@ -1,0 +1,726 @@
+[
+  {
+    "id": "AK-401-01",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Bericht hat genau die Tage Mo bis Fr mit Datum, Tagesart noch offen",
+    "schnittstelle": "berichtstageAnlegen",
+    "eingabe": {
+      "woche": "2026-W41",
+      "beginn": "2026-09-01",
+      "ende": null,
+      "bundesland": "NW"
+    },
+    "erwartet": {
+      "tage": [
+        {
+          "datum": "2026-10-05",
+          "tag": "Mo",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-10-06",
+          "tag": "Di",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-10-07",
+          "tag": "Mi",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-10-08",
+          "tag": "Do",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-10-09",
+          "tag": "Fr",
+          "tagesart": null,
+          "ausserhalb": false
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-401-02",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Woche über den Jahreswechsel: Mo 28.12.2026 bis Fr 01.01.2027",
+    "schnittstelle": "berichtstageAnlegen",
+    "eingabe": {
+      "woche": "2026-W53",
+      "beginn": "2026-09-01",
+      "ende": null,
+      "bundesland": "NW"
+    },
+    "erwartet": {
+      "tage": [
+        {
+          "datum": "2026-12-28",
+          "tag": "Mo",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-29",
+          "tag": "Di",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-30",
+          "tag": "Mi",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-31",
+          "tag": "Do",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2027-01-01",
+          "tag": "Fr",
+          "tagesart": "Feiertag",
+          "ausserhalb": false
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-402-01",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Genau fünf Tagesarten in dieser Reihenfolge",
+    "schnittstelle": "tagesarten",
+    "eingabe": {},
+    "erwartet": {
+      "tagesarten": ["Betrieb", "Berufsschule", "Urlaub", "Krank", "Feiertag"]
+    }
+  },
+  {
+    "id": "AK-402-02",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Eine andere Tagesart wird abgewiesen, Meldung am Tag",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        },
+        {
+          "tag": "Di",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": "Homeoffice",
+          "text": ""
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "Werkstatt"
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "tage_ungueltig",
+      "tage": [
+        {
+          "tag": "Mo",
+          "fehler": ["tagesart_unbekannt"]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-402-03",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Kleingeschriebene Tagesart ist keine der fünf",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": "betrieb",
+          "text": ""
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "tage_ungueltig",
+      "tage": [
+        {
+          "tag": "Mo",
+          "fehler": ["tagesart_unbekannt"]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-402-04",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Jede der fünf Tagesarten wird angenommen",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        },
+        {
+          "tag": "Di",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        },
+        {
+          "tag": "Mi",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        },
+        {
+          "tag": "Do",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        },
+        {
+          "tag": "Fr",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": ""
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Berufsschule",
+          "text": ""
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Urlaub",
+          "text": ""
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Krank",
+          "text": ""
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Feiertag",
+          "text": ""
+        }
+      ]
+    },
+    "erwartet": {
+      "aenderungen": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": ""
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Berufsschule",
+          "text": ""
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Urlaub",
+          "text": ""
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Krank",
+          "text": ""
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Feiertag",
+          "text": ""
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-405-01",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Vorbelegter Feiertag wird zu Berufsschule",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Fr",
+          "ausserhalb": false,
+          "tagesart": "Feiertag",
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Fr",
+          "tagesart": "Berufsschule",
+          "text": "Lernfeld 3"
+        }
+      ]
+    },
+    "erwartet": {
+      "aenderungen": [
+        {
+          "tag": "Fr",
+          "tagesart": "Berufsschule",
+          "text": "Lernfeld 3"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-405-02",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Vorbelegter Feiertag wird zu Urlaub, ohne Text",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Do",
+          "ausserhalb": false,
+          "tagesart": "Feiertag",
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Do",
+          "tagesart": "Urlaub",
+          "text": ""
+        }
+      ]
+    },
+    "erwartet": {
+      "aenderungen": [
+        {
+          "tag": "Do",
+          "tagesart": "Urlaub",
+          "text": ""
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-406-01",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Entwurf darf ohne Tagesart gespeichert werden (Tagesart geleert)",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": "Betrieb",
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": "",
+          "text": "Notiz"
+        }
+      ]
+    },
+    "erwartet": {
+      "aenderungen": [
+        {
+          "tag": "Mo",
+          "tagesart": null,
+          "text": "Notiz"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-406-02",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Nicht mitgeschickte Felder bleiben, unveränderte Tage werden nicht geschrieben",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": "Krank",
+          "text": "x"
+        },
+        {
+          "tag": "Di",
+          "ausserhalb": false,
+          "tagesart": "Betrieb",
+          "text": "gleich"
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": null,
+          "text": null
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "gleich"
+        }
+      ]
+    },
+    "erwartet": {
+      "aenderungen": []
+    }
+  },
+  {
+    "id": "AK-406-03",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Nur ein Feld mitgeschickt: das andere bleibt gespeichert",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mi",
+          "ausserhalb": false,
+          "tagesart": "Betrieb",
+          "text": "alt"
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mi",
+          "tagesart": null,
+          "text": "neu"
+        }
+      ]
+    },
+    "erwartet": {
+      "aenderungen": [
+        {
+          "tag": "Mi",
+          "tagesart": "Betrieb",
+          "text": "neu"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-407-01",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Umlaute, Zeilenumbrüche und Leerzeichen bleiben unverändert",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Größe der Übergabe geprüft – „Jörg“ hat ß erklärt.\n\n  Zweiter Absatz, eingerückt.\nEnde.  "
+        }
+      ]
+    },
+    "erwartet": {
+      "aenderungen": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Größe der Übergabe geprüft – „Jörg“ hat ß erklärt.\n\n  Zweiter Absatz, eingerückt.\nEnde.  "
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-407-02",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Zeilenumbrüche werden einheitlich gespeichert",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "eins\r\nzwei\rdrei\nvier"
+        }
+      ]
+    },
+    "erwartet": {
+      "aenderungen": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "eins\nzwei\ndrei\nvier"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-407-03",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "2.000 Zeichen werden unverändert gespeichert",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. La"
+        }
+      ]
+    },
+    "erwartet": {
+      "aenderungen": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. Lange Beschreibung mit Umlauten äöü. La"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-407-04",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "5.000 Zeichen sind die Obergrenze und werden angenommen",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfu"
+        }
+      ]
+    },
+    "erwartet": {
+      "aenderungen": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfu"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-407-05",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "5.001 Zeichen werden abgewiesen, Meldung am Feld",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        },
+        {
+          "tag": "Di",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfux"
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "kurz"
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "tage_ungueltig",
+      "tage": [
+        {
+          "tag": "Mo",
+          "fehler": ["text_zu_lang"]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-407-06",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Zeilenumbruch zählt als ein Zeichen, auch als Wagenrücklauf und Zeilenvorschub",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\r\n"
+        }
+      ]
+    },
+    "erwartet": {
+      "aenderungen": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-407-07",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Gezählt werden Unicode-Zeichen: ein Emoji ist ein Zeichen",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa😀"
+        }
+      ]
+    },
+    "erwartet": {
+      "aenderungen": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa😀"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-407-08",
+    "modul": "M04",
+    "ebene": "fachlogik",
+    "beschreibung": "Falsche Tagesart und zu langer Text am selben Tag: beide Meldungen",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": "Homeoffice",
+          "text": "Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfung äöü ß. Prüfux"
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "tage_ungueltig",
+      "tage": [
+        {
+          "tag": "Mo",
+          "fehler": ["tagesart_unbekannt", "text_zu_lang"]
+        }
+      ]
+    }
+  }
+]

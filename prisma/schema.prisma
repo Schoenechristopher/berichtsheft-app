@@ -125,6 +125,9 @@ model ReportDay {
   activities      String       @default("")
   /// Tag liegt vor Beginn oder nach Ende der Ausbildung (AK-305).
   outsideTraining Boolean      @default(false) @map("outside_training")
+  /// Beim Anlegen (bzw. beim Einbeziehen nach AK-203) als „Feiertag“ vorbelegt (AK-404); bleibt,
+  /// auch wenn der Azubi die Tagesart ändert oder das Bundesland später wechselt.
+  holidayPreset   Boolean      @default(false) @map("holiday_preset")
 
   comments Comment[]
 

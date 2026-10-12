@@ -101,6 +101,50 @@ Die Signaturen stehen in `specs/M01-kalender-und-zeit.md`, Abschnitt 6.
 `betrieb` sagt, ob die Plattform im Produktivbetrieb läuft. `gestellt` ist `true`, wenn „jetzt“ danach den vorgegebenen
 Zeitpunkt liefert.
 
+## Schnittstellen von M03 (Fachlogik)
+
+Die Signaturen stehen in `specs/M03-wochenberichte-entstehen.md`, Abschnitt 6. Zusätzliche Datenformate:
+
+| Art | Format | Beispiel |
+| --- | --- | --- |
+| Status | `Entwurf`, `Eingereicht`, `Freigegeben`, `Abgelehnt` (Statusmodell in `docs/01`) | `Abgelehnt` |
+| Tagesart | `Betrieb`, `Berufsschule`, `Urlaub`, `Krank`, `Feiertag`; keine Tagesart: `null` | `Feiertag` |
+| Ausbildungszeitraum | `beginn` Kalendertag, `ende` Kalendertag oder `null` (kein Ende eingetragen) | `"ende": null` |
+
+| Schnittstelle | `eingabe` | `erwartet` (Erfolg) | Fehlercodes |
+| --- | --- | --- | --- |
+| `faelligeWochen` | `{ "beginn", "ende" }`; der Fall nennt `uhr` | `{ "wochen": [<Woche>, …] }` aufsteigend | – |
+| `berichtstageAnlegen` | `{ "woche": <Woche>, "beginn", "ende", "bundesland": <Bundesland> }` | `{ "tage": [{ "datum": <Kalendertag>, "tag": <Wochentag>, "tagesart": <Tagesart> \| null, "ausserhalb": <Wahrheitswert> } × 5] }` | `woche_ungueltig`, `bundesland_unbekannt` |
+| `ausserhalbNeuBerechnen` | `{ "tage": [{ "datum", "tagesart", "ausserhalb" }, …], "beginn", "ende", "bundesland" }` | `{ "aenderungen": [{ "datum", "ausserhalb", "tagesart"? }, …] }` nur geänderte Tage; `tagesart` nur, wenn sie vorbelegt wird | `bundesland_unbekannt` |
+| `istOffen` | `{ "status": <Status> }` | `{ "offen": <Wahrheitswert> }` | – |
+| `wocheEinordnen` | `{ "woche", "status", "inhalt": <Wahrheitswert>, "historie": <Wahrheitswert>, "beginn", "ende" }`; der Fall nennt `uhr` | `{ "ausgeblendet", "ausserhalb", "offen", "vergangenOffen" }` (je Wahrheitswert) | – |
+
+`inhalt` heißt: Mindestens ein Tag hat eine Tagesart oder einen Text. `historie` heißt: Es gibt mindestens einen
+Statuswechsel.
+
+## Schnittstellen von M04 (Fachlogik)
+
+Die Signaturen stehen in `specs/M04-bericht-erfassen.md`, Abschnitt 6. Status und Tagesart wie bei M03; Tage eines
+Berichts werden mit ihrem Wochentag `Mo` bis `Fr` benannt.
+
+| Schnittstelle | `eingabe` | `erwartet` (Erfolg) | Fehlercodes |
+| --- | --- | --- | --- |
+| `tagesarten` | `{}` | `{ "tagesarten": [<Tagesart> × 5] }` in fester Reihenfolge | – |
+| `tageSpeichern` | `{ "tage": [{ "tag", "ausserhalb", "tagesart", "text" }, …], "eingaben": [{ "tag", "tagesart": <Text> \| "" \| null, "text": <Text> \| null }, …] }` | `{ "aenderungen": [{ "tag", "tagesart": <Tagesart> \| null, "text" }, …] }` nur Tage, deren Werte sich ändern | `tage_ungueltig` mit `"tage": [{ "tag", "fehler": [<Code>, …] }]` |
+
+`tage` ist der gespeicherte Stand, `eingaben` das, was der Azubi abschickt. In `eingaben` heißt `null` „nicht
+mitgeschickt, bleibt unverändert“, `""` bei der Tagesart „geleert“. Eine Tagesart, die keine der fünf ist, gibt der
+Adapter unverändert an die Plattform weiter, die sie abweisen muss. Bei `tage_ungueltig` wird nichts gespeichert; je
+betroffenem Tag stehen die Codes in der Reihenfolge `tagesart_unbekannt`, `text_zu_lang`.
+
+Fehlercodes von M04 (Ergänzung der Liste „Fehlercodes“):
+
+| Code | Bedeutung | AK |
+| --- | --- | --- |
+| `tage_ungueltig` | Mindestens ein Tag hat eine ungültige Eingabe; nichts wird gespeichert. Die Codes je Tag folgen. | AK-402, AK-407 |
+| `tagesart_unbekannt` | Die Tagesart ist keine der fünf (je Tag in `tage_ungueltig`). | AK-402 |
+| `text_zu_lang` | „Tätigkeiten“ hat mehr als 5.000 Zeichen (je Tag in `tage_ungueltig`). | AK-407 |
+
 ## Fehlercodes
 
 | Code | Bedeutung | AK |

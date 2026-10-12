@@ -6,6 +6,18 @@
 import { InvalidInstantError, clockFromEnvironment, now } from "@/domain/clock";
 import { FEDERAL_STATES, UnknownFederalStateError, isFederalState } from "@/domain/federal-states";
 import { isPublicHoliday, publicHolidays } from "@/domain/holidays";
+import type { ReportStatus } from "@/domain/report-access";
+import { DAY_TYPES, DAY_TYPE_LABELS, validateDayInputs, type DayInput } from "@/domain/report-days";
+import {
+  classifyWeek,
+  correctOutsideTraining,
+  planReportDays,
+  weeksDue,
+  type DayType,
+  type StoredDay,
+  type TrainingPeriod,
+} from "@/domain/report-generation";
+import { isOpenStatus } from "@/domain/report-status";
 import {
   APP_TIME_ZONE,
   InvalidIsoWeekError,
@@ -117,6 +129,99 @@ export function formatInstant(instant: Date): string {
   return `${local}${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(abs % 60).padStart(2, "0")}`;
 }
 
+function boolean(input: Input, name: string): boolean {
+  const value = field(input, name);
+  if (typeof value !== "boolean") {
+    throw new CaseFormatError(`Eingabe „${name}“ muss ein Wahrheitswert sein.`);
+  }
+  return value;
+}
+
+function list(input: Input, name: string): Input[] {
+  const value = field(input, name);
+  if (!Array.isArray(value) || value.some((entry) => typeof entry !== "object" || entry === null)) {
+    throw new CaseFormatError(`Eingabe „${name}“ muss eine Liste von Objekten sein.`);
+  }
+  return value as Input[];
+}
+
+// --- M03 Wochenberichte entstehen, M04 Bericht erfassen ---
+
+const STATUSES: Record<string, ReportStatus> = {
+  Entwurf: "DRAFT",
+  Eingereicht: "SUBMITTED",
+  Freigegeben: "APPROVED",
+  Abgelehnt: "REJECTED",
+};
+
+function status(input: Input, name: string): ReportStatus {
+  const value = text(input, name);
+  if (!Object.hasOwn(STATUSES, value)) {
+    throw new CaseFormatError(`Unbekannter Status: ${value}`);
+  }
+  return STATUSES[value];
+}
+
+/** Tagesart der App → neutraler Name (`Betrieb` …), leer → null. */
+function dayTypeName(dayType: DayType | null): string | null {
+  return dayType === null ? null : DAY_TYPE_LABELS[dayType];
+}
+
+const DAY_TYPE_BY_NAME = new Map(DAY_TYPES.map((type) => [DAY_TYPE_LABELS[type], type]));
+
+/** Gespeicherte Tagesart: neutraler Name oder null; jeder andere Wert ist ein fehlerhafter Prüffall. */
+function storedDayType(value: unknown): DayType | null {
+  if (value === null) {
+    return null;
+  }
+  const type = typeof value === "string" ? DAY_TYPE_BY_NAME.get(value) : undefined;
+  if (!type) {
+    throw new CaseFormatError(`Gespeicherte Tagesart muss eine der fünf Tagesarten oder null sein: ${String(value)}`);
+  }
+  return type;
+}
+
+/**
+ * Eingabe einer Tagesart aus dem Formular: null = nicht mitgeschickt, "" = leer. Bekannte Namen
+ * werden übersetzt; jeder andere Text geht unverändert an die App, die ihn abweisen muss.
+ */
+function inputDayType(value: unknown): string | null {
+  if (value === null || value === "") {
+    return value;
+  }
+  if (typeof value !== "string") {
+    throw new CaseFormatError(`Tagesart der Eingabe muss Text oder null sein: ${String(value)}`);
+  }
+  return DAY_TYPE_BY_NAME.get(value) ?? value;
+}
+
+function optionalText(input: Input, name: string): string | null {
+  const value = field(input, name);
+  if (value !== null && typeof value !== "string") {
+    throw new CaseFormatError(`Eingabe „${name}“ muss Text oder null sein.`);
+  }
+  return value;
+}
+
+/** Ausbildungszeitraum aus `beginn` und `ende` (Kalendertag oder null). */
+function trainingPeriod(input: Input): TrainingPeriod {
+  const end = field(input, "ende");
+  if (end !== null && typeof end !== "string") {
+    throw new CaseFormatError("Eingabe „ende“ muss ein Kalendertag oder null sein.");
+  }
+  return { start: parseDate(text(input, "beginn")), end: end === null ? null : parseDate(end) };
+}
+
+const WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr"];
+
+function weekday(input: Input): string {
+  const day = text(input, "tag");
+  if (!WEEKDAYS.includes(day)) {
+    throw new CaseFormatError(`Tag muss Mo bis Fr sein: ${day}`);
+  }
+  return day;
+}
+
 const operations: Record<string, (input: Input) => Result> = {
   jetzt: () => ({ zeitpunkt: formatInstant(now()) }),
   uhrVorgeben: (input) => {
@@ -157,6 +262,91 @@ const operations: Record<string, (input: Input) => Result> = {
   feiertage: (input) => ({
     feiertage: [...publicHolidays(integer(input, "jahr"), text(input, "bundesland"))].sort(),
   }),
+
+  // --- M03 Wochenberichte entstehen ---
+  faelligeWochen: (input) => ({ wochen: weeksDue(trainingPeriod(input), now()).map(formatWeek) }),
+  berichtstageAnlegen: (input) => ({
+    tage: planReportDays(parseWeek(text(input, "woche")), trainingPeriod(input), text(input, "bundesland")).map(
+      (day) => ({
+        datum: toDateInput(day.date),
+        tag: weekdayShort(day.date),
+        tagesart: dayTypeName(day.dayType),
+        ausserhalb: day.outsideTraining,
+      }),
+    ),
+  }),
+  ausserhalbNeuBerechnen: (input) => {
+    const days: StoredDay[] = list(input, "tage").map((day) => ({
+      id: text(day, "datum"),
+      date: parseDate(text(day, "datum")),
+      dayType: storedDayType(field(day, "tagesart")),
+      outsideTraining: boolean(day, "ausserhalb"),
+    }));
+    return {
+      aenderungen: correctOutsideTraining(days, trainingPeriod(input), text(input, "bundesland")).map((change) => ({
+        datum: change.id,
+        ausserhalb: change.outsideTraining,
+        ...(change.dayType ? { tagesart: dayTypeName(change.dayType) } : {}),
+      })),
+    };
+  },
+  istOffen: (input) => ({ offen: isOpenStatus(status(input, "status")) }),
+  wocheEinordnen: (input) => {
+    const result = classifyWeek(
+      {
+        ...parseWeek(text(input, "woche")),
+        status: status(input, "status"),
+        hasContent: boolean(input, "inhalt"),
+        hasHistory: boolean(input, "historie"),
+      },
+      trainingPeriod(input),
+      currentIsoWeek(now()),
+    );
+    return {
+      ausgeblendet: result.hidden,
+      ausserhalb: result.outsideTraining,
+      offen: result.open,
+      vergangenOffen: result.pastOpen,
+    };
+  },
+
+  // --- M04 Bericht erfassen ---
+  tagesarten: () => ({ tagesarten: DAY_TYPES.map((type) => DAY_TYPE_LABELS[type]) }),
+  tageSpeichern: (input) => {
+    const days = list(input, "tage").map((day) => ({
+      id: weekday(day),
+      outsideTraining: boolean(day, "ausserhalb"),
+      dayType: storedDayType(field(day, "tagesart")),
+      activities: text(day, "text"),
+    }));
+    const inputs = new Map<string, DayInput>(
+      list(input, "eingaben").map((entry) => [
+        weekday(entry),
+        { dayType: inputDayType(field(entry, "tagesart")), activities: optionalText(entry, "text") },
+      ]),
+    );
+    const result = validateDayInputs(days, inputs, new Map(days.map((day) => [day.id, day])));
+    if (!result.ok) {
+      // Fehlerart je Feld, nicht der Meldungstext: Feld Tagesart bzw. Tätigkeiten.
+      return {
+        fehler: "tage_ungueltig",
+        tage: Object.entries(result.errors).map(([day, errors]) => ({
+          tag: day,
+          fehler: [
+            ...(errors.dayType !== undefined ? ["tagesart_unbekannt"] : []),
+            ...(errors.activities !== undefined ? ["text_zu_lang"] : []),
+          ],
+        })),
+      };
+    }
+    return {
+      aenderungen: result.updates.map((update) => ({
+        tag: update.id,
+        tagesart: dayTypeName(update.dayType),
+        text: update.activities,
+      })),
+    };
+  },
 };
 
 /** Namen aller Schnittstellen, die der Adapter kennt. */

@@ -26,7 +26,7 @@ export interface EditorDay {
   /** z. B. „Montag, 05.10.2026“ */
   label: string;
   outsideTraining: boolean;
-  /** Gesetzlicher Feiertag im Bundesland: Hinweis „Feiertag (vorbelegt)“. */
+  /** Beim Anlegen als Feiertag vorbelegt (nach dem damals gültigen Bundesland): Hinweis „Feiertag (vorbelegt)“. */
   holiday: boolean;
   dayType: string;
   activities: string;

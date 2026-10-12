@@ -173,6 +173,81 @@ describe("Wochenberichte erzeugen", () => {
     expect((await report(prisma, nils.id, 2027, 21)).days[3]).toMatchObject({ dayType: null });
   });
 
+  it("AK-404 Hinweis „vorbelegt“ folgt dem beim Anlegen gültigen Bundesland, nicht dem aktuellen", async () => {
+    const { bernd, anna } = await createPersons(prisma);
+    setFixedNow("2027-05-24T08:00:00+02:00");
+    await ensureReportsForTrainee(prisma, anna.id, now());
+    const preset = (days: { holidayPreset: boolean }[]) => days.map((day) => day.holidayPreset);
+    // Fronleichnam (Do 27.05.2027) in NW vorbelegt.
+    expect(preset((await report(prisma, anna.id, 2027, 21)).days)).toEqual([false, false, false, true, false]);
+
+    // Wechsel auf Niedersachsen: Der Merker bleibt, auch wenn die Tagesart geändert wird.
+    await updateFederalState(prisma, bernd, "NI");
+    const kw21 = await report(prisma, anna.id, 2027, 21);
+    await saveReportDays(
+      prisma,
+      { id: anna.id, role: "TRAINEE", active: true },
+      kw21.id,
+      new Map([[kw21.days[3].id, input("SCHOOL", "Blockunterricht")]]),
+    );
+    await ensureReportsForTrainee(prisma, anna.id, now());
+    expect((await report(prisma, anna.id, 2027, 21)).days[3]).toMatchObject({ dayType: "SCHOOL", holidayPreset: true });
+
+    // Wechsel auf Bayern: Mo 06.01.2027 (Heilige Drei Könige) war in NW kein Feiertag und bleibt unmarkiert.
+    await updateFederalState(prisma, bernd, "BY");
+    expect((await report(prisma, anna.id, 2027, 1)).days[2]).toMatchObject({ dayType: null, holidayPreset: false });
+  });
+
+  it("AK-404 Tag, der nach geändertem Ausbildungsbeginn neu in die Ausbildung fällt, wird vorbelegt und so gemerkt", async () => {
+    const { bernd, anna } = await createPersons(prisma);
+    await prisma.person.update({ where: { id: anna.id }, data: { trainingStart: new Date("2027-05-28T00:00:00Z") } });
+    setFixedNow("2027-05-28T08:00:00+02:00");
+    await ensureReportsForTrainee(prisma, anna.id, now());
+    expect((await report(prisma, anna.id, 2027, 21)).days[3]).toMatchObject({
+      outsideTraining: true,
+      dayType: null,
+      holidayPreset: false,
+    });
+
+    const moved = await updatePerson(prisma, bernd, anna.id, {
+      name: "Anna",
+      email: "anna@test.invalid",
+      role: "TRAINEE",
+      trainerId: bernd.id,
+      trainingStart: "2027-05-24",
+      trainingEnd: "",
+    });
+    expect(moved).toMatchObject({ ok: true });
+    await ensureReportsForTrainee(prisma, anna.id, now());
+    expect((await report(prisma, anna.id, 2027, 21)).days[3]).toMatchObject({
+      outsideTraining: false,
+      dayType: "HOLIDAY",
+      holidayPreset: true,
+    });
+  });
+
+  it("AK-1204 Datenbank weist KW 53 in Jahren mit 52 Wochen ab; KW 53 in Jahren mit 53 Wochen bleibt erlaubt", async () => {
+    const { anna } = await createPersons(prisma);
+    for (const isoYear of [2027, 2025]) {
+      await expect(prisma.weeklyReport.create({ data: { traineeId: anna.id, isoYear, isoWeek: 53 } })).rejects.toThrow(
+        /weekly_report_iso_week_range/,
+      );
+    }
+    for (const isoWeek of [0, 54]) {
+      await expect(
+        prisma.weeklyReport.create({ data: { traineeId: anna.id, isoYear: 2026, isoWeek } }),
+      ).rejects.toThrow(/weekly_report_iso_week_range/);
+    }
+    for (const isoYear of [2026, 2020, 2032]) {
+      await expect(
+        prisma.weeklyReport.create({ data: { traineeId: anna.id, isoYear, isoWeek: 53 } }),
+      ).resolves.toMatchObject({ isoYear, isoWeek: 53 });
+    }
+    await expect(
+      prisma.weeklyReport.create({ data: { traineeId: anna.id, isoYear: 2027, isoWeek: 52 } }),
+    ).resolves.toMatchObject({ isoWeek: 52 });
+  });
+
   it("AK-205 deaktivierte Azubis bekommen keine neuen Wochen", async () => {
     const { bernd, anna } = await createPersons(prisma);
     await ensureReportsForTrainee(prisma, anna.id, now());
@@ -455,7 +530,7 @@ describe("Entwurf speichern", () => {
     expect((await report(prisma, anna.id, 2026, 41)).days[0].activities).toBe("geändert");
   });
 
-  it("Formularfelder dayType-<id> und activities-<id> werden gelesen", () => {
+  it("AK-406 Formularfelder dayType-<id> und activities-<id> werden gelesen", () => {
     const form = new FormData();
     form.set("dayType-a", "WORK");
     form.set("activities-a", "Text");
