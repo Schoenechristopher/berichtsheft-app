@@ -151,8 +151,9 @@ Entwicklersitzungen **mit möglichst wenig Verbrauch zu einem abgenommenen Ergeb
   - `.env` aus `.env.example`
   - `npm ci`, Migration und Seed
 
-  Für Liferay ergänzt P00 der Plattform JDK und Bundle. Das ersetzt die Handschritte unter „Cloud-Sitzungen“ in
-  `CLAUDE.md`. Eigener PR, vor G1.
+  Für Liferay ergänzt P00 der Plattform JDK und Bundle. Umgesetzt als SessionStart-Hook in
+  `.claude/hooks/session-start.sh` (12.10.2026): idempotent, `npm ci` nur bei geändertem `package-lock.json`; erster
+  Lauf rund 40 Sekunden, jeder weitere rund 4 Sekunden.
 - **KE-S02 Auftragsvorlage:** `playbooks/vorlage-arbeitspaket.md` (G4) bekommt die Pflichtfelder aus KE-R01. Ein kleines
   Prüfskript meldet fehlende Felder (KE-AK-01).
 - **KE-S03 Leitfaden der Steuerung:** `playbooks/00-steuerung.md` bekommt die Regeln KE-R01 bis KE-R07, die Vorlage für
@@ -163,5 +164,5 @@ Entwicklersitzungen **mit möglichst wenig Verbrauch zu einem abgenommenen Ergeb
 ## Offene Punkte
 
 - [ ] Ob die Plattform den Verbrauch je Sitzung meldet. Sonst messen KE-R18 und KZ-5 mit Dauer und Zahl der Runden.
-- [ ] Ob Startskripte über die Umgebung der Cloud-Sitzungen oder als Hook im Repository eingerichtet werden; der Hook
-      liegt unter `.claude/` und ist damit geschützter Pfad (AM-R04).
+- [x] Startskript als Hook im Repository (`.claude/hooks/session-start.sh`), nicht über die Umgebung; damit ist es
+      versioniert und geschützter Pfad (AM-R04).
