@@ -98,15 +98,15 @@ Zentrale Begriffe stehen in `specs/00-uebersicht.md`. Für M01 gilt zusätzlich:
 
 Text aus `docs/01-spezifikation.md`; Prüffälle in `specs/pruefung/M01.json`.
 
-| AK-ID | Kriterium (Kurzfassung) | Regeln | Prüffälle |
-| --- | --- | --- | --- |
-| AK-404 | Gesetzliche Feiertage des eingestellten Bundeslands sind als „Feiertag“ vorbelegt; Beispiele 25.12.2026, Fronleichnam 2027 in NW ja, NI nein. Das Vorbelegen beim Anlegen regelt M03. | M01-R15, M01-R19 | AK-404-01 bis AK-404-03 |
-| AK-1201 | „Jetzt“ aus einer zentralen Uhr, für Tests und Vorführungen stellbar, im Produktivbetrieb nicht. | M01-R01 bis M01-R04 | AK-1201-01 bis AK-1201-05 |
-| AK-1202 | Maßgeblich ist der Kalendertag in Europe/Berlin, mit Sommer- und Winterzeit. | M01-R05, M01-R06, M01-R09 | AK-1202-01 bis AK-1202-09 |
-| AK-1203 | ISO-8601-Kalenderwochen (Woche 1 enthält den 4. Januar). | M01-R07, M01-R08, M01-R10, M01-R11 | AK-1203-01 bis AK-1203-10 |
-| AK-1204 | Eine Woche, die es nicht gibt, wird abgewiesen, z. B. KW 53/2027 oder KW 0. | M01-R08, M01-R12 | AK-1204-01 bis AK-1204-06 |
-| AK-1205 | Genau die 16 Bundesländer mit festen Kürzeln; ein unbekanntes Kürzel wird abgewiesen. | M01-R13, M01-R14, M01-R18 | AK-1205-01 bis AK-1205-06 |
-| AK-1206 | Feiertag ist jeder landesweite gesetzliche Feiertag, einschließlich einmaliger; kommunale und regionale zählen nicht. | M01-R15 bis M01-R17, M01-R19 | AK-1206-01 bis AK-1206-11 |
+| AK-ID | Kriterium (Kurzfassung) | Regeln | Prüffälle | Ebene |
+| --- | --- | --- | --- | --- |
+| AK-404 | Gesetzliche Feiertage des eingestellten Bundeslands sind als „Feiertag“ vorbelegt; Beispiele 25.12.2026, Fronleichnam 2027 in NW ja, NI nein. Das Vorbelegen beim Anlegen regelt M03. | M01-R15, M01-R19 | AK-404-01 bis AK-404-03 | Fachlogik |
+| AK-1201 | „Jetzt“ aus einer zentralen Uhr, für Tests und Vorführungen stellbar, im Produktivbetrieb nicht. | M01-R01 bis M01-R04 | AK-1201-01 bis AK-1201-05 | Fachlogik |
+| AK-1202 | Maßgeblich ist der Kalendertag in Europe/Berlin, mit Sommer- und Winterzeit. | M01-R05, M01-R06, M01-R09 | AK-1202-01 bis AK-1202-09 | Fachlogik |
+| AK-1203 | ISO-8601-Kalenderwochen (Woche 1 enthält den 4. Januar). | M01-R07, M01-R08, M01-R10, M01-R11 | AK-1203-01 bis AK-1203-10 | Fachlogik |
+| AK-1204 | Eine Woche, die es nicht gibt, wird abgewiesen, z. B. KW 53/2027 oder KW 0. | M01-R08, M01-R12 | AK-1204-01 bis AK-1204-06 | Fachlogik |
+| AK-1205 | Genau die 16 Bundesländer mit festen Kürzeln; ein unbekanntes Kürzel wird abgewiesen. | M01-R13, M01-R14, M01-R18 | AK-1205-01 bis AK-1205-06 | Fachlogik |
+| AK-1206 | Feiertag ist jeder landesweite gesetzliche Feiertag, einschließlich einmaliger; kommunale und regionale zählen nicht. | M01-R15 bis M01-R17, M01-R19 | AK-1206-01 bis AK-1206-11 | Fachlogik |
 
 Hilfsfunktionen für **AK-301 bis AK-304** (aktuelle Woche, Folgewoche, Vergleich) liefert M01; die Kriterien gehören
 M03 und werden dort geprüft.

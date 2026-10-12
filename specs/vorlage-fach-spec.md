@@ -8,7 +8,7 @@ TypeScript-App ein Modul umsetzt, steht in `specs/code-landkarte.md`; wie eine P
 
 Dateiname: `specs/Mxx-<name>.md` (z. B. `M01-kalender-und-zeit.md`), für das Querschnittsmodul `specs/Q-<name>.md`.
 `npm run ak:abdeckung` liest die Tabelle in Abschnitt 4 und verlangt für jede dort genannte AK-ID mindestens einen
-Prüffall mit diesem Modul.
+Prüffall mit diesem Modul; ausgenommen bis G3 sind AKs mit Ebene `Ablauf, G3` (Entscheidung E1).
 
 ## 1. Zweck und Abgrenzung
 
@@ -31,12 +31,23 @@ Nummeriert und einzeln überprüfbar, z. B.:
 
 ## 4. Akzeptanzkriterien
 
-Die AK-IDs des Moduls mit ihrem Text aus `docs/01` (bzw. `docs/05`), je ID die Regeln und Prüffälle, die sie belegen.
-Jede AK-ID gehört genau einem Modul.
+Die AK-IDs des Moduls mit ihrem Text aus `docs/01` (bzw. `docs/05`), je ID die Regeln und Prüffälle, die sie belegen,
+und die Ebene, auf der sie geprüft wird. Jede AK-ID gehört genau einem Modul.
 
-| AK-ID | Kriterium (Kurzfassung) | Regeln | Prüffälle |
-| --- | --- | --- | --- |
-| AK-… | … | Mxx-R01 | AK-…-01 |
+| AK-ID | Kriterium (Kurzfassung) | Regeln | Prüffälle | Ebene |
+| --- | --- | --- | --- | --- |
+| AK-… | … | Mxx-R01 | AK-…-01 | Fachlogik |
+
+Werte der Spalte „Ebene“ (genau so geschrieben; ein anderer Wert lässt `npm run ak:abdeckung` scheitern):
+
+- `Fachlogik`: geprüft mit Prüffällen der Ebene `fachlogik` (Regel ohne Speicher und ohne Oberfläche).
+- `Daten`: geprüft mit Prüffällen der Ebene `daten` (Regel am gespeicherten Bestand).
+- `Ablauf, G3`: nur im Ablauf (Browser) prüfbar; der Prüffall folgt in G3 (Entscheidung E1). In „Prüffälle“ steht
+  dann `folgt in G3`, und unter der Tabelle begründet ein Satz je AK, warum sie sich nicht als Fachlogik prüfen lässt.
+  Bis G3 ist eine solche AK ohne Prüffall kein Fehler; sie erscheint in `docs/03-testabdeckung.md` in der Spalte
+  „Prüffall folgt (G3)“. Eine AK, die sich als Fachlogik prüfen lässt, wird nicht so markiert.
+
+Eine Tabelle mit vier Spalten (ohne „Ebene“) bleibt lesbar; neue Fach-Specs nutzen fünf.
 
 ## 5. Logisches Datenmodell
 

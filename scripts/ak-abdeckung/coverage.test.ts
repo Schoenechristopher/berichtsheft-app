@@ -4,6 +4,9 @@ import {
   casesAsTests,
   checkCases,
   criterionOfCase,
+  DEFERRED_CASES_REQUIRED,
+  parseModuleTable,
+  pendingCriteria,
   levelOf,
   moduleOfSpecFile,
   parseCheckCases,
@@ -242,5 +245,105 @@ describe("Prüffälle in der Abdeckung (specs/pruefung)", () => {
       "Modul Q: AK-1206 hat keinen Prüffall.",
     ]);
     expect(checkCases(read([fall("AK-101-01")]).cases, criteria, new Map([["M01", ["AK-101"]]]))).toEqual([]);
+  });
+});
+
+describe("Ebene der AK-Tabelle einer Fach-Spec (Entscheidung E1: „Ablauf, G3“)", () => {
+  const criteria = parseCriteria(spec);
+  const fall = (id: string) => ({
+    id,
+    modul: "M02",
+    ebene: "fachlogik",
+    schnittstelle: "darfAktion",
+    eingabe: {},
+    erwartet: {},
+  });
+  const cases = (...ids: string[]) =>
+    parseCheckCases(JSON.stringify(ids.map(fall), null, 2), "specs/pruefung/M02.json").cases;
+  const table = (rows: string) => `
+## 4. Akzeptanzkriterien
+| AK-ID | Kriterium (Kurzfassung) | Regeln | Prüffälle | Ebene |
+| --- | --- | --- | --- | --- |
+${rows}
+## 5. Logisches Datenmodell
+`;
+
+  it("liest die fünfte Spalte „Ebene“ mit den Werten Fachlogik, Daten und „Ablauf, G3“", () => {
+    expect(
+      parseModuleTable(
+        table(
+          [
+            "| AK-101 | Anmeldung | M02-R01 | folgt in G3 | Ablauf, G3 |",
+            "| AK-1102 | Text mit \\| im Kriterium | M02-R02 | AK-1102-01 | Fachlogik |",
+            "| UI-AK-14 | Text | – | – | Daten |",
+          ].join("\n"),
+        ),
+      ),
+    ).toEqual({
+      criteria: [
+        { id: "AK-101", level: "Ablauf, G3" },
+        { id: "AK-1102", level: "Fachlogik" },
+        { id: "UI-AK-14", level: "Daten" },
+      ],
+      errors: [],
+    });
+  });
+
+  it("vierspaltige Tabelle (ohne Ebene) bleibt lesbar", () => {
+    expect(parseModuleTable(table("| AK-101 | Text | M01-R01 | AK-101-01 |"))).toEqual({
+      criteria: [{ id: "AK-101" }],
+      errors: [],
+    });
+  });
+
+  it("unbekannter Ebenenwert oder falsche Spaltenzahl in der Spec-Tabelle ist ein Fehler", () => {
+    const { criteria: rows, errors } = parseModuleTable(
+      table(
+        [
+          "| AK-101 | Text | M02-R01 | folgt in G3 | Ablauf |",
+          "| AK-1102 | Text | M02-R01 | AK-1102-01 | Fachlogik | x |",
+        ].join("\n"),
+      ),
+    );
+    expect(rows.map((row) => row.id)).toEqual(["AK-101", "AK-1102"]);
+    expect(errors).toEqual([
+      "AK-101: unbekannte Ebene „Ablauf“ (erlaubt: Fachlogik; Daten; Ablauf, G3).",
+      "AK-1102: Zeile hat 6 statt 4 oder 5 Spalten.",
+    ]);
+  });
+
+  it("markierte AK („Ablauf, G3“) ohne Prüffall ist in G2 kein Fehler und wird als „Prüffall folgt (G3)“ gekennzeichnet", () => {
+    const modules = new Map([["M02", ["AK-101", "AK-1102"]]]);
+    const deferred = new Set(["AK-101"]);
+    expect(DEFERRED_CASES_REQUIRED).toBe(false);
+    expect(checkCases(cases("AK-1102-01"), criteria, modules, deferred)).toEqual([]);
+    expect(pendingCriteria(deferred, cases("AK-1102-01"))).toEqual(["AK-101"]);
+    const markdown = renderMarkdown(buildCoverage(criteria, []), [], new Set(["AK-101"]));
+    expect(markdown).toContain("| AK-ID | Kurztext | Tests | Ebene | Prüffall folgt (G3) |");
+    expect(markdown).toContain(
+      "| AK-101 | Anmeldung nur über das Firmenkonto; ein eigenes Passwort gibt es nicht. | **kein Test** | – | ja |",
+    );
+    expect(markdown).toMatch(/\| AK-1102 \| .* \| – \| {2}\|\n/);
+  });
+
+  it("markierte AK mit Prüffall zählt normal und ist nicht mehr gekennzeichnet", () => {
+    const modules = new Map([["M02", ["AK-101"]]]);
+    const deferred = new Set(["AK-101"]);
+    expect(checkCases(cases("AK-101-01"), criteria, modules, deferred)).toEqual([]);
+    expect(pendingCriteria(deferred, cases("AK-101-01"))).toEqual([]);
+  });
+
+  it("unmarkierte AK ohne Prüffall ist ein Fehler wie bisher", () => {
+    const modules = new Map([["M02", ["AK-101", "AK-1102"]]]);
+    expect(checkCases(cases("AK-1102-01"), criteria, modules, new Set())).toEqual([
+      "Modul M02: AK-101 hat keinen Prüffall.",
+    ]);
+  });
+
+  it("ab G3 (Schalter umgelegt) braucht auch die markierte AK einen Prüffall", () => {
+    const modules = new Map([["M02", ["AK-101", "AK-1102"]]]);
+    expect(checkCases(cases("AK-1102-01"), criteria, modules, new Set(["AK-101"]), true)).toEqual([
+      "Modul M02: AK-101 hat keinen Prüffall.",
+    ]);
   });
 });
