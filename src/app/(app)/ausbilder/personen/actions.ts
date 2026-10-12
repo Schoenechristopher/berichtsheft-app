@@ -104,7 +104,7 @@ export async function updateSettingsAction(prev: FormState, formData: FormData):
   const federalState = formData.get("federalState");
   const result = await updateFederalState(db(), actor, typeof federalState === "string" ? federalState : null);
   if (result.ok) {
-    done("/ausbilder/einstellungen?meldung=gespeichert");
+    done("/einstellungen?meldung=gespeichert");
   }
   return next(prev, result);
 }

@@ -7,6 +7,7 @@
  * gleichzeitige Änderungen nicht gemeinsam eine Regel umgehen (z. B. den letzten Ausbilder).
  */
 import { isFederalState } from "@/domain/federal-states";
+import { isTheme, type Theme } from "@/domain/theme";
 import {
   checkDeactivate,
   checkDelete,
@@ -327,4 +328,21 @@ export async function listActiveTrainees(prisma: PrismaClient) {
     include: { trainer: { select: { id: true, name: true, active: true } } },
     orderBy: { name: "asc" },
   });
+}
+
+export type ThemeResult = { ok: true; theme: Theme } | { ok: false; formError: string };
+
+/**
+ * Eigene Darstellung speichern (UI-AK-14): System, Hell oder Dunkel, am Konto und damit auf jedem
+ * Gerät. Jede Person ändert nur ihre eigene.
+ */
+export async function updateOwnTheme(prisma: PrismaClient, viewer: Viewer, value: unknown): Promise<ThemeResult> {
+  if (!viewer.active) {
+    return { ok: false, formError: "Zugriff verweigert" };
+  }
+  if (!isTheme(value)) {
+    return { ok: false, formError: "Unbekannte Darstellung." };
+  }
+  await prisma.person.update({ where: { id: viewer.id }, data: { theme: value } });
+  return { ok: true, theme: value };
 }

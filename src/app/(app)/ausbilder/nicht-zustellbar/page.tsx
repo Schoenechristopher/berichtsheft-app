@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CHANNEL_LABELS } from "@/domain/notifications";
 import { formatDateTime } from "@/domain/report-history";
-import { Badge, Notice, secondaryButtonClass } from "@/components/ui";
+import { Badge, Button, EmptyState, Notice, PageHeader } from "@/components/ui";
 import { db } from "@/lib/db";
 import { listUndeliverable } from "@/lib/notifications/service";
 import { requirePerson } from "@/lib/session";
@@ -19,12 +19,11 @@ export default async function UndeliverablePage({ searchParams }: PageProps<"/au
   const { meldung } = await searchParams;
 
   return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-semibold">Nicht zustellbare Nachrichten</h1>
-      <p className="text-sm text-slate-600">
-        E-Mail- und Teams-Nachrichten, die nach mehreren Versuchen nicht versendet werden konnten oder deren Empfänger
-        deaktiviert ist. Benachrichtigungen in der App sind davon nicht betroffen.
-      </p>
+    <div className="mx-auto max-w-[1120px] space-y-6">
+      <PageHeader
+        title="Nicht zustellbare Nachrichten"
+        subtitle="E-Mail- und Teams-Nachrichten, die nach mehreren Versuchen nicht versendet werden konnten oder deren Empfänger deaktiviert ist. Benachrichtigungen in der App sind davon nicht betroffen."
+      />
       {meldung === "erneut" ? (
         <Notice tone="success">Die Nachricht wird beim nächsten Durchlauf erneut versendet.</Notice>
       ) : null}
@@ -34,44 +33,42 @@ export default async function UndeliverablePage({ searchParams }: PageProps<"/au
         </Notice>
       ) : null}
       {items.length === 0 ? (
-        <p className="text-slate-600" data-testid="undeliverable-empty">
-          Keine nicht zustellbaren Nachrichten.
-        </p>
+        <EmptyState testId="undeliverable-empty">Keine nicht zustellbaren Nachrichten.</EmptyState>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-3" aria-label="Nicht zustellbare Nachrichten">
           {items.map((item) => (
             <li
               key={item.id}
               data-testid="undeliverable"
-              className="space-y-1 rounded-md border border-red-200 bg-white p-3 text-sm"
+              className="rounded-card border-border border-l-danger bg-surface space-y-1 border border-l-4 p-4 text-sm"
             >
               <div className="flex flex-wrap items-center gap-2">
-                <Badge tone="amber">{CHANNEL_LABELS[item.channel]}</Badge>
-                <span className="font-medium text-slate-900">
+                <Badge tone="warning">{CHANNEL_LABELS[item.channel]}</Badge>
+                <span className="font-medium">
                   An {item.recipient.name}
                   {item.recipient.active ? "" : " (deaktiviert)"}
                 </span>
               </div>
-              <p className="break-words text-slate-800" data-testid="undeliverable-subject">
+              <p className="break-words" data-testid="undeliverable-subject">
                 Anlass: {item.subject}
               </p>
-              <p className="text-slate-600">
+              <p className="text-fg-muted tabular-nums">
                 Letzter Versuch: {item.failedAt ? formatDateTime(item.failedAt) : "–"} · Versuche: {item.attempts}
               </p>
-              <p className="break-words text-red-800" data-testid="undeliverable-error">
+              <p className="text-danger break-words" data-testid="undeliverable-error">
                 Fehler: {item.lastError ?? "unbekannt"}
               </p>
               {item.recipient.active ? (
                 <form action={retryAction.bind(null, item.id)}>
-                  <button type="submit" className={`${secondaryButtonClass} mt-1 w-full sm:w-auto`}>
+                  <Button type="submit" variant="secondary" className="mt-2 w-full sm:w-auto">
                     Erneut versuchen
-                  </button>
+                  </Button>
                 </form>
               ) : null}
             </li>
           ))}
         </ul>
       )}
-    </section>
+    </div>
   );
 }

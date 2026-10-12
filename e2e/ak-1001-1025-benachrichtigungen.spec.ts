@@ -13,6 +13,7 @@ import {
   prepareWeek,
   queryOne,
   restoreSeedState,
+  revokeApproval,
   searchMail,
   withDatabase,
   type DayContent,
@@ -60,8 +61,20 @@ async function clearNotifications(email: string) {
   );
 }
 
+/** Glocke in der Kopfzeile: ab 1024 px ein Knopf mit Vorschau, darunter ein Link (UI-Spezifikation „Glocke“). */
 function bell(page: Page) {
-  return page.getByRole("link", { name: /^Benachrichtigungen/ });
+  const header = page.getByRole("banner");
+  const name = /^Benachrichtigungen/;
+  return header.getByRole("button", { name }).or(header.getByRole("link", { name }));
+}
+
+/** Glocke öffnen und über „Alle anzeigen“ zur Liste (Desktop). */
+async function openNotificationList(page: Page) {
+  await bell(page).click();
+  await page
+    .getByRole("region", { name: "Neueste Benachrichtigungen" })
+    .getByRole("link", { name: "Alle anzeigen" })
+    .click();
 }
 
 test.describe("Benachrichtigungen", () => {
@@ -112,13 +125,13 @@ test.describe("Benachrichtigungen", () => {
     // AK-1015: Zähler ungelesener App-Benachrichtigungen.
     await bernd.page.reload();
     await expect(bernd.page.getByTestId("notification-count")).toHaveText("1");
-    await expect(bell(bernd.page)).toHaveAccessibleName("Benachrichtigungen: 1 ungelesen");
+    await expect(bell(bernd.page)).toHaveAccessibleName("Benachrichtigungen, 1 ungelesen");
     // AK-1001: Clara (Vertretung) wird nicht benachrichtigt.
     const clara = await newSession(browser, accounts.clara);
     await expect(clara.page.getByTestId("notification-count")).toHaveCount(0);
 
     // Öffnen der Liste: „Neu“, Inhalt mit Azubi, Woche, Anlass; danach gelesen.
-    await bell(bernd.page).click();
+    await openNotificationList(bernd.page);
     await expect(bernd.page).toHaveURL(/\/benachrichtigungen$/);
     const item = bernd.page.getByTestId("notification").first();
     await expect(item.getByTestId("notification-new")).toHaveText("Neu");
@@ -138,7 +151,7 @@ test.describe("Benachrichtigungen", () => {
     ).toEqual({ count: "0" });
 
     // Erneutes Öffnen: nicht mehr „Neu“.
-    await bell(bernd.page).click();
+    await openNotificationList(bernd.page);
     await expect(bernd.page.getByTestId("notification")).toHaveCount(1);
     await expect(bernd.page.getByTestId("notification-new")).toHaveCount(0);
     for (const session of [trainee, bernd, clara]) {
@@ -153,13 +166,13 @@ test.describe("Benachrichtigungen", () => {
     await page.getByRole("navigation", { name: "Menü" }).getByRole("link", { name: "Einstellungen" }).click();
     await expect(page).toHaveURL(/\/einstellungen$/);
     // AK-1012: Voreinstellung E-Mail + App.
-    await expect(page.getByRole("checkbox", { name: /E-Mail/ })).toBeChecked();
-    await expect(page.getByRole("checkbox", { name: /Teams/ })).not.toBeChecked();
-    await expect(page.getByRole("checkbox", { name: /App/ })).toBeChecked();
+    await expect(page.getByRole("switch", { name: /E-Mail/ })).toBeChecked();
+    await expect(page.getByRole("switch", { name: /Teams/ })).not.toBeChecked();
+    await expect(page.getByRole("switch", { name: /App/ })).toBeChecked();
 
     // Alle abwählen: Hinweis, dass dann auch keine Erinnerungen kommen.
-    await page.getByRole("checkbox", { name: /E-Mail/ }).uncheck();
-    await page.getByRole("checkbox", { name: /App/ }).uncheck();
+    await page.getByRole("switch", { name: /E-Mail/ }).uncheck();
+    await page.getByRole("switch", { name: /App/ }).uncheck();
     await expect(page.getByTestId("no-channel-warning")).toContainText("auch keine Erinnerungen");
     await page.getByRole("button", { name: "Kanäle speichern" }).click();
     await expect(page.getByRole("status")).toHaveText(
@@ -172,7 +185,7 @@ test.describe("Benachrichtigungen", () => {
     await expect(page.getByTestId("no-channel-warning")).toBeVisible();
 
     // Nur Teams.
-    await page.getByRole("checkbox", { name: /Teams/ }).check();
+    await page.getByRole("switch", { name: /Teams/ }).check();
     await expect(page.getByTestId("no-channel-warning")).toHaveCount(0);
     await page.getByRole("button", { name: "Kanäle speichern" }).click();
     await expect(page.getByRole("status")).toBeVisible();
@@ -184,9 +197,9 @@ test.describe("Benachrichtigungen", () => {
   test("AK-1011 Ausbilder stellen ihre Kanäle bei den Einstellungen ein", async ({ page }) => {
     await login(page, accounts.clara);
     await page.getByRole("navigation", { name: "Hauptmenü" }).getByRole("link", { name: "Einstellungen" }).click();
-    await expect(page.getByRole("heading", { name: "Meine Benachrichtigungen" })).toBeVisible();
-    await page.getByRole("checkbox", { name: /Teams/ }).check();
-    await page.getByRole("checkbox", { name: /E-Mail/ }).uncheck();
+    await expect(page.getByRole("heading", { name: "Benachrichtigungen", exact: true })).toBeVisible();
+    await page.getByRole("switch", { name: /Teams/ }).check();
+    await page.getByRole("switch", { name: /E-Mail/ }).uncheck();
     await page.getByRole("button", { name: "Kanäle speichern" }).click();
     await expect(page.getByText("Gespeichert. Die Kanäle gelten ab der nächsten Benachrichtigung.")).toBeVisible();
     expect(await queryOne("SELECT channels FROM person WHERE email = $1", [accounts.clara.email])).toEqual({
@@ -211,14 +224,13 @@ test.describe("Benachrichtigungen", () => {
 
     const clara = await newSession(browser, accounts.clara);
     await clara.page.goto(`/berichte/${reportId}`);
-    await clara.page.getByLabel("Begründung für die Rücknahme").fill("Mittwoch falsches Datum");
-    await confirmAction(clara.page, "Freigabe zurücknehmen", "Freigabe zurücknehmen?");
+    await revokeApproval(clara.page, "Mittwoch falsches Datum");
     await expect(clara.page.getByTestId("report-status")).toHaveText("Status: Abgelehnt");
 
     // Und Emil erhält eine Benachrichtigung über seine gewählten Kanäle – in der App …
     await trainee.page.goto("/azubi");
     await expect(trainee.page.getByTestId("notification-count")).toHaveText("2");
-    await bell(trainee.page).click();
+    await openNotificationList(trainee.page);
     await expect(trainee.page.getByTestId("notification").first().getByRole("heading")).toHaveText(
       "Freigabe zurückgenommen: Emil Neu, KW 40/2026",
     );

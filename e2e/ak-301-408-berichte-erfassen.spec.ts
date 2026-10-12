@@ -8,6 +8,7 @@ import {
   downloadPdf,
   insertTrainee,
   login,
+  logout,
   reportIdOf,
   restoreSeedState,
   withDatabase,
@@ -35,7 +36,7 @@ function day(page: Page, label: string) {
 }
 
 async function openWeek39(page: Page) {
-  await page.goto("/azubi");
+  await page.goto("/azubi/wochen");
   await page
     .getByRole("list", { name: "Wochenberichte" })
     .getByRole("link", { name: /KW 39\/2026/ })
@@ -62,6 +63,7 @@ test.describe("Berichte erfassen", () => {
     const current = currentIsoWeek(now());
     await login(page, accounts.anna);
     await expect(page).toHaveURL(/\/azubi$/);
+    await page.goto("/azubi/wochen");
 
     const rows = page.getByRole("list", { name: "Wochenberichte" }).getByTestId("week-row");
     await expect(rows).toHaveCount(expected.length);
@@ -78,7 +80,7 @@ test.describe("Berichte erfassen", () => {
     await expect(rows.first()).toContainText("aktuelle Woche");
     await expect(rows.first()).not.toHaveAttribute("data-past-open", "true");
     await expect(page.locator('[data-testid="week-row"][data-past-open="true"]')).toHaveCount(expected.length - 1);
-    await expect(rows.last().getByText("noch offen")).toBeVisible();
+    await expect(rows.last().getByText("Überfällig")).toBeVisible();
     await expect(page.getByRole("status")).toHaveText(`${expected.length - 1} vergangene Wochen sind noch offen.`);
 
     // Erneutes Öffnen erzeugt nichts doppelt (AK-304).
@@ -128,6 +130,7 @@ test.describe("Berichte erfassen", () => {
       trainingStart: "2026-01-01",
     });
     await login(page, accounts.emil);
+    await page.goto("/azubi/wochen");
     await page
       .getByRole("list", { name: "Wochenberichte" })
       .getByRole("link", { name: /KW 1\/2026/ })
@@ -150,7 +153,7 @@ test.describe("Berichte erfassen", () => {
     await newYear.getByLabel("Tagesart").selectOption({ label: "Berufsschule" });
     await newYear.getByLabel("Tätigkeiten").fill("Blockunterricht Lernfeld 1");
     await page.getByRole("button", { name: "Speichern" }).click();
-    await expect(page.getByTestId("save-status")).toHaveText("Gespeichert.");
+    await expect(page.getByTestId("save-status")).toHaveText("Gespeichert");
     await page.reload();
     await expect(day(page, "Donnerstag, 01.01.2026").getByLabel("Tagesart")).toHaveValue("SCHOOL");
   });
@@ -172,10 +175,10 @@ test.describe("Berichte erfassen", () => {
     await tuesday.getByLabel("Tätigkeiten").fill(long);
     await expect(page.getByTestId("save-status")).toHaveText("Ungespeicherte Änderungen");
     await page.getByRole("button", { name: "Speichern" }).click();
-    await expect(page.getByTestId("save-status")).toHaveText("Gespeichert.");
+    await expect(page.getByTestId("save-status")).toHaveText("Gespeichert");
 
     // Abmelden und neu anmelden.
-    await page.getByRole("button", { name: "Abmelden" }).click();
+    await logout(page);
     await expect(page).toHaveURL(/\/anmelden/);
     await login(page, accounts.anna);
     await openWeek39(page);
@@ -183,7 +186,7 @@ test.describe("Berichte erfassen", () => {
     await expect(day(page, "Montag, 21.09.2026").getByLabel("Tätigkeiten")).toHaveValue(text);
     await expect(day(page, "Dienstag, 22.09.2026").getByLabel("Tagesart")).toHaveValue("SCHOOL");
     await expect(day(page, "Dienstag, 22.09.2026").getByLabel("Tätigkeiten")).toHaveValue(long);
-    await expect(page.getByTestId("save-status")).toHaveText("Alle Änderungen gespeichert.");
+    await expect(page.getByTestId("save-status")).toHaveText("Gespeichert");
 
     // Gespeichert wird exakt der Text (Zeilenumbrüche als „\n“).
     const stored = await withDatabase(
@@ -223,7 +226,7 @@ test.describe("Berichte erfassen", () => {
       dialogs.push(dialog.message());
       await dialog.dismiss();
     });
-    await page.getByRole("link", { name: "Zur Übersicht" }).click();
+    await page.getByRole("link", { name: "Zurück zu Meine Wochen" }).click();
     await expect.poll(() => dialogs.length).toBe(1);
     expect(dialogs[0]).toContain("ungespeicherte Änderungen");
     await expect(page).toHaveURL(/\/berichte\//);
@@ -231,7 +234,7 @@ test.describe("Berichte erfassen", () => {
 
     // Auch „Abmelden“ fragt nach.
     page.once("dialog", (dialog) => dialog.dismiss());
-    await page.getByRole("button", { name: "Abmelden" }).click();
+    await logout(page);
     await expect(page).toHaveURL(/\/berichte\//);
 
     // Schließen oder Neuladen: Browser-Dialog „beforeunload“.
@@ -250,15 +253,15 @@ test.describe("Berichte erfassen", () => {
     await openWeek39(page);
     await day(page, "Montag, 21.09.2026").getByLabel("Tätigkeiten").fill("gespeichert");
     await page.getByRole("button", { name: "Speichern" }).click();
-    await expect(page.getByTestId("save-status")).toHaveText("Gespeichert.");
+    await expect(page.getByTestId("save-status")).toHaveText("Gespeichert");
 
     let dialogShown = false;
     page.on("dialog", async (dialog) => {
       dialogShown = true;
       await dialog.dismiss();
     });
-    await page.getByRole("link", { name: "Zur Übersicht" }).click();
-    await expect(page).toHaveURL(/\/azubi$/);
+    await page.getByRole("link", { name: "Zurück zu Meine Wochen" }).click();
+    await expect(page).toHaveURL(/\/azubi\/wochen$/);
     expect(dialogShown).toBe(false);
   });
 
@@ -329,7 +332,7 @@ test.describe("Berichte erfassen", () => {
     // Erneut zurück und bestätigen: zur Übersicht, die Änderung ist verworfen.
     page.once("dialog", (dialog) => dialog.accept());
     await page.evaluate(() => window.history.back());
-    await expect(page).toHaveURL(/\/azubi$/);
+    await expect(page).toHaveURL(/\/azubi\/wochen$/);
 
     // Vor: wieder im Bericht, ohne die verworfene Änderung.
     await page.evaluate(() => window.history.forward());
@@ -354,7 +357,7 @@ test.describe("Berichte erfassen", () => {
     await openWeek39(page);
     await day(page, "Montag, 21.09.2026").getByLabel("Tätigkeiten").fill("gespeichert");
     await page.getByRole("button", { name: "Speichern" }).click();
-    await expect(page.getByTestId("save-status")).toHaveText("Gespeichert.");
+    await expect(page.getByTestId("save-status")).toHaveText("Gespeichert");
 
     let dialogShown = false;
     page.on("dialog", async (dialog) => {
@@ -362,7 +365,7 @@ test.describe("Berichte erfassen", () => {
       await dialog.dismiss();
     });
     await page.evaluate(() => window.history.back());
-    await expect(page).toHaveURL(/\/azubi$/);
+    await expect(page).toHaveURL(/\/azubi\/wochen$/);
     expect(dialogShown).toBe(false);
   });
 

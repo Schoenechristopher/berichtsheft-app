@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AuthCard } from "@/components/AuthCard";
+import { Button } from "@/components/ui";
 import { NO_ACCESS_MESSAGE } from "@/domain/access";
 import { switchAccount } from "@/lib/auth/logout";
 
@@ -9,16 +10,13 @@ export const metadata: Metadata = { title: "Kein Zugang" };
 export default function NoAccessPage() {
   return (
     <AuthCard title={NO_ACCESS_MESSAGE}>
-      <p className="text-sm text-slate-600">
+      <p className="text-fg-muted">
         Ihr Firmenkonto ist für das Berichtsheft nicht freigeschaltet oder wurde deaktiviert.
       </p>
       <form action={switchAccount}>
-        <button
-          type="submit"
-          className="w-full rounded-md border border-slate-300 bg-white px-4 py-2.5 font-medium text-slate-800 hover:bg-slate-50"
-        >
+        <Button type="submit" variant="secondary" className="w-full">
           Mit anderem Konto anmelden
-        </button>
+        </Button>
       </form>
     </AuthCard>
   );

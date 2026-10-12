@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import { FEDERAL_STATES } from "@/domain/federal-states";
-import { Field, inputClass, primaryButtonClass } from "@/components/ui";
+import { Button } from "@/components/ui/button";
+import { Field, inputClass } from "@/components/ui/field";
 import type { FormState } from "../personen/actions";
 
 /** Bundesland der Firma (AK-209). */
@@ -24,7 +25,7 @@ export function SettingsForm({
           defaultValue={federalState}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? "federalState-error federalState-hint" : "federalState-hint"}
-          className={inputClass}
+          className={`${inputClass} md:max-w-sm`}
         >
           {Object.entries(FEDERAL_STATES).map(([code, name]) => (
             <option key={code} value={code}>
@@ -33,9 +34,15 @@ export function SettingsForm({
           ))}
         </select>
       </Field>
-      <button type="submit" disabled={pending} className={`${primaryButtonClass} w-full sm:w-auto`}>
+      <Button
+        type="submit"
+        variant="primary"
+        pending={pending}
+        pendingLabel="Wird gespeichert …"
+        className="w-full sm:w-auto"
+      >
         Speichern
-      </button>
+      </Button>
     </form>
   );
 }

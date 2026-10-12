@@ -11,6 +11,7 @@ import {
   queryOne,
   reportIdOf,
   reseedAnna,
+  revokeApproval,
   runReminderJob,
   searchMail,
   withDatabase,
@@ -178,11 +179,10 @@ test.describe("Beispielszenarien", () => {
 
     // Dann wird der Bericht nicht eingereicht
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expect(
-      page
-        .getByRole("alert")
-        .filter({ hasText: "Nicht eingereicht – bitte ergänzen: Freitag, 25.12.2026: Tätigkeiten fehlen." }),
-    ).toBeVisible();
+    // Fehlerleiste oben mit dem betroffenen Tag und Sprunglink (UI-AK-08).
+    const issues = page.getByRole("alert").filter({ hasText: "1 Tag ist unvollständig: Fr" });
+    await expect(issues).toBeVisible();
+    await expect(issues.getByRole("link", { name: "Freitag, 25.12.2026: Tätigkeiten fehlen" })).toBeVisible();
     await expect(page.getByTestId("report-status")).toHaveText("Status: Entwurf");
     expect(await queryOne("SELECT status FROM weekly_report WHERE id = $1", [reportId])).toEqual({ status: "DRAFT" });
     // Und Freitag ist als "Tätigkeiten fehlen" markiert
@@ -213,15 +213,20 @@ test.describe("Beispielszenarien", () => {
       const berndSession = await newSession(browser, bernd);
       await berndSession.page.goto("/ausbilder/pruefliste");
       await berndSession.page.getByTestId("review-row").filter({ hasText: "Anna Azubi" }).getByRole("link").click();
+      // Geteilte Prüfansicht: nach der Freigabe Toast und der nächste Bericht (hier keiner mehr, UI-AK-11).
       await confirmAction(berndSession.page, "Freigeben", "Bericht freigeben?");
+      await expect(berndSession.page.getByRole("status").filter({ hasText: "Bericht freigegeben" })).toBeVisible();
+      // Erst den Sprung zum nächsten Bericht abwarten (hier: leere Liste), sonst bricht goto ihn ab.
+      await expect(berndSession.page).toHaveURL(/\/ausbilder\/pruefliste$/);
+      await expect(berndSession.page.getByTestId("review-queue-empty")).toBeVisible();
+      await berndSession.page.goto(`/berichte/${reportId}`);
       await expect(berndSession.page.getByTestId("report-status")).toHaveText("Status: Freigegeben");
       await expect(berndSession.page.getByTestId("approval-note")).toContainText("Freigegeben von Bernd Ausbilder");
 
       // Wenn Ausbilderin "Clara" (nicht zugeordnet) die Freigabe mit Begründung "Mittwoch falsches Datum" zurücknimmt
       const claraSession = await newSession(browser, accounts.clara);
       await claraSession.page.goto(`/berichte/${reportId}`);
-      await claraSession.page.getByLabel("Begründung für die Rücknahme").fill("Mittwoch falsches Datum");
-      await confirmAction(claraSession.page, "Freigabe zurücknehmen", "Freigabe zurücknehmen?");
+      await revokeApproval(claraSession.page, "Mittwoch falsches Datum");
 
       // Dann hat der Bericht den Status "Abgelehnt"
       await expect(claraSession.page.getByTestId("report-status")).toHaveText("Status: Abgelehnt");

@@ -49,6 +49,7 @@ next-env.d.ts
 # Playwright
 /test-results/
 /playwright-report/
+/screenshots/
 /blob-report/
 /playwright/.cache/
 

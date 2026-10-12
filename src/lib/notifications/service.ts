@@ -181,6 +181,20 @@ export async function countUnread(prisma: PrismaClient, personId: string): Promi
 }
 
 /**
+ * Vorschau der Glocke (UI-Spezifikation „Glocke“): die letzten App-Benachrichtigungen, neueste
+ * zuerst. Markiert nichts als gelesen – das tut erst die Liste (AK-1015).
+ */
+export async function previewNotifications(prisma: PrismaClient, personId: string, take = 5) {
+  const notifications = await prisma.notification.findMany({
+    where: { recipientId: personId, channel: "APP" },
+    orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+    take,
+    select: { id: true, subject: true, link: true, createdAt: true, readAt: true },
+  });
+  return notifications.map(({ readAt, ...item }) => ({ ...item, unread: readAt === null }));
+}
+
+/**
  * Eigene App-Benachrichtigungen, neueste zuerst (AK-1015). Das Öffnen der Liste markiert alle
  * ungelesenen als gelesen; `unread` sagt, welche der angezeigten bis eben ungelesen waren.
  */

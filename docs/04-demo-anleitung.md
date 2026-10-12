@@ -40,50 +40,53 @@ Nur Testdaten, keine echten Personen. Benutzername und Passwort sind jeweils gle
 | `dora` | `dora` | Firmenkonto ohne Eintrag in der App → „Kein Zugang – bitte an den Ausbilder wenden“ |
 | `emil` | `emil` | Firmenkonto, das erst in der Vorführung angelegt wird |
 
-Abmelden: Schaltfläche „Abmelden“ oben rechts. Um die Person zu wechseln, abmelden und mit dem anderen Konto anmelden – oder das zweite (private) Fenster nutzen.
+Abmelden: oben rechts auf den eigenen Namen (Kontomenü) und „Abmelden“. Um die Person zu wechseln, abmelden und mit dem anderen Konto anmelden – oder das zweite (private) Fenster nutzen.
 
 ## 5. Drehbuch (ca. 15 Minuten)
 
 Annas Woche **KW 40/2026** (28.09.–02.10.2026) ist im Anfangszustand teilweise ausgefüllt (Montag bis Mittwoch) und eignet sich für den ganzen Ablauf.
 
+Zur Orientierung: Links steht ab einer Fensterbreite von 1024 px die **Seitenleiste** mit den Menüpunkten (Azubi: Start, Meine Wochen, Benachrichtigungen, Einstellungen; Ausbilder: Start, Prüfliste, Azubis, Personen, Benachrichtigungen, Einstellungen), darunter der Punkt „Teams-Postfach (Demo)“. In schmaleren Fenstern öffnet der **Burger-Knopf** (☰) oben links dieselbe Navigation. Oben rechts stehen die **Glocke** und das **Kontomenü** mit Name, Rolle, „Einstellungen“ und „Abmelden“.
+
 ### 5.1 Anna erfasst und reicht ein (3 Minuten)
 
-1. Fenster 1: als `anna` anmelden. Die Übersicht „Meine Wochenberichte“ zeigt alle Wochen seit Ausbildungsbeginn; vergangene offene Wochen sind gelb hervorgehoben.
-2. **KW 40/2026** öffnen. Jeder Tag hat eine Tagesart (Betrieb, Berufsschule, Urlaub, Krank, Feiertag) und das Feld „Tätigkeiten“.
-3. Donnerstag: Tagesart „Betrieb“, Tätigkeiten z. B. „Arbeitsplätze vorbereitet“. Freitag: Tagesart leer lassen. Auf **„Einreichen“** klicken: Der Bericht wird **nicht** eingereicht, Freitag ist rot als „Tagesart fehlt“ markiert (Pflichtfelder werden geprüft).
-4. Freitag: Tagesart „Urlaub“ (kein Text nötig). **„Speichern“**, dann **„Einreichen“** und im Dialog bestätigen. Status: „Eingereicht“, der Bericht ist jetzt schreibgeschützt.
+1. Fenster 1: als `anna` anmelden. Die **Startseite** begrüßt mit „Hallo Anna“ und zeigt oben die aktuelle Woche als große Karte (Status, Tagesmarken Mo–Fr, „x von 5 Tagen ausgefüllt“, Knopf „Weiter erfassen“). Darunter stehen unter **„Zu erledigen“** alle offenen Wochen vor der aktuellen – abgelehnte oben, sonst die älteste zuerst, überfällige mit „Überfällig“. Der Menüpunkt **„Meine Wochen“** zeigt die vollständige Liste mit Filter (Alle / Offen / Eingereicht / Freigegeben) und rechts oben „Berichtsheft als PDF herunterladen“.
+2. **KW 40/2026** öffnen (unter „Zu erledigen“ oder in „Meine Wochen“). Ab 1280 px stehen die fünf Tage nebeneinander, in schmaleren Fenstern untereinander. Jeder Tag hat eine Tagesart (Betrieb, Berufsschule, Urlaub, Krank, Feiertag) und das Feld „Tätigkeiten“.
+3. Donnerstag: Tagesart „Betrieb“, Tätigkeiten z. B. „Arbeitsplätze vorbereitet“. Die Fußleiste unten zeigt jetzt „Ungespeicherte Änderungen“. Freitag: Tagesart leer lassen. Auf **„Einreichen …“** klicken: Der Bericht wird **nicht** eingereicht. Oben erscheint eine Fehlerleiste „1 Tag ist unvollständig: Fr“ mit einem Sprunglink, Freitag ist rot als „Tagesart fehlt“ markiert (Pflichtfelder werden geprüft).
+4. Freitag: Tagesart „Urlaub“ (kein Text nötig). **„Speichern“** – die Fußleiste zeigt „Gespeichert“, unten erscheint kurz „Entwurf gespeichert“. Dann **„Einreichen …“** und im Dialog bestätigen (ungespeicherte Änderungen würden dabei mitgespeichert). Status: „Eingereicht“, der Bericht ist jetzt schreibgeschützt.
 
 Tipp: Beispielszenario „Einreichen scheitert an fehlendem Text“ – eine Woche mit Feiertag (z. B. KW 52 mit dem 25.12.) ist erst später in der Ausbildung vorhanden; dasselbe Verhalten zeigt Schritt 3.
 
 ### 5.2 Bernd lehnt mit Tageskommentar ab (2 Minuten)
 
-1. Fenster 2 (privat): als `bernd` anmelden. Die **Glocke** oben zeigt eine ungelesene Benachrichtigung („Bericht eingereicht“).
-2. Menü **„Prüfliste“** → Annas KW 40 öffnen.
-3. Beim Mittwoch in „Kommentar zu Mittwoch … (optional)“ z. B. „Welche Themen genau?“ eintragen. Ohne Gesamtkommentar auf **„Ablehnen“** klicken: Meldung am Feld „Bitte einen Gesamtkommentar eingeben“.
-4. Gesamtkommentar „Bitte die Berufsschule genauer beschreiben.“ eintragen, **„Ablehnen“** und bestätigen. Status: „Abgelehnt“.
+1. Fenster 2 (privat): als `bernd` anmelden. Die **Glocke** oben zeigt eine ungelesene Benachrichtigung („Bericht eingereicht“); ein Klick öffnet eine Vorschau der letzten fünf mit „Alle anzeigen“. Die Startseite zeigt die Kacheln „Zu prüfen (1)“ und „Azubis mit überfälligen Wochen“.
+2. Menü **„Prüfliste“**: Ab 1024 px ist die Ansicht geteilt – links die Liste, rechts der ausgewählte Bericht. Annas KW 40 anklicken (die Adresse enthält jetzt `?bericht=…`; mit den Pfeiltasten wechselt die Auswahl). In schmalen Fenstern öffnet der Eintrag die Berichtsseite mit „← Prüfliste“.
+3. Beim Mittwoch auf **„Kommentar zu diesem Tag“** klicken und z. B. „Welche Themen genau?“ eintragen.
+4. Unten in der Entscheidungsleiste **„Ablehnen …“**: Der Dialog nennt die Zahl der Tageskommentare und verlangt einen Gesamtkommentar. Ohne Text „Ablehnen“ klicken: Meldung am Feld „Bitte einen Gesamtkommentar eingeben“. Dann „Bitte die Berufsschule genauer beschreiben.“ eintragen und **„Ablehnen“**. Es erscheint „Bericht abgelehnt“, und die Prüfansicht springt zum nächsten Bericht – hier ist die Liste danach leer („Keine Berichte Ihrer Azubis zur Prüfung …“).
 
 ### 5.3 Anna überarbeitet, Bernd gibt frei, PDF (3 Minuten)
 
-1. Fenster 1 (Anna): Seite neu laden. Oben steht der Gesamtkommentar, beim Mittwoch der Tageskommentar; die Glocke zeigt die Ablehnung.
-2. Mittwoch ergänzen (z. B. „Lernfeld 2: Aufbau eines PCs, Mainboard und Speicher“), **„Erneut einreichen“** und bestätigen.
-3. Fenster 2 (Bernd): Prüfliste → Bericht öffnen → **„Freigeben“** und bestätigen. Angezeigt wird „Freigegeben von Bernd Ausbilder am …, … Uhr“.
-4. **„Als PDF herunterladen“**: Das PDF enthält Name, Kalenderwoche, alle Tage und den Freigabevermerk.
-5. Unten auf der Berichtsseite steht der **Verlauf** nach Prüfrunden: Einreichen, Ablehnung mit Kommentaren, erneutes Einreichen, Freigabe – jeweils mit Person und Zeitpunkt, nicht änderbar.
+1. Fenster 1 (Anna): Seite neu laden. Oben steht der Gesamtkommentar als Hinweisleiste, beim Mittwoch der Tageskommentar; die Glocke zeigt die Ablehnung. Auf der Startseite steht die Woche unter „Zu erledigen“ ganz oben mit „Abgelehnt“ und der ersten Zeile des Kommentars.
+2. Mittwoch ergänzen (z. B. „Lernfeld 2: Aufbau eines PCs, Mainboard und Speicher“), **„Erneut einreichen …“** und bestätigen.
+3. Fenster 2 (Bernd): Prüfliste → Annas KW 40 (Kennzeichen „Erneut eingereicht“) → **„Freigeben …“** und bestätigen. Danach zeigt die Prüfansicht den nächsten Bericht bzw. den Leerzustand.
+4. Menü **„Azubis“** → Anna Azubi → KW 40 öffnen: Angezeigt wird „Freigegeben von Bernd Ausbilder am …, … Uhr“. **„Als PDF herunterladen“**: Das PDF enthält Name, Kalenderwoche, alle Tage und den Freigabevermerk.
+5. Unten auf der Berichtsseite lässt sich der **Verlauf** aufklappen, nach Prüfrunden: Einreichen, Ablehnung mit Kommentaren, erneutes Einreichen, Freigabe – jeweils mit Person und Zeitpunkt, nicht änderbar.
 
 ### 5.4 Clara nimmt die Freigabe als Vertretung zurück (2 Minuten)
 
 Beispielszenario „Vertretung nimmt Freigabe zurück“.
 
 1. Fenster 2: Bernd abmelden, als `clara` anmelden. Clara ist Anna **nicht** zugeordnet und hat deshalb keine Benachrichtigung bekommen – prüfen darf sie trotzdem.
-2. Startseite → „Wochenberichte der Azubis“ → **Anna Azubi** → KW 40 öffnen.
-3. „Begründung für die Rücknahme“: „Mittwoch falsches Datum“, **„Freigabe zurücknehmen“** und bestätigen. Status: „Abgelehnt“; der Verlauf zeigt Bernds Freigabe und Claras Rücknahme mit Begründung.
+2. Menü **„Azubis“** (oder Startseite → „Wochenberichte der Azubis“) → **Anna Azubi** → KW 40 öffnen.
+3. **„Freigabe zurücknehmen …“**: Im Dialog die Begründung „Mittwoch falsches Datum“ eintragen und **„Freigabe zurücknehmen“**. Status: „Abgelehnt“; der Verlauf zeigt Bernds Freigabe und Claras Rücknahme mit Begründung.
 4. **„Als PDF herunterladen“**: Das neue PDF trägt keinen Freigabevermerk mehr, sondern „Nicht freigegeben – Status: Abgelehnt“.
 
 ### 5.5 Benachrichtigungen in Glocke und Mailpit (2 Minuten)
 
-1. Fenster 1 (Anna): Seite neu laden – die Glocke zählt die neuen Benachrichtigungen. Glocke öffnen: Freigabe und Rücknahme stehen als „Neu“ in der Liste; mit „Zum Bericht“ geht es direkt zur Woche. Kommentare und Begründungen stehen bewusst nur im Bericht, nicht in der Nachricht.
+1. Fenster 1 (Anna): Seite neu laden – die Glocke zählt die neuen Benachrichtigungen. Glocke öffnen (Vorschau) und **„Alle anzeigen“** bzw. Menüpunkt „Benachrichtigungen“: Freigabe und Rücknahme stehen als „Neu“ in der Liste, mit Zeitangabe wie „vor 5 Min.“; mit „Zum Bericht“ geht es direkt zur Woche. Erst das Öffnen der Liste markiert sie als gelesen. Kommentare und Begründungen stehen bewusst nur im Bericht, nicht in der Nachricht.
 2. <http://localhost:8025> (Mailpit) öffnen: Dieselben Nachrichten sind als E-Mail angekommen (an Bernd: „Bericht eingereicht“, an Anna: Ablehnung, Freigabe, Rücknahme). Die E-Mails gehen nicht nach außen.
-3. Optional: Anna wählt unter **„Einstellungen“** zusätzlich „Teams“. Neue Nachrichten erscheinen dann im **„Teams-Postfach (Demo)“** – in der Demo ist Teams nur simuliert. Wer alle Kanäle abwählt, sieht einen Hinweis, dass dann auch keine Erinnerungen kommen.
+3. Optional: Anna schaltet unter **„Einstellungen“** im Abschnitt „Benachrichtigungen“ zusätzlich den Schalter „Teams“ ein und speichert. Neue Nachrichten erscheinen dann im **„Teams-Postfach (Demo)“** – in der Demo ist Teams nur simuliert. Wer alle Kanäle abschaltet, sieht eine Warnleiste, dass dann auch keine Erinnerungen kommen.
+4. Optional: Im Abschnitt **„Darstellung“** zwischen „System“, „Hell“ und „Dunkel“ wählen – die Wahl gilt sofort, bleibt nach dem Abmelden erhalten und gilt auch im zweiten Fenster nach dem nächsten Laden.
 
 ### 5.6 Erinnerung am Montag um 9:00 Uhr (2 Minuten)
 
@@ -106,12 +109,12 @@ Ergebnis: Anna erhält **eine** Erinnerung, die alle ihre offenen Wochen nennt (
 1. Fenster 2: als `bernd` (oder `clara`) angemeldet, Menü **„Personen“** → **„Person anlegen“**.
 2. Name „Emil Neu“, Firmen-E-Mail `emil@berichtsheft.test`, Rolle „Azubi“. Ohne Ausbilder speichern: Die Meldung nennt das fehlende Feld. Dann „Zugeordneter Ausbilder“ Bernd und einen Ausbildungsbeginn (z. B. Montag der laufenden Woche) wählen und speichern. Emil ist „noch nie angemeldet“.
 3. Fenster 1: abmelden, als `emil` anmelden. Der erste Login ordnet das Firmenkonto über die E-Mail zu; Emil sieht seine Wochenberichte ab Ausbildungsbeginn.
-4. Fenster 2: Emil öffnen → **„Deaktivieren“**. Fenster 1: Emil abmelden und erneut anmelden → „Kein Zugang – bitte an den Ausbilder wenden“. (Dasselbe sieht `dora`, die gar nicht angelegt ist.) Mit „Wieder aktivieren“ hat Emil wieder Zugang.
-5. Unter **„Einstellungen“** stellt der Ausbilder das Bundesland der Firma ein; es bestimmt die vorbelegten Feiertage neuer Wochen.
+4. Fenster 2: Emil öffnen (Menü „Personen“) → **„Deaktivieren“**. Fenster 1: Emil abmelden und erneut anmelden → „Kein Zugang – bitte an den Ausbilder wenden“. (Dasselbe sieht `dora`, die gar nicht angelegt ist.) Mit „Wieder aktivieren“ hat Emil wieder Zugang.
+5. Unter **„Einstellungen“** (Abschnitt „Zustellung“, nur für Ausbilder) stellt der Ausbilder das Bundesland der Firma ein; es bestimmt die vorbelegten Feiertage neuer Wochen. Die frühere Adresse `/ausbilder/einstellungen` leitet hierher um.
 
 ### 5.8 Smartphone (optional, 1 Minute)
 
-Im Browser die Entwicklerwerkzeuge öffnen (`F12`) und die Geräteansicht wählen (z. B. 375 px Breite) oder die App im selben Netzwerk auf dem Smartphone aufrufen: Alle Funktionen sind ohne seitliches Scrollen bedienbar.
+Im Browser die Entwicklerwerkzeuge öffnen (`F12`) und die Geräteansicht wählen (z. B. 375 px Breite) oder die App im selben Netzwerk auf dem Smartphone aufrufen: Die Navigation steckt hinter dem Burger-Knopf (☰), die Tage stehen untereinander, die Prüfliste öffnet die Berichtsseite. Alle Funktionen sind ohne seitliches Scrollen bedienbar.
 
 ## 6. Bekannte Grenzen der Demo
 

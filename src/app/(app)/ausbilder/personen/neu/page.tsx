@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BackLink } from "@/components/ui";
+import { Card, PageHeader } from "@/components/ui";
 import { db } from "@/lib/db";
 import { requirePerson } from "@/lib/session";
 import { createPersonAction } from "../actions";
@@ -17,20 +17,21 @@ export default async function NewPersonPage() {
   });
 
   return (
-    <section className="space-y-4">
-      <BackLink href="/ausbilder/personen">Personen</BackLink>
-      <h1 className="text-2xl font-semibold">Person anlegen</h1>
-      <p className="text-sm text-slate-600">
-        Die Person meldet sich mit ihrem Firmenkonto an. Beim ersten Login wird sie über die bestätigte Firmen-E-Mail
-        zugeordnet; danach zählt nur noch das Konto, auch wenn sich die E-Mail später ändert.
-      </p>
-      <PersonForm
-        action={createPersonAction}
-        initial={{}}
-        trainers={trainers}
-        submitLabel="Person anlegen"
-        emailHint="Genau die E-Mail des Firmenkontos, z. B. vorname.nachname@firma.de"
+    <div className="mx-auto max-w-[1120px] space-y-6">
+      <PageHeader
+        back={{ href: "/ausbilder/personen", label: "Zurück zu Personen" }}
+        title="Person anlegen"
+        subtitle="Die Person meldet sich mit ihrem Firmenkonto an. Beim ersten Login wird sie über die bestätigte Firmen-E-Mail zugeordnet; danach zählt nur noch das Konto, auch wenn sich die E-Mail später ändert."
       />
-    </section>
+      <Card>
+        <PersonForm
+          action={createPersonAction}
+          initial={{}}
+          trainers={trainers}
+          submitLabel="Person anlegen"
+          emailHint="Genau die E-Mail des Firmenkontos, z. B. vorname.nachname@firma.de"
+        />
+      </Card>
+    </div>
   );
 }

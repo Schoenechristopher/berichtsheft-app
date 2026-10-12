@@ -59,7 +59,7 @@ jobs:
           retention-days: 14
 
   e2e:
-    name: Docker Compose + Playwright (Chromium, Firefox, Edge, 375 px)
+    name: Docker Compose + Playwright (Chromium, Firefox, Edge, 375 px, axe, Screenshots)
     needs: checks
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -96,8 +96,29 @@ jobs:
           # Edge ist auf den GitHub-Runnern meist vorinstalliert; sonst installiert Playwright es.
           command -v microsoft-edge-stable || npx playwright install --with-deps msedge
           microsoft-edge-stable --version
-      - name: Playwright gegen die laufende Demo (alle Projekte)
-        run: npx playwright test
+      - name: Playwright gegen die laufende Demo (Chromium, Firefox, Edge, 375 px)
+        run: npx playwright test --project=chromium --project=firefox --project=msedge --project=smartphone-375
+      # UI-AK-16: axe auf allen Seiten, hell und dunkel, 1280 und 375 px (Chromium). Normal ca. 4 Minuten (CI-17).
+      - name: Barrierefreiheit (axe)
+        if: ${{ !cancelled() }}
+        timeout-minutes: 10
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/a11y
+        run: npx playwright test --project=a11y
+      # Screenshots der vier Hauptseiten (Desktop/Handy, hell/dunkel). Normal unter 1 Minute (CI-17).
+      - name: Screenshots der Hauptseiten
+        if: ${{ !cancelled() }}
+        timeout-minutes: 3
+        env:
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/screenshots
+        run: npx playwright test --project=screenshots
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: screenshots
+          path: screenshots/
+          retention-days: 7
+          if-no-files-found: ignore
       - name: Container-Logs
         if: failure()
         run: docker compose logs --no-color

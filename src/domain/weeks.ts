@@ -96,3 +96,9 @@ const WEEKDAYS_LONG = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag"
 export function weekdayLong(date: Date): string {
   return WEEKDAYS_LONG[date.getUTCDay()];
 }
+
+/** Kurzer Zeitraum Mo–Fr für Kacheln, z. B. „05.10.–09.10.“. */
+export function weekRangeShort(isoYear: number, isoWeek: number): string {
+  const days = isoWeekWorkdays(isoYear, isoWeek);
+  return `${formatDate(days[0]).slice(0, 6)}–${formatDate(days[4]).slice(0, 6)}`;
+}

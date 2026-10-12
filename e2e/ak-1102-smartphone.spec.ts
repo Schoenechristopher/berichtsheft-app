@@ -6,11 +6,13 @@ import {
   downloadPdf,
   insertTrainee,
   login,
+  openMenu,
   personId,
   prepareWeek,
   queryOne,
   restoreSeedState,
   withDatabase,
+  writeDayComment,
   type DayContent,
 } from "./helpers";
 
@@ -87,7 +89,9 @@ test.describe("Smartphone-Breite 375 px", () => {
       ]),
     );
     await login(page, emil);
-    await expectNoHorizontalScroll(page, "Übersicht");
+    await expectNoHorizontalScroll(page, "Start");
+    await page.goto("/azubi/wochen");
+    await expectNoHorizontalScroll(page, "Meine Wochen");
     await page.getByTestId("week-row").filter({ hasText: "KW 40/2026" }).getByRole("link").click();
     await expect(page).toHaveURL(new RegExp(`/berichte/${reportId}$`));
     await expectNoHorizontalScroll(page, "Bericht");
@@ -100,7 +104,7 @@ test.describe("Smartphone-Breite 375 px", () => {
     const save = page.getByRole("button", { name: "Speichern" });
     await expect(save).toBeInViewport();
     await save.click();
-    await expect(page.getByTestId("save-status")).toHaveText("Gespeichert.");
+    await expect(page.getByTestId("save-status")).toHaveText("Gespeichert");
     expect(
       await queryOne("SELECT day_type FROM report_day WHERE report_id = $1 AND date = '2026-10-01'", [reportId]),
     ).toEqual({ day_type: "WORK" });
@@ -130,19 +134,26 @@ test.describe("Smartphone-Breite 375 px", () => {
 
     const bernd = await newSession(browser, accounts.bernd);
     await expectNoHorizontalScroll(bernd.page, "Start (Ausbilder)");
+    await openMenu(bernd.page);
     await bernd.page.getByRole("navigation", { name: "Hauptmenü" }).getByRole("link", { name: "Prüfliste" }).click();
     await expectNoHorizontalScroll(bernd.page, "Prüfliste");
     await bernd.page.getByTestId("review-row").filter({ hasText: "Emil Neu" }).getByRole("link").click();
     await expect(bernd.page).toHaveURL(new RegExp(`/berichte/${reportId}$`));
     await expectNoHorizontalScroll(bernd.page, "Bericht prüfen");
 
-    // Kommentieren: Tageskommentar und Gesamtkommentar, auch mit sehr langen Wörtern.
-    await bernd.page
-      .getByLabel("Kommentar zu Mittwoch, 30.09.2026 (optional)")
-      .fill(`Welche Themen genau? ${"Subnetzmaskenberechnung".repeat(5)}`);
-    await bernd.page.getByLabel("Gesamtkommentar (Pflicht beim Ablehnen)").fill("Bitte die Berufsschule genauer.");
+    // Kommentieren: Tageskommentar und Gesamtkommentar (im Dialog), auch mit sehr langen Wörtern.
+    await writeDayComment(
+      bernd.page,
+      "Mittwoch, 30.09.2026",
+      `Welche Themen genau? ${"Subnetzmaskenberechnung".repeat(5)}`,
+    );
     await expectNoHorizontalScroll(bernd.page, "Kommentare");
-    await confirmAction(bernd.page, "Ablehnen", "Bericht ablehnen?");
+    await bernd.page.getByRole("button", { name: "Ablehnen", exact: true }).click();
+    const rejectDialog = bernd.page.getByRole("dialog", { name: "Bericht ablehnen?" });
+    await expect(rejectDialog).toBeInViewport();
+    await rejectDialog.getByLabel("Gesamtkommentar (Pflicht beim Ablehnen)").fill("Bitte die Berufsschule genauer.");
+    await expectNoHorizontalScroll(bernd.page, "Dialog „Bericht ablehnen?“");
+    await rejectDialog.getByRole("button", { name: "Ablehnen", exact: true }).click();
     await expect(bernd.page.getByTestId("report-status")).toHaveText("Status: Abgelehnt");
 
     // Der Azubi sieht die Kommentare beim Tag, überarbeitet und reicht erneut ein.
@@ -160,8 +171,12 @@ test.describe("Smartphone-Breite 375 px", () => {
     await expect(bernd.page.getByTestId("report-status")).toHaveText("Status: Freigegeben");
     await expectNoHorizontalScroll(bernd.page, "freigegebener Bericht mit Historie");
 
-    await bernd.page.getByLabel("Begründung für die Rücknahme").fill("Mittwoch falsches Datum");
-    await confirmAction(bernd.page, "Freigabe zurücknehmen", "Freigabe zurücknehmen?");
+    await bernd.page.getByRole("button", { name: "Freigabe zurücknehmen", exact: true }).click();
+    const revokeDialog = bernd.page.getByRole("dialog", { name: "Freigabe zurücknehmen?" });
+    await expect(revokeDialog).toBeInViewport();
+    await revokeDialog.getByLabel("Begründung für die Rücknahme").fill("Mittwoch falsches Datum");
+    await expectNoHorizontalScroll(bernd.page, "Dialog „Freigabe zurücknehmen?“");
+    await revokeDialog.getByRole("button", { name: "Freigabe zurücknehmen", exact: true }).click();
     await expect(bernd.page.getByTestId("report-status")).toHaveText("Status: Abgelehnt");
     await expectNoHorizontalScroll(bernd.page, "zurückgenommene Freigabe");
     await trainee.context.close();
@@ -170,6 +185,7 @@ test.describe("Smartphone-Breite 375 px", () => {
 
   test("AK-1102 exportieren: Woche und Zeitraum als PDF", async ({ page }) => {
     await login(page, accounts.anna);
+    await page.goto("/azubi/wochen");
     const range = page.getByText("Berichtsheft als PDF herunterladen");
     await range.click();
     await expectNoHorizontalScroll(page, "Übersicht mit Zeitraum-Export");
@@ -185,9 +201,10 @@ test.describe("Smartphone-Breite 375 px", () => {
 
   test("AK-1102 Einstellungen: Kanäle (Azubi), Bundesland und Kanäle (Ausbilder)", async ({ browser }) => {
     const anna = await newSession(browser, accounts.anna);
+    await openMenu(anna.page);
     await anna.page.getByRole("navigation", { name: "Menü" }).getByRole("link", { name: "Einstellungen" }).click();
     await expectNoHorizontalScroll(anna.page, "Einstellungen (Azubi)");
-    await anna.page.getByRole("checkbox", { name: /Teams/ }).check();
+    await anna.page.getByRole("switch", { name: /Teams/ }).check();
     await anna.page.getByRole("button", { name: "Kanäle speichern" }).click();
     await expect(anna.page.getByRole("status")).toHaveText(
       "Gespeichert. Die Kanäle gelten ab der nächsten Benachrichtigung.",
@@ -197,6 +214,7 @@ test.describe("Smartphone-Breite 375 px", () => {
     });
 
     const clara = await newSession(browser, accounts.clara);
+    await openMenu(clara.page);
     await clara.page
       .getByRole("navigation", { name: "Hauptmenü" })
       .getByRole("link", { name: "Einstellungen" })
@@ -229,7 +247,9 @@ test.describe("Smartphone-Breite 375 px", () => {
       const anna = await newSession(browser, accounts.anna);
       for (const path of [
         "/azubi",
+        "/azubi/wochen",
         `/berichte/${await annasSeedReportId()}`,
+        "/einstellungen",
         "/benachrichtigungen",
         "/entwickler-postfach",
       ]) {
@@ -244,6 +264,7 @@ test.describe("Smartphone-Breite 375 px", () => {
       const annaId = await personId(accounts.anna.email);
       for (const path of [
         "/ausbilder",
+        "/ausbilder/azubis",
         `/ausbilder/azubis/${annaId}`,
         "/ausbilder/pruefliste",
         "/ausbilder/pruefliste?filter=alle",
@@ -263,6 +284,7 @@ test.describe("Smartphone-Breite 375 px", () => {
       await expect(bernd.page.getByLabel("Zugeordneter Ausbilder")).toHaveAttribute("aria-invalid", "true");
       await expectNoHorizontalScroll(bernd.page, "Person anlegen mit Fehlermeldungen");
 
+      await openMenu(bernd.page);
       const nav = bernd.page.getByRole("navigation", { name: "Hauptmenü" });
       await nav.getByTestId("undeliverable-count").click();
       await expect(bernd.page.getByTestId("undeliverable")).toHaveCount(1);

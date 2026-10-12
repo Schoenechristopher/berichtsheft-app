@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { FIELD_LABELS, type PersonField, type PersonInput } from "@/domain/people";
-import { Field, Notice, inputClass, primaryButtonClass } from "@/components/ui";
+import { Button, Field, Notice, inputClass } from "@/components/ui";
 import type { FormState } from "./actions";
 
 export interface TrainerOption {
@@ -76,42 +76,49 @@ function PersonFormFields({
   });
 
   return (
-    <form action={formAction} className="space-y-4" noValidate>
+    <form action={formAction} className="max-w-3xl space-y-5" noValidate>
       {formError ? <Notice tone="error">{formError}</Notice> : null}
       {Object.keys(errors).length > 0 ? <Notice tone="error">Bitte die markierten Felder prüfen.</Notice> : null}
 
-      <Field id="name" label={FIELD_LABELS.name} error={errors.name}>
-        <input
-          {...a11y("name")}
-          type="text"
-          autoComplete="off"
-          defaultValue={values.name ?? ""}
-          className={inputClass}
-        />
-      </Field>
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <Field id="name" label={FIELD_LABELS.name} error={errors.name}>
+          <input
+            {...a11y("name")}
+            type="text"
+            autoComplete="off"
+            defaultValue={values.name ?? ""}
+            className={inputClass}
+          />
+        </Field>
 
-      <Field id="email" label={FIELD_LABELS.email} error={errors.email} hint={emailHint}>
-        <input
-          {...a11y("email", !!emailHint)}
-          type="email"
-          autoComplete="off"
-          inputMode="email"
-          defaultValue={values.email ?? ""}
-          className={inputClass}
-        />
-      </Field>
+        <Field id="email" label={FIELD_LABELS.email} error={errors.email} hint={emailHint}>
+          <input
+            {...a11y("email", !!emailHint)}
+            type="email"
+            autoComplete="off"
+            inputMode="email"
+            defaultValue={values.email ?? ""}
+            className={inputClass}
+          />
+        </Field>
 
-      <Field id="role" label={FIELD_LABELS.role} error={errors.role}>
-        <select {...a11y("role")} value={role} onChange={(event) => setRole(event.target.value)} className={inputClass}>
-          <option value="">Bitte wählen</option>
-          <option value="TRAINEE">Azubi</option>
-          <option value="TRAINER">Ausbilder</option>
-        </select>
-      </Field>
+        <Field id="role" label={FIELD_LABELS.role} error={errors.role}>
+          <select
+            {...a11y("role")}
+            value={role}
+            onChange={(event) => setRole(event.target.value)}
+            className={inputClass}
+          >
+            <option value="">Bitte wählen</option>
+            <option value="TRAINEE">Azubi</option>
+            <option value="TRAINER">Ausbilder</option>
+          </select>
+        </Field>
+      </div>
 
       {role === "TRAINEE" ? (
-        <fieldset className="space-y-4 rounded-lg border border-slate-200 p-3">
-          <legend className="px-1 text-sm font-medium text-slate-700">Ausbildung</legend>
+        <fieldset className="rounded-card border-border grid grid-cols-1 gap-5 border p-4 md:grid-cols-2">
+          <legend className="px-1 text-sm font-medium">Ausbildung</legend>
           <Field id="trainerId" label={FIELD_LABELS.trainerId} error={errors.trainerId}>
             <select {...a11y("trainerId")} defaultValue={values.trainerId ?? ""} className={inputClass}>
               <option value="">Bitte wählen</option>
@@ -142,9 +149,15 @@ function PersonFormFields({
         </fieldset>
       ) : null}
 
-      <button type="submit" disabled={pending} className={`${primaryButtonClass} w-full sm:w-auto`}>
-        {pending ? "Wird gespeichert …" : submitLabel}
-      </button>
+      <Button
+        type="submit"
+        variant="primary"
+        pending={pending}
+        pendingLabel="Wird gespeichert …"
+        className="w-full sm:w-auto"
+      >
+        {submitLabel}
+      </Button>
     </form>
   );
 }

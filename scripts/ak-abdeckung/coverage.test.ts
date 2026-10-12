@@ -5,6 +5,7 @@ import {
   parseCriteria,
   parseTestNames,
   parseTests,
+  parseUiCriteria,
   renderMarkdown,
   shortText,
   unknownIds,
@@ -100,5 +101,46 @@ describe("Nachweis der Testabdeckung (npm run ak:abdeckung)", () => {
       "| AK-101 | Anmeldung nur über das Firmenkonto; ein eigenes Passwort gibt es nicht. | `src/a.test.ts`: AK-101 Logik<br>`e2e/a.spec.ts`: Szenario (AK-101 AK-1010) | Unit, Browser |",
     );
     expect(markdown).toContain("| AK-1102 | Bei 375 px Breite ohne horizontales Scrollen. | **kein Test** | – |");
+  });
+
+  it("liest UI-AK-IDs aus der Tabelle der UI-Spezifikation (eigener Abschnitt, Ebene laut Spezifikation)", () => {
+    const uiSpec = `
+| ID | Kriterium | Ebene |
+| --- | --- | --- |
+| UI-AK-01 | Ab 1024 px ist die Seitenleiste sichtbar, darunter nicht. | Browser |
+| UI-AK-14 | Die Darstellung lässt sich auf System, Hell und Dunkel stellen; \`data-theme\` am html. | Browser + DB |
+Fließtext mit UI-AK-99 zählt nicht.
+| AK-101 | gehört nicht zur UI-Spezifikation |
+`;
+    const uiCriteria = parseUiCriteria(uiSpec);
+    expect(uiCriteria).toEqual([
+      { id: "UI-AK-01", text: "Ab 1024 px ist die Seitenleiste sichtbar, darunter nicht.", level: "Browser" },
+      {
+        id: "UI-AK-14",
+        text: "Die Darstellung lässt sich auf System, Hell und Dunkel stellen; `data-theme` am html.",
+        level: "Browser + DB",
+      },
+    ]);
+    // AK-IDs und UI-AK-IDs werden getrennt gezählt: „UI-AK-14“ ist kein Treffer für eine AK-ID.
+    const criteria = parseCriteria(spec);
+    expect(criteria.map((criterion) => criterion.id)).toEqual(["AK-101", "AK-1102"]);
+    const tests = [
+      { file: "e2e/ui.spec.ts", name: "UI-AK-01 Seitenleiste", level: "Browser" as const },
+      { file: "tests/db/theme.test.ts", name: "UI-AK-14 Darstellung am Konto", level: "DB" as const },
+      { file: "e2e/ui.spec.ts", name: "UI-AK-14 UI-AK-21 Darstellung im Browser", level: "Browser" as const },
+    ];
+    const uiRows = buildCoverage(uiCriteria, tests);
+    expect(uiRows.map((row) => [row.id, row.tests.length])).toEqual([
+      ["UI-AK-01", 1],
+      ["UI-AK-14", 2],
+    ]);
+    expect(buildCoverage(criteria, tests).every((row) => row.tests.length === 0)).toBe(true);
+    expect(unknownIds([...criteria, ...uiCriteria], tests)).toEqual(["UI-AK-21"]);
+    const markdown = renderMarkdown(buildCoverage(criteria, tests), uiRows);
+    expect(markdown).toContain("## UI-Akzeptanzkriterien");
+    expect(markdown).toContain("Abgedeckt: 2 von 2 UI-Akzeptanzkriterien.");
+    expect(markdown).toContain(
+      "| UI-AK-14 | Die Darstellung lässt sich auf System, Hell und Dunkel stellen; `data-theme` am html. | `tests/db/theme.test.ts`: UI-AK-14 Darstellung am Konto<br>`e2e/ui.spec.ts`: UI-AK-14 UI-AK-21 Darstellung im Browser | Browser + DB | DB, Browser |",
+    );
   });
 });

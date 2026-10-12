@@ -10,6 +10,7 @@ import {
   toDateInput,
   weekLabel,
   weekRangeLabel,
+  weekRangeShort,
   weekdayLong,
   weekdayShort,
 } from "./weeks";
@@ -51,5 +52,12 @@ describe("Woche eines Datums", () => {
     expect(toDateInput(calendarDateIn(new Date("2026-10-04T21:59:00Z"), "Europe/Berlin"))).toBe("2026-10-04");
     // Winterzeit: UTC+1.
     expect(toDateInput(calendarDateIn(new Date("2026-12-31T23:00:00Z"), "Europe/Berlin"))).toBe("2027-01-01");
+  });
+});
+
+describe("weekRangeShort", () => {
+  it("kurzer Zeitraum für Kacheln", () => {
+    expect(weekRangeShort(2026, 41)).toBe("05.10.–09.10.");
+    expect(weekRangeShort(2026, 1)).toBe("29.12.–02.01.");
   });
 });

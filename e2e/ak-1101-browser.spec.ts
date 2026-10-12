@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { accounts, annasSeedReportId, login } from "./helpers";
+import { accounts, annasSeedReportId, login, logout } from "./helpers";
 
 /**
  * Browser-Matrix (AK-1101): Alle Tests laufen in den Projekten „chromium“, „firefox“ und „msedge“
@@ -26,8 +26,8 @@ test("AK-1101 die App läuft im Browser des Projekts: anmelden, Bericht öffnen,
 
   await login(page, accounts.anna);
   await expect(page).toHaveURL(/\/azubi$/);
-  await expect(page.getByRole("heading", { name: "Meine Wochenberichte" })).toBeVisible();
-  await expect(page).toHaveTitle("Meine Wochenberichte · Berichtsheft");
+  await expect(page.getByRole("heading", { name: "Hallo Anna" })).toBeVisible();
+  await expect(page).toHaveTitle("Start – Berichtsheft");
 
   await page.goto(`/berichte/${await annasSeedReportId()}`);
   await expect(page.getByRole("heading", { name: /KW 40\/2026/ })).toBeVisible();
@@ -36,7 +36,7 @@ test("AK-1101 die App läuft im Browser des Projekts: anmelden, Bericht öffnen,
   await page.getByRole("link", { name: /^Benachrichtigungen/ }).click();
   await expect(page.getByRole("heading", { name: "Benachrichtigungen" })).toBeVisible();
 
-  await page.getByRole("button", { name: "Abmelden" }).click();
+  await logout(page);
   await page.waitForURL(/\/anmelden/);
   await page.goto("/azubi");
   await expect(page).toHaveURL(/\/anmelden/);

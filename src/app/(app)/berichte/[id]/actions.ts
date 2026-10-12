@@ -23,12 +23,15 @@ export type SaveState = {
   submissionIssues?: SubmissionIssue[];
   /** Zuletzt erfolgreich gespeicherte Werte je Tag (Grundlage für „ungespeicherte Änderungen“). */
   saved?: SavedValues;
+  /** Eingereicht (nicht nur gespeichert). */
+  submitted?: boolean;
 } | null;
 
 /** Zustand der Formulare für Zurückziehen, Freigeben, Ablehnen und Rücknahme. */
 export type TransitionState = {
   attempt: number;
   ok: boolean;
+  action?: ReportAction;
   formError?: string;
   fieldErrors?: Extract<TransitionResult, { ok: false }>["fieldErrors"];
 } | null;
@@ -62,7 +65,7 @@ export async function saveReportAction(reportId: string, prev: SaveState, formDa
       revalidateReport(reportId);
     }
     if (result.ok) {
-      return { attempt, ok: true, saved };
+      return { attempt, ok: true, saved, submitted: true };
     }
     return {
       attempt,
@@ -79,6 +82,7 @@ export async function saveReportAction(reportId: string, prev: SaveState, formDa
     return { attempt, ok: false, formError: result.formError, dayErrors: result.dayErrors, saved: prev?.saved };
   }
   revalidatePath("/azubi");
+  revalidatePath("/azubi/wochen");
   revalidatePath(`/berichte/${reportId}`);
   return {
     attempt,
@@ -122,7 +126,7 @@ export async function transitionAction(
     revalidateReport(reportId);
   }
   return result.ok
-    ? { attempt, ok: true }
+    ? { attempt, ok: true, action: action as ReportAction }
     : { attempt, ok: false, formError: result.formError, fieldErrors: result.fieldErrors };
 }
 
@@ -143,6 +147,7 @@ async function savedValues(reportId: string): Promise<SavedValues> {
 
 function revalidateReport(reportId: string) {
   revalidatePath("/azubi");
+  revalidatePath("/azubi/wochen");
   revalidatePath("/ausbilder");
   revalidatePath("/ausbilder/pruefliste");
   revalidatePath(`/berichte/${reportId}`);
