@@ -1,13 +1,52 @@
 /**
- * Kalenderwochen nach ISO 8601 (Montag bis Sonntag, KW 1 enthält den 4. Januar).
+ * Kalender und Zeit (M01, AK-1202 – AK-1204): Kalenderwochen nach ISO 8601 (Montag bis Sonntag,
+ * KW 1 enthält den 4. Januar) und Kalendertage in Europe/Berlin.
  * Reine Funktionen; Daten sind UTC-Mitternacht und stehen für Kalendertage.
  */
 
-/** Montag der ISO-Woche als UTC-Datum. */
-export function isoWeekMonday(isoYear: number, isoWeek: number): Date {
+/** Zeitzone der Firma: bestimmt den Kalendertag und damit, wann eine neue Woche beginnt (AK-1202). */
+export const APP_TIME_ZONE = "Europe/Berlin";
+
+/** Eine Woche, die es nicht gibt, z. B. KW 53/2027 oder KW 0 (AK-1204). */
+export class InvalidIsoWeekError extends Error {
+  constructor(
+    readonly isoYear: number,
+    readonly isoWeek: number,
+  ) {
+    super(
+      Number.isInteger(isoYear) && Number.isInteger(isoWeek)
+        ? `Ungültige Kalenderwoche: KW ${isoWeek}/${isoYear} (das Jahr ${isoYear} hat ${isoWeeksInYear(isoYear)} Kalenderwochen).`
+        : `Ungültige Kalenderwoche: KW ${isoWeek}/${isoYear}.`,
+    );
+    this.name = "InvalidIsoWeekError";
+  }
+}
+
+const DAY_MS = 86_400_000;
+
+/** Montag der KW 1 als UTC-Datum, ohne Prüfung. */
+function firstIsoMonday(isoYear: number): Date {
   const jan4 = new Date(Date.UTC(isoYear, 0, 4));
   const jan4Weekday = (jan4.getUTCDay() + 6) % 7; // 0 = Montag
-  return new Date(Date.UTC(isoYear, 0, 4 - jan4Weekday + (isoWeek - 1) * 7));
+  return new Date(Date.UTC(isoYear, 0, 4 - jan4Weekday));
+}
+
+/** Anzahl der ISO-Kalenderwochen eines Jahres: 52 oder 53. */
+export function isoWeeksInYear(isoYear: number): number {
+  return Math.round((firstIsoMonday(isoYear + 1).getTime() - firstIsoMonday(isoYear).getTime()) / (7 * DAY_MS));
+}
+
+/** Gibt es die Woche? Ganzzahlig, von 1 bis zur Wochenzahl des Jahres (AK-1204). */
+export function isValidIsoWeek(isoYear: number, isoWeek: number): boolean {
+  return Number.isInteger(isoYear) && Number.isInteger(isoWeek) && isoWeek >= 1 && isoWeek <= isoWeeksInYear(isoYear);
+}
+
+/** Montag der ISO-Woche als UTC-Datum. Eine Woche, die es nicht gibt, wird abgewiesen (AK-1204). */
+export function isoWeekMonday(isoYear: number, isoWeek: number): Date {
+  if (!isValidIsoWeek(isoYear, isoWeek)) {
+    throw new InvalidIsoWeekError(isoYear, isoWeek);
+  }
+  return new Date(firstIsoMonday(isoYear).getTime() + (isoWeek - 1) * 7 * DAY_MS);
 }
 
 /** Montag bis Freitag der ISO-Woche. */
@@ -47,15 +86,13 @@ export interface IsoWeek {
   isoWeek: number;
 }
 
-const DAY_MS = 86_400_000;
-
 /** ISO-Woche, in der der Kalendertag liegt (Datum als UTC-Mitternacht). */
 export function isoWeekOf(date: Date): IsoWeek {
   const weekday = (date.getUTCDay() + 6) % 7; // 0 = Montag
   // Der Donnerstag derselben Woche bestimmt das ISO-Jahr.
   const thursday = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 3 - weekday));
   const isoYear = thursday.getUTCFullYear();
-  const isoWeek = 1 + Math.floor((thursday.getTime() - isoWeekMonday(isoYear, 1).getTime()) / (7 * DAY_MS));
+  const isoWeek = 1 + Math.floor((thursday.getTime() - firstIsoMonday(isoYear).getTime()) / (7 * DAY_MS));
   return { isoYear, isoWeek };
 }
 
@@ -82,6 +119,16 @@ export function calendarDateIn(instant: Date, timeZone: string): Date {
   }).formatToParts(instant);
   const part = (type: string) => Number(parts.find((p) => p.type === type)?.value);
   return new Date(Date.UTC(part("year"), part("month") - 1, part("day")));
+}
+
+/** Heutiger Kalendertag in Europe/Berlin (UTC-Mitternacht), z. B. aus `now()` des Uhr-Moduls. */
+export function today(now: Date): Date {
+  return calendarDateIn(now, APP_TIME_ZONE);
+}
+
+/** Aktuelle ISO-Woche in Europe/Berlin. */
+export function currentIsoWeek(now: Date): IsoWeek {
+  return isoWeekOf(today(now));
 }
 
 /** Zeitraum Mo–Fr als Text, z. B. „28.09.2026 – 02.10.2026“. */

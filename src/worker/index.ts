@@ -6,7 +6,7 @@
 import "dotenv/config";
 import { PgBoss } from "pg-boss";
 import { now } from "../domain/clock";
-import { APP_TIME_ZONE } from "../domain/report-generation";
+import { APP_TIME_ZONE } from "../domain/weeks";
 import { createPrismaClient } from "../lib/db";
 import { createDeliveryAdapters } from "../lib/notifications/adapters";
 import { notificationConfig } from "../lib/notifications/config";

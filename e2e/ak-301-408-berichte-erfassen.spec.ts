@@ -1,6 +1,7 @@
 import { expect, test, type Dialog, type Page } from "@playwright/test";
 import { now } from "../src/domain/clock";
-import { currentIsoWeek, weeksDue } from "../src/domain/report-generation";
+import { weeksDue } from "../src/domain/report-generation";
+import { currentIsoWeek } from "../src/domain/weeks";
 import { MAX_ACTIVITIES_LENGTH } from "../src/domain/report-days";
 import {
   accounts,

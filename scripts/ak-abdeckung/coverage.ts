@@ -1,10 +1,11 @@
 /**
  * Nachweis der Testabdeckung: welche Akzeptanzkriterien (AK-IDs aus der Spezifikation) haben
- * einen Test, dessen Name die AK-ID nennt. Reine Funktionen, ohne Dateizugriff.
+ * einen Test, dessen Name die AK-ID nennt, oder einen neutralen Prüffall (`specs/pruefung/*.json`),
+ * dessen ID mit der AK-ID beginnt. Reine Funktionen, ohne Dateizugriff.
  */
 import ts from "typescript";
 
-export type Level = "Unit" | "DB" | "Browser";
+export type Level = "Unit" | "DB" | "Browser" | "Prüffall";
 
 export interface Criterion {
   id: string;
@@ -178,7 +179,7 @@ export function unknownIds(criteria: Criterion[], tests: TestCase[]): string[] {
   return [...ids].filter((id) => !known.has(id)).sort();
 }
 
-const LEVEL_ORDER: Level[] = ["Unit", "DB", "Browser"];
+const LEVEL_ORDER: Level[] = ["Unit", "DB", "Browser", "Prüffall"];
 
 function escapeCell(text: string): string {
   return text.replaceAll("|", "\\|").replaceAll("\n", " ");
@@ -200,9 +201,9 @@ export function renderMarkdown(rows: CoverageRow[], uiRows: CoverageRow[] = []):
   const lines = [
     "# Testabdeckung der Akzeptanzkriterien",
     "",
-    "Erzeugt mit `npm run ak:abdeckung` aus `docs/01-spezifikation.md`, `docs/05-ui-spezifikation.md` und den Testnamen (Vitest und Playwright). Nicht von Hand bearbeiten; CI prüft, dass die Datei aktuell ist (`npm run ak:abdeckung -- --pruefen`).",
+    "Erzeugt mit `npm run ak:abdeckung` aus `docs/01-spezifikation.md`, `docs/05-ui-spezifikation.md`, den Testnamen (Vitest und Playwright) und den Prüffällen unter `specs/pruefung/`. Nicht von Hand bearbeiten; CI prüft, dass die Datei aktuell ist (`npm run ak:abdeckung -- --pruefen`).",
     "",
-    "Ein Test zählt für ein Kriterium, wenn sein Name die AK-ID nennt; die Beispielszenarien tragen ihren Namen wörtlich wie in der Spezifikation und nennen die AK-IDs als Playwright-Tags (`@AK-…`). Ebenen: **Unit** = Vitest ohne Datenbank (`src/**/*.test.ts`, `scripts/**/*.test.ts`), **DB** = Vitest gegen PostgreSQL (`tests/db/`), **Browser** = Playwright gegen die laufende Demo (`e2e/`; Projekte Chromium, Firefox, Edge und Smartphone 375 px, siehe `playwright.config.ts`).",
+    "Ein Test zählt für ein Kriterium, wenn sein Name die AK-ID nennt; die Beispielszenarien tragen ihren Namen wörtlich wie in der Spezifikation und nennen die AK-IDs als Playwright-Tags (`@AK-…`). Ebenen: **Unit** = Vitest ohne Datenbank (`src/**/*.test.ts`, `scripts/**/*.test.ts`, `tests/pruefung/`), **DB** = Vitest gegen PostgreSQL (`tests/db/`), **Browser** = Playwright gegen die laufende Demo (`e2e/`; Projekte Chromium, Firefox, Edge und Smartphone 375 px, siehe `playwright.config.ts`), **Prüffall** = neutraler Prüffall aus `specs/pruefung/*.json`, dessen ID mit der AK-ID beginnt (ausgeführt vom Prüf-Runner `tests/pruefung/`).",
     "",
     `Abgedeckt: ${covered} von ${rows.length} Akzeptanzkriterien.`,
     "",
@@ -232,4 +233,165 @@ export function renderMarkdown(rows: CoverageRow[], uiRows: CoverageRow[] = []):
     }
   }
   return `${lines.join("\n")}\n`;
+}
+
+/** Module der Fach-Specs (`docs/06-spec-architektur.md`, „Modulschnitt“). */
+export const MODULES = ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08", "M09", "Q"] as const;
+/** Ebenen der Prüffälle (`specs/pruefung/format.md`). */
+export const CASE_LEVELS = ["fachlogik", "ablauf", "daten", "upgrade"] as const;
+
+/** Neutraler Prüffall, soweit die Abdeckung ihn braucht. */
+export interface CheckCase {
+  file: string;
+  id: string;
+  modul: string;
+  ebene: string;
+}
+
+/** Prüffall-ID `<AK-ID>-<NN>`, z. B. `AK-1204-01` oder `UI-AK-14-01`. */
+const CASE_ID = /^((?:UI-)?AK-\d{2,4})-(\d{2})$/;
+
+/** Modul einer Fach-Spec aus ihrem Dateinamen, z. B. `M01-kalender-und-zeit.md` → `M01`. */
+export function moduleOfSpecFile(fileName: string): string | null {
+  return /^(M\d{2}|Q)-[^/]*\.md$/.exec(fileName)?.[1] ?? null;
+}
+
+/**
+ * AK- und UI-AK-IDs aus der Tabelle des Abschnitts „Akzeptanzkriterien“ einer Fach-Spec
+ * (`## 4. Akzeptanzkriterien`, Zeilen `| AK-404 | … |`).
+ */
+export function parseModuleCriteria(markdown: string): string[] {
+  const ids: string[] = [];
+  let inSection = false;
+  for (const line of markdown.split("\n")) {
+    if (/^##\s/.test(line)) {
+      inSection = /^##\s+(\d+\.\s+)?Akzeptanzkriterien\b/.test(line);
+      continue;
+    }
+    const match = inSection ? /^\|\s*((?:UI-)?AK-\d{2,4})\s*\|/.exec(line) : null;
+    if (match && !ids.includes(match[1])) {
+      ids.push(match[1]);
+    }
+  }
+  return ids;
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Liest die Prüffälle einer Datei und meldet Formfehler: Liste, Pflichtfelder je Ebene, gültige
+ * Ebene und gültiges Modul, ID-Schema und `"id"` nur auf Prüffall-Ebene (wegen `prueffallIds()`).
+ */
+export function parseCheckCases(json: string, file: string): { cases: CheckCase[]; errors: string[] } {
+  const errors: string[] = [];
+  let content: unknown;
+  try {
+    content = JSON.parse(json);
+  } catch (error) {
+    return { cases: [], errors: [`${file}: kein gültiges JSON (${(error as Error).message})`] };
+  }
+  if (!Array.isArray(content)) {
+    return { cases: [], errors: [`${file}: Prüffall-Datei muss eine Liste von Prüffällen sein.`] };
+  }
+  const cases: CheckCase[] = [];
+  content.forEach((entry: unknown, index) => {
+    const where = `${file}, Eintrag ${index + 1}`;
+    if (!isObject(entry)) {
+      errors.push(`${where}: kein Objekt.`);
+      return;
+    }
+    const required = ["id", "modul", "ebene", "erwartet"];
+    if (entry.ebene === "fachlogik") {
+      required.push("schnittstelle", "eingabe");
+    } else if (entry.ebene === "ablauf") {
+      required.push("uhr", "schritte");
+    }
+    const missing = required.filter((name) => !(name in entry));
+    if (missing.length > 0) {
+      errors.push(`${where}: Pflichtfeld fehlt: ${missing.join(", ")}.`);
+    }
+    const id = typeof entry.id === "string" ? entry.id : "";
+    const label = id ? `${file}: ${id}` : where;
+    if (id && !CASE_ID.test(id)) {
+      errors.push(`${label}: ID folgt nicht dem Schema <AK-ID>-<NN>.`);
+    }
+    if (typeof entry.modul !== "string" || !(MODULES as readonly string[]).includes(entry.modul)) {
+      errors.push(`${label}: unbekanntes Modul „${String(entry.modul)}“.`);
+    }
+    if (typeof entry.ebene !== "string" || !(CASE_LEVELS as readonly string[]).includes(entry.ebene)) {
+      errors.push(`${label}: unbekannte Ebene „${String(entry.ebene)}“.`);
+    }
+    if (id && typeof entry.modul === "string" && typeof entry.ebene === "string") {
+      cases.push({ file, id, modul: entry.modul, ebene: entry.ebene });
+    }
+  });
+  const idFields = [...json.matchAll(/"id"\s*:/g)].length;
+  if (idFields !== content.length) {
+    errors.push(
+      `${file}: "id" darf nur auf der Ebene des Prüffalls stehen (${idFields}-mal bei ${content.length} Prüffällen).`,
+    );
+  }
+  return { cases, errors };
+}
+
+/** AK-ID eines Prüffalls (ID ohne laufende Nummer). */
+export function criterionOfCase(id: string): string | null {
+  return CASE_ID.exec(id)?.[1] ?? null;
+}
+
+/**
+ * Prüft die Prüffälle gegen Spezifikation und Fach-Specs: eindeutige IDs, bekannte AK-ID, AK gehört
+ * zum `modul` des Prüffalls, jede AK gehört höchstens einem Modul, und jede AK eines beschriebenen
+ * Moduls hat mindestens einen Prüffall.
+ */
+export function checkCases(
+  cases: CheckCase[],
+  criteria: Criterion[],
+  moduleCriteria: ReadonlyMap<string, readonly string[]>,
+): string[] {
+  const errors: string[] = [];
+  const known = new Set(criteria.map((criterion) => criterion.id));
+  const owner = new Map<string, string>();
+  for (const [module, ids] of moduleCriteria) {
+    for (const id of ids) {
+      if (!known.has(id)) {
+        errors.push(`Fach-Spec ${module}: ${id} steht nicht in der Spezifikation.`);
+      }
+      const other = owner.get(id);
+      if (other && other !== module) {
+        errors.push(`${id} gehört zwei Modulen: ${other} und ${module}.`);
+      }
+      owner.set(id, other ?? module);
+    }
+  }
+  const seen = new Set<string>();
+  for (const entry of cases) {
+    if (seen.has(entry.id)) {
+      errors.push(`${entry.file}: Prüffall-ID ${entry.id} ist doppelt.`);
+    }
+    seen.add(entry.id);
+    const criterion = criterionOfCase(entry.id);
+    if (!criterion) {
+      continue;
+    }
+    if (!known.has(criterion)) {
+      errors.push(`${entry.file}: ${entry.id} nennt keine bekannte AK-ID.`);
+    } else if (!moduleCriteria.get(entry.modul)?.includes(criterion)) {
+      errors.push(`${entry.file}: ${entry.id} – ${criterion} gehört nicht zum Modul ${entry.modul}.`);
+    }
+  }
+  const covered = new Set(cases.map((entry) => criterionOfCase(entry.id)));
+  for (const [module, ids] of moduleCriteria) {
+    for (const id of ids.filter((id) => !covered.has(id))) {
+      errors.push(`Modul ${module}: ${id} hat keinen Prüffall.`);
+    }
+  }
+  return errors;
+}
+
+/** Prüffälle als Tests der Ebene „Prüffall“ (der Runner erzeugt ihre Testnamen, `parseTests` sieht sie nicht). */
+export function casesAsTests(cases: CheckCase[]): TestCase[] {
+  return cases.map((entry) => ({ file: entry.file, name: entry.id, level: "Prüffall" }));
 }

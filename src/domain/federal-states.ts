@@ -1,5 +1,5 @@
 /**
- * Bundesländer für die Feiertage (AK-209). Die Kürzel entsprechen denen von feiertagejs.
+ * Bundesländer für die Feiertage (AK-209, AK-1205). Die Kürzel entsprechen denen von feiertagejs.
  */
 export const FEDERAL_STATES = {
   BW: "Baden-Württemberg",
@@ -29,4 +29,12 @@ export function isFederalState(value: unknown): value is FederalState {
 /** Anzeigename; unbekannte Kürzel werden unverändert angezeigt. */
 export function federalStateName(code: string): string {
   return isFederalState(code) ? FEDERAL_STATES[code] : code;
+}
+
+/** Ein Kürzel, das kein Bundesland ist (AK-1205). */
+export class UnknownFederalStateError extends Error {
+  constructor(readonly code: string) {
+    super(`Unbekanntes Bundesland: ${code}`);
+    this.name = "UnknownFederalStateError";
+  }
 }

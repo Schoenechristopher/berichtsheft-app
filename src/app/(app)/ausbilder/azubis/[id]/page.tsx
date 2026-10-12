@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { now } from "@/domain/clock";
-import { currentIsoWeek } from "@/domain/report-generation";
+import { currentIsoWeek } from "@/domain/weeks";
 import { toDateInput } from "@/domain/weeks";
 import { Badge, PageHeader } from "@/components/ui";
 import { PdfRangeForm } from "@/components/PdfExport";

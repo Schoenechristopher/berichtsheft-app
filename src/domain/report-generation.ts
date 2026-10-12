@@ -2,15 +2,12 @@
  * Entstehung der Wochenberichte (AK-301 – AK-305, AK-404) und Hervorhebung in der Übersicht (AK-306).
  *
  * Reine Funktionen ohne Abhängigkeit zu UI oder Datenbank. „Jetzt“ wird übergeben (aus dem
- * Uhr-Modul); die aktuelle Woche bestimmt sich nach der Zeitzone Europe/Berlin.
+ * Uhr-Modul); die aktuelle Woche liefert M01 (`currentIsoWeek` in `weeks.ts`, Europe/Berlin).
  */
 import { isPublicHoliday } from "./holidays";
 import type { ReportStatus } from "./report-access";
 import { isOpenStatus } from "./report-status";
-import { calendarDateIn, compareWeeks, isoWeekOf, isoWeekWorkdays, nextIsoWeek, type IsoWeek } from "./weeks";
-
-/** Zeitzone der Firma: bestimmt, wann eine neue Woche beginnt. */
-export const APP_TIME_ZONE = "Europe/Berlin";
+import { compareWeeks, currentIsoWeek, isoWeekOf, isoWeekWorkdays, nextIsoWeek, type IsoWeek } from "./weeks";
 
 /** Ausbildungszeitraum; Daten als UTC-Mitternacht, Ende optional. */
 export interface TrainingPeriod {
@@ -25,16 +22,6 @@ export interface PlannedDay {
   date: Date;
   dayType: DayType | null;
   outsideTraining: boolean;
-}
-
-/** Heutiger Kalendertag in Europe/Berlin (UTC-Mitternacht). */
-export function today(now: Date): Date {
-  return calendarDateIn(now, APP_TIME_ZONE);
-}
-
-/** Aktuelle ISO-Woche in Europe/Berlin. */
-export function currentIsoWeek(now: Date): IsoWeek {
-  return isoWeekOf(today(now));
 }
 
 /**

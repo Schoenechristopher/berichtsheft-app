@@ -88,7 +88,7 @@ berichtsheft-app/
 └── liferay-72/                       vollständige Umsetzung (Liferay Workspace, OSGi)
 ```
 
-- **Rückverfolgbar:** Jede AK-ID (AK-101 … AK-1102, UI-AK-01 … UI-AK-20) gehört genau einem Modul und hat mindestens
+- **Rückverfolgbar:** Jede AK-ID (AK-101 … AK-1206, UI-AK-01 … UI-AK-20) gehört genau einem Modul und hat mindestens
   einen Prüffall. `npm run ak:abdeckung` prüft beides.
 - **Änderungen:** Eine fachliche Änderung beginnt immer in der Fach-Spec und den Prüffällen. Danach werden die
   Umsetzungen nachgezogen. Ein Profil oder Playbook ändert nie eine Regel.
@@ -100,7 +100,7 @@ dem vorhandenen Code. Gebaut wird in der Reihenfolge M01 bis M09, weil jedes Mod
 
 | Modul | Inhalt | AK-IDs | Code heute | Hängt ab von | Empfohlener Weg |
 | --- | --- | --- | --- | --- | --- |
-| M01 Kalender und Zeit | Uhr-Modul, ISO-Wochen in Europe/Berlin, Bundesländer, Feiertage | AK-404; Hilfsfunktionen für AK-301 bis 304 (gehören M03) | `src/domain/clock`, `weeks`, `holidays`, `federal-states` | – | A Quellcode |
+| M01 Kalender und Zeit | Uhr-Modul, ISO-Wochen in Europe/Berlin, Bundesländer, Feiertage | AK-404, AK-1201 bis AK-1206; Hilfsfunktionen für AK-301 bis 304 (gehören M03) | `src/domain/clock`, `weeks`, `holidays`, `federal-states` | – | A Quellcode |
 | M02 Personen und Zugang | Rollen, Anmeldung, Zuordnung und Vertretung, Deaktivieren, Nutzerverwaltung | AK-101 ff., AK-201 ff. | `src/domain/people`, `access`; `src/lib/auth`, `src/lib/people` | – | B Spec (Liferay-Konten und -Rollen) |
 | M03 Wochenberichte entstehen | Automatische Wochen ab Ausbildungsbeginn, außerhalb der Ausbildung, Definition „offen“ | AK-301 bis 306 | `src/domain/report-generation` | M01, M02 | A Quellcode |
 | M04 Bericht erfassen | Tagesarten, Tätigkeiten, Längengrenze, Speichern, Bearbeitungsrechte | AK-401 bis 408 | `src/domain/report-days`, `src/lib/reports` | M03 | A für Regeln, B für Formular |
@@ -405,6 +405,8 @@ U00 klären sie zuerst, bevor gebaut wird.
 - [ ] Ob Liferay-Bundles, Java 8/11 und die Bezugsquellen in der Cloud-Sitzung erreichbar sind (P00).
 - [ ] Ob OpenID Connect auf 7.2 CE optional mitgeliefert wird (Profil 7.2).
 - [ ] Umfang des Dunkelmodus auf 6.2.5 (Profil 6.2.5).
+- [ ] Die Landkarten-Prüfung (`npm run landkarte`) meldet in G1 nur einen Bericht, weil erst M01 beschrieben ist. Am
+      Ende von G2 wird sie Pflicht in der CI (`npm run landkarte -- --pruefen`).
 - [x] AK-301 bis 304 gehören M03; M01 liefert Hilfsfunktionen, auf die M03 verweist (12.10.2026).
 - [x] Blindtest bei einer Lücke: nicht fragen, Annahme treffen und in der Lückenliste vermerken; bestanden nur mit
       grünen Prüffällen und leerer Lückenliste (12.10.2026).

@@ -1,7 +1,6 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { now } from "../src/domain/clock";
-import { currentIsoWeek } from "../src/domain/report-generation";
-import { isoWeekMonday, isoWeekOf, toDateInput, type IsoWeek } from "../src/domain/weeks";
+import { currentIsoWeek, isoWeekMonday, isoWeekOf, toDateInput, type IsoWeek } from "../src/domain/weeks";
 import {
   accounts,
   deletePersons,

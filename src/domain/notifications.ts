@@ -11,15 +11,18 @@
  * - Pro Ereignis, Empfänger und Kanal genau eine Zeile; der Ereignisschlüssel macht sie eindeutig.
  */
 import type { ReportAction } from "./report-status";
+import { classifyWeek, type TrainingPeriod, type WeekForOverview } from "./report-generation";
 import {
   APP_TIME_ZONE,
-  classifyWeek,
+  compareWeeks,
   currentIsoWeek,
+  formatDate,
+  isoWeekMonday,
+  isoWeekOf,
   today,
-  type TrainingPeriod,
-  type WeekForOverview,
-} from "./report-generation";
-import { compareWeeks, formatDate, isoWeekMonday, isoWeekOf, weekRangeLabel, type IsoWeek } from "./weeks";
+  weekRangeLabel,
+  type IsoWeek,
+} from "./weeks";
 
 /** Kanal einer Benachrichtigung (wie `Channel` im Datenmodell). */
 export type Channel = "EMAIL" | "TEAMS" | "APP";

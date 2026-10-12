@@ -1,6 +1,6 @@
 # Berichtsheft-App – Anforderungen und Akzeptanzkriterien
 
-Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201, AK-204, AK-206 bis AK-208 freigegeben am 06.10.2026 (Etappe 2) · Ergänzungen zu AK-203, AK-305, AK-306, AK-404, AK-406 bis AK-408 freigegeben am 06.10.2026 (Etappe 3) · Ergänzungen zu AK-501, AK-502, AK-505, AK-604 bis AK-606, AK-803 und zum Statusmodell freigegeben am 06.10.2026 (Etappe 4) · Ergänzungen zu AK-901 bis AK-907 und zum PDF-Export freigegeben am 06.10.2026 (Etappe 5) · Ergänzungen zu AK-1001 bis AK-1025 und zu Benachrichtigungen und Erinnerung freigegeben am 07.10.2026 (Etappe 6) · Ergänzungen zu AK-1101, AK-1102, zum Teams-Postfach und zum Beispielszenario „Erinnerung“ freigegeben am 07.10.2026 (Etappe 7)
+Stand: 06.10.2026 · freigegeben · Ergänzungen zu AK-201, AK-204, AK-206 bis AK-208 freigegeben am 06.10.2026 (Etappe 2) · Ergänzungen zu AK-203, AK-305, AK-306, AK-404, AK-406 bis AK-408 freigegeben am 06.10.2026 (Etappe 3) · Ergänzungen zu AK-501, AK-502, AK-505, AK-604 bis AK-606, AK-803 und zum Statusmodell freigegeben am 06.10.2026 (Etappe 4) · Ergänzungen zu AK-901 bis AK-907 und zum PDF-Export freigegeben am 06.10.2026 (Etappe 5) · Ergänzungen zu AK-1001 bis AK-1025 und zu Benachrichtigungen und Erinnerung freigegeben am 07.10.2026 (Etappe 6) · Ergänzungen zu AK-1101, AK-1102, zum Teams-Postfach und zum Beispielszenario „Erinnerung“ freigegeben am 07.10.2026 (Etappe 7) · Kapitel 12 „Kalender und Zeit“ (AK-1201 bis AK-1206) Entwurf zur Freigabe (Etappe G1, 12.10.2026)
 
 Azubis führen ihr Berichtsheft digital als Wochenbericht, Ausbilder prüfen und geben es frei. Diese Spezifikation ist freigegeben und durch die Akzeptanzkriterien (AK) testbar. Technik und Hosting stehen in [02-plan.md](02-plan.md).
 
@@ -217,6 +217,19 @@ Jedes Kriterium ist eine prüfbare Aussage mit eigener ID, damit Testfälle dara
 | --- | --- |
 | AK-1101 | Die Web-App funktioniert in den aktuellen Versionen von Edge, Chrome und Firefox. Ergänzung: Nachgewiesen, indem alle Browser-Tests in allen drei Browsern laufen. |
 | AK-1102 | Bei 375 px Breite sind alle Kernfunktionen ohne horizontales Scrollen bedienbar: erfassen, einreichen, zurückziehen, prüfen, kommentieren, exportieren, Einstellungen. Ergänzung: Das gilt auch für die übrigen Seiten (Übersicht, Prüfliste, Nutzerverwaltung, Benachrichtigungen, Nicht zustellbar, Anmelden, Kein Zugang). |
+
+### 12. Kalender und Zeit
+
+Entwurf zur Freigabe (Etappe G1, 12.10.2026). Eigentümer ist das Modul M01 (`specs/M01-kalender-und-zeit.md`); AK-404 gehört ebenfalls zu M01.
+
+| ID | Kriterium |
+| --- | --- |
+| AK-1201 | Fachliche Regeln beziehen „jetzt“ aus einer zentralen Uhr. Für Tests und Vorführungen ist sie auf einen festen Zeitpunkt stellbar, im Produktivbetrieb nicht. Ergänzung: Im Produktivbetrieb wirkt eine Vorgabe des Zeitpunkts aus der Konfiguration nicht; es gilt die Systemzeit. |
+| AK-1202 | Maßgeblich ist der Kalendertag in Europe/Berlin, mit Sommer- und Winterzeit. Beispiel: 05.10.2026, 22:30 UTC ist Dienstag, 06.10.2026. Ergänzung: Eine neue Woche beginnt Montag, 0:00 Uhr Berliner Zeit; Sonntag 23:59 Uhr gehört noch zur alten Woche. |
+| AK-1203 | Wochen sind ISO-8601-Kalenderwochen von Montag bis Sonntag (Woche 1 enthält den 4. Januar). Beispiele: 01.01.2027 liegt in KW 53/2026, 29.12.2025 in KW 1/2026. |
+| AK-1204 | Eine Woche, die es nicht gibt, wird abgewiesen, z. B. KW 53/2027 oder KW 0. Ergänzung: Sie wird nie still in eine Woche des Nachbarjahrs umgedeutet. |
+| AK-1205 | Wählbar sind genau die 16 Bundesländer mit festen Kürzeln (BW, BY, BE, BB, HB, HH, HE, MV, NI, NW, RP, SL, SN, ST, SH, TH); ein unbekanntes Kürzel wird abgewiesen. |
+| AK-1206 | Feiertag ist jeder landesweite gesetzliche Feiertag des Bundeslands, einschließlich einmaliger landesweiter Feiertage (z. B. 08.05.2025 in Berlin); nur kommunale oder regionale Feiertage zählen nicht. Ergänzung: Maßgeblich ist das Feiertagsrecht des jeweiligen Jahres, z. B. Reformationstag in Niedersachsen erst ab 2018 (2017 einmalig bundesweit). |
 
 ## Beispielszenarien
 

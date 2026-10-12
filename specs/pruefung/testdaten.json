@@ -1,0 +1,50 @@
+{
+  "beschreibung": "Gemeinsame Testdaten aller Plattformen. Jede Plattform lädt sie über ihren Seed. Nur Testpersonen, keine echten Personendaten.",
+  "bundesland": "NW",
+  "personen": [
+    {
+      "schluessel": "anna",
+      "name": "Anna Azubi",
+      "email": "anna@berichtsheft.test",
+      "konto": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f03",
+      "rolle": "azubi",
+      "angelegt": true,
+      "ausbildungsbeginn": "2026-09-01",
+      "ausbilder": "bernd"
+    },
+    {
+      "schluessel": "bernd",
+      "name": "Bernd Ausbilder",
+      "email": "bernd@berichtsheft.test",
+      "konto": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f01",
+      "rolle": "ausbilder",
+      "angelegt": true
+    },
+    {
+      "schluessel": "clara",
+      "name": "Clara Ausbilderin",
+      "email": "clara@berichtsheft.test",
+      "konto": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f02",
+      "rolle": "ausbilder",
+      "angelegt": true
+    },
+    {
+      "schluessel": "dora",
+      "name": "Dora Ohnezugang",
+      "email": "dora@berichtsheft.test",
+      "konto": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f09",
+      "rolle": null,
+      "angelegt": false,
+      "hinweis": "Firmenkonto ohne Eintrag in der App (AK-102)"
+    },
+    {
+      "schluessel": "emil",
+      "name": "Emil Neu",
+      "email": "emil@berichtsheft.test",
+      "konto": "6f1c2a10-0b1e-4c55-9a8e-1b2c3d4e5f05",
+      "rolle": null,
+      "angelegt": false,
+      "hinweis": "Firmenkonto, das der Admin im Test erst anlegt (AK-201)"
+    }
+  ]
+}

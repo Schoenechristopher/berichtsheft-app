@@ -4,7 +4,8 @@
  * Fachregeln rufen nie `new Date()` direkt auf, sondern `now()`. Tests stellen die Uhr
  * mit `setFixedNow()` auf einen festen Zeitpunkt (z. B. Montag 9:00 Uhr) und setzen sie
  * mit `resetClock()` zurück. Für Demo und Browser-Tests lässt sich ein fester Zeitpunkt
- * außerdem per Umgebungsvariable `APP_FIXED_NOW` vorgeben (nicht in Produktion).
+ * außerdem per Umgebungsvariable `APP_FIXED_NOW` vorgeben (nicht in Produktion, AK-1201).
+ * `setFixedNow()` und `setClock()` rufen nur Tests auf, nie der Anwendungscode.
  */
 
 export interface Clock {
@@ -56,10 +57,18 @@ export function clockFromEnvironment(env: Record<string, string | undefined> = p
   return systemClock;
 }
 
+/** Ein Zeitpunkt, der sich nicht lesen lässt. */
+export class InvalidInstantError extends Error {
+  constructor(instant: Date | string) {
+    super(`Ungültiger Zeitpunkt für die Uhr: ${String(instant)}`);
+    this.name = "InvalidInstantError";
+  }
+}
+
 function parseInstant(instant: Date | string): Date {
   const date = typeof instant === "string" ? new Date(instant) : new Date(instant.getTime());
   if (Number.isNaN(date.getTime())) {
-    throw new Error(`Ungültiger Zeitpunkt für die Uhr: ${String(instant)}`);
+    throw new InvalidInstantError(instant);
   }
   return date;
 }
