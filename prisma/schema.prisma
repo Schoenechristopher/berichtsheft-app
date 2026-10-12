@@ -31,6 +31,13 @@ enum ReportStatus {
   REJECTED
 }
 
+/// Darstellung der Oberfläche (UI-Spezifikation): „System“ folgt dem Gerät, „Hell“ und „Dunkel“ überschreiben.
+enum Theme {
+  SYSTEM
+  LIGHT
+  DARK
+}
+
 /// Tagesart (AK-402): genau diese fünf Werte.
 enum DayType {
   WORK
@@ -61,6 +68,8 @@ model Person {
   trainingEnd   DateTime? @map("training_end") @db.Date
   /// Gewählte Kanäle; Voreinstellung E-Mail + App (AK-1012).
   channels      Channel[] @default([EMAIL, APP])
+  /// Darstellung (System, Hell, Dunkel), am Konto gespeichert und damit geräteübergreifend (UI-AK-14).
+  theme         Theme     @default(SYSTEM)
   createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 

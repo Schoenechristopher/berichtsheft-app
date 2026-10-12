@@ -1,15 +1,18 @@
-import Link from "next/link";
 import { homePathFor, roleLabel } from "@/domain/access";
-import { NotificationBell } from "@/components/NotificationBell";
+import { AppShell, type NavItem } from "@/components/AppShell";
+import { testLoginEnabled } from "@/lib/auth/config";
 import { logout } from "@/lib/auth/logout";
 import { db } from "@/lib/db";
 import { devMailboxEnabled } from "@/lib/notifications/config";
 import { countUndeliverable, countUnread } from "@/lib/notifications/service";
+import { listReviewQueue } from "@/lib/reports";
 import { currentPath, requirePerson } from "@/lib/session";
 
-const navLinkClass = "text-blue-700 hover:underline";
-
-/** Rahmen für alle Seiten nach der Anmeldung. Ohne gültige Sitzung geht es zur Anmeldung. */
+/**
+ * Rahmen für alle Seiten nach der Anmeldung. Ohne gültige Sitzung geht es zur Anmeldung.
+ * Menüpunkte je Rolle (UI-Spezifikation, „Menüpunkte“, UI-AK-02). Die Navigation heißt für
+ * Ausbilder „Hauptmenü“ (mit den Admin-Funktionen, AK-104), für Azubis „Menü“.
+ */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const person = await requirePerson();
   // Die Liste der Benachrichtigungen markiert beim Öffnen alles als gelesen (AK-1015); auf ihr
@@ -17,93 +20,59 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const onNotifications = (await currentPath())?.startsWith("/benachrichtigungen") ?? false;
   const unread = onNotifications ? 0 : await countUnread(db(), person.id);
   const devMailbox = devMailboxEnabled();
-  // Nicht zustellbare Nachrichten: Hinweis nur für Ausbilder (bestätigte Auslegung 12).
-  const undeliverable = await countUndeliverable(db(), person);
+  const trainer = person.role === "TRAINER";
+
+  const items: NavItem[] = trainer
+    ? [
+        { href: "/ausbilder", label: "Start", icon: "home" },
+        {
+          href: "/ausbilder/pruefliste",
+          label: "Prüfliste",
+          icon: "review",
+          count: (await listReviewQueue(db(), person, "mine")).length,
+          testId: "nav-review-count",
+        },
+        { href: "/ausbilder/azubis", label: "Azubis", icon: "trainees", match: ["/ausbilder/azubis"] },
+        { href: "/ausbilder/personen", label: "Personen", icon: "people", match: ["/ausbilder/personen"] },
+        { href: "/benachrichtigungen", label: "Benachrichtigungen", icon: "notifications" },
+        { href: "/einstellungen", label: "Einstellungen", icon: "settings" },
+      ]
+    : [
+        { href: "/azubi", label: "Start", icon: "home" },
+        { href: "/azubi/wochen", label: "Meine Wochen", icon: "weeks", match: ["/berichte"] },
+        { href: "/benachrichtigungen", label: "Benachrichtigungen", icon: "notifications" },
+        { href: "/einstellungen", label: "Einstellungen", icon: "settings" },
+      ];
+  if (trainer) {
+    // Nicht zustellbare Nachrichten: nur für Ausbilder und nur, wenn es welche gibt (bestätigte Auslegung 12).
+    const undeliverable = await countUndeliverable(db(), person);
+    if (undeliverable > 0) {
+      items.push({
+        href: "/ausbilder/nicht-zustellbar",
+        label: "Nicht zustellbar",
+        icon: "undeliverable",
+        count: undeliverable,
+        countTone: "danger",
+        testId: "undeliverable-count",
+      });
+    }
+  }
+  if (devMailbox) {
+    items.push({ href: "/entwickler-postfach", label: "Teams-Postfach (Demo)", icon: "mailbox", separated: true });
+  }
 
   return (
-    <>
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-2 px-4 py-3">
-          <Link href={homePathFor(person.role)} className="font-semibold text-slate-900">
-            Berichtsheft
-          </Link>
-          <div className="flex flex-wrap items-center gap-3 text-sm">
-            <span className="text-slate-600" data-testid="current-person">
-              {person.name} · {roleLabel(person.role)}
-            </span>
-            <NotificationBell initialUnread={unread} />
-            <form action={logout}>
-              <button
-                type="submit"
-                className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-800 hover:bg-slate-50"
-              >
-                Abmelden
-              </button>
-            </form>
-          </div>
-        </div>
-        {/* „Hauptmenü“ nur für Ausbilder (Admin-Funktionen, AK-104); Azubis haben ein eigenes „Menü“. */}
-        <nav aria-label={person.role === "TRAINER" ? "Hauptmenü" : "Menü"} className="mx-auto max-w-4xl px-4 pb-2">
-          <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            {person.role === "TRAINER" ? (
-              <>
-                <li>
-                  <Link href="/ausbilder" className={navLinkClass}>
-                    Start
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/ausbilder/pruefliste" className={navLinkClass}>
-                    Prüfliste
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/ausbilder/personen" className={navLinkClass}>
-                    Personen
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/ausbilder/einstellungen" className={navLinkClass}>
-                    Einstellungen
-                  </Link>
-                </li>
-                {undeliverable > 0 ? (
-                  <li>
-                    <Link
-                      href="/ausbilder/nicht-zustellbar"
-                      className="font-medium text-red-700 hover:underline"
-                      data-testid="undeliverable-count"
-                    >
-                      Nicht zustellbar ({undeliverable})
-                    </Link>
-                  </li>
-                ) : null}
-              </>
-            ) : (
-              <>
-                <li>
-                  <Link href="/azubi" className={navLinkClass}>
-                    Meine Wochen
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/einstellungen" className={navLinkClass}>
-                    Einstellungen
-                  </Link>
-                </li>
-              </>
-            )}
-            {devMailbox ? (
-              <li>
-                <Link href="/entwickler-postfach" className={navLinkClass}>
-                  Teams-Postfach (Demo)
-                </Link>
-              </li>
-            ) : null}
-          </ul>
-        </nav>
-      </header>
-      <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6">{children}</main>
-    </>
+    <AppShell
+      homeHref={homePathFor(person.role)}
+      navLabel={trainer ? "Hauptmenü" : "Menü"}
+      items={items}
+      person={{ name: person.name, role: roleLabel(person.role), settingsHref: "/einstellungen" }}
+      unread={unread}
+      demo={devMailbox || testLoginEnabled()}
+      theme={person.theme}
+      logout={logout}
+    >
+      {children}
+    </AppShell>
   );
 }

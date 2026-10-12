@@ -32,25 +32,27 @@ test.describe("Feinschliff", () => {
     await deletePersons(emil.email);
   });
 
-  test("Seitentitel nennen die Seite", async ({ browser }) => {
+  test("UI-AK-19 Seitentitel nennen die Seite, jede Seite hat genau eine h1", async ({ browser }) => {
     const anonymous = await browser.newPage();
     await anonymous.goto("/anmelden");
-    await expect(anonymous).toHaveTitle("Anmelden · Berichtsheft");
+    await expect(anonymous).toHaveTitle("Anmelden – Berichtsheft");
     await anonymous.goto("/gibt-es-nicht");
-    await expect(anonymous).toHaveTitle("Seite nicht gefunden · Berichtsheft");
+    await expect(anonymous).toHaveTitle("Seite nicht gefunden – Berichtsheft");
     await anonymous.close();
 
     const anna = await browser.newPage();
     await login(anna, accounts.anna);
     for (const [path, title] of [
-      ["/azubi", "Meine Wochenberichte"],
-      [`/berichte/${await annasSeedReportId()}`, "Wochenbericht"],
+      ["/azubi", "Start"],
+      ["/azubi/wochen", "Meine Wochen"],
+      [`/berichte/${await annasSeedReportId()}`, "KW 40/2026"],
       ["/einstellungen", "Einstellungen"],
       ["/benachrichtigungen", "Benachrichtigungen"],
       ["/entwickler-postfach", "Teams-Postfach (Demo)"],
     ]) {
       await anna.goto(path);
-      await expect(anna, path).toHaveTitle(`${title} · Berichtsheft`);
+      await expect(anna, path).toHaveTitle(`${title} – Berichtsheft`);
+      await expect(anna.locator("h1"), path).toHaveCount(1);
     }
     await anna.close();
 
@@ -60,15 +62,18 @@ test.describe("Feinschliff", () => {
     for (const [path, title] of [
       ["/ausbilder", "Start"],
       ["/ausbilder/pruefliste", "Prüfliste"],
+      ["/ausbilder/azubis", "Azubis"],
       [`/ausbilder/azubis/${annaId}`, "Wochenberichte eines Azubis"],
       ["/ausbilder/personen", "Personen"],
       ["/ausbilder/personen/neu", "Person anlegen"],
       [`/ausbilder/personen/${annaId}`, "Person bearbeiten"],
+      ["/einstellungen", "Einstellungen"],
       ["/ausbilder/einstellungen", "Einstellungen"],
       ["/ausbilder/nicht-zustellbar", "Nicht zustellbare Nachrichten"],
     ]) {
       await bernd.goto(path);
-      await expect(bernd, path).toHaveTitle(`${title} · Berichtsheft`);
+      await expect(bernd, path).toHaveTitle(`${title} – Berichtsheft`);
+      await expect(bernd.locator("h1"), path).toHaveCount(1);
     }
     await bernd.close();
   });
@@ -81,7 +86,9 @@ test.describe("Feinschliff", () => {
     );
   });
 
-  test("Bestätigungsdialog per Tastatur: Fokus auf „Abbrechen“, Escape schließt, Enter bestätigt", async ({ page }) => {
+  test("UI-AK-18 Bestätigungsdialog per Tastatur: Fokus auf „Abbrechen“, Escape schließt, Enter bestätigt", async ({
+    page,
+  }) => {
     await insertTrainee({ name: emil.name, email: emil.email, accountId: emil.accountId });
     const reportId = await prepareWeek(emil.email, 2026, 40, fullWeek);
     await login(page, emil);

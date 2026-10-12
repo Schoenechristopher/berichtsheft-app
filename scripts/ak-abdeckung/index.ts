@@ -1,6 +1,6 @@
 /**
- * `npm run ak:abdeckung`: meldet jede AK-ID der Spezifikation ohne Test und schreibt
- * `docs/03-testabdeckung.md`. Mit `--pruefen` (CI) wird nichts geschrieben; das Skript scheitert,
+ * `npm run ak:abdeckung`: meldet jede AK-ID der Spezifikation und jede UI-AK-ID der
+ * UI-Spezifikation ohne Test und schreibt `docs/03-testabdeckung.md`. Mit `--pruefen` (CI) wird nichts geschrieben; das Skript scheitert,
  * wenn die Datei nicht aktuell ist. Ohne Test für eine AK-ID scheitert es immer.
  */
 import { readFile, readdir, writeFile } from "node:fs/promises";
@@ -9,6 +9,7 @@ import {
   buildCoverage,
   levelOf,
   parseCriteria,
+  parseUiCriteria,
   parseTests,
   renderMarkdown,
   unknownIds,
@@ -17,6 +18,7 @@ import {
 
 const root = path.resolve(import.meta.dirname, "../..");
 const SPEC = "docs/01-spezifikation.md";
+const UI_SPEC = "docs/05-ui-spezifikation.md";
 const OUTPUT = "docs/03-testabdeckung.md";
 const TEST_DIRS = ["src", "tests", "e2e", "scripts"];
 const TEST_FILE = /\.(test|spec)\.tsx?$/;
@@ -33,6 +35,7 @@ async function listTestFiles(dir: string): Promise<string[]> {
 async function main() {
   const check = process.argv.includes("--pruefen");
   const criteria = parseCriteria(await readFile(path.join(root, SPEC), "utf8"));
+  const uiCriteria = parseUiCriteria(await readFile(path.join(root, UI_SPEC), "utf8"));
   const files = (await Promise.all(TEST_DIRS.map(listTestFiles))).flat();
   const tests: TestCase[] = [];
   for (const file of files) {
@@ -43,17 +46,18 @@ async function main() {
   }
 
   const rows = buildCoverage(criteria, tests);
-  const missing = rows.filter((row) => row.tests.length === 0).map((row) => row.id);
-  const unknown = unknownIds(criteria, tests);
-  const markdown = renderMarkdown(rows);
+  const uiRows = buildCoverage(uiCriteria, tests);
+  const missing = [...rows, ...uiRows].filter((row) => row.tests.length === 0).map((row) => row.id);
+  const unknown = unknownIds([...criteria, ...uiCriteria], tests);
+  const markdown = renderMarkdown(rows, uiRows);
 
   console.log(
-    `${criteria.length} Akzeptanzkriterien, ${tests.length} Tests in ${files.length} Dateien; ` +
-      `ohne Test: ${missing.length === 0 ? "keine" : missing.join(", ")}.`,
+    `${criteria.length} Akzeptanzkriterien und ${uiCriteria.length} UI-Akzeptanzkriterien, ${tests.length} Tests in ` +
+      `${files.length} Dateien; ohne Test: ${missing.length === 0 ? "keine" : missing.join(", ")}.`,
   );
   let failed = missing.length > 0;
   if (unknown.length > 0) {
-    console.error(`AK-IDs in Testnamen, die es in der Spezifikation nicht gibt: ${unknown.join(", ")}`);
+    console.error(`AK-/UI-AK-IDs in Testnamen, die es in den Spezifikationen nicht gibt: ${unknown.join(", ")}`);
     failed = true;
   }
 
@@ -68,7 +72,7 @@ async function main() {
     console.log(`${OUTPUT} aktualisiert.`);
   }
   if (missing.length > 0) {
-    console.error(`AK-IDs ohne Test: ${missing.join(", ")}`);
+    console.error(`AK- bzw. UI-AK-IDs ohne Test: ${missing.join(", ")}`);
   }
   process.exitCode = failed ? 1 : 0;
 }

@@ -8,7 +8,8 @@
  */
 import { validateDayInputs, type DayErrors, type DayInput, type DayUpdate } from "@/domain/report-days";
 import { canEditReport, canManagePeople, canViewReport, type Viewer } from "@/domain/report-access";
-import type { HistoryChange, HistoryComment } from "@/domain/report-history";
+import { currentFeedback, type HistoryChange, type HistoryComment } from "@/domain/report-history";
+import { weekProgress } from "@/domain/week-progress";
 import {
   OPEN_STATUSES,
   classifyWeek,
@@ -152,14 +153,26 @@ export async function listTraineeWeeks(prisma: PrismaClient, viewer: Viewer, tra
       isoYear: true,
       isoWeek: true,
       status: true,
-      days: { select: { dayType: true, activities: true } },
+      days: {
+        select: { date: true, dayType: true, activities: true, outsideTraining: true },
+        orderBy: { date: "asc" },
+      },
+      statusChanges: {
+        where: { toStatus: "SUBMITTED" },
+        orderBy: { seq: "desc" },
+        take: 1,
+        select: { createdAt: true },
+      },
       _count: { select: { statusChanges: true } },
     },
     orderBy: [{ isoYear: "desc" }, { isoWeek: "desc" }],
   });
   const reports = stored
-    .map(({ days, _count, ...report }) => ({
+    .map(({ days, _count, statusChanges, ...report }) => ({
       ...report,
+      // Fortschritt für Start Azubi und die Wochen-Kachel (UI-Spezifikation).
+      progress: weekProgress(days),
+      lastSubmittedAt: statusChanges[0]?.createdAt ?? null,
       ...classifyWeek(
         {
           ...report,
@@ -267,6 +280,22 @@ export async function loadReportHistory(
   };
 }
 
+/**
+ * Gesamtkommentar bzw. Begründung der aktuellen Ablehnung je Bericht (für „Zu erledigen“ auf
+ * Start Azubi). Nur für Berichte, die die Person sehen darf – der Aufrufer hat sie so geladen.
+ */
+export async function rejectionTexts(prisma: PrismaClient, reportIds: readonly string[]): Promise<Map<string, string>> {
+  const texts = new Map<string, string>();
+  for (const reportId of reportIds) {
+    const { changes, comments } = await loadReportHistory(prisma, reportId);
+    const feedback = currentFeedback("REJECTED", changes, comments);
+    if (feedback) {
+      texts.set(reportId, feedback.text);
+    }
+  }
+  return texts;
+}
+
 /** Filter der Prüfliste (AK-601): eigene Azubis (Voreinstellung) oder alle. */
 export type ReviewScope = "mine" | "all";
 
@@ -289,11 +318,14 @@ export async function listReviewQueue(prisma: PrismaClient, viewer: Viewer, scop
         take: 1,
         select: { createdAt: true },
       },
+      // „Erneut eingereicht“ ab Runde 2: Der Bericht war schon einmal abgelehnt.
+      _count: { select: { statusChanges: { where: { toStatus: "REJECTED" } } } },
     },
   });
   return reports
-    .map(({ statusChanges, ...report }) => ({
+    .map(({ statusChanges, _count, ...report }) => ({
       ...report,
+      resubmitted: _count.statusChanges > 0,
       submittedAt: statusChanges[0]?.createdAt ?? report.updatedAt,
       assignedToViewer: report.trainee.trainerId === viewer.id,
     }))

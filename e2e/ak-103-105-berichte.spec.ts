@@ -13,8 +13,9 @@ test.describe("Zugriff auf Berichte", () => {
   test("AK-103 Azubi sieht eigene Berichte, ein fremder Bericht ergibt „Zugriff verweigert“", async ({ page }) => {
     const { reportId: ottosReport } = await insertTrainee({ ...otto, withReport: true });
     await login(page, accounts.anna);
+    await page.goto("/azubi/wochen");
 
-    // Eigener Bericht über die Startseite; fremde Wochen erscheinen nicht.
+    // Eigener Bericht über „Meine Wochen“; fremde Wochen erscheinen nicht.
     const weeks = page.getByRole("list", { name: "Wochenberichte" });
     await expect(weeks.getByRole("link", { name: /KW 40\/2026/ })).toHaveCount(1);
     await expect(page.locator(`a[href="/berichte/${ottosReport}"]`)).toHaveCount(0);

@@ -329,3 +329,42 @@ export async function reseedAnna() {
   await runScript("prisma/seed.ts");
   await restoreSeedState();
 }
+
+/** Abmelden über das Kontomenü in der Kopfzeile (UI-Spezifikation „Rahmen“). */
+export async function logout(page: Page) {
+  await page.getByRole("button", { name: /^Konto:/ }).click();
+  await page.getByRole("button", { name: "Abmelden" }).click();
+}
+
+/** Unter 1024 px: Navigation über den Burger-Knopf als Schublade öffnen. */
+export async function openMenu(page: Page) {
+  await page.getByRole("button", { name: "Menü öffnen" }).click();
+}
+
+/** Ablehnen mit Gesamtkommentar im Dialog (AK-604); optional vorher Tageskommentare (AK-605). */
+export async function rejectReport(page: Page, comment: string, dayComments: Record<string, string> = {}) {
+  for (const [dayLabel, text] of Object.entries(dayComments)) {
+    await writeDayComment(page, dayLabel, text);
+  }
+  await page.getByRole("button", { name: "Ablehnen", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Bericht ablehnen?" });
+  await dialog.getByLabel("Gesamtkommentar (Pflicht beim Ablehnen)").fill(comment);
+  await dialog.getByRole("button", { name: "Ablehnen", exact: true }).click();
+}
+
+/** Tageskommentar in der Prüfansicht: „Kommentar zu diesem Tag“ öffnet das Feld. */
+export async function writeDayComment(page: Page, dayLabel: string, text: string) {
+  const field = page.getByLabel(`Kommentar zu ${dayLabel} (optional)`);
+  if ((await field.count()) === 0) {
+    await page.getByRole("button", { name: `Kommentar zu diesem Tag (${dayLabel})` }).click();
+  }
+  await field.fill(text);
+}
+
+/** Freigabe zurücknehmen mit Begründung im Dialog (AK-703). */
+export async function revokeApproval(page: Page, reason: string) {
+  await page.getByRole("button", { name: "Freigabe zurücknehmen", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Freigabe zurücknehmen?" });
+  await dialog.getByLabel("Begründung für die Rücknahme").fill(reason);
+  await dialog.getByRole("button", { name: "Freigabe zurücknehmen", exact: true }).click();
+}

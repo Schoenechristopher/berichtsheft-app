@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { Field, Notice, dangerButtonClass, inputClass, secondaryButtonClass } from "@/components/ui";
+import { Button, Field, Notice, inputClass } from "@/components/ui";
 import type { FormState } from "./actions";
 
 type ButtonAction = (prev: FormState) => Promise<FormState>;
@@ -13,9 +13,9 @@ export function StatusButton({ action, label, testId }: { action: ButtonAction; 
   return (
     <form action={formAction} className="space-y-2" data-testid={testId}>
       {state && !state.ok && state.formError ? <Notice tone="error">{state.formError}</Notice> : null}
-      <button type="submit" disabled={pending} className={`${secondaryButtonClass} w-full sm:w-auto`}>
+      <Button type="submit" variant="secondary" pending={pending} className="w-full sm:w-auto">
         {label}
-      </button>
+      </Button>
     </form>
   );
 }
@@ -43,7 +43,7 @@ export function DeleteForm({
       {offerDeactivate ? (
         <StatusButton action={deactivateAction} label="Stattdessen deaktivieren" testId="offer-deactivate" />
       ) : null}
-      <form action={formAction} className="space-y-3" key={state?.attempt ?? 0}>
+      <form action={formAction} className="max-w-md space-y-3" key={state?.attempt ?? 0}>
         <Field id="confirmName" label={`Zur Bestätigung den Namen eintippen: ${name}`} error={confirmError}>
           <input
             id="confirmName"
@@ -55,9 +55,9 @@ export function DeleteForm({
             className={inputClass}
           />
         </Field>
-        <button type="submit" disabled={pending} className={`${dangerButtonClass} w-full sm:w-auto`}>
+        <Button type="submit" variant="danger" pending={pending} className="w-full sm:w-auto">
           Endgültig löschen
-        </button>
+        </Button>
       </form>
     </div>
   );

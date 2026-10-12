@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { now } from "@/domain/clock";
 import { formatDateTime } from "@/domain/report-history";
+import { relativeTime } from "@/domain/relative-time";
 import { MessageText } from "@/components/MessageText";
-import { Badge, Notice } from "@/components/ui";
+import { Badge, EmptyState, Notice, PageHeader } from "@/components/ui";
 import { db } from "@/lib/db";
 import { openNotifications } from "@/lib/notifications/service";
 import { requirePerson } from "@/lib/session";
@@ -11,59 +12,76 @@ import { requirePerson } from "@/lib/session";
 export const metadata: Metadata = { title: "Benachrichtigungen" };
 
 /**
- * Eigene Benachrichtigungen des Kanals „App“ (AK-1015), neueste zuerst, mit Link zum Bericht.
- * Das Öffnen der Liste markiert sie als gelesen; was bis eben ungelesen war, trägt „Neu“.
+ * Eigene Benachrichtigungen des Kanals „App“ (AK-1015), neueste zuerst, mit Link zum Bericht:
+ * ungelesen-Punkt, Anlass, Zeit relativ („vor 2 Std.“, absolut im Tooltip). Das Öffnen der Liste
+ * markiert sie als gelesen; was bis eben ungelesen war, trägt „Neu“.
  */
 export default async function NotificationsPage() {
   const person = await requirePerson();
-  const notifications = await openNotifications(db(), person.id, now());
-  const settingsPath = person.role === "TRAINER" ? "/ausbilder/einstellungen" : "/einstellungen";
+  const instant = now();
+  const notifications = await openNotifications(db(), person.id, instant);
 
   return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-semibold">Benachrichtigungen</h1>
+    <div className="mx-auto max-w-[1120px] space-y-6">
+      <PageHeader title="Benachrichtigungen" />
       {!person.channels.includes("APP") ? (
         <Notice tone="info">
           Der Kanal „App“ ist ausgeschaltet: Neue Benachrichtigungen erscheinen hier nicht.{" "}
-          <Link href={settingsPath} className="underline">
+          <Link href="/einstellungen" className="font-medium underline">
             Einstellungen ändern
           </Link>
         </Notice>
       ) : null}
       {notifications.length === 0 ? (
-        <p className="text-slate-600">Keine Benachrichtigungen.</p>
+        <EmptyState testId="notifications-empty">Keine Benachrichtigungen.</EmptyState>
       ) : (
-        <ul className="space-y-3">
+        <ul
+          className="divide-border rounded-card border-border bg-surface divide-y border"
+          aria-label="Benachrichtigungen"
+        >
           {notifications.map((item) => (
-            <li
-              key={item.id}
-              data-testid="notification"
-              className={`space-y-2 rounded-md border p-3 ${item.unread ? "border-blue-300 bg-blue-50" : "border-slate-200 bg-white"}`}
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                {item.unread ? (
-                  <span data-testid="notification-new">
-                    <Badge tone="blue">Neu</Badge>
-                  </span>
-                ) : null}
-                <h2 className="font-medium break-words text-slate-900">{item.subject}</h2>
-              </div>
-              <p className="text-xs text-slate-500">{formatDateTime(item.createdAt)}</p>
-              {item.link ? (
-                <Link href={item.link} className="inline-block text-sm font-medium text-blue-700 underline">
-                  {item.link.startsWith("/berichte/") ? "Zum Bericht" : "Zur Übersicht"}
-                </Link>
-              ) : null}
-              <details>
-                <summary className="cursor-pointer text-sm text-slate-600">Nachricht anzeigen</summary>
-                <div className="mt-2">
-                  <MessageText text={item.body} />
+            <li key={item.id} data-testid="notification" className="flex gap-3 p-4">
+              <span
+                aria-hidden="true"
+                className={`mt-2 h-2.5 w-2.5 shrink-0 rounded-full ${item.unread ? "bg-accent" : "bg-transparent"}`}
+              />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  {item.unread ? (
+                    <span data-testid="notification-new">
+                      <Badge tone="accent">Neu</Badge>
+                    </span>
+                  ) : null}
+                  <h2 className="font-medium break-words">{item.subject}</h2>
                 </div>
-              </details>
+                <p className="text-fg-muted text-sm">
+                  <time dateTime={item.createdAt.toISOString()} title={formatDateTime(item.createdAt)}>
+                    {relativeTime(item.createdAt, instant)}
+                  </time>
+                </p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                  {item.link ? (
+                    <Link
+                      href={item.link}
+                      className="text-accent inline-flex min-h-11 items-center text-sm font-medium underline lg:min-h-8"
+                    >
+                      {item.link.startsWith("/berichte/") ? "Zum Bericht" : "Zur Übersicht"}
+                    </Link>
+                  ) : null}
+                </div>
+                <details>
+                  <summary className="text-fg-muted inline-flex min-h-11 cursor-pointer items-center text-sm lg:min-h-8">
+                    Nachricht anzeigen
+                  </summary>
+                  <div className="mt-2">
+                    <MessageText text={item.body} />
+                  </div>
+                </details>
+              </div>
             </li>
           ))}
         </ul>
       )}
-    </section>
+    </div>
   );
 }

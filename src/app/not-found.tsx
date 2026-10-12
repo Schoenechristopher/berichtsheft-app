@@ -7,7 +7,8 @@ export const metadata: Metadata = { title: "Seite nicht gefunden" };
 export default function NotFound() {
   return (
     <AuthCard title="Seite nicht gefunden">
-      <Link href="/" className="text-blue-700 underline">
+      <p className="text-fg-muted">Die aufgerufene Adresse gibt es nicht oder nicht mehr.</p>
+      <Link href="/" className="text-accent font-medium underline">
         Zur Startseite
       </Link>
     </AuthCard>

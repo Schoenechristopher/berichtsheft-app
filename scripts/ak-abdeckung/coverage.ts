@@ -9,6 +9,8 @@ export type Level = "Unit" | "DB" | "Browser";
 export interface Criterion {
   id: string;
   text: string;
+  /** Ebene laut Spezifikation (nur UI-AK, z. B. „Browser + DB“). */
+  level?: string;
 }
 
 export interface TestCase {
@@ -28,7 +30,10 @@ export interface CoverageRow extends Criterion {
   tests: TestCase[];
 }
 
-const AK_ID = /AK-\d{3,4}/g;
+/** AK-IDs der Spezifikation (AK-101 … AK-1102); „UI-AK-…“ gehört nicht dazu. */
+const AK_ID = /(?<!UI-)AK-\d{3,4}/g;
+/** UI-AK-IDs der UI-Spezifikation (UI-AK-01 … UI-AK-20). */
+const UI_AK_ID = /UI-AK-\d{2}(?!\d)/g;
 
 /** Liest alle Akzeptanzkriterien aus den Tabellen der Spezifikation (`| AK-101 | Text |`). */
 export function parseCriteria(markdown: string): Criterion[] {
@@ -37,6 +42,21 @@ export function parseCriteria(markdown: string): Criterion[] {
     const match = /^\|\s*(AK-\d{3,4})\s*\|\s*(.+?)\s*\|\s*$/.exec(line);
     if (match && !criteria.some((criterion) => criterion.id === match[1])) {
       criteria.push({ id: match[1], text: match[2] });
+    }
+  }
+  return criteria;
+}
+
+/**
+ * Liest alle UI-Akzeptanzkriterien aus der Tabelle der UI-Spezifikation
+ * (`| UI-AK-01 | Kriterium | Ebene |`).
+ */
+export function parseUiCriteria(markdown: string): Criterion[] {
+  const criteria: Criterion[] = [];
+  for (const line of markdown.split("\n")) {
+    const match = /^\|\s*(UI-AK-\d{2})\s*\|\s*(.+?)\s*\|\s*([^|]+?)\s*\|\s*$/.exec(line);
+    if (match && !criteria.some((criterion) => criterion.id === match[1])) {
+      criteria.push({ id: match[1], text: match[2], level: match[3] });
     }
   }
   return criteria;
@@ -133,7 +153,10 @@ export function parseTestNames(source: string, fileName: string): string[] {
 }
 
 function idsOf(test: TestCase): string[] {
-  return [test.name, ...(test.tags ?? [])].flatMap((text) => text.match(AK_ID) ?? []);
+  return [test.name, ...(test.tags ?? [])].flatMap((text) => [
+    ...(text.match(AK_ID) ?? []),
+    ...(text.match(UI_AK_ID) ?? []),
+  ]);
 }
 
 function label(test: TestCase): string {
@@ -148,7 +171,7 @@ export function buildCoverage(criteria: Criterion[], tests: TestCase[]): Coverag
   }));
 }
 
-/** AK-IDs in Testnamen, die es in der Spezifikation nicht gibt (Tippfehler). */
+/** AK- und UI-AK-IDs in Testnamen, die es in den Spezifikationen nicht gibt (Tippfehler). */
 export function unknownIds(criteria: Criterion[], tests: TestCase[]): string[] {
   const known = new Set(criteria.map((criterion) => criterion.id));
   const ids = new Set(tests.flatMap(idsOf));
@@ -161,13 +184,23 @@ function escapeCell(text: string): string {
   return text.replaceAll("|", "\\|").replaceAll("\n", " ");
 }
 
-/** Tabelle für `docs/03-testabdeckung.md`. */
-export function renderMarkdown(rows: CoverageRow[]): string {
+function testsCell(row: CoverageRow): string {
+  return row.tests.length === 0
+    ? "**kein Test**"
+    : row.tests.map((test) => `\`${test.file}\`: ${escapeCell(label(test))}`).join("<br>");
+}
+
+function levelsCell(row: CoverageRow): string {
+  return LEVEL_ORDER.filter((level) => row.tests.some((test) => test.level === level)).join(", ") || "–";
+}
+
+/** Tabellen für `docs/03-testabdeckung.md`: AK-IDs, darunter ein eigener Abschnitt für die UI-AK-IDs. */
+export function renderMarkdown(rows: CoverageRow[], uiRows: CoverageRow[] = []): string {
   const covered = rows.filter((row) => row.tests.length > 0).length;
   const lines = [
     "# Testabdeckung der Akzeptanzkriterien",
     "",
-    "Erzeugt mit `npm run ak:abdeckung` aus `docs/01-spezifikation.md` und den Testnamen (Vitest und Playwright). Nicht von Hand bearbeiten; CI prüft, dass die Datei aktuell ist (`npm run ak:abdeckung -- --pruefen`).",
+    "Erzeugt mit `npm run ak:abdeckung` aus `docs/01-spezifikation.md`, `docs/05-ui-spezifikation.md` und den Testnamen (Vitest und Playwright). Nicht von Hand bearbeiten; CI prüft, dass die Datei aktuell ist (`npm run ak:abdeckung -- --pruefen`).",
     "",
     "Ein Test zählt für ein Kriterium, wenn sein Name die AK-ID nennt; die Beispielszenarien tragen ihren Namen wörtlich wie in der Spezifikation und nennen die AK-IDs als Playwright-Tags (`@AK-…`). Ebenen: **Unit** = Vitest ohne Datenbank (`src/**/*.test.ts`, `scripts/**/*.test.ts`), **DB** = Vitest gegen PostgreSQL (`tests/db/`), **Browser** = Playwright gegen die laufende Demo (`e2e/`; Projekte Chromium, Firefox, Edge und Smartphone 375 px, siehe `playwright.config.ts`).",
     "",
@@ -177,12 +210,26 @@ export function renderMarkdown(rows: CoverageRow[]): string {
     "| --- | --- | --- | --- |",
   ];
   for (const row of rows) {
-    const tests =
-      row.tests.length === 0
-        ? "**kein Test**"
-        : row.tests.map((test) => `\`${test.file}\`: ${escapeCell(label(test))}`).join("<br>");
-    const levels = LEVEL_ORDER.filter((level) => row.tests.some((test) => test.level === level)).join(", ") || "–";
-    lines.push(`| ${row.id} | ${escapeCell(shortText(row.text))} | ${tests} | ${levels} |`);
+    lines.push(`| ${row.id} | ${escapeCell(shortText(row.text))} | ${testsCell(row)} | ${levelsCell(row)} |`);
+  }
+  if (uiRows.length > 0) {
+    const uiCovered = uiRows.filter((row) => row.tests.length > 0).length;
+    lines.push(
+      "",
+      "## UI-Akzeptanzkriterien",
+      "",
+      "Aus `docs/05-ui-spezifikation.md` (UI-AK-01 … UI-AK-20). Ein Test zählt, wenn sein Name mit der UI-AK-ID beginnt bzw. sie nennt. „Ebene (Soll)“ ist die Ebene laut UI-Spezifikation.",
+      "",
+      `Abgedeckt: ${uiCovered} von ${uiRows.length} UI-Akzeptanzkriterien.`,
+      "",
+      "| UI-AK-ID | Kurztext | Tests | Ebene (Soll) | Ebene |",
+      "| --- | --- | --- | --- | --- |",
+    );
+    for (const row of uiRows) {
+      lines.push(
+        `| ${row.id} | ${escapeCell(shortText(row.text))} | ${testsCell(row)} | ${escapeCell(row.level ?? "–")} | ${levelsCell(row)} |`,
+      );
+    }
   }
   return `${lines.join("\n")}\n`;
 }

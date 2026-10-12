@@ -9,6 +9,7 @@ import {
   prepareWeek,
   queryOne,
   restoreSeedState,
+  writeDayComment,
   type DayContent,
 } from "./helpers";
 
@@ -181,18 +182,23 @@ test.describe("Einreichen und Prüfen", () => {
 
     const bernd = await newSession(browser, accounts.bernd);
     await bernd.page.goto(`/berichte/${reportId}`);
-    // AK-604: ohne Gesamtkommentar kein Dialog, Meldung am Feld.
-    await bernd.page.getByLabel("Kommentar zu Mittwoch, 30.09.2026 (optional)").fill("Welche Themen genau?");
+    // AK-605: optionaler Tageskommentar über „Kommentar zu diesem Tag“.
+    await writeDayComment(bernd.page, "Mittwoch, 30.09.2026", "Welche Themen genau?");
+    // AK-604: Der Gesamtkommentar ist Pflichtfeld im Dialog „Ablehnen …“; ohne ihn bleibt der Dialog
+    // offen, die Meldung steht am Feld, und es wird nicht abgelehnt.
     await bernd.page.getByRole("button", { name: "Ablehnen", exact: true }).click();
-    await expect(bernd.page.getByRole("dialog")).toHaveCount(0);
-    await expect(bernd.page.getByText("Bitte einen Gesamtkommentar eingeben")).toBeVisible();
-    await expect(bernd.page.getByLabel("Gesamtkommentar (Pflicht beim Ablehnen)")).toHaveAttribute(
+    const rejectDialog = bernd.page.getByRole("dialog", { name: "Bericht ablehnen?" });
+    await expect(rejectDialog).toContainText("Dazu kommt 1 Tageskommentar.");
+    await rejectDialog.getByRole("button", { name: "Ablehnen", exact: true }).click();
+    await expect(rejectDialog.getByText("Bitte einen Gesamtkommentar eingeben")).toBeVisible();
+    await expect(rejectDialog.getByLabel("Gesamtkommentar (Pflicht beim Ablehnen)")).toHaveAttribute(
       "aria-invalid",
       "true",
     );
-    // AK-605: Gesamtkommentar plus optionaler Tageskommentar.
-    await bernd.page.getByLabel("Gesamtkommentar (Pflicht beim Ablehnen)").fill("Bitte die Berufsschule genauer.");
-    await confirmAction(bernd.page, "Ablehnen", "Bericht ablehnen?");
+    await expect(rejectDialog).toBeVisible();
+    expect(await reportStatus(reportId)).toBe("SUBMITTED");
+    await rejectDialog.getByLabel("Gesamtkommentar (Pflicht beim Ablehnen)").fill("Bitte die Berufsschule genauer.");
+    await rejectDialog.getByRole("button", { name: "Ablehnen", exact: true }).click();
     await expect(bernd.page.getByTestId("report-status")).toHaveText("Status: Abgelehnt");
 
     // AK-606: Emil sieht Gesamtkommentar oben und den Tageskommentar beim Mittwoch.
@@ -216,10 +222,13 @@ test.describe("Einreichen und Prüfen", () => {
     await bernd.page.goto("/ausbilder/pruefliste");
     await expect(bernd.page.getByTestId("review-row")).toHaveCount(1);
 
-    // AK-603: Freigabe mit Name sowie Datum und Uhrzeit.
+    // AK-603: Freigabe mit Name sowie Datum und Uhrzeit. Die geteilte Prüfansicht öffnet danach den
+    // nächsten Bericht (UI-AK-11); den Freigabevermerk zeigt die Berichtsseite.
     await bernd.page.getByTestId("review-row").getByRole("link").click();
     await expect(bernd.page.getByText("IPv4-Subnetting")).toBeVisible();
     await confirmAction(bernd.page, "Freigeben", "Bericht freigeben?");
+    await expect(bernd.page.getByTestId("review-queue-empty")).toBeVisible();
+    await bernd.page.goto(`/berichte/${reportId}`);
     await expect(bernd.page.getByTestId("report-status")).toHaveText("Status: Freigegeben");
     await expect(bernd.page.getByTestId("approval-note")).toHaveText(
       /^Freigegeben von Bernd Ausbilder am \d{2}\.\d{2}\.\d{4}, \d{2}:\d{2} Uhr$/,
@@ -275,10 +284,12 @@ test.describe("Einreichen und Prüfen", () => {
     await clara.page.goto(`/berichte/${reportId}`);
     await expect(clara.page.getByRole("button", { name: "Ablehnen" })).toHaveCount(0);
     await clara.page.getByRole("button", { name: "Freigabe zurücknehmen", exact: true }).click();
-    await expect(clara.page.getByRole("dialog")).toHaveCount(0);
-    await expect(clara.page.getByText("Bitte eine Begründung eingeben")).toBeVisible();
-    await clara.page.getByLabel("Begründung für die Rücknahme").fill("Mittwoch falsches Datum");
-    await confirmAction(clara.page, "Freigabe zurücknehmen", "Freigabe zurücknehmen?");
+    const revokeDialog = clara.page.getByRole("dialog", { name: "Freigabe zurücknehmen?" });
+    await revokeDialog.getByRole("button", { name: "Freigabe zurücknehmen", exact: true }).click();
+    await expect(revokeDialog.getByText("Bitte eine Begründung eingeben")).toBeVisible();
+    expect(await reportStatus(reportId)).toBe("APPROVED");
+    await revokeDialog.getByLabel("Begründung für die Rücknahme").fill("Mittwoch falsches Datum");
+    await revokeDialog.getByRole("button", { name: "Freigabe zurücknehmen", exact: true }).click();
 
     // Dann hat der Bericht den Status „Abgelehnt“.
     await expect(clara.page.getByTestId("report-status")).toHaveText("Status: Abgelehnt");
@@ -335,7 +346,11 @@ test.describe("Einreichen und Prüfen", () => {
     await bernd.page.goto("/ausbilder/pruefliste");
     expect(await noHorizontalScroll(bernd.page)).toBe(true);
     await bernd.page.goto(`/berichte/${reportId}`);
-    await bernd.page.getByLabel("Gesamtkommentar (Pflicht beim Ablehnen)").fill("Ein_sehr_langes_Wort_".repeat(10));
+    await bernd.page.getByRole("button", { name: "Ablehnen", exact: true }).click();
+    await bernd.page
+      .getByRole("dialog", { name: "Bericht ablehnen?" })
+      .getByLabel("Gesamtkommentar (Pflicht beim Ablehnen)")
+      .fill("Ein_sehr_langes_Wort_".repeat(10));
     expect(await noHorizontalScroll(bernd.page)).toBe(true);
     await trainee.context.close();
     await bernd.context.close();

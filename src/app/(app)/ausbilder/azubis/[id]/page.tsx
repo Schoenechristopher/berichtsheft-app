@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { now } from "@/domain/clock";
 import { currentIsoWeek } from "@/domain/report-generation";
-import { BackLink, Badge } from "@/components/ui";
-import { PdfRangeForm } from "@/components/PdfExport";
-import { WeekOverview } from "@/components/WeekOverview";
 import { toDateInput } from "@/domain/weeks";
+import { Badge, PageHeader } from "@/components/ui";
+import { PdfRangeForm } from "@/components/PdfExport";
+import { WeekOverview, parseWeekFilter } from "@/components/WeekOverview";
 import { db } from "@/lib/db";
 import { isUuid } from "@/lib/ids";
 import { trainingPeriod } from "@/lib/people/labels";
@@ -15,8 +15,11 @@ import { requirePerson } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Wochenberichte eines Azubis" };
 
-/** Wochenübersicht eines Azubis für Ausbilder (AK-105, AK-306): dieselbe Liste, nur lesend. */
-export default async function TraineeWeeksPage({ params }: PageProps<"/ausbilder/azubis/[id]">) {
+/**
+ * Wochen eines Azubis für Ausbilder (AK-105, AK-306): Meine Wochen aus Ausbildersicht, nur lesend,
+ * mit Filter und Sammel-PDF.
+ */
+export default async function TraineeWeeksPage({ params, searchParams }: PageProps<"/ausbilder/azubis/[id]">) {
   const viewer = await requirePerson("TRAINER");
   const { id } = await params;
   if (!isUuid(id)) {
@@ -30,21 +33,31 @@ export default async function TraineeWeeksPage({ params }: PageProps<"/ausbilder
   }
   const { trainee, reports } = overview;
   const range = exportRangeDefaults(trainee, instant);
+  const filter = parseWeekFilter((await searchParams).status);
 
   return (
-    <section className="space-y-4">
-      <BackLink href="/ausbilder">Zur Startseite</BackLink>
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold break-words">Wochenberichte von {trainee.name}</h1>
-        <p className="text-sm text-slate-600">
-          Ausbildung {trainingPeriod(trainee.trainingStart, trainee.trainingEnd)}
-        </p>
-        {trainee.active ? null : <Badge tone="slate">deaktiviert</Badge>}
-      </div>
-      {range ? (
-        <PdfRangeForm action={`/azubis/${trainee.id}/pdf`} from={toDateInput(range.from)} to={toDateInput(range.to)} />
-      ) : null}
-      <WeekOverview reports={reports} currentWeek={currentIsoWeek(instant)} />
-    </section>
+    <div className="mx-auto max-w-[1120px] space-y-6">
+      <PageHeader
+        back={{ href: "/ausbilder/azubis", label: "Zurück zu Azubis" }}
+        title={`Wochenberichte von ${trainee.name}`}
+        subtitle={`Ausbildung ${trainingPeriod(trainee.trainingStart, trainee.trainingEnd)}`}
+        meta={trainee.active ? null : <Badge>deaktiviert</Badge>}
+        actions={
+          range ? (
+            <PdfRangeForm
+              action={`/azubis/${trainee.id}/pdf`}
+              from={toDateInput(range.from)}
+              to={toDateInput(range.to)}
+            />
+          ) : null
+        }
+      />
+      <WeekOverview
+        reports={reports}
+        currentWeek={currentIsoWeek(instant)}
+        filter={filter}
+        basePath={`/ausbilder/azubis/${trainee.id}`}
+      />
+    </div>
   );
 }

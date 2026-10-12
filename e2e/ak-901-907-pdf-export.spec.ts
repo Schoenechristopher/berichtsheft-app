@@ -38,6 +38,7 @@ test.describe("PDF-Export", () => {
 
   test("AK-906 AK-902 Azubi lädt das eigene Berichtsheft für einen Zeitraum herunter", async ({ page }) => {
     await login(page, accounts.anna);
+    await page.goto("/azubi/wochen");
     await page.getByText("Berichtsheft als PDF herunterladen").click();
     const form = page.getByRole("form", { name: "Berichtsheft als PDF" });
     // Vorbelegt mit dem Ausbildungsbeginn.
@@ -115,6 +116,7 @@ test.describe("PDF-Export", () => {
   test("AK-1102 PDF-Export bei 375 px ohne horizontales Scrollen", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 800 });
     await login(page, accounts.anna);
+    await page.goto("/azubi/wochen");
     await page.getByText("Berichtsheft als PDF herunterladen").click();
     await expect(page.getByRole("button", { name: "Zeitraum als PDF herunterladen" })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);

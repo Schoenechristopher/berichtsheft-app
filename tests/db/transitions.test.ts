@@ -83,7 +83,7 @@ describe("Einreichen (AK-501 – AK-505)", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.submissionIssues).toEqual([
-      { dayId: report.days[2].id, dayLabel: "Mittwoch, 30.09.2026", problem: "ACTIVITIES_MISSING" },
+      { dayId: report.days[2].id, dayLabel: "Mittwoch, 30.09.2026", dayShort: "Mi", problem: "ACTIVITIES_MISSING" },
     ]);
     expect(result.formError).toContain("Mittwoch, 30.09.2026: Tätigkeiten fehlen");
     expect(await status(report.id)).toBe("DRAFT");

@@ -1,16 +1,12 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { ConfirmSubmit } from "@/components/ConfirmSubmit";
-import {
-  Field,
-  Notice,
-  dangerButtonClass,
-  inputClass,
-  primaryButtonClass,
-  secondaryButtonClass,
-} from "@/components/ui";
-import { isBlank, TRANSITION_MESSAGES } from "@/domain/report-status";
+import { useRouter } from "next/navigation";
+import { useActionState, useId, useState } from "react";
+import { ConfirmSubmit, ConfirmWithReason } from "@/components/ui/dialog";
+import { Field, inputClass } from "@/components/ui/field";
+import { Notice } from "@/components/ui/notice";
+import { useErrorToast, useToast } from "@/components/ui/toast";
+import { isBlank, TRANSITION_MESSAGES, type ReportAction } from "@/domain/report-status";
 import type { TransitionState } from "./actions";
 
 type Action = (prev: TransitionState, formData: FormData) => Promise<TransitionState>;
@@ -30,8 +26,36 @@ function SeenFields({ seen }: { seen: Seen }) {
   );
 }
 
-function FormError({ state }: { state: TransitionState }) {
-  return state && !state.ok && state.formError ? <Notice tone="error">{state.formError}</Notice> : null;
+const SUCCESS_MESSAGES: Partial<Record<ReportAction, string>> = {
+  APPROVE: "Bericht freigegeben",
+  REJECT: "Bericht abgelehnt",
+  WITHDRAW: "Bericht zurückgezogen",
+  REVOKE_APPROVAL: "Freigabe zurückgenommen",
+};
+
+/**
+ * Serveraktion mit Rückmeldung: Erfolg als Toast direkt nach der Antwort (die Seite ersetzt das
+ * Formular danach), Fehler als Fehler-Toast mit der Meldung aus der Fachlogik (z. B. AK-508). Mit
+ * `nextHref` geht es nach Erfolg weiter, z. B. in der Prüfansicht zum nächsten Bericht (UI-AK-11).
+ */
+function useTransition(action: Action, nextHref?: string) {
+  const toast = useToast();
+  const router = useRouter();
+  const result = useActionState<TransitionState, FormData>(async (prev, formData) => {
+    const state = await action(prev, formData);
+    if (state?.ok) {
+      const message = state.action ? SUCCESS_MESSAGES[state.action] : undefined;
+      if (message) {
+        toast.success(message);
+      }
+      if (nextHref) {
+        router.push(nextHref);
+      }
+    }
+    return state;
+  }, null);
+  useErrorToast(result[0]);
+  return result;
 }
 
 /** Tag in der Prüfansicht: Inhalt nur lesend, dazu optionaler Tageskommentar (AK-605). */
@@ -44,85 +68,119 @@ export interface ReviewDay {
 }
 
 /**
- * Prüfen (AK-602 – AK-605): Tage lesen, optional je Tag kommentieren, dann freigeben oder mit
- * Gesamtkommentar ablehnen. Beides mit Bestätigungsdialog; der Server prüft Rolle, Status und
- * Version selbst und meldet z. B. „Bericht wurde zurückgezogen“ (AK-508).
+ * Prüfen (AK-602 – AK-605, UI-Spezifikation „Prüfansicht“): Tage als Zeilen (links Tag, Datum und
+ * Tagesart, rechts der Text), je Tag „Kommentar zu diesem Tag“, das ein Feld öffnet. Die
+ * Entscheidungsleiste steht fest unten: „Ablehnen …“ mit Pflicht-Gesamtkommentar im Dialog, der
+ * die Zahl der Tageskommentare nennt, und „Freigeben“ mit Bestätigungsdialog. Der Server prüft
+ * Rolle, Status und Version selbst und meldet z. B. „Bericht wurde zurückgezogen“ (AK-508).
  */
 export function ReviewForm({
   action,
   seen,
   days,
   canReject,
+  nextHref,
 }: {
   action: Action;
   seen: Seen;
   days: ReviewDay[];
   /** Nein bei deaktiviertem Azubi (bestätigte Auslegung): dann nur Freigeben. */
   canReject: boolean;
+  /** Prüfansicht: nach der Entscheidung zum nächsten Bericht der Liste. */
+  nextHref?: string;
 }) {
-  const [state, formAction, pending] = useActionState(action, null);
-  const [comment, setComment] = useState("");
+  const [state, formAction, pending] = useTransition(action, nextHref);
   const [dayComments, setDayComments] = useState<Record<string, string>>({});
-  const [commentMissing, setCommentMissing] = useState(false);
-  const commentError =
-    (commentMissing && isBlank(comment) ? TRANSITION_MESSAGES.commentRequired : undefined) ??
-    (state && !state.ok ? state.fieldErrors?.comment : undefined);
-  const hasDayComments = Object.values(dayComments).some((text) => !isBlank(text));
+  const [openComments, setOpenComments] = useState<Record<string, boolean>>({});
+  const commentCount = Object.values(dayComments).filter((text) => !isBlank(text)).length;
+  const serverCommentError = state && !state.ok ? state.fieldErrors?.comment : undefined;
+  const baseId = useId();
 
   return (
     <form action={formAction} className="space-y-4" aria-label="Bericht prüfen" noValidate>
       <SeenFields seen={seen} />
-      <FormError state={state} />
-      <ul className="space-y-2" aria-label="Tage">
+      <ul className="divide-border rounded-card border-border bg-surface divide-y border" aria-label="Tage">
         {days.map((day) => {
           const id = `dayComment-${day.id}`;
           const error = state && !state.ok ? state.fieldErrors?.dayComments?.[day.id] : undefined;
+          const open = openComments[day.id] || !!error;
           return (
             <li
               key={day.id}
               data-testid="report-day"
-              className={`space-y-2 rounded-lg border border-slate-200 p-3 ${day.outsideTraining ? "bg-slate-100 text-slate-500" : "bg-white"}`}
+              className={`grid gap-x-6 gap-y-2 p-4 md:grid-cols-[12rem_1fr] ${day.outsideTraining ? "bg-surface-muted text-fg-muted" : ""}`}
             >
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="font-medium">{day.label}</span>
-                <span className="text-sm">{day.dayTypeLabel}</span>
+              <div>
+                <p className="font-medium">{day.label}</p>
+                <p className="text-fg-muted text-sm">{day.dayTypeLabel}</p>
               </div>
-              {day.activities ? <p className="text-sm break-words whitespace-pre-wrap">{day.activities}</p> : null}
-              {canReject ? (
-                <Field id={id} label={`Kommentar zu ${day.label} (optional)`} error={error}>
-                  <textarea
-                    id={id}
-                    name={id}
-                    rows={2}
-                    value={dayComments[day.id] ?? ""}
-                    onChange={(event) => setDayComments((current) => ({ ...current, [day.id]: event.target.value }))}
-                    aria-invalid={error ? true : undefined}
-                    aria-describedby={error ? `${id}-error` : undefined}
-                    className={`${inputClass} resize-y`}
-                  />
-                </Field>
-              ) : null}
+              <div className="min-w-0 space-y-2">
+                {day.activities ? (
+                  <p className="break-words whitespace-pre-wrap">{day.activities}</p>
+                ) : (
+                  <p className="text-fg-muted text-sm">Keine Tätigkeiten eingetragen.</p>
+                )}
+                {canReject ? (
+                  open ? (
+                    <Field id={id} label={`Kommentar zu ${day.label} (optional)`} error={error}>
+                      <textarea
+                        id={id}
+                        name={id}
+                        rows={2}
+                        value={dayComments[day.id] ?? ""}
+                        onChange={(event) =>
+                          setDayComments((current) => ({ ...current, [day.id]: event.target.value }))
+                        }
+                        aria-invalid={error ? true : undefined}
+                        aria-describedby={error ? `${id}-error` : undefined}
+                        className={`${inputClass} resize-y`}
+                        autoFocus={!error}
+                      />
+                    </Field>
+                  ) : (
+                    <button
+                      type="button"
+                      id={`${baseId}-${day.id}`}
+                      onClick={() => setOpenComments((current) => ({ ...current, [day.id]: true }))}
+                      className="text-accent inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 hover:underline lg:min-h-8"
+                    >
+                      Kommentar zu diesem Tag<span className="sr-only"> ({day.label})</span>
+                    </button>
+                  )
+                ) : null}
+              </div>
             </li>
           );
         })}
       </ul>
-      {canReject ? (
-        <Field id="comment" label="Gesamtkommentar (Pflicht beim Ablehnen)" error={commentError}>
-          <textarea
-            id="comment"
-            name="comment"
-            rows={3}
-            value={comment}
-            onChange={(event) => setComment(event.target.value)}
-            aria-invalid={commentError ? true : undefined}
-            aria-describedby={commentError ? "comment-error" : undefined}
-            className={`${inputClass} resize-y`}
+      {canReject ? null : <Notice tone="info">{TRANSITION_MESSAGES.traineeInactiveReview}</Notice>}
+      <div
+        data-testid="decision-bar"
+        className="border-border bg-surface sticky bottom-0 z-10 flex flex-wrap items-center justify-end gap-2 border-t py-3"
+      >
+        {canReject ? (
+          <ConfirmWithReason
+            label="Ablehnen"
+            title="Bericht ablehnen?"
+            message={
+              <p>
+                Der Azubi sieht Ihren Gesamtkommentar und die Tageskommentare und kann den Bericht überarbeiten.{" "}
+                {commentCount === 0
+                  ? "Es gibt keine Tageskommentare."
+                  : commentCount === 1
+                    ? "Dazu kommt 1 Tageskommentar."
+                    : `Dazu kommen ${commentCount} Tageskommentare.`}
+              </p>
+            }
+            fieldLabel="Gesamtkommentar (Pflicht beim Ablehnen)"
+            fieldName="comment"
+            requiredMessage={TRANSITION_MESSAGES.commentRequired}
+            name="action"
+            value="REJECT"
+            disabled={pending}
+            serverError={serverCommentError}
           />
-        </Field>
-      ) : (
-        <Notice tone="info">{TRANSITION_MESSAGES.traineeInactiveReview}</Notice>
-      )}
-      <div className="flex flex-wrap gap-3">
+        ) : null}
         <ConfirmSubmit
           label="Freigeben"
           title="Bericht freigeben?"
@@ -130,33 +188,16 @@ export function ReviewForm({
             <p>
               Der Bericht wird freigegeben und ist danach für niemanden mehr änderbar – außer über „Freigabe
               zurücknehmen“.
-              {hasDayComments || !isBlank(comment)
-                ? " Eingegebene Kommentare werden bei der Freigabe nicht gespeichert."
-                : ""}
+              {commentCount > 0 ? " Eingegebene Kommentare werden bei der Freigabe nicht gespeichert." : ""}
             </p>
           }
-          buttonClass={primaryButtonClass}
+          variant="primary"
           name="action"
           value="APPROVE"
           disabled={pending}
+          pending={pending}
+          pendingLabel="Wird gespeichert …"
         />
-        {canReject ? (
-          <ConfirmSubmit
-            label="Ablehnen"
-            title="Bericht ablehnen?"
-            message={
-              <p>Der Azubi sieht Ihren Gesamtkommentar und die Tageskommentare und kann den Bericht überarbeiten.</p>
-            }
-            buttonClass={dangerButtonClass}
-            name="action"
-            value="REJECT"
-            disabled={pending}
-            beforeOpen={() => {
-              setCommentMissing(true);
-              return !isBlank(comment);
-            }}
-          />
-        ) : null}
       </div>
     </form>
   );
@@ -164,49 +205,32 @@ export function ReviewForm({
 
 /** Zurückziehen durch den Azubi (AK-506), nur solange „Eingereicht“. */
 export function WithdrawForm({ action, seen }: { action: Action; seen: Seen }) {
-  const [state, formAction, pending] = useActionState(action, null);
+  const [, formAction, pending] = useTransition(action);
   return (
-    <form action={formAction} className="space-y-3" aria-label="Bericht zurückziehen">
+    <form action={formAction} aria-label="Bericht zurückziehen">
       <SeenFields seen={seen} />
-      <FormError state={state} />
       <ConfirmSubmit
         label="Zurückziehen"
         title="Bericht zurückziehen?"
         message={<p>Der Bericht wird wieder zum Entwurf, Sie können ihn bearbeiten und erneut einreichen.</p>}
-        buttonClass={secondaryButtonClass}
+        variant="secondary"
         name="action"
         value="WITHDRAW"
         disabled={pending}
+        pending={pending}
+        pendingLabel="Wird zurückgezogen …"
       />
     </form>
   );
 }
 
-/** Freigabe zurücknehmen (AK-703): nur mit Begründung, danach „Abgelehnt“. */
+/** Freigabe zurücknehmen (AK-703): nur mit Begründung im Dialog, danach „Abgelehnt“. */
 export function RevokeForm({ action, seen }: { action: Action; seen: Seen }) {
-  const [state, formAction, pending] = useActionState(action, null);
-  const [reason, setReason] = useState("");
-  const [checked, setChecked] = useState(false);
-  const error =
-    (checked && isBlank(reason) ? TRANSITION_MESSAGES.reasonRequired : undefined) ??
-    (state && !state.ok ? state.fieldErrors?.reason : undefined);
+  const [state, formAction, pending] = useTransition(action);
   return (
-    <form action={formAction} className="space-y-3" aria-label="Freigabe zurücknehmen" noValidate>
+    <form action={formAction} aria-label="Freigabe zurücknehmen" noValidate>
       <SeenFields seen={seen} />
-      <FormError state={state} />
-      <Field id="reason" label="Begründung für die Rücknahme" error={error}>
-        <textarea
-          id="reason"
-          name="reason"
-          rows={3}
-          value={reason}
-          onChange={(event) => setReason(event.target.value)}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? "reason-error" : undefined}
-          className={`${inputClass} resize-y`}
-        />
-      </Field>
-      <ConfirmSubmit
+      <ConfirmWithReason
         label="Freigabe zurücknehmen"
         title="Freigabe zurücknehmen?"
         message={
@@ -214,14 +238,15 @@ export function RevokeForm({ action, seen }: { action: Action; seen: Seen }) {
             Der Bericht wird „Abgelehnt“ und für den Azubi wieder bearbeitbar. Die Begründung steht in der Historie.
           </p>
         }
-        buttonClass={dangerButtonClass}
+        fieldLabel="Begründung für die Rücknahme"
+        fieldName="reason"
+        requiredMessage={TRANSITION_MESSAGES.reasonRequired}
         name="action"
         value="REVOKE_APPROVAL"
         disabled={pending}
-        beforeOpen={() => {
-          setChecked(true);
-          return !isBlank(reason);
-        }}
+        pending={pending}
+        pendingLabel="Wird zurückgenommen …"
+        serverError={state && !state.ok ? state.fieldErrors?.reason : undefined}
       />
     </form>
   );

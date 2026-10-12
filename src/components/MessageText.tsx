@@ -2,10 +2,10 @@
 export function MessageText({ text }: { text: string }) {
   const parts = text.split(/(https?:\/\/[^\s]+)/g);
   return (
-    <p className="text-sm break-words whitespace-pre-line text-slate-700">
+    <p className="text-fg text-sm break-words whitespace-pre-line">
       {parts.map((part, index) =>
         index % 2 === 1 ? (
-          <a key={index} href={part} className="text-blue-700 underline">
+          <a key={index} href={part} className="text-accent underline">
             {part}
           </a>
         ) : (

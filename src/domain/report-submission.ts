@@ -5,7 +5,7 @@
  * (verbindlich, in derselben Transaktion wie der Statuswechsel).
  */
 import type { DayType } from "./report-generation";
-import { formatDate, weekdayLong } from "./weeks";
+import { formatDate, weekdayLong, weekdayShort } from "./weeks";
 
 /** Tag, soweit die Prüfung ihn braucht. */
 export interface DayForSubmission {
@@ -28,6 +28,8 @@ export interface SubmissionIssue {
   dayId: string;
   /** z. B. „Freitag, 25.12.2026“ */
   dayLabel: string;
+  /** z. B. „Fr“ für die Fehlerleiste */
+  dayShort: string;
   problem: SubmissionProblem;
 }
 
@@ -49,14 +51,24 @@ export function validateSubmission(days: readonly DayForSubmission[]): Submissio
         return [];
       }
       const dayLabel = `${weekdayLong(day.date)}, ${formatDate(day.date)}`;
+      const dayShort = weekdayShort(day.date);
       if (!day.dayType) {
-        return [{ dayId: day.id, dayLabel, problem: "DAY_TYPE_MISSING" }];
+        return [{ dayId: day.id, dayLabel, dayShort, problem: "DAY_TYPE_MISSING" }];
       }
       if (NEEDS_ACTIVITIES.includes(day.dayType) && day.activities.trim() === "") {
-        return [{ dayId: day.id, dayLabel, problem: "ACTIVITIES_MISSING" }];
+        return [{ dayId: day.id, dayLabel, dayShort, problem: "ACTIVITIES_MISSING" }];
       }
       return [];
     });
+}
+
+/**
+ * Überschrift der Fehlerleiste nach einem gescheiterten Einreichen (UI-AK-08), z. B.
+ * „2 Tage sind unvollständig: Mi, Fr“. Die Leiste nennt darunter jeden Tag mit Sprunglink.
+ */
+export function submissionHeadline(issues: readonly Pick<SubmissionIssue, "dayShort">[]): string {
+  const days = issues.map((issue) => issue.dayShort).join(", ");
+  return issues.length === 1 ? `1 Tag ist unvollständig: ${days}` : `${issues.length} Tage sind unvollständig: ${days}`;
 }
 
 /** Zusammenfassung über dem Formular, nennt alle betroffenen Tage (AK-502). */
