@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   buildCoverage,
+  casesAsTests,
+  checkCases,
+  criterionOfCase,
   levelOf,
+  moduleOfSpecFile,
+  parseCheckCases,
+  parseModuleCriteria,
   parseCriteria,
   parseTestNames,
   parseTests,
@@ -142,5 +148,99 @@ Fließtext mit UI-AK-99 zählt nicht.
     expect(markdown).toContain(
       "| UI-AK-14 | Die Darstellung lässt sich auf System, Hell und Dunkel stellen; `data-theme` am html. | `tests/db/theme.test.ts`: UI-AK-14 Darstellung am Konto<br>`e2e/ui.spec.ts`: UI-AK-14 UI-AK-21 Darstellung im Browser | Browser + DB | DB, Browser |",
     );
+  });
+});
+
+describe("Prüffälle in der Abdeckung (specs/pruefung)", () => {
+  const criteria = parseCriteria(spec);
+  const fall = (id: string, extra: Record<string, unknown> = {}) => ({
+    id,
+    modul: "M01",
+    ebene: "fachlogik",
+    schnittstelle: "istFeiertag",
+    eingabe: { bundesland: "NW", datum: "2026-12-25" },
+    erwartet: { feiertag: true },
+    ...extra,
+  });
+  const read = (cases: unknown) => parseCheckCases(JSON.stringify(cases, null, 2), "specs/pruefung/M01.json");
+
+  it("liest AK-IDs nur aus dem Abschnitt „Akzeptanzkriterien“ einer Fach-Spec; Modul aus dem Dateinamen", () => {
+    const markdown = `
+## 3. Regeln
+| AK-999 | gehört nicht dazu |
+## 4. Akzeptanzkriterien
+| AK-ID | Kriterium | Regeln | Prüffälle |
+| --- | --- | --- | --- |
+| AK-101 | Text | M01-R01 | AK-101-01 |
+| UI-AK-14 | Text | – | – |
+## 5. Logisches Datenmodell
+| AK-1102 | gehört nicht dazu |
+`;
+    expect(parseModuleCriteria(markdown)).toEqual(["AK-101", "UI-AK-14"]);
+    expect(moduleOfSpecFile("M01-kalender-und-zeit.md")).toBe("M01");
+    expect(moduleOfSpecFile("Q-plattform-und-qualitaet.md")).toBe("Q");
+    expect(moduleOfSpecFile("00-uebersicht.md")).toBeNull();
+    expect(moduleOfSpecFile("code-landkarte.md")).toBeNull();
+  });
+
+  it("Prüffälle zählen als Tests der Ebene „Prüffall“", () => {
+    const { cases, errors } = read([fall("AK-101-01"), fall("AK-1102-01")]);
+    expect(errors).toEqual([]);
+    expect(criterionOfCase("AK-1102-01")).toBe("AK-1102");
+    expect(criterionOfCase("UI-AK-14-02")).toBe("UI-AK-14");
+    const rows = buildCoverage(criteria, casesAsTests(cases));
+    expect(rows.map((row) => [row.id, row.tests.map((test) => test.level)])).toEqual([
+      ["AK-101", ["Prüffall"]],
+      ["AK-1102", ["Prüffall"]],
+    ]);
+    expect(renderMarkdown(rows)).toContain(
+      "| AK-101 | Anmeldung nur über das Firmenkonto; ein eigenes Passwort gibt es nicht. | `specs/pruefung/M01.json`: AK-101-01 | Prüffall |",
+    );
+  });
+
+  it("meldet Formfehler: Pflichtfelder, ID-Schema, Modul, Ebene und verschachteltes „id“", () => {
+    expect(read({ id: "AK-101-01" }).errors).toEqual([
+      "specs/pruefung/M01.json: Prüffall-Datei muss eine Liste von Prüffällen sein.",
+    ]);
+    expect(parseCheckCases("[", "x.json").errors[0]).toMatch(/^x.json: kein gültiges JSON/);
+    const { cases, errors } = read([
+      { id: "AK-101-01", modul: "M01", ebene: "fachlogik", erwartet: {} },
+      fall("AK-101-1"),
+      fall("AK-101-02", { modul: "M10" }),
+      fall("AK-101-03", { ebene: "oberflaeche" }),
+      fall("AK-101-04", { eingabe: { id: "verschachtelt" } }),
+      { id: "AK-101-05", modul: "M05", ebene: "ablauf", erwartet: {} },
+    ]);
+    expect(errors).toEqual([
+      "specs/pruefung/M01.json, Eintrag 1: Pflichtfeld fehlt: schnittstelle, eingabe.",
+      "specs/pruefung/M01.json: AK-101-1: ID folgt nicht dem Schema <AK-ID>-<NN>.",
+      "specs/pruefung/M01.json: AK-101-02: unbekanntes Modul „M10“.",
+      "specs/pruefung/M01.json: AK-101-03: unbekannte Ebene „oberflaeche“.",
+      "specs/pruefung/M01.json, Eintrag 6: Pflichtfeld fehlt: uhr, schritte.",
+      'specs/pruefung/M01.json: "id" darf nur auf der Ebene des Prüffalls stehen (7-mal bei 6 Prüffällen).',
+    ]);
+    expect(cases).toHaveLength(6);
+  });
+
+  it("meldet doppelte IDs, unbekannte AK-IDs, falsches Modul und AKs beschriebener Module ohne Prüffall", () => {
+    const { cases } = read([
+      fall("AK-101-01"),
+      fall("AK-101-01"),
+      fall("AK-999-01"),
+      fall("AK-1102-01", { modul: "M05" }),
+    ]);
+    const modules = new Map([
+      ["M01", ["AK-101"]],
+      ["Q", ["AK-1102", "AK-101", "AK-1206"]],
+    ]);
+    expect(checkCases(cases, criteria, modules)).toEqual([
+      "AK-101 gehört zwei Modulen: M01 und Q.",
+      "Fach-Spec Q: AK-1206 steht nicht in der Spezifikation.",
+      "specs/pruefung/M01.json: Prüffall-ID AK-101-01 ist doppelt.",
+      "specs/pruefung/M01.json: AK-999-01 nennt keine bekannte AK-ID.",
+      "specs/pruefung/M01.json: AK-1102-01 – AK-1102 gehört nicht zum Modul M05.",
+      "Modul Q: AK-1206 hat keinen Prüffall.",
+    ]);
+    expect(checkCases(read([fall("AK-101-01")]).cases, criteria, new Map([["M01", ["AK-101"]]]))).toEqual([]);
   });
 });

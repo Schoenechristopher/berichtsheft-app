@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { now } from "@/domain/clock";
-import { currentIsoWeek } from "@/domain/report-generation";
 import { firstLine } from "@/domain/week-progress";
-import { compareWeeks, weekRangeLabel, weekRangeShort } from "@/domain/weeks";
+import { compareWeeks, currentIsoWeek, weekRangeLabel, weekRangeShort } from "@/domain/weeks";
 import {
   Card,
   DataList,

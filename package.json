@@ -21,7 +21,8 @@
     "db:seed": "prisma db seed",
     "postinstall": "prisma generate",
     "ak:abdeckung": "tsx scripts/ak-abdeckung/index.ts",
-    "pruefumfang": "node scripts/pruefumfang/index.mjs"
+    "pruefumfang": "node scripts/pruefumfang/index.mjs",
+    "landkarte": "node scripts/code-landkarte/index.mjs"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",

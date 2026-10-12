@@ -6,7 +6,7 @@
  * in der sie entstanden sind. Runde 0 gibt es nur, falls vor der ersten Einreichung etwas geschah.
  */
 import type { ReportStatus } from "./report-access";
-import { APP_TIME_ZONE } from "./report-generation";
+import { APP_TIME_ZONE } from "./weeks";
 
 export interface HistoryChange {
   id: string;

@@ -1,0 +1,689 @@
+[
+  {
+    "id": "AK-404-01",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Fr 25.12.2026 ist Feiertag",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "NW",
+      "datum": "2026-12-25"
+    },
+    "erwartet": {
+      "feiertag": true
+    }
+  },
+  {
+    "id": "AK-404-02",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Fronleichnam 2027 ist in Niedersachsen kein Feiertag",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "NI",
+      "datum": "2027-05-27"
+    },
+    "erwartet": {
+      "feiertag": false
+    }
+  },
+  {
+    "id": "AK-404-03",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Fronleichnam 2027 ist in Nordrhein-Westfalen Feiertag",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "NW",
+      "datum": "2027-05-27"
+    },
+    "erwartet": {
+      "feiertag": true
+    }
+  },
+  {
+    "id": "AK-1201-01",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "feste Uhr: Montag 12.10.2026, 9:00 Uhr",
+    "uhr": "2026-10-12T09:00:00+02:00",
+    "schnittstelle": "jetzt",
+    "eingabe": {},
+    "erwartet": {
+      "zeitpunkt": "2026-10-12T09:00:00+02:00"
+    }
+  },
+  {
+    "id": "AK-1201-02",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "feste Uhr in der Winterzeit",
+    "uhr": "2026-12-25T10:00:00+01:00",
+    "schnittstelle": "jetzt",
+    "eingabe": {},
+    "erwartet": {
+      "zeitpunkt": "2026-12-25T10:00:00+01:00"
+    }
+  },
+  {
+    "id": "AK-1201-03",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "außerhalb des Produktivbetriebs wirkt die Vorgabe",
+    "schnittstelle": "uhrVorgeben",
+    "eingabe": {
+      "zeitpunkt": "2026-10-19T09:00:00+02:00",
+      "betrieb": "test"
+    },
+    "erwartet": {
+      "gestellt": true
+    }
+  },
+  {
+    "id": "AK-1201-04",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "im Produktivbetrieb ist die Uhr nicht stellbar",
+    "schnittstelle": "uhrVorgeben",
+    "eingabe": {
+      "zeitpunkt": "2000-01-01T00:00:00+00:00",
+      "betrieb": "produktiv"
+    },
+    "erwartet": {
+      "gestellt": false
+    }
+  },
+  {
+    "id": "AK-1201-05",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "unlesbarer Zeitpunkt wird abgewiesen",
+    "schnittstelle": "uhrVorgeben",
+    "eingabe": {
+      "zeitpunkt": "kein Datum",
+      "betrieb": "test"
+    },
+    "erwartet": {
+      "fehler": "zeitpunkt_ungueltig"
+    }
+  },
+  {
+    "id": "AK-1202-01",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "05.10.2026, 22:30 UTC ist Dienstag, 06.10.2026",
+    "schnittstelle": "kalendertag",
+    "eingabe": {
+      "zeitpunkt": "2026-10-05T22:30:00+00:00"
+    },
+    "erwartet": {
+      "datum": "2026-10-06",
+      "wochentag": "Di"
+    }
+  },
+  {
+    "id": "AK-1202-02",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Sommerzeit: 23:59:59 Uhr Berlin ist noch Samstag",
+    "schnittstelle": "kalendertag",
+    "eingabe": {
+      "zeitpunkt": "2026-10-24T21:59:59+00:00"
+    },
+    "erwartet": {
+      "datum": "2026-10-24",
+      "wochentag": "Sa"
+    }
+  },
+  {
+    "id": "AK-1202-03",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "nach der Umstellung auf Winterzeit: 23:59:59 Uhr Berlin ist noch Sonntag",
+    "schnittstelle": "kalendertag",
+    "eingabe": {
+      "zeitpunkt": "2026-10-25T22:59:59+00:00"
+    },
+    "erwartet": {
+      "datum": "2026-10-25",
+      "wochentag": "So"
+    }
+  },
+  {
+    "id": "AK-1202-04",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Winterzeit: Mitternacht Berlin ist 23:00 UTC",
+    "schnittstelle": "kalendertag",
+    "eingabe": {
+      "zeitpunkt": "2026-10-25T23:00:00+00:00"
+    },
+    "erwartet": {
+      "datum": "2026-10-26",
+      "wochentag": "Mo"
+    }
+  },
+  {
+    "id": "AK-1202-05",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Sommerzeit: Mitternacht Berlin ist 22:00 UTC",
+    "schnittstelle": "kalendertag",
+    "eingabe": {
+      "zeitpunkt": "2026-03-29T22:00:00+00:00"
+    },
+    "erwartet": {
+      "datum": "2026-03-30",
+      "wochentag": "Mo"
+    }
+  },
+  {
+    "id": "AK-1202-06",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Sonntag 23:59 Uhr Berlin gehört noch zur alten Woche",
+    "schnittstelle": "aktuelleWoche",
+    "eingabe": {
+      "zeitpunkt": "2026-10-11T23:59:00+02:00"
+    },
+    "erwartet": {
+      "woche": "2026-W41"
+    }
+  },
+  {
+    "id": "AK-1202-07",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Montag 0:00 Uhr Berlin beginnt die neue Woche",
+    "schnittstelle": "aktuelleWoche",
+    "eingabe": {
+      "zeitpunkt": "2026-10-12T00:00:00+02:00"
+    },
+    "erwartet": {
+      "woche": "2026-W42"
+    }
+  },
+  {
+    "id": "AK-1202-08",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Jahreswechsel: Montag 04.01.2027, 0:00 Uhr Berlin ist KW 1/2027",
+    "schnittstelle": "aktuelleWoche",
+    "eingabe": {
+      "zeitpunkt": "2027-01-03T23:00:00+00:00"
+    },
+    "erwartet": {
+      "woche": "2027-W01"
+    }
+  },
+  {
+    "id": "AK-1202-09",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "„jetzt“ wird in Berliner Ortszeit angegeben",
+    "uhr": "2026-10-05T22:30:00+00:00",
+    "schnittstelle": "jetzt",
+    "eingabe": {},
+    "erwartet": {
+      "zeitpunkt": "2026-10-06T00:30:00+02:00"
+    }
+  },
+  {
+    "id": "AK-1203-01",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "01.01.2027 liegt in KW 53/2026",
+    "schnittstelle": "isoWoche",
+    "eingabe": {
+      "datum": "2027-01-01"
+    },
+    "erwartet": {
+      "woche": "2026-W53"
+    }
+  },
+  {
+    "id": "AK-1203-02",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "29.12.2025 liegt in KW 1/2026",
+    "schnittstelle": "isoWoche",
+    "eingabe": {
+      "datum": "2025-12-29"
+    },
+    "erwartet": {
+      "woche": "2026-W01"
+    }
+  },
+  {
+    "id": "AK-1203-03",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "04.01.2027 liegt in KW 1/2027",
+    "schnittstelle": "isoWoche",
+    "eingabe": {
+      "datum": "2027-01-04"
+    },
+    "erwartet": {
+      "woche": "2027-W01"
+    }
+  },
+  {
+    "id": "AK-1203-04",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Sonntag 03.01.2021 gehört zu KW 53/2020",
+    "schnittstelle": "isoWoche",
+    "eingabe": {
+      "datum": "2021-01-03"
+    },
+    "erwartet": {
+      "woche": "2020-W53"
+    }
+  },
+  {
+    "id": "AK-1203-05",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Montag der KW 53/2026",
+    "schnittstelle": "montagDerWoche",
+    "eingabe": {
+      "jahr": 2026,
+      "woche": 53
+    },
+    "erwartet": {
+      "datum": "2026-12-28"
+    }
+  },
+  {
+    "id": "AK-1203-06",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Mo–Fr der KW 52/2026",
+    "schnittstelle": "arbeitstage",
+    "eingabe": {
+      "jahr": 2026,
+      "woche": 52
+    },
+    "erwartet": {
+      "tage": ["2026-12-21", "2026-12-22", "2026-12-23", "2026-12-24", "2026-12-25"]
+    }
+  },
+  {
+    "id": "AK-1203-07",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "auf KW 53/2026 folgt KW 1/2027",
+    "schnittstelle": "naechsteWoche",
+    "eingabe": {
+      "woche": "2026-W53"
+    },
+    "erwartet": {
+      "woche": "2027-W01"
+    }
+  },
+  {
+    "id": "AK-1203-08",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "KW 53/2026 liegt vor KW 1/2027",
+    "schnittstelle": "vergleicheWochen",
+    "eingabe": {
+      "a": "2026-W53",
+      "b": "2027-W01"
+    },
+    "erwartet": {
+      "ergebnis": "frueher"
+    }
+  },
+  {
+    "id": "AK-1203-09",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "schnittstelle": "vergleicheWochen",
+    "eingabe": {
+      "a": "2026-W41",
+      "b": "2026-W41"
+    },
+    "erwartet": {
+      "ergebnis": "gleich"
+    }
+  },
+  {
+    "id": "AK-1203-10",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "schnittstelle": "vergleicheWochen",
+    "eingabe": {
+      "a": "2027-W01",
+      "b": "2026-W52"
+    },
+    "erwartet": {
+      "ergebnis": "spaeter"
+    }
+  },
+  {
+    "id": "AK-1204-01",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "KW 53/2027 gibt es nicht",
+    "schnittstelle": "montagDerWoche",
+    "eingabe": {
+      "jahr": 2027,
+      "woche": 53
+    },
+    "erwartet": {
+      "fehler": "woche_ungueltig"
+    }
+  },
+  {
+    "id": "AK-1204-02",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "KW 0 gibt es nicht",
+    "schnittstelle": "montagDerWoche",
+    "eingabe": {
+      "jahr": 2027,
+      "woche": 0
+    },
+    "erwartet": {
+      "fehler": "woche_ungueltig"
+    }
+  },
+  {
+    "id": "AK-1204-03",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "KW 54 gibt es nie",
+    "schnittstelle": "montagDerWoche",
+    "eingabe": {
+      "jahr": 2026,
+      "woche": 54
+    },
+    "erwartet": {
+      "fehler": "woche_ungueltig"
+    }
+  },
+  {
+    "id": "AK-1204-04",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "keine Arbeitstage für KW 53/2027",
+    "schnittstelle": "arbeitstage",
+    "eingabe": {
+      "jahr": 2027,
+      "woche": 53
+    },
+    "erwartet": {
+      "fehler": "woche_ungueltig"
+    }
+  },
+  {
+    "id": "AK-1204-05",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "KW 53/2027 rutscht nicht still ins Jahr 2028",
+    "schnittstelle": "naechsteWoche",
+    "eingabe": {
+      "woche": "2027-W53"
+    },
+    "erwartet": {
+      "fehler": "woche_ungueltig"
+    }
+  },
+  {
+    "id": "AK-1204-06",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "2027 hat 52 Wochen: auf KW 52 folgt KW 1/2028",
+    "schnittstelle": "naechsteWoche",
+    "eingabe": {
+      "woche": "2027-W52"
+    },
+    "erwartet": {
+      "woche": "2028-W01"
+    }
+  },
+  {
+    "id": "AK-1205-01",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "genau die 16 Bundesländer",
+    "schnittstelle": "bundeslaender",
+    "eingabe": {},
+    "erwartet": {
+      "bundeslaender": ["BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV", "NI", "NW", "RP", "SL", "SN", "ST", "SH", "TH"]
+    }
+  },
+  {
+    "id": "AK-1205-02",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "schnittstelle": "istBundesland",
+    "eingabe": {
+      "kuerzel": "NW"
+    },
+    "erwartet": {
+      "bundesland": true
+    }
+  },
+  {
+    "id": "AK-1205-03",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "unbekanntes Kürzel",
+    "schnittstelle": "istBundesland",
+    "eingabe": {
+      "kuerzel": "XX"
+    },
+    "erwartet": {
+      "bundesland": false
+    }
+  },
+  {
+    "id": "AK-1205-04",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Kürzel sind fest, auch in der Schreibweise",
+    "schnittstelle": "istBundesland",
+    "eingabe": {
+      "kuerzel": "nw"
+    },
+    "erwartet": {
+      "bundesland": false
+    }
+  },
+  {
+    "id": "AK-1205-05",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "unbekanntes Bundesland wird abgewiesen",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "XX",
+      "datum": "2026-12-25"
+    },
+    "erwartet": {
+      "fehler": "bundesland_unbekannt"
+    }
+  },
+  {
+    "id": "AK-1205-06",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "eine Stadt ist kein Bundesland",
+    "schnittstelle": "feiertage",
+    "eingabe": {
+      "bundesland": "AUGSBURG",
+      "jahr": 2026
+    },
+    "erwartet": {
+      "fehler": "bundesland_unbekannt"
+    }
+  },
+  {
+    "id": "AK-1206-01",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "einmaliger Feiertag in Berlin: 80. Jahrestag der Befreiung",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "BE",
+      "datum": "2025-05-08"
+    },
+    "erwartet": {
+      "feiertag": true
+    }
+  },
+  {
+    "id": "AK-1206-02",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "in Nordrhein-Westfalen kein Feiertag",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "NW",
+      "datum": "2025-05-08"
+    },
+    "erwartet": {
+      "feiertag": false
+    }
+  },
+  {
+    "id": "AK-1206-03",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "einmaliger Feiertag in Berlin: 75. Jahrestag der Befreiung",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "BE",
+      "datum": "2020-05-08"
+    },
+    "erwartet": {
+      "feiertag": true
+    }
+  },
+  {
+    "id": "AK-1206-04",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "einmalig heißt: nicht jedes Jahr",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "BE",
+      "datum": "2026-05-08"
+    },
+    "erwartet": {
+      "feiertag": false
+    }
+  },
+  {
+    "id": "AK-1206-05",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "einmaliger Feiertag in Berlin: 75. Jahrestag des Volksaufstands vom 17. Juni 1953",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "BE",
+      "datum": "2028-06-17"
+    },
+    "erwartet": {
+      "feiertag": true
+    }
+  },
+  {
+    "id": "AK-1206-06",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "alle gesetzlichen Feiertage Berlins 2025",
+    "schnittstelle": "feiertage",
+    "eingabe": {
+      "bundesland": "BE",
+      "jahr": 2025
+    },
+    "erwartet": {
+      "feiertage": [
+        "2025-01-01",
+        "2025-03-08",
+        "2025-04-18",
+        "2025-04-21",
+        "2025-05-01",
+        "2025-05-08",
+        "2025-05-29",
+        "2025-06-09",
+        "2025-10-03",
+        "2025-12-25",
+        "2025-12-26"
+      ]
+    }
+  },
+  {
+    "id": "AK-1206-07",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Augsburger Friedensfest ist kommunal",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "BY",
+      "datum": "2026-08-08"
+    },
+    "erwartet": {
+      "feiertag": false
+    }
+  },
+  {
+    "id": "AK-1206-08",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Fronleichnam gilt in Sachsen nur regional",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "SN",
+      "datum": "2027-05-27"
+    },
+    "erwartet": {
+      "feiertag": false
+    }
+  },
+  {
+    "id": "AK-1206-09",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Reformationstag 2017 einmalig bundesweit",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "NI",
+      "datum": "2017-10-31"
+    },
+    "erwartet": {
+      "feiertag": true
+    }
+  },
+  {
+    "id": "AK-1206-10",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Reformationstag in Niedersachsen erst ab 2018",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "NI",
+      "datum": "2016-10-31"
+    },
+    "erwartet": {
+      "feiertag": false
+    }
+  },
+  {
+    "id": "AK-1206-11",
+    "modul": "M01",
+    "ebene": "fachlogik",
+    "beschreibung": "Reformationstag in Niedersachsen seit 2018",
+    "schnittstelle": "istFeiertag",
+    "eingabe": {
+      "bundesland": "NI",
+      "datum": "2026-10-31"
+    },
+    "erwartet": {
+      "feiertag": true
+    }
+  }
+]

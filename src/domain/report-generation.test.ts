@@ -4,7 +4,6 @@ import {
   classifyWeek,
   correctOutsideTraining,
   isWeekOutsideTraining,
-  currentIsoWeek,
   isOutsideTraining,
   isPastOpen,
   planReportDays,
@@ -12,7 +11,7 @@ import {
   type StoredDay,
   type TrainingPeriod,
 } from "./report-generation";
-import { formatDate, isoWeekOf, type IsoWeek } from "./weeks";
+import { currentIsoWeek, formatDate, isoWeekOf, type IsoWeek } from "./weeks";
 
 const date = (value: string) => new Date(`${value}T00:00:00Z`);
 const period = (start: string, end?: string): TrainingPeriod => ({ start: date(start), end: end ? date(end) : null });

@@ -14,11 +14,11 @@ import {
   OPEN_STATUSES,
   classifyWeek,
   correctOutsideTraining,
-  currentIsoWeek,
   planReportDays,
   weeksDue,
   type TrainingPeriod,
 } from "@/domain/report-generation";
+import { currentIsoWeek } from "@/domain/weeks";
 import { Prisma, type PrismaClient } from "@/generated/prisma/client";
 import { isUuid } from "@/lib/ids";
 import { getFederalState, listActiveTrainees } from "@/lib/people/service";

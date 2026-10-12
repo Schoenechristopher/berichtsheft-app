@@ -7,7 +7,8 @@
  * entscheiden die reinen Funktionen in `src/domain/report-pdf.ts`; das Layout steht in `src/pdf/`.
  */
 import { ACCESS_DENIED_MESSAGE, canViewReport, type Viewer } from "@/domain/report-access";
-import { today, type TrainingPeriod } from "@/domain/report-generation";
+import type { TrainingPeriod } from "@/domain/report-generation";
+import { today } from "@/domain/weeks";
 import {
   defaultExportRange,
   parseExportRange,
