@@ -2,6 +2,7 @@ import { expect, test, type TestInfo } from "@playwright/test";
 import { assertNoDeviation, loadCases } from "../tests/pruefung/cases";
 import { reseedAnna } from "./helpers";
 import { FlowAdapter, setAppState } from "./pruefung/ablauf-adapter";
+import { testLimit } from "./pruefung/testgrenzen";
 
 /**
  * Ablauf-Runner für TypeScript (`specs/pruefung/format.md`, „Aufbau eines Ablauf-Falls“): führt jeden Prüffall der
@@ -36,6 +37,12 @@ test.describe("Neutrale Prüffälle der Ebene „ablauf“ (specs/pruefung)", ()
   for (const { file, entry } of cases) {
     test(`${entry.id} (${file}, ablauf)`, async ({ browser }, testInfo) => {
       assertNoDeviation(entry);
+      const limit = testLimit(entry.id, testInfo.project.name);
+      if (limit) {
+        // Freigegebene Testgrenze: sichtbar übersprungen, mit Begründung im Bericht.
+        testInfo.annotations.push({ type: "Testgrenze", description: `${limit.grund} (Freigabe: ${limit.freigabe})` });
+        test.skip(true, `Testgrenze: ${limit.grund} (Freigabe: ${limit.freigabe})`);
+      }
       const adapter = new FlowAdapter(browser, contextOptions(testInfo), ablaufUrl);
       try {
         expect(await adapter.run(entry)).toEqual(entry.erwartet);
