@@ -129,6 +129,7 @@ describe("Sammel-PDF", () => {
   it("AK-902 „Bis“ vor „Von“ wird abgewiesen", async () => {
     expect(await loadRangeExport(prisma, persons.anna, persons.anna.id, "2026-10-01", "2026-09-01", now())).toEqual({
       ok: false,
+      reason: "to-before-from",
       status: 400,
       message: "„Bis“ darf nicht vor „Von“ liegen.",
     });
@@ -159,12 +160,17 @@ describe("Zugriff (AK-906)", () => {
     expect((await loadRangeExport(prisma, persons.anna, persons.anna.id, null, null, now())).ok).toBe(true);
     expect(await loadWeekExport(prisma, persons.anna, report.id, now())).toEqual({
       ok: false,
+      reason: "forbidden",
       status: 403,
       message: "Zugriff verweigert",
     });
-    expect(await loadRangeExport(prisma, persons.anna, otto.id, null, null, now())).toMatchObject({ status: 403 });
+    expect(await loadRangeExport(prisma, persons.anna, otto.id, null, null, now())).toMatchObject({
+      reason: "forbidden",
+      status: 403,
+    });
     // Ein Azubi kann auch über die Ausbilder-ID nichts exportieren.
     expect(await loadRangeExport(prisma, persons.anna, persons.bernd.id, null, null, now())).toMatchObject({
+      reason: "not-found",
       status: 404,
     });
   });
@@ -173,10 +179,14 @@ describe("Zugriff (AK-906)", () => {
     for (const id of ["00000000-0000-4000-8000-000000000000", "kein-bericht"]) {
       expect(await loadWeekExport(prisma, persons.bernd, id, now())).toEqual({
         ok: false,
+        reason: "not-found",
         status: 404,
         message: "Seite nicht gefunden",
       });
-      expect(await loadRangeExport(prisma, persons.bernd, id, null, null, now())).toMatchObject({ status: 404 });
+      expect(await loadRangeExport(prisma, persons.bernd, id, null, null, now())).toMatchObject({
+        reason: "not-found",
+        status: 404,
+      });
     }
   });
 
@@ -197,8 +207,9 @@ describe("Zugriff (AK-906)", () => {
   it("AK-906 deaktivierte Personen exportieren nichts", async () => {
     const own = await annasReport(40);
     const inactive = { ...persons.anna, active: false };
-    expect(await loadWeekExport(prisma, inactive, own.id, now())).toMatchObject({ status: 403 });
+    expect(await loadWeekExport(prisma, inactive, own.id, now())).toMatchObject({ reason: "forbidden", status: 403 });
     expect(await loadRangeExport(prisma, inactive, persons.anna.id, null, null, now())).toMatchObject({
+      reason: "forbidden",
       status: 403,
     });
   });

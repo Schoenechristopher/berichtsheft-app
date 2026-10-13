@@ -59,6 +59,17 @@ import {
 } from "@/domain/report-status";
 import { validateSubmission, type SubmissionProblem } from "@/domain/report-submission";
 
+import { changeLabel, groupHistory, type HistoryChange, type HistoryComment } from "@/domain/report-history";
+import {
+  exportRange,
+  rangeExport,
+  weekExport,
+  type DayForPdf,
+  type PdfExport,
+  type RangeReason,
+  type ReportForPdf,
+} from "@/domain/report-pdf";
+
 export type Input = Record<string, unknown>;
 export type Result = Record<string, unknown>;
 
@@ -578,6 +589,157 @@ const statusOperations: Record<string, (input: Input) => Result> = {
   },
 };
 
+// ---------------------------------------------------------------------------
+// M06 Historie
+// ---------------------------------------------------------------------------
+
+/**
+ * Statuswechsel in ihrer Reihenfolge: `{ von, nach, person, zeitpunkt, runde, begruendung }` (M06) bzw.
+ * `{ von, nach, person, zeitpunkt }` (M07). `person` wird unverändert als Name weitergegeben (M06:
+ * Schlüssel, M07: Name).
+ */
+function historyChanges(input: Input, withRound: boolean): HistoryChange[] {
+  return list(input, "statuswechsel").map((entry, index) => ({
+    id: `s${index + 1}`,
+    seq: index + 1,
+    // Prüfrunde und Begründung sind für den Freigabevermerk (M07) ohne Bedeutung; M07-Fälle nennen sie nicht.
+    reviewRound: withRound ? integer(entry, "runde") : 0,
+    fromStatus: field(entry, "von") === null ? null : status(entry, "von"),
+    toStatus: status(entry, "nach"),
+    actorName: text(entry, "person"),
+    reason: withRound ? textOrNull(entry, "begruendung") : null,
+    createdAt: parseInstant(text(entry, "zeitpunkt")),
+  }));
+}
+
+/** Kommentare `{ runde, tag, person, text }`; `tag` = null ist der Gesamtkommentar. */
+function historyComments(input: Input): HistoryComment[] {
+  return list(input, "kommentare").map((entry, index) => {
+    const day = field(entry, "tag") === null ? null : weekday(entry);
+    return {
+      id: `k${index + 1}`,
+      reviewRound: integer(entry, "runde"),
+      dayId: day,
+      dayDate: day === null ? null : weekdayDate(day),
+      authorName: text(entry, "person"),
+      text: text(entry, "text"),
+      // Der Zeitpunkt eines Kommentars ist für die Gruppierung ohne Bedeutung (Reihenfolge nach Tag).
+      createdAt: new Date(0),
+    };
+  });
+}
+
+/** Historie, wie die Berichtsseite sie zeigt: Runden neueste zuerst (`format.md`, M06). */
+export function historyRounds(
+  changes: readonly HistoryChange[],
+  comments: readonly HistoryComment[],
+  person: (name: string) => string,
+  day: (comment: HistoryComment) => string,
+): Result {
+  return {
+    runden: groupHistory(changes, comments).map((round) => ({
+      runde: round.round,
+      eintraege: round.changes.map((change) => ({
+        bezeichnung: changeLabel(change),
+        nach: statusName(change.toStatus),
+        person: person(change.actorName),
+        zeitpunkt: formatInstant(change.createdAt),
+        begruendung: change.reason,
+      })),
+      gesamtkommentare: round.overall.map((comment) => ({ person: person(comment.authorName), text: comment.text })),
+      tageskommentare: round.days.map((comment) => ({
+        tag: day(comment),
+        person: person(comment.authorName),
+        text: comment.text,
+      })),
+    })),
+  };
+}
+
+const historyOperations: Record<string, (input: Input) => Result> = {
+  historieGruppieren: (input) =>
+    historyRounds(
+      historyChanges(input, true),
+      historyComments(input),
+      (name) => name,
+      (comment) => comment.dayId ?? "",
+    ),
+};
+
+// ---------------------------------------------------------------------------
+// M07 PDF-Export
+// ---------------------------------------------------------------------------
+
+/** Feste Fehlercodes je Grund, aus dem ein Zeitraum abgewiesen wird. */
+export const RANGE_REASON_CODES: Record<RangeReason, string> = {
+  "invalid-from": "von_ungueltig",
+  "invalid-to": "bis_ungueltig",
+  "to-before-from": "bis_vor_von",
+};
+
+/** Inhalt eines PDF (`format.md`, „PDF-Inhalt“): Texte und Vermerke, nicht das Layout. */
+export function pdfContent(pdf: PdfExport): Result {
+  const { document } = pdf;
+  return {
+    titel: document.title,
+    dateiname: pdf.fileName,
+    erstellt: document.createdAt,
+    ...(document.rangeLabel !== undefined ? { zeitraum: document.rangeLabel } : {}),
+    wochen: document.weeks.map((week) => ({
+      name: week.traineeName,
+      kw: week.title,
+      zeitraum: week.range,
+      status: week.statusLabel,
+      vermerk: week.marking.kind === "APPROVED" ? week.marking.text : null,
+      kennzeichnung: week.marking.kind === "NOT_APPROVED" ? week.marking.text : null,
+      kopfzeile: week.marking.short,
+      ausserhalb: week.outsideTraining,
+      tage: week.days.map((day) => ({
+        datum: day.label,
+        tagesart: day.dayTypeLabel,
+        taetigkeiten: day.activities,
+      })),
+    })),
+  };
+}
+
+/** Gespeicherter Bericht für das PDF: `{ woche, status, tage: [{ tag, tagesart, text, ausserhalb }], statuswechsel }`. */
+function reportForPdf(input: Input): ReportForPdf {
+  const week = parseWeek(text(input, "woche"));
+  const workdays = isoWeekWorkdays(week.isoYear, week.isoWeek);
+  const days: DayForPdf[] = list(input, "tage").map((day) => ({
+    date: workdays[WEEKDAYS.indexOf(weekday(day))],
+    dayType: storedDayType(field(day, "tagesart")),
+    activities: text(day, "text"),
+    outsideTraining: bool(day, "ausserhalb"),
+  }));
+  if (days.length !== 5 || new Set(days.map((day) => day.date)).size !== 5) {
+    throw new CaseFormatError("„tage“ muss genau die fünf Tage Mo bis Fr nennen.");
+  }
+  return { ...week, status: status(input, "status"), days, changes: historyChanges(input, false) };
+}
+
+/** Ausbildungszeitraum `{ beginn, ende }` oder null. */
+function trainingPeriodOrNull(input: Input, name: string): TrainingPeriod | null {
+  const value = objectOrNull(input, name);
+  return value === null ? null : trainingPeriod(value);
+}
+
+const pdfOperations: Record<string, (input: Input) => Result> = {
+  pdfWoche: (input) =>
+    pdfContent(weekExport(reportForPdf(input), text(input, "name"), trainingPeriodOrNull(input, "ausbildung"), now())),
+  pdfZeitraum: (input) => {
+    const period = trainingPeriod(object(input, "ausbildung"));
+    const range = exportRange(period, textOrNull(input, "von"), textOrNull(input, "bis"), now());
+    if (!range.ok) {
+      return { fehler: RANGE_REASON_CODES[range.reason] };
+    }
+    return pdfContent(
+      rangeExport(list(input, "berichte").map(reportForPdf), text(input, "name"), period, range.range, now()),
+    );
+  },
+};
+
 const operations: Record<string, (input: Input) => Result> = {
   jetzt: () => ({ zeitpunkt: formatInstant(now()) }),
   uhrVorgeben: (input) => {
@@ -707,6 +869,10 @@ const operations: Record<string, (input: Input) => Result> = {
 
   // --- M05 Status und Prüfung ---
   ...statusOperations,
+
+  // --- M06 Historie, M07 PDF-Export ---
+  ...historyOperations,
+  ...pdfOperations,
 };
 
 /** Namen aller Schnittstellen, die der Adapter kennt. */

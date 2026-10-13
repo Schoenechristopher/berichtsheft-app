@@ -186,10 +186,19 @@ describe("Zeitraum des Sammel-PDF", () => {
     });
     expect(parseExportRange("2026-10-02", "2026-09-15", fallback)).toEqual({
       ok: false,
+      reason: "to-before-from",
       message: RANGE_MESSAGES.order,
     });
-    expect(parseExportRange("2026-02-31", "", fallback)).toEqual({ ok: false, message: RANGE_MESSAGES.invalidFrom });
-    expect(parseExportRange("", "morgen", fallback)).toEqual({ ok: false, message: RANGE_MESSAGES.invalidTo });
+    expect(parseExportRange("2026-02-31", "", fallback)).toEqual({
+      ok: false,
+      reason: "invalid-from",
+      message: RANGE_MESSAGES.invalidFrom,
+    });
+    expect(parseExportRange("", "morgen", fallback)).toEqual({
+      ok: false,
+      reason: "invalid-to",
+      message: RANGE_MESSAGES.invalidTo,
+    });
     expect(parseDateInput("2028-02-29")).toEqual(utc("2028-02-29"));
   });
 });

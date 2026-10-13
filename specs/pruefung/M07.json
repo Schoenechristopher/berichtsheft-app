@@ -1,0 +1,4240 @@
+[
+  {
+    "id": "AK-901-01",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "PDF einer Woche: Name, Kalenderwoche, Zeitraum, alle Tage mit Datum, Tagesart und Tätigkeiten, Status; Erstellungsdatum aus der Uhr",
+    "uhr": "2026-10-06T21:00:00+02:00",
+    "schnittstelle": "pdfWoche",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "woche": "2026-W36",
+      "status": "Entwurf",
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": null,
+          "text": "",
+          "ausserhalb": true
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "Start",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": null,
+          "text": "",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Feiertag",
+          "text": "",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Berufsschule",
+          "text": "Lernfeld 1",
+          "ausserhalb": false
+        }
+      ],
+      "statuswechsel": [],
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      }
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – KW 36/2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_KW36-2026.pdf",
+      "erstellt": "06.10.2026, 21:00 Uhr",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 36/2026",
+          "zeitraum": "31.08.2026 – 04.09.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 31.08.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Dienstag, 01.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Start"
+            },
+            {
+              "datum": "Mittwoch, 02.09.2026",
+              "tagesart": "Tagesart noch offen",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Donnerstag, 03.09.2026",
+              "tagesart": "Feiertag",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Freitag, 04.09.2026",
+              "tagesart": "Berufsschule",
+              "taetigkeiten": "Lernfeld 1"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-901-02",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Woche ganz außerhalb der Ausbildung ist markiert; ein Tag außerhalb behält seine gespeicherte Tagesart erkennbar",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfWoche",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "woche": "2026-W35",
+      "status": "Entwurf",
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Vorab eingetragen",
+          "ausserhalb": true
+        },
+        {
+          "tag": "Di",
+          "tagesart": null,
+          "text": "",
+          "ausserhalb": true
+        },
+        {
+          "tag": "Mi",
+          "tagesart": null,
+          "text": "",
+          "ausserhalb": true
+        },
+        {
+          "tag": "Do",
+          "tagesart": null,
+          "text": "",
+          "ausserhalb": true
+        },
+        {
+          "tag": "Fr",
+          "tagesart": null,
+          "text": "",
+          "ausserhalb": true
+        }
+      ],
+      "statuswechsel": [],
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      }
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – KW 35/2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_KW35-2026.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 35/2026",
+          "zeitraum": "24.08.2026 – 28.08.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": true,
+          "tage": [
+            {
+              "datum": "Montag, 24.08.2026",
+              "tagesart": "außerhalb der Ausbildung (Betrieb)",
+              "taetigkeiten": "Vorab eingetragen"
+            },
+            {
+              "datum": "Dienstag, 25.08.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Mittwoch, 26.08.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Donnerstag, 27.08.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Freitag, 28.08.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-902-01",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Zum Zeitraum gehört jede Woche, deren Mo–Fr ihn berührt (Fr 02.10. bis Mo 05.10.: KW 40 und 41, nicht KW 39)",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfZeitraum",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "von": "2026-10-02",
+      "bis": "2026-10-05",
+      "berichte": [
+        {
+          "woche": "2026-W39",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        },
+        {
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        },
+        {
+          "woche": "2026-W41",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – 02.10.2026 – 05.10.2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_2026-10-02_bis_2026-10-05.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "zeitraum": "02.10.2026 – 05.10.2026",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 40/2026",
+          "zeitraum": "28.09.2026 – 02.10.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 28.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 40"
+            },
+            {
+              "datum": "Dienstag, 29.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 40"
+            },
+            {
+              "datum": "Mittwoch, 30.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 40"
+            },
+            {
+              "datum": "Donnerstag, 01.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 40"
+            },
+            {
+              "datum": "Freitag, 02.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 40"
+            }
+          ]
+        },
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 41/2026",
+          "zeitraum": "05.10.2026 – 09.10.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 05.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Dienstag, 06.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Mittwoch, 07.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Donnerstag, 08.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Freitag, 09.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-902-02",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Wochen in zeitlicher Reihenfolge, auch über den Jahreswechsel (KW 53/2026 vor KW 1/2027)",
+    "uhr": "2027-01-08T12:00:00+01:00",
+    "schnittstelle": "pdfZeitraum",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "von": "2026-09-01",
+      "bis": "2027-01-08",
+      "berichte": [
+        {
+          "woche": "2026-W41",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        },
+        {
+          "woche": "2027-W01",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Berufsschule",
+              "text": "Tätigkeit KW 1",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Berufsschule",
+              "text": "Tätigkeit KW 1",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Berufsschule",
+              "text": "Tätigkeit KW 1",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Berufsschule",
+              "text": "Tätigkeit KW 1",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Berufsschule",
+              "text": "Tätigkeit KW 1",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        },
+        {
+          "woche": "2026-W53",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 53",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 53",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 53",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 53",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Feiertag",
+              "text": "",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        },
+        {
+          "woche": "2026-W36",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 36",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 36",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 36",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 36",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 36",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – 01.09.2026 – 08.01.2027",
+      "dateiname": "Berichtsheft_Anna-Azubi_2026-09-01_bis_2027-01-08.pdf",
+      "erstellt": "08.01.2027, 12:00 Uhr",
+      "zeitraum": "01.09.2026 – 08.01.2027",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 36/2026",
+          "zeitraum": "31.08.2026 – 04.09.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 31.08.2026",
+              "tagesart": "außerhalb der Ausbildung (Betrieb)",
+              "taetigkeiten": "Tätigkeit KW 36"
+            },
+            {
+              "datum": "Dienstag, 01.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 36"
+            },
+            {
+              "datum": "Mittwoch, 02.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 36"
+            },
+            {
+              "datum": "Donnerstag, 03.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 36"
+            },
+            {
+              "datum": "Freitag, 04.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 36"
+            }
+          ]
+        },
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 41/2026",
+          "zeitraum": "05.10.2026 – 09.10.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 05.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Dienstag, 06.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Mittwoch, 07.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Donnerstag, 08.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Freitag, 09.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            }
+          ]
+        },
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 53/2026",
+          "zeitraum": "28.12.2026 – 01.01.2027",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 28.12.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 53"
+            },
+            {
+              "datum": "Dienstag, 29.12.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 53"
+            },
+            {
+              "datum": "Mittwoch, 30.12.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 53"
+            },
+            {
+              "datum": "Donnerstag, 31.12.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 53"
+            },
+            {
+              "datum": "Freitag, 01.01.2027",
+              "tagesart": "Feiertag",
+              "taetigkeiten": ""
+            }
+          ]
+        },
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 1/2027",
+          "zeitraum": "04.01.2027 – 08.01.2027",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 04.01.2027",
+              "tagesart": "Berufsschule",
+              "taetigkeiten": "Tätigkeit KW 1"
+            },
+            {
+              "datum": "Dienstag, 05.01.2027",
+              "tagesart": "Berufsschule",
+              "taetigkeiten": "Tätigkeit KW 1"
+            },
+            {
+              "datum": "Mittwoch, 06.01.2027",
+              "tagesart": "Berufsschule",
+              "taetigkeiten": "Tätigkeit KW 1"
+            },
+            {
+              "datum": "Donnerstag, 07.01.2027",
+              "tagesart": "Berufsschule",
+              "taetigkeiten": "Tätigkeit KW 1"
+            },
+            {
+              "datum": "Freitag, 08.01.2027",
+              "tagesart": "Berufsschule",
+              "taetigkeiten": "Tätigkeit KW 1"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-902-03",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Ausgeblendete Wochen (leer, ganz außerhalb, ohne Historie) fehlen; eine Woche außerhalb mit Inhalt erscheint markiert, eine leere Woche in der Ausbildung erscheint",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfZeitraum",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "ausbildung": {
+        "beginn": "2026-09-14",
+        "ende": null
+      },
+      "von": "2026-09-01",
+      "bis": "2026-09-30",
+      "berichte": [
+        {
+          "woche": "2026-W36",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Di",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Mi",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Do",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Fr",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            }
+          ],
+          "statuswechsel": []
+        },
+        {
+          "woche": "2026-W37",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Vorab eingetragen",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Di",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Mi",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Do",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Fr",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            }
+          ],
+          "statuswechsel": []
+        },
+        {
+          "woche": "2026-W38",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – 01.09.2026 – 30.09.2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_2026-09-01_bis_2026-09-30.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "zeitraum": "01.09.2026 – 30.09.2026",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 37/2026",
+          "zeitraum": "07.09.2026 – 11.09.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": true,
+          "tage": [
+            {
+              "datum": "Montag, 07.09.2026",
+              "tagesart": "außerhalb der Ausbildung (Betrieb)",
+              "taetigkeiten": "Vorab eingetragen"
+            },
+            {
+              "datum": "Dienstag, 08.09.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Mittwoch, 09.09.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Donnerstag, 10.09.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Freitag, 11.09.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            }
+          ]
+        },
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 38/2026",
+          "zeitraum": "14.09.2026 – 18.09.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 14.09.2026",
+              "tagesart": "Tagesart noch offen",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Dienstag, 15.09.2026",
+              "tagesart": "Tagesart noch offen",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Mittwoch, 16.09.2026",
+              "tagesart": "Tagesart noch offen",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Donnerstag, 17.09.2026",
+              "tagesart": "Tagesart noch offen",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Freitag, 18.09.2026",
+              "tagesart": "Tagesart noch offen",
+              "taetigkeiten": ""
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-902-04",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Ausgeblendet ist nur die unberührte Woche: Eine leere Woche ganz außerhalb mit Historie erscheint",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfZeitraum",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "ausbildung": {
+        "beginn": "2026-09-14",
+        "ende": null
+      },
+      "von": "2026-09-01",
+      "bis": "2026-09-11",
+      "berichte": [
+        {
+          "woche": "2026-W36",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Di",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Mi",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Do",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Fr",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            }
+          ],
+          "statuswechsel": []
+        },
+        {
+          "woche": "2026-W37",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Di",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Mi",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Do",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Fr",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            }
+          ],
+          "statuswechsel": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "Anna Azubi",
+              "zeitpunkt": "2026-09-11T16:00:00+02:00"
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – 01.09.2026 – 11.09.2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_2026-09-01_bis_2026-09-11.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "zeitraum": "01.09.2026 – 11.09.2026",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 37/2026",
+          "zeitraum": "07.09.2026 – 11.09.2026",
+          "status": "Eingereicht",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Eingereicht",
+          "kopfzeile": "Nicht freigegeben (Eingereicht)",
+          "ausserhalb": true,
+          "tage": [
+            {
+              "datum": "Montag, 07.09.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Dienstag, 08.09.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Mittwoch, 09.09.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Donnerstag, 10.09.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Freitag, 11.09.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-902-05",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Ohne Von und Bis gilt Ausbildungsbeginn bis heute",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfZeitraum",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "von": null,
+      "bis": null,
+      "berichte": [
+        {
+          "woche": "2026-W41",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        },
+        {
+          "woche": "2026-W42",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 42",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 42",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 42",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 42",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 42",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – 01.09.2026 – 06.10.2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_2026-09-01_bis_2026-10-06.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "zeitraum": "01.09.2026 – 06.10.2026",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 41/2026",
+          "zeitraum": "05.10.2026 – 09.10.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 05.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Dienstag, 06.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Mittwoch, 07.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Donnerstag, 08.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Freitag, 09.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-902-06",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Nach dem Ausbildungsende gilt Ausbildungsbeginn bis Ausbildungsende; leere Angaben gelten als nicht angegeben",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfZeitraum",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "ausbildung": {
+        "beginn": "2024-09-01",
+        "ende": "2026-06-30"
+      },
+      "von": "",
+      "bis": "  ",
+      "berichte": [
+        {
+          "woche": "2026-W27",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Abschlussarbeit",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Übergabe",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Do",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            },
+            {
+              "tag": "Fr",
+              "tagesart": null,
+              "text": "",
+              "ausserhalb": true
+            }
+          ],
+          "statuswechsel": []
+        },
+        {
+          "woche": "2026-W28",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 28",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 28",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 28",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 28",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 28",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – 01.09.2024 – 30.06.2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_2024-09-01_bis_2026-06-30.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "zeitraum": "01.09.2024 – 30.06.2026",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 27/2026",
+          "zeitraum": "29.06.2026 – 03.07.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 29.06.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Abschlussarbeit"
+            },
+            {
+              "datum": "Dienstag, 30.06.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Übergabe"
+            },
+            {
+              "datum": "Mittwoch, 01.07.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Donnerstag, 02.07.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            },
+            {
+              "datum": "Freitag, 03.07.2026",
+              "tagesart": "außerhalb der Ausbildung",
+              "taetigkeiten": ""
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-902-07",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Nur Von angegeben: Bis ist heute",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfZeitraum",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "von": "2026-10-05",
+      "bis": null,
+      "berichte": [
+        {
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        },
+        {
+          "woche": "2026-W41",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – 05.10.2026 – 06.10.2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_2026-10-05_bis_2026-10-06.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "zeitraum": "05.10.2026 – 06.10.2026",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 41/2026",
+          "zeitraum": "05.10.2026 – 09.10.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 05.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Dienstag, 06.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Mittwoch, 07.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Donnerstag, 08.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Freitag, 09.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-902-08",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein ungültiges Von (31.02.) wird abgewiesen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfZeitraum",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "von": "2026-02-31",
+      "bis": "2026-10-02",
+      "berichte": [
+        {
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "von_ungueltig"
+    }
+  },
+  {
+    "id": "AK-902-09",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Bis, das kein Kalendertag ist, wird abgewiesen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfZeitraum",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "von": "2026-09-01",
+      "bis": "morgen",
+      "berichte": [
+        {
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "bis_ungueltig"
+    }
+  },
+  {
+    "id": "AK-902-10",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Bis vor Von wird abgewiesen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfZeitraum",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "von": "2026-10-02",
+      "bis": "2026-09-15",
+      "berichte": [
+        {
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "bis_vor_von"
+    }
+  },
+  {
+    "id": "AK-902-11",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Zeitraum ohne Wochen (nur Samstag und Sonntag) ergibt ein PDF ohne Wochen statt eines Fehlers",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfZeitraum",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "von": "2026-10-03",
+      "bis": "2026-10-04",
+      "berichte": [
+        {
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        },
+        {
+          "woche": "2026-W41",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – 03.10.2026 – 04.10.2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_2026-10-03_bis_2026-10-04.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "zeitraum": "03.10.2026 – 04.10.2026",
+      "wochen": []
+    }
+  },
+  {
+    "id": "AK-902-12",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Bis gleich Von: der Tag gehört zum Zeitraum",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfZeitraum",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "von": "2026-09-25",
+      "bis": "2026-09-25",
+      "berichte": [
+        {
+          "woche": "2026-W39",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        },
+        {
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – 25.09.2026 – 25.09.2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_2026-09-25_bis_2026-09-25.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "zeitraum": "25.09.2026 – 25.09.2026",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 39/2026",
+          "zeitraum": "21.09.2026 – 25.09.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 21.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 39"
+            },
+            {
+              "datum": "Dienstag, 22.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 39"
+            },
+            {
+              "datum": "Mittwoch, 23.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 39"
+            },
+            {
+              "datum": "Donnerstag, 24.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 39"
+            },
+            {
+              "datum": "Freitag, 25.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 39"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-903-01",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Freigegebene Woche: Freigabevermerk mit Name des Ausbilders, Datum und Uhrzeit der Freigabe",
+    "uhr": "2026-12-01T08:30:00+01:00",
+    "schnittstelle": "pdfWoche",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "woche": "2026-W40",
+      "status": "Freigegeben",
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        }
+      ],
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "statuswechsel": [
+        {
+          "von": "Entwurf",
+          "nach": "Eingereicht",
+          "person": "Anna Azubi",
+          "zeitpunkt": "2026-10-02T17:00:00+02:00"
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Freigegeben",
+          "person": "Bernd Ausbilder",
+          "zeitpunkt": "2026-10-05T14:05:00+02:00"
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – KW 40/2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_KW40-2026.pdf",
+      "erstellt": "01.12.2026, 08:30 Uhr",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 40/2026",
+          "zeitraum": "28.09.2026 – 02.10.2026",
+          "status": "Freigegeben",
+          "vermerk": "Freigegeben von Bernd Ausbilder am 05.10.2026, 14:05 Uhr",
+          "kennzeichnung": null,
+          "kopfzeile": "Freigegeben",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 28.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Dienstag, 29.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Mittwoch, 30.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Donnerstag, 01.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Freitag, 02.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-903-02",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Nach Rücknahme und erneuter Freigabe zählt die aktuell gültige Freigabe",
+    "uhr": "2026-10-09T10:00:00+02:00",
+    "schnittstelle": "pdfWoche",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "woche": "2026-W40",
+      "status": "Freigegeben",
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        }
+      ],
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "statuswechsel": [
+        {
+          "von": "Entwurf",
+          "nach": "Eingereicht",
+          "person": "Anna Azubi",
+          "zeitpunkt": "2026-10-02T17:00:00+02:00"
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Freigegeben",
+          "person": "Bernd Ausbilder",
+          "zeitpunkt": "2026-10-05T14:05:00+02:00"
+        },
+        {
+          "von": "Freigegeben",
+          "nach": "Abgelehnt",
+          "person": "Clara Ausbilderin",
+          "zeitpunkt": "2026-10-06T10:00:00+02:00"
+        },
+        {
+          "von": "Abgelehnt",
+          "nach": "Eingereicht",
+          "person": "Anna Azubi",
+          "zeitpunkt": "2026-10-06T11:00:00+02:00"
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Freigegeben",
+          "person": "Clara Ausbilderin",
+          "zeitpunkt": "2026-10-07T12:30:00+02:00"
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – KW 40/2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_KW40-2026.pdf",
+      "erstellt": "09.10.2026, 10:00 Uhr",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 40/2026",
+          "zeitraum": "28.09.2026 – 02.10.2026",
+          "status": "Freigegeben",
+          "vermerk": "Freigegeben von Clara Ausbilderin am 07.10.2026, 12:30 Uhr",
+          "kennzeichnung": null,
+          "kopfzeile": "Freigegeben",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 28.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Dienstag, 29.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Mittwoch, 30.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Donnerstag, 01.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Freitag, 02.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-903-03",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Datum und Uhrzeit des Vermerks in Berliner Zeit, auch in der Winterzeit und bei einem Zeitpunkt in UTC",
+    "uhr": "2026-11-02T10:00:00+01:00",
+    "schnittstelle": "pdfWoche",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "woche": "2026-W44",
+      "status": "Freigegeben",
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Server gewartet",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "Server gewartet",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Betrieb",
+          "text": "Server gewartet",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Betrieb",
+          "text": "Server gewartet",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Betrieb",
+          "text": "Server gewartet",
+          "ausserhalb": false
+        }
+      ],
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "statuswechsel": [
+        {
+          "von": "Entwurf",
+          "nach": "Eingereicht",
+          "person": "Anna Azubi",
+          "zeitpunkt": "2026-10-30T15:00:00+01:00"
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Freigegeben",
+          "person": "Bernd Ausbilder",
+          "zeitpunkt": "2026-11-02T08:45:00+00:00"
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – KW 44/2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_KW44-2026.pdf",
+      "erstellt": "02.11.2026, 10:00 Uhr",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 44/2026",
+          "zeitraum": "26.10.2026 – 30.10.2026",
+          "status": "Freigegeben",
+          "vermerk": "Freigegeben von Bernd Ausbilder am 02.11.2026, 09:45 Uhr",
+          "kennzeichnung": null,
+          "kopfzeile": "Freigegeben",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 26.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Server gewartet"
+            },
+            {
+              "datum": "Dienstag, 27.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Server gewartet"
+            },
+            {
+              "datum": "Mittwoch, 28.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Server gewartet"
+            },
+            {
+              "datum": "Donnerstag, 29.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Server gewartet"
+            },
+            {
+              "datum": "Freitag, 30.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Server gewartet"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-904-01",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Sammel-PDF: Entwurf, Eingereicht und Abgelehnt sind als „Nicht freigegeben“ mit Status gekennzeichnet, nur die freigegebene Woche trägt den Vermerk",
+    "uhr": "2026-10-09T17:00:00+02:00",
+    "schnittstelle": "pdfZeitraum",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "von": "2026-09-14",
+      "bis": "2026-10-09",
+      "berichte": [
+        {
+          "woche": "2026-W41",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 41",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "Anna Azubi",
+              "zeitpunkt": "2026-10-09T15:00:00+02:00"
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "Bernd Ausbilder",
+              "zeitpunkt": "2026-10-09T16:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "woche": "2026-W40",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 40",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "Anna Azubi",
+              "zeitpunkt": "2026-10-02T16:00:00+02:00"
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "Bernd Ausbilder",
+              "zeitpunkt": "2026-10-05T09:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "woche": "2026-W39",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 39",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "Anna Azubi",
+              "zeitpunkt": "2026-09-25T16:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "woche": "2026-W38",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 38",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 38",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 38",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 38",
+              "ausserhalb": false
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Tätigkeit KW 38",
+              "ausserhalb": false
+            }
+          ],
+          "statuswechsel": []
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – 14.09.2026 – 09.10.2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_2026-09-14_bis_2026-10-09.pdf",
+      "erstellt": "09.10.2026, 17:00 Uhr",
+      "zeitraum": "14.09.2026 – 09.10.2026",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 38/2026",
+          "zeitraum": "14.09.2026 – 18.09.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 14.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 38"
+            },
+            {
+              "datum": "Dienstag, 15.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 38"
+            },
+            {
+              "datum": "Mittwoch, 16.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 38"
+            },
+            {
+              "datum": "Donnerstag, 17.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 38"
+            },
+            {
+              "datum": "Freitag, 18.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 38"
+            }
+          ]
+        },
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 39/2026",
+          "zeitraum": "21.09.2026 – 25.09.2026",
+          "status": "Eingereicht",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Eingereicht",
+          "kopfzeile": "Nicht freigegeben (Eingereicht)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 21.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 39"
+            },
+            {
+              "datum": "Dienstag, 22.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 39"
+            },
+            {
+              "datum": "Mittwoch, 23.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 39"
+            },
+            {
+              "datum": "Donnerstag, 24.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 39"
+            },
+            {
+              "datum": "Freitag, 25.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 39"
+            }
+          ]
+        },
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 40/2026",
+          "zeitraum": "28.09.2026 – 02.10.2026",
+          "status": "Abgelehnt",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Abgelehnt",
+          "kopfzeile": "Nicht freigegeben (Abgelehnt)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 28.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 40"
+            },
+            {
+              "datum": "Dienstag, 29.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 40"
+            },
+            {
+              "datum": "Mittwoch, 30.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 40"
+            },
+            {
+              "datum": "Donnerstag, 01.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 40"
+            },
+            {
+              "datum": "Freitag, 02.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 40"
+            }
+          ]
+        },
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 41/2026",
+          "zeitraum": "05.10.2026 – 09.10.2026",
+          "status": "Freigegeben",
+          "vermerk": "Freigegeben von Bernd Ausbilder am 09.10.2026, 16:00 Uhr",
+          "kennzeichnung": null,
+          "kopfzeile": "Freigegeben",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 05.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Dienstag, 06.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Mittwoch, 07.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Donnerstag, 08.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            },
+            {
+              "datum": "Freitag, 09.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Tätigkeit KW 41"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-904-02",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Eingereichte Woche: „Nicht freigegeben – Status: Eingereicht“, kein Vermerk",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfWoche",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "woche": "2026-W40",
+      "status": "Eingereicht",
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        }
+      ],
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "statuswechsel": [
+        {
+          "von": "Entwurf",
+          "nach": "Eingereicht",
+          "person": "Anna Azubi",
+          "zeitpunkt": "2026-10-02T17:00:00+02:00"
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – KW 40/2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_KW40-2026.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 40/2026",
+          "zeitraum": "28.09.2026 – 02.10.2026",
+          "status": "Eingereicht",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Eingereicht",
+          "kopfzeile": "Nicht freigegeben (Eingereicht)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 28.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Dienstag, 29.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Mittwoch, 30.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Donnerstag, 01.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Freitag, 02.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-905-01",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Nach der Rücknahme: kein Freigabevermerk, sondern „Nicht freigegeben – Status: Abgelehnt“",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfWoche",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "woche": "2026-W40",
+      "status": "Abgelehnt",
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        }
+      ],
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      },
+      "statuswechsel": [
+        {
+          "von": "Entwurf",
+          "nach": "Eingereicht",
+          "person": "Anna Azubi",
+          "zeitpunkt": "2026-10-02T17:00:00+02:00"
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Freigegeben",
+          "person": "Bernd Ausbilder",
+          "zeitpunkt": "2026-10-05T14:05:00+02:00"
+        },
+        {
+          "von": "Freigegeben",
+          "nach": "Abgelehnt",
+          "person": "Clara Ausbilderin",
+          "zeitpunkt": "2026-10-06T08:00:00+02:00"
+        }
+      ]
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – KW 40/2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_KW40-2026.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 40/2026",
+          "zeitraum": "28.09.2026 – 02.10.2026",
+          "status": "Abgelehnt",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Abgelehnt",
+          "kopfzeile": "Nicht freigegeben (Abgelehnt)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 28.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Dienstag, 29.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Mittwoch, 30.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Donnerstag, 01.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Freitag, 02.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-907-01",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Umlaute, ß, Akzente, Zeilenumbrüche und Leerzeichen in Name und Tätigkeiten erscheinen unverändert; der Dateiname umschreibt den Namen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfWoche",
+    "eingabe": {
+      "name": "Jörg Müßig-Äpfel",
+      "woche": "2026-W40",
+      "status": "Entwurf",
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Übergabe an die Ärztin „Dr. Öztürk“ vorbereitet.\nGrößen prüfen: ß, é, ç, ñ – alles bleibt.\n\n  Eingerückte Zeile mit Leerzeichen am Ende  ",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Berufsschule",
+          "text": "Lernfeld 3: Clients in Netzwerke einbinden",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Berufsschule",
+          "text": "Lernfeld 3: Clients in Netzwerke einbinden",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Berufsschule",
+          "text": "Lernfeld 3: Clients in Netzwerke einbinden",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Berufsschule",
+          "text": "Lernfeld 3: Clients in Netzwerke einbinden",
+          "ausserhalb": false
+        }
+      ],
+      "statuswechsel": [],
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      }
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Jörg Müßig-Äpfel – KW 40/2026",
+      "dateiname": "Berichtsheft_Joerg-Muessig-Aepfel_KW40-2026.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "wochen": [
+        {
+          "name": "Jörg Müßig-Äpfel",
+          "kw": "KW 40/2026",
+          "zeitraum": "28.09.2026 – 02.10.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 28.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Übergabe an die Ärztin „Dr. Öztürk“ vorbereitet.\nGrößen prüfen: ß, é, ç, ñ – alles bleibt.\n\n  Eingerückte Zeile mit Leerzeichen am Ende  "
+            },
+            {
+              "datum": "Dienstag, 29.09.2026",
+              "tagesart": "Berufsschule",
+              "taetigkeiten": "Lernfeld 3: Clients in Netzwerke einbinden"
+            },
+            {
+              "datum": "Mittwoch, 30.09.2026",
+              "tagesart": "Berufsschule",
+              "taetigkeiten": "Lernfeld 3: Clients in Netzwerke einbinden"
+            },
+            {
+              "datum": "Donnerstag, 01.10.2026",
+              "tagesart": "Berufsschule",
+              "taetigkeiten": "Lernfeld 3: Clients in Netzwerke einbinden"
+            },
+            {
+              "datum": "Freitag, 02.10.2026",
+              "tagesart": "Berufsschule",
+              "taetigkeiten": "Lernfeld 3: Clients in Netzwerke einbinden"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-907-02",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "5.000 Zeichen je Tag mit Umlauten und überlangen Wörtern erscheinen vollständig, nichts wird gekürzt",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfWoche",
+    "eingabe": {
+      "name": "Anna Azubi",
+      "woche": "2026-W40",
+      "status": "Entwurf",
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. PrüfÄ",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. PrüfÄ",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Betrieb",
+          "text": "Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. PrüfÄ",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Betrieb",
+          "text": "Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. PrüfÄ",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Betrieb",
+          "text": "Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. PrüfÄ",
+          "ausserhalb": false
+        }
+      ],
+      "statuswechsel": [],
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      }
+    },
+    "erwartet": {
+      "titel": "Berichtsheft Anna Azubi – KW 40/2026",
+      "dateiname": "Berichtsheft_Anna-Azubi_KW40-2026.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "wochen": [
+        {
+          "name": "Anna Azubi",
+          "kw": "KW 40/2026",
+          "zeitraum": "28.09.2026 – 02.10.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 28.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. PrüfÄ"
+            },
+            {
+              "datum": "Dienstag, 29.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. PrüfÄ"
+            },
+            {
+              "datum": "Mittwoch, 30.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. PrüfÄ"
+            },
+            {
+              "datum": "Donnerstag, 01.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. PrüfÄ"
+            },
+            {
+              "datum": "Freitag, 02.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. Prüfung der Größenänderung über Straßen und Brücken; Donaudampfschifffahrtsgesellschaftskapitänsmütze geprüft. PrüfÄ"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-907-03",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Akzente werden im Dateinamen entfernt, Sonderzeichen zu „-“",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfWoche",
+    "eingabe": {
+      "name": "René O'Neil",
+      "woche": "2026-W40",
+      "status": "Entwurf",
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        }
+      ],
+      "statuswechsel": [],
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      }
+    },
+    "erwartet": {
+      "titel": "Berichtsheft René O'Neil – KW 40/2026",
+      "dateiname": "Berichtsheft_Rene-O-Neil_KW40-2026.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "wochen": [
+        {
+          "name": "René O'Neil",
+          "kw": "KW 40/2026",
+          "zeitraum": "28.09.2026 – 02.10.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 28.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Dienstag, 29.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Mittwoch, 30.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Donnerstag, 01.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Freitag, 02.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-907-04",
+    "modul": "M07",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Name ohne Buchstaben und Ziffern ergibt „Azubi“ im Dateinamen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "pdfWoche",
+    "eingabe": {
+      "name": "../..",
+      "woche": "2026-W40",
+      "status": "Entwurf",
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        }
+      ],
+      "statuswechsel": [],
+      "ausbildung": {
+        "beginn": "2026-09-01",
+        "ende": null
+      }
+    },
+    "erwartet": {
+      "titel": "Berichtsheft ../.. – KW 40/2026",
+      "dateiname": "Berichtsheft_Azubi_KW40-2026.pdf",
+      "erstellt": "06.10.2026, 10:00 Uhr",
+      "wochen": [
+        {
+          "name": "../..",
+          "kw": "KW 40/2026",
+          "zeitraum": "28.09.2026 – 02.10.2026",
+          "status": "Entwurf",
+          "vermerk": null,
+          "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+          "kopfzeile": "Nicht freigegeben (Entwurf)",
+          "ausserhalb": false,
+          "tage": [
+            {
+              "datum": "Montag, 28.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Dienstag, 29.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Mittwoch, 30.09.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Donnerstag, 01.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            },
+            {
+              "datum": "Freitag, 02.10.2026",
+              "tagesart": "Betrieb",
+              "taetigkeiten": "Netzwerk geplant"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-903-04",
+    "modul": "M07",
+    "ebene": "daten",
+    "beschreibung": "Nach der Freigabe trägt das PDF den Vermerk mit Name, Datum und Uhrzeit der gespeicherten Freigabe",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-07T14:05:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "pdf_woche_exportieren",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Freigegeben"
+        },
+        {
+          "pdf": {
+            "titel": "Berichtsheft Anna Azubi – KW 40/2026",
+            "dateiname": "Berichtsheft_Anna-Azubi_KW40-2026.pdf",
+            "erstellt": "07.10.2026, 14:05 Uhr",
+            "wochen": [
+              {
+                "name": "Anna Azubi",
+                "kw": "KW 40/2026",
+                "zeitraum": "28.09.2026 – 02.10.2026",
+                "status": "Freigegeben",
+                "vermerk": "Freigegeben von Bernd Ausbilder am 07.10.2026, 14:05 Uhr",
+                "kennzeichnung": null,
+                "kopfzeile": "Freigegeben",
+                "ausserhalb": false,
+                "tage": [
+                  {
+                    "datum": "Montag, 28.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Dienstag, 29.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Mittwoch, 30.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Donnerstag, 01.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Freitag, 02.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-07T14:05:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-905-02",
+    "modul": "M07",
+    "ebene": "daten",
+    "beschreibung": "Ein nach der Rücknahme neu erzeugtes PDF enthält keinen Freigabevermerk mehr",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            },
+            {
+              "als": "bernd",
+              "aktion": "freigeben",
+              "uhr": "2026-10-06T11:00:00+02:00"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "pdf_woche_exportieren",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T12:00:00+02:00"
+      },
+      {
+        "als": "clara",
+        "aktion": "freigabe_zuruecknehmen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "begruendung": "Mittwoch falsches Datum",
+        "uhr": "2026-10-06T13:00:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "pdf_woche_exportieren",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T14:00:00+02:00"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "pdf": {
+            "titel": "Berichtsheft Anna Azubi – KW 40/2026",
+            "dateiname": "Berichtsheft_Anna-Azubi_KW40-2026.pdf",
+            "erstellt": "06.10.2026, 12:00 Uhr",
+            "wochen": [
+              {
+                "name": "Anna Azubi",
+                "kw": "KW 40/2026",
+                "zeitraum": "28.09.2026 – 02.10.2026",
+                "status": "Freigegeben",
+                "vermerk": "Freigegeben von Bernd Ausbilder am 06.10.2026, 11:00 Uhr",
+                "kennzeichnung": null,
+                "kopfzeile": "Freigegeben",
+                "ausserhalb": false,
+                "tage": [
+                  {
+                    "datum": "Montag, 28.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Dienstag, 29.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Mittwoch, 30.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Donnerstag, 01.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Freitag, 02.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "pdf": {
+            "titel": "Berichtsheft Anna Azubi – KW 40/2026",
+            "dateiname": "Berichtsheft_Anna-Azubi_KW40-2026.pdf",
+            "erstellt": "06.10.2026, 14:00 Uhr",
+            "wochen": [
+              {
+                "name": "Anna Azubi",
+                "kw": "KW 40/2026",
+                "zeitraum": "28.09.2026 – 02.10.2026",
+                "status": "Abgelehnt",
+                "vermerk": null,
+                "kennzeichnung": "Nicht freigegeben – Status: Abgelehnt",
+                "kopfzeile": "Nicht freigegeben (Abgelehnt)",
+                "ausserhalb": false,
+                "tage": [
+                  {
+                    "datum": "Montag, 28.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Dienstag, 29.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Mittwoch, 30.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Donnerstag, 01.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Freitag, 02.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T11:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Freigegeben",
+              "nach": "Abgelehnt",
+              "person": "clara",
+              "zeitpunkt": "2026-10-06T13:00:00+02:00",
+              "runde": 1,
+              "begruendung": "Mittwoch falsches Datum"
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-906-01",
+    "modul": "M07",
+    "ebene": "daten",
+    "beschreibung": "Der Azubi exportiert nur eigene Berichte: fremde ergeben „Zugriff verweigert“, eine Person ohne Berichtsheft „nicht gefunden“",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "personen": [
+        {
+          "schluessel": "otto",
+          "name": "Otto Azubi",
+          "rolle": "azubi",
+          "ausbilder": "clara",
+          "ausbildungsbeginn": "2026-09-01"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "pdf_woche_exportieren",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "anna",
+        "aktion": "pdf_woche_exportieren",
+        "azubi": "otto",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "anna",
+        "aktion": "pdf_zeitraum_exportieren",
+        "azubi": "otto"
+      },
+      {
+        "als": "anna",
+        "aktion": "pdf_zeitraum_exportieren",
+        "azubi": "bernd"
+      },
+      {
+        "als": "anna",
+        "aktion": "pdf_zeitraum_exportieren",
+        "azubi": "anna",
+        "von": "2026-09-28",
+        "bis": "2026-10-02"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "pdf": {
+            "titel": "Berichtsheft Anna Azubi – KW 40/2026",
+            "dateiname": "Berichtsheft_Anna-Azubi_KW40-2026.pdf",
+            "erstellt": "06.10.2026, 10:00 Uhr",
+            "wochen": [
+              {
+                "name": "Anna Azubi",
+                "kw": "KW 40/2026",
+                "zeitraum": "28.09.2026 – 02.10.2026",
+                "status": "Entwurf",
+                "vermerk": null,
+                "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+                "kopfzeile": "Nicht freigegeben (Entwurf)",
+                "ausserhalb": false,
+                "tage": [
+                  {
+                    "datum": "Montag, 28.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Dienstag, 29.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Mittwoch, 30.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Donnerstag, 01.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Freitag, 02.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "fehler": "zugriff_verweigert"
+        },
+        {
+          "fehler": "zugriff_verweigert"
+        },
+        {
+          "fehler": "nicht_gefunden"
+        },
+        {
+          "pdf": {
+            "titel": "Berichtsheft Anna Azubi – 28.09.2026 – 02.10.2026",
+            "dateiname": "Berichtsheft_Anna-Azubi_2026-09-28_bis_2026-10-02.pdf",
+            "erstellt": "06.10.2026, 10:00 Uhr",
+            "zeitraum": "28.09.2026 – 02.10.2026",
+            "wochen": [
+              {
+                "name": "Anna Azubi",
+                "kw": "KW 40/2026",
+                "zeitraum": "28.09.2026 – 02.10.2026",
+                "status": "Entwurf",
+                "vermerk": null,
+                "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+                "kopfzeile": "Nicht freigegeben (Entwurf)",
+                "ausserhalb": false,
+                "tage": [
+                  {
+                    "datum": "Montag, 28.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Dienstag, 29.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Mittwoch, 30.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Donnerstag, 01.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Freitag, 02.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [],
+          "kommentare": []
+        },
+        {
+          "azubi": "otto",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": null,
+              "text": ""
+            },
+            {
+              "tag": "Di",
+              "tagesart": null,
+              "text": ""
+            },
+            {
+              "tag": "Mi",
+              "tagesart": null,
+              "text": ""
+            },
+            {
+              "tag": "Do",
+              "tagesart": null,
+              "text": ""
+            },
+            {
+              "tag": "Fr",
+              "tagesart": null,
+              "text": ""
+            }
+          ],
+          "historie": [],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-906-02",
+    "modul": "M07",
+    "ebene": "daten",
+    "beschreibung": "Ausbilder exportieren die Berichte aller Azubis, auch deaktivierter und ohne Zuordnung; der deaktivierte Azubi selbst nicht mehr; kein Hinweis „deaktiviert“ im PDF",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "person_deaktivieren",
+        "person": "anna"
+      },
+      {
+        "als": "bernd",
+        "aktion": "pdf_woche_exportieren",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "clara",
+        "aktion": "pdf_woche_exportieren",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "clara",
+        "aktion": "pdf_zeitraum_exportieren",
+        "azubi": "anna",
+        "von": "2026-09-28",
+        "bis": "2026-10-02"
+      },
+      {
+        "als": "anna",
+        "aktion": "pdf_woche_exportieren",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "anna",
+        "aktion": "pdf_zeitraum_exportieren",
+        "azubi": "anna"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "deaktiviert": true
+        },
+        {
+          "pdf": {
+            "titel": "Berichtsheft Anna Azubi – KW 40/2026",
+            "dateiname": "Berichtsheft_Anna-Azubi_KW40-2026.pdf",
+            "erstellt": "06.10.2026, 10:00 Uhr",
+            "wochen": [
+              {
+                "name": "Anna Azubi",
+                "kw": "KW 40/2026",
+                "zeitraum": "28.09.2026 – 02.10.2026",
+                "status": "Entwurf",
+                "vermerk": null,
+                "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+                "kopfzeile": "Nicht freigegeben (Entwurf)",
+                "ausserhalb": false,
+                "tage": [
+                  {
+                    "datum": "Montag, 28.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Dienstag, 29.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Mittwoch, 30.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Donnerstag, 01.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Freitag, 02.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "pdf": {
+            "titel": "Berichtsheft Anna Azubi – KW 40/2026",
+            "dateiname": "Berichtsheft_Anna-Azubi_KW40-2026.pdf",
+            "erstellt": "06.10.2026, 10:00 Uhr",
+            "wochen": [
+              {
+                "name": "Anna Azubi",
+                "kw": "KW 40/2026",
+                "zeitraum": "28.09.2026 – 02.10.2026",
+                "status": "Entwurf",
+                "vermerk": null,
+                "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+                "kopfzeile": "Nicht freigegeben (Entwurf)",
+                "ausserhalb": false,
+                "tage": [
+                  {
+                    "datum": "Montag, 28.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Dienstag, 29.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Mittwoch, 30.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Donnerstag, 01.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Freitag, 02.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "pdf": {
+            "titel": "Berichtsheft Anna Azubi – 28.09.2026 – 02.10.2026",
+            "dateiname": "Berichtsheft_Anna-Azubi_2026-09-28_bis_2026-10-02.pdf",
+            "erstellt": "06.10.2026, 10:00 Uhr",
+            "zeitraum": "28.09.2026 – 02.10.2026",
+            "wochen": [
+              {
+                "name": "Anna Azubi",
+                "kw": "KW 40/2026",
+                "zeitraum": "28.09.2026 – 02.10.2026",
+                "status": "Entwurf",
+                "vermerk": null,
+                "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+                "kopfzeile": "Nicht freigegeben (Entwurf)",
+                "ausserhalb": false,
+                "tage": [
+                  {
+                    "datum": "Montag, 28.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Dienstag, 29.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Mittwoch, 30.09.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Donnerstag, 01.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  },
+                  {
+                    "datum": "Freitag, 02.10.2026",
+                    "tagesart": "Betrieb",
+                    "taetigkeiten": "Netzwerk geplant"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "fehler": "zugriff_verweigert"
+        },
+        {
+          "fehler": "zugriff_verweigert"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-902-13",
+    "modul": "M07",
+    "ebene": "daten",
+    "beschreibung": "Sammel-PDF aus dem gespeicherten Bestand: ohne Angabe Ausbildungsbeginn bis heute, ausgeblendete Wochen fehlen, zeitliche Reihenfolge; Bis vor Von wird abgewiesen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "ausbildungszeitraum_aendern",
+        "person": "anna",
+        "beginn": "2026-09-15",
+        "ende": null
+      },
+      {
+        "als": "anna",
+        "aktion": "pdf_zeitraum_exportieren",
+        "azubi": "anna"
+      },
+      {
+        "als": "anna",
+        "aktion": "pdf_zeitraum_exportieren",
+        "azubi": "anna",
+        "von": "2026-10-01",
+        "bis": "2026-09-01"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "geaendert": true
+        },
+        {
+          "pdf": {
+            "titel": "Berichtsheft Anna Azubi – 15.09.2026 – 06.10.2026",
+            "dateiname": "Berichtsheft_Anna-Azubi_2026-09-15_bis_2026-10-06.pdf",
+            "erstellt": "06.10.2026, 10:00 Uhr",
+            "zeitraum": "15.09.2026 – 06.10.2026",
+            "wochen": [
+              {
+                "name": "Anna Azubi",
+                "kw": "KW 38/2026",
+                "zeitraum": "14.09.2026 – 18.09.2026",
+                "status": "Entwurf",
+                "vermerk": null,
+                "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+                "kopfzeile": "Nicht freigegeben (Entwurf)",
+                "ausserhalb": false,
+                "tage": [
+                  {
+                    "datum": "Montag, 14.09.2026",
+                    "tagesart": "außerhalb der Ausbildung",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Dienstag, 15.09.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Mittwoch, 16.09.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Donnerstag, 17.09.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Freitag, 18.09.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  }
+                ]
+              },
+              {
+                "name": "Anna Azubi",
+                "kw": "KW 39/2026",
+                "zeitraum": "21.09.2026 – 25.09.2026",
+                "status": "Entwurf",
+                "vermerk": null,
+                "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+                "kopfzeile": "Nicht freigegeben (Entwurf)",
+                "ausserhalb": false,
+                "tage": [
+                  {
+                    "datum": "Montag, 21.09.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Dienstag, 22.09.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Mittwoch, 23.09.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Donnerstag, 24.09.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Freitag, 25.09.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  }
+                ]
+              },
+              {
+                "name": "Anna Azubi",
+                "kw": "KW 40/2026",
+                "zeitraum": "28.09.2026 – 02.10.2026",
+                "status": "Entwurf",
+                "vermerk": null,
+                "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+                "kopfzeile": "Nicht freigegeben (Entwurf)",
+                "ausserhalb": false,
+                "tage": [
+                  {
+                    "datum": "Montag, 28.09.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Dienstag, 29.09.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Mittwoch, 30.09.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Donnerstag, 01.10.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Freitag, 02.10.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  }
+                ]
+              },
+              {
+                "name": "Anna Azubi",
+                "kw": "KW 41/2026",
+                "zeitraum": "05.10.2026 – 09.10.2026",
+                "status": "Entwurf",
+                "vermerk": null,
+                "kennzeichnung": "Nicht freigegeben – Status: Entwurf",
+                "kopfzeile": "Nicht freigegeben (Entwurf)",
+                "ausserhalb": false,
+                "tage": [
+                  {
+                    "datum": "Montag, 05.10.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Dienstag, 06.10.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Mittwoch, 07.10.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Donnerstag, 08.10.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  },
+                  {
+                    "datum": "Freitag, 09.10.2026",
+                    "tagesart": "Tagesart noch offen",
+                    "taetigkeiten": ""
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "fehler": "bis_vor_von"
+        }
+      ],
+      "berichte": []
+    }
+  }
+]

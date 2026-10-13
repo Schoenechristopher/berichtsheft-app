@@ -1,0 +1,1891 @@
+[
+  {
+    "id": "AK-801-01",
+    "modul": "M06",
+    "ebene": "fachlogik",
+    "beschreibung": "Alle fünf Arten von Statuswechseln mit Bezeichnung, neuem Status, Person und Zeitpunkt; nach Runde gruppiert, neueste zuerst",
+    "schnittstelle": "historieGruppieren",
+    "eingabe": {
+      "statuswechsel": [
+        {
+          "von": "Entwurf",
+          "nach": "Eingereicht",
+          "person": "anna",
+          "zeitpunkt": "2026-10-06T10:00:00+02:00",
+          "runde": 1,
+          "begruendung": null
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Entwurf",
+          "person": "anna",
+          "zeitpunkt": "2026-10-06T10:10:00+02:00",
+          "runde": 1,
+          "begruendung": null
+        },
+        {
+          "von": "Entwurf",
+          "nach": "Eingereicht",
+          "person": "anna",
+          "zeitpunkt": "2026-10-06T10:20:00+02:00",
+          "runde": 2,
+          "begruendung": null
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Abgelehnt",
+          "person": "bernd",
+          "zeitpunkt": "2026-10-07T09:00:00+02:00",
+          "runde": 2,
+          "begruendung": null
+        },
+        {
+          "von": "Abgelehnt",
+          "nach": "Eingereicht",
+          "person": "anna",
+          "zeitpunkt": "2026-10-07T12:00:00+02:00",
+          "runde": 3,
+          "begruendung": null
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Freigegeben",
+          "person": "clara",
+          "zeitpunkt": "2026-10-08T08:00:00+02:00",
+          "runde": 3,
+          "begruendung": null
+        },
+        {
+          "von": "Freigegeben",
+          "nach": "Abgelehnt",
+          "person": "bernd",
+          "zeitpunkt": "2026-10-09T08:00:00+02:00",
+          "runde": 3,
+          "begruendung": "Datum falsch"
+        }
+      ],
+      "kommentare": [
+        {
+          "runde": 2,
+          "tag": null,
+          "person": "bernd",
+          "text": "Bitte genauer"
+        }
+      ]
+    },
+    "erwartet": {
+      "runden": [
+        {
+          "runde": 3,
+          "eintraege": [
+            {
+              "bezeichnung": "Erneut eingereicht",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-07T12:00:00+02:00",
+              "begruendung": null
+            },
+            {
+              "bezeichnung": "Freigegeben",
+              "nach": "Freigegeben",
+              "person": "clara",
+              "zeitpunkt": "2026-10-08T08:00:00+02:00",
+              "begruendung": null
+            },
+            {
+              "bezeichnung": "Freigabe zurückgenommen",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-09T08:00:00+02:00",
+              "begruendung": "Datum falsch"
+            }
+          ],
+          "gesamtkommentare": [],
+          "tageskommentare": []
+        },
+        {
+          "runde": 2,
+          "eintraege": [
+            {
+              "bezeichnung": "Eingereicht",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:20:00+02:00",
+              "begruendung": null
+            },
+            {
+              "bezeichnung": "Abgelehnt",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-07T09:00:00+02:00",
+              "begruendung": null
+            }
+          ],
+          "gesamtkommentare": [
+            {
+              "person": "bernd",
+              "text": "Bitte genauer"
+            }
+          ],
+          "tageskommentare": []
+        },
+        {
+          "runde": 1,
+          "eintraege": [
+            {
+              "bezeichnung": "Eingereicht",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "begruendung": null
+            },
+            {
+              "bezeichnung": "Zurückgezogen",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:10:00+02:00",
+              "begruendung": null
+            }
+          ],
+          "gesamtkommentare": [],
+          "tageskommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-801-02",
+    "modul": "M06",
+    "ebene": "fachlogik",
+    "beschreibung": "Gleicher Zeitpunkt: Die Einträge bleiben in der Reihenfolge ihres Entstehens",
+    "schnittstelle": "historieGruppieren",
+    "eingabe": {
+      "statuswechsel": [
+        {
+          "von": "Entwurf",
+          "nach": "Eingereicht",
+          "person": "anna",
+          "zeitpunkt": "2026-10-06T10:00:00+02:00",
+          "runde": 1,
+          "begruendung": null
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Abgelehnt",
+          "person": "bernd",
+          "zeitpunkt": "2026-10-06T10:00:00+02:00",
+          "runde": 1,
+          "begruendung": null
+        },
+        {
+          "von": "Abgelehnt",
+          "nach": "Eingereicht",
+          "person": "anna",
+          "zeitpunkt": "2026-10-06T10:00:00+02:00",
+          "runde": 2,
+          "begruendung": null
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Freigegeben",
+          "person": "bernd",
+          "zeitpunkt": "2026-10-06T10:00:00+02:00",
+          "runde": 2,
+          "begruendung": null
+        }
+      ],
+      "kommentare": [
+        {
+          "runde": 1,
+          "tag": null,
+          "person": "bernd",
+          "text": "Kurz"
+        }
+      ]
+    },
+    "erwartet": {
+      "runden": [
+        {
+          "runde": 2,
+          "eintraege": [
+            {
+              "bezeichnung": "Erneut eingereicht",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "begruendung": null
+            },
+            {
+              "bezeichnung": "Freigegeben",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "begruendung": null
+            }
+          ],
+          "gesamtkommentare": [],
+          "tageskommentare": []
+        },
+        {
+          "runde": 1,
+          "eintraege": [
+            {
+              "bezeichnung": "Eingereicht",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "begruendung": null
+            },
+            {
+              "bezeichnung": "Abgelehnt",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "begruendung": null
+            }
+          ],
+          "gesamtkommentare": [
+            {
+              "person": "bernd",
+              "text": "Kurz"
+            }
+          ],
+          "tageskommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-801-03",
+    "modul": "M06",
+    "ebene": "fachlogik",
+    "beschreibung": "Ohne Statuswechsel ist die Historie leer",
+    "schnittstelle": "historieGruppieren",
+    "eingabe": {
+      "statuswechsel": [],
+      "kommentare": []
+    },
+    "erwartet": {
+      "runden": []
+    }
+  },
+  {
+    "id": "AK-801-04",
+    "modul": "M06",
+    "ebene": "daten",
+    "beschreibung": "Jeder Statuswechsel landet mit Zeitpunkt (auch nach der Zeitumstellung), Person, altem und neuem Status und Runde in der Historie; die Berichtsseite zeigt sie nach Runden",
+    "uhr": "2026-10-06T09:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T10:00:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T10:10:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T10:20:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Bitte genauer",
+        "uhr": "2026-10-07T09:00:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "erneut_einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-07T12:00:00+02:00"
+      },
+      {
+        "als": "clara",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-08T08:00:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "freigabe_zuruecknehmen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "begruendung": "Datum falsch",
+        "uhr": "2026-10-26T09:00:00+01:00"
+      },
+      {
+        "aktion": "historie_lesen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "status": "Entwurf"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "status": "Freigegeben"
+        },
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "runden": [
+            {
+              "runde": 3,
+              "eintraege": [
+                {
+                  "bezeichnung": "Erneut eingereicht",
+                  "nach": "Eingereicht",
+                  "person": "anna",
+                  "zeitpunkt": "2026-10-07T12:00:00+02:00",
+                  "begruendung": null
+                },
+                {
+                  "bezeichnung": "Freigegeben",
+                  "nach": "Freigegeben",
+                  "person": "clara",
+                  "zeitpunkt": "2026-10-08T08:00:00+02:00",
+                  "begruendung": null
+                },
+                {
+                  "bezeichnung": "Freigabe zurückgenommen",
+                  "nach": "Abgelehnt",
+                  "person": "bernd",
+                  "zeitpunkt": "2026-10-26T09:00:00+01:00",
+                  "begruendung": "Datum falsch"
+                }
+              ],
+              "gesamtkommentare": [],
+              "tageskommentare": []
+            },
+            {
+              "runde": 2,
+              "eintraege": [
+                {
+                  "bezeichnung": "Eingereicht",
+                  "nach": "Eingereicht",
+                  "person": "anna",
+                  "zeitpunkt": "2026-10-06T10:20:00+02:00",
+                  "begruendung": null
+                },
+                {
+                  "bezeichnung": "Abgelehnt",
+                  "nach": "Abgelehnt",
+                  "person": "bernd",
+                  "zeitpunkt": "2026-10-07T09:00:00+02:00",
+                  "begruendung": null
+                }
+              ],
+              "gesamtkommentare": [
+                {
+                  "person": "bernd",
+                  "text": "Bitte genauer"
+                }
+              ],
+              "tageskommentare": []
+            },
+            {
+              "runde": 1,
+              "eintraege": [
+                {
+                  "bezeichnung": "Eingereicht",
+                  "nach": "Eingereicht",
+                  "person": "anna",
+                  "zeitpunkt": "2026-10-06T10:00:00+02:00",
+                  "begruendung": null
+                },
+                {
+                  "bezeichnung": "Zurückgezogen",
+                  "nach": "Entwurf",
+                  "person": "anna",
+                  "zeitpunkt": "2026-10-06T10:10:00+02:00",
+                  "begruendung": null
+                }
+              ],
+              "gesamtkommentare": [],
+              "tageskommentare": []
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:10:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:20:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-07T09:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            },
+            {
+              "von": "Abgelehnt",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-07T12:00:00+02:00",
+              "runde": 3,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "clara",
+              "zeitpunkt": "2026-10-08T08:00:00+02:00",
+              "runde": 3,
+              "begruendung": null
+            },
+            {
+              "von": "Freigegeben",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-26T09:00:00+01:00",
+              "runde": 3,
+              "begruendung": "Datum falsch"
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 2,
+              "tag": null,
+              "person": "bernd",
+              "text": "Bitte genauer"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-802-01",
+    "modul": "M06",
+    "ebene": "fachlogik",
+    "beschreibung": "Kommentare früherer Runden bleiben ihrer Runde zugeordnet: Gesamtkommentar, dann Tage Mo bis Fr",
+    "schnittstelle": "historieGruppieren",
+    "eingabe": {
+      "statuswechsel": [
+        {
+          "von": "Entwurf",
+          "nach": "Eingereicht",
+          "person": "anna",
+          "zeitpunkt": "2026-10-06T10:00:00+02:00",
+          "runde": 1,
+          "begruendung": null
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Abgelehnt",
+          "person": "bernd",
+          "zeitpunkt": "2026-10-06T11:00:00+02:00",
+          "runde": 1,
+          "begruendung": null
+        },
+        {
+          "von": "Abgelehnt",
+          "nach": "Eingereicht",
+          "person": "anna",
+          "zeitpunkt": "2026-10-06T12:00:00+02:00",
+          "runde": 2,
+          "begruendung": null
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Abgelehnt",
+          "person": "clara",
+          "zeitpunkt": "2026-10-06T13:00:00+02:00",
+          "runde": 2,
+          "begruendung": null
+        },
+        {
+          "von": "Abgelehnt",
+          "nach": "Eingereicht",
+          "person": "anna",
+          "zeitpunkt": "2026-10-06T14:00:00+02:00",
+          "runde": 3,
+          "begruendung": null
+        }
+      ],
+      "kommentare": [
+        {
+          "runde": 2,
+          "tag": "Fr",
+          "person": "clara",
+          "text": "Freitag fehlt noch"
+        },
+        {
+          "runde": 1,
+          "tag": "Fr",
+          "person": "bernd",
+          "text": "Freitag ergänzen"
+        },
+        {
+          "runde": 1,
+          "tag": null,
+          "person": "bernd",
+          "text": "Bitte genauer"
+        },
+        {
+          "runde": 1,
+          "tag": "Mo",
+          "person": "bernd",
+          "text": "Montag ergänzen"
+        },
+        {
+          "runde": 2,
+          "tag": null,
+          "person": "clara",
+          "text": "Zweite Runde"
+        }
+      ]
+    },
+    "erwartet": {
+      "runden": [
+        {
+          "runde": 3,
+          "eintraege": [
+            {
+              "bezeichnung": "Erneut eingereicht",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T14:00:00+02:00",
+              "begruendung": null
+            }
+          ],
+          "gesamtkommentare": [],
+          "tageskommentare": []
+        },
+        {
+          "runde": 2,
+          "eintraege": [
+            {
+              "bezeichnung": "Erneut eingereicht",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T12:00:00+02:00",
+              "begruendung": null
+            },
+            {
+              "bezeichnung": "Abgelehnt",
+              "nach": "Abgelehnt",
+              "person": "clara",
+              "zeitpunkt": "2026-10-06T13:00:00+02:00",
+              "begruendung": null
+            }
+          ],
+          "gesamtkommentare": [
+            {
+              "person": "clara",
+              "text": "Zweite Runde"
+            }
+          ],
+          "tageskommentare": [
+            {
+              "tag": "Fr",
+              "person": "clara",
+              "text": "Freitag fehlt noch"
+            }
+          ]
+        },
+        {
+          "runde": 1,
+          "eintraege": [
+            {
+              "bezeichnung": "Eingereicht",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "begruendung": null
+            },
+            {
+              "bezeichnung": "Abgelehnt",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T11:00:00+02:00",
+              "begruendung": null
+            }
+          ],
+          "gesamtkommentare": [
+            {
+              "person": "bernd",
+              "text": "Bitte genauer"
+            }
+          ],
+          "tageskommentare": [
+            {
+              "tag": "Mo",
+              "person": "bernd",
+              "text": "Montag ergänzen"
+            },
+            {
+              "tag": "Fr",
+              "person": "bernd",
+              "text": "Freitag ergänzen"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-802-02",
+    "modul": "M06",
+    "ebene": "fachlogik",
+    "beschreibung": "Die Begründung einer Rücknahme bleibt in der Runde der Freigabe; das erneute Einreichen öffnet die nächste",
+    "schnittstelle": "historieGruppieren",
+    "eingabe": {
+      "statuswechsel": [
+        {
+          "von": "Entwurf",
+          "nach": "Eingereicht",
+          "person": "anna",
+          "zeitpunkt": "2026-10-06T10:00:00+02:00",
+          "runde": 1,
+          "begruendung": null
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Freigegeben",
+          "person": "bernd",
+          "zeitpunkt": "2026-10-06T11:00:00+02:00",
+          "runde": 1,
+          "begruendung": null
+        },
+        {
+          "von": "Freigegeben",
+          "nach": "Abgelehnt",
+          "person": "clara",
+          "zeitpunkt": "2026-10-06T12:00:00+02:00",
+          "runde": 1,
+          "begruendung": "Mittwoch falsches Datum"
+        },
+        {
+          "von": "Abgelehnt",
+          "nach": "Eingereicht",
+          "person": "anna",
+          "zeitpunkt": "2026-10-06T13:00:00+02:00",
+          "runde": 2,
+          "begruendung": null
+        },
+        {
+          "von": "Eingereicht",
+          "nach": "Freigegeben",
+          "person": "bernd",
+          "zeitpunkt": "2026-10-06T14:00:00+02:00",
+          "runde": 2,
+          "begruendung": null
+        }
+      ],
+      "kommentare": []
+    },
+    "erwartet": {
+      "runden": [
+        {
+          "runde": 2,
+          "eintraege": [
+            {
+              "bezeichnung": "Erneut eingereicht",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T13:00:00+02:00",
+              "begruendung": null
+            },
+            {
+              "bezeichnung": "Freigegeben",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T14:00:00+02:00",
+              "begruendung": null
+            }
+          ],
+          "gesamtkommentare": [],
+          "tageskommentare": []
+        },
+        {
+          "runde": 1,
+          "eintraege": [
+            {
+              "bezeichnung": "Eingereicht",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "begruendung": null
+            },
+            {
+              "bezeichnung": "Freigegeben",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T11:00:00+02:00",
+              "begruendung": null
+            },
+            {
+              "bezeichnung": "Freigabe zurückgenommen",
+              "nach": "Abgelehnt",
+              "person": "clara",
+              "zeitpunkt": "2026-10-06T12:00:00+02:00",
+              "begruendung": "Mittwoch falsches Datum"
+            }
+          ],
+          "gesamtkommentare": [],
+          "tageskommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-802-03",
+    "modul": "M06",
+    "ebene": "daten",
+    "beschreibung": "Zwei Ablehnungen mit Kommentaren, dann Freigabe: alle Kommentare bleiben gespeichert und ihrer Runde zugeordnet",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Erste Runde",
+        "tageskommentare": {
+          "Fr": "Freitag fehlt",
+          "Mo": "Montag ergänzen"
+        },
+        "uhr": "2026-10-06T11:00:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "erneut_einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T12:00:00+02:00"
+      },
+      {
+        "als": "clara",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Zweite Runde",
+        "uhr": "2026-10-06T13:00:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "erneut_einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T14:00:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T15:00:00+02:00"
+      },
+      {
+        "aktion": "historie_lesen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "status": "Freigegeben"
+        },
+        {
+          "runden": [
+            {
+              "runde": 3,
+              "eintraege": [
+                {
+                  "bezeichnung": "Erneut eingereicht",
+                  "nach": "Eingereicht",
+                  "person": "anna",
+                  "zeitpunkt": "2026-10-06T14:00:00+02:00",
+                  "begruendung": null
+                },
+                {
+                  "bezeichnung": "Freigegeben",
+                  "nach": "Freigegeben",
+                  "person": "bernd",
+                  "zeitpunkt": "2026-10-06T15:00:00+02:00",
+                  "begruendung": null
+                }
+              ],
+              "gesamtkommentare": [],
+              "tageskommentare": []
+            },
+            {
+              "runde": 2,
+              "eintraege": [
+                {
+                  "bezeichnung": "Erneut eingereicht",
+                  "nach": "Eingereicht",
+                  "person": "anna",
+                  "zeitpunkt": "2026-10-06T12:00:00+02:00",
+                  "begruendung": null
+                },
+                {
+                  "bezeichnung": "Abgelehnt",
+                  "nach": "Abgelehnt",
+                  "person": "clara",
+                  "zeitpunkt": "2026-10-06T13:00:00+02:00",
+                  "begruendung": null
+                }
+              ],
+              "gesamtkommentare": [
+                {
+                  "person": "clara",
+                  "text": "Zweite Runde"
+                }
+              ],
+              "tageskommentare": []
+            },
+            {
+              "runde": 1,
+              "eintraege": [
+                {
+                  "bezeichnung": "Eingereicht",
+                  "nach": "Eingereicht",
+                  "person": "anna",
+                  "zeitpunkt": "2026-10-06T10:00:00+02:00",
+                  "begruendung": null
+                },
+                {
+                  "bezeichnung": "Abgelehnt",
+                  "nach": "Abgelehnt",
+                  "person": "bernd",
+                  "zeitpunkt": "2026-10-06T11:00:00+02:00",
+                  "begruendung": null
+                }
+              ],
+              "gesamtkommentare": [
+                {
+                  "person": "bernd",
+                  "text": "Erste Runde"
+                }
+              ],
+              "tageskommentare": [
+                {
+                  "tag": "Mo",
+                  "person": "bernd",
+                  "text": "Montag ergänzen"
+                },
+                {
+                  "tag": "Fr",
+                  "person": "bernd",
+                  "text": "Freitag fehlt"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T11:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Abgelehnt",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T12:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "clara",
+              "zeitpunkt": "2026-10-06T13:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            },
+            {
+              "von": "Abgelehnt",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T14:00:00+02:00",
+              "runde": 3,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T15:00:00+02:00",
+              "runde": 3,
+              "begruendung": null
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 1,
+              "tag": null,
+              "person": "bernd",
+              "text": "Erste Runde"
+            },
+            {
+              "runde": 1,
+              "tag": "Mo",
+              "person": "bernd",
+              "text": "Montag ergänzen"
+            },
+            {
+              "runde": 1,
+              "tag": "Fr",
+              "person": "bernd",
+              "text": "Freitag fehlt"
+            },
+            {
+              "runde": 2,
+              "tag": null,
+              "person": "clara",
+              "text": "Zweite Runde"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-802-04",
+    "modul": "M06",
+    "ebene": "daten",
+    "beschreibung": "Die Begründung einer Rücknahme bleibt nach erneutem Einreichen und erneuter Freigabe erhalten, in der Runde der Freigabe",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            },
+            {
+              "als": "bernd",
+              "aktion": "freigeben",
+              "uhr": "2026-10-06T11:00:00+02:00"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "clara",
+        "aktion": "freigabe_zuruecknehmen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "begruendung": "Mittwoch falsches Datum",
+        "uhr": "2026-10-06T12:00:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "erneut_einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T13:00:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T14:00:00+02:00"
+      },
+      {
+        "aktion": "historie_lesen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "status": "Freigegeben"
+        },
+        {
+          "runden": [
+            {
+              "runde": 2,
+              "eintraege": [
+                {
+                  "bezeichnung": "Erneut eingereicht",
+                  "nach": "Eingereicht",
+                  "person": "anna",
+                  "zeitpunkt": "2026-10-06T13:00:00+02:00",
+                  "begruendung": null
+                },
+                {
+                  "bezeichnung": "Freigegeben",
+                  "nach": "Freigegeben",
+                  "person": "bernd",
+                  "zeitpunkt": "2026-10-06T14:00:00+02:00",
+                  "begruendung": null
+                }
+              ],
+              "gesamtkommentare": [],
+              "tageskommentare": []
+            },
+            {
+              "runde": 1,
+              "eintraege": [
+                {
+                  "bezeichnung": "Eingereicht",
+                  "nach": "Eingereicht",
+                  "person": "anna",
+                  "zeitpunkt": "2026-10-06T10:00:00+02:00",
+                  "begruendung": null
+                },
+                {
+                  "bezeichnung": "Freigegeben",
+                  "nach": "Freigegeben",
+                  "person": "bernd",
+                  "zeitpunkt": "2026-10-06T11:00:00+02:00",
+                  "begruendung": null
+                },
+                {
+                  "bezeichnung": "Freigabe zurückgenommen",
+                  "nach": "Abgelehnt",
+                  "person": "clara",
+                  "zeitpunkt": "2026-10-06T12:00:00+02:00",
+                  "begruendung": "Mittwoch falsches Datum"
+                }
+              ],
+              "gesamtkommentare": [],
+              "tageskommentare": []
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T11:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Freigegeben",
+              "nach": "Abgelehnt",
+              "person": "clara",
+              "zeitpunkt": "2026-10-06T12:00:00+02:00",
+              "runde": 1,
+              "begruendung": "Mittwoch falsches Datum"
+            },
+            {
+              "von": "Abgelehnt",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T13:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T14:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-803-01",
+    "modul": "M06",
+    "ebene": "daten",
+    "beschreibung": "Statuswechsel lassen sich an der Fachlogik vorbei nicht ändern (neuer Status, Person, Zeitpunkt, Begründung)",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            },
+            {
+              "als": "bernd",
+              "aktion": "ablehnen",
+              "kommentar": "Bitte ergänzen",
+              "tageskommentare": {
+                "Mo": "Montag fehlt"
+              },
+              "uhr": "2026-10-06T11:00:00+02:00"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "aktion": "historie_aendern",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "eintrag": "statuswechsel",
+        "nummer": 2,
+        "werte": {
+          "nach": "Freigegeben"
+        }
+      },
+      {
+        "aktion": "historie_aendern",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "eintrag": "statuswechsel",
+        "nummer": 1,
+        "werte": {
+          "person": "clara",
+          "zeitpunkt": "2026-10-01T08:00:00+02:00"
+        }
+      },
+      {
+        "aktion": "historie_aendern",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "eintrag": "statuswechsel",
+        "nummer": 2,
+        "werte": {
+          "begruendung": "nachträglich"
+        }
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "historie_unveraenderlich"
+        },
+        {
+          "fehler": "historie_unveraenderlich"
+        },
+        {
+          "fehler": "historie_unveraenderlich"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T11:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 1,
+              "tag": null,
+              "person": "bernd",
+              "text": "Bitte ergänzen"
+            },
+            {
+              "runde": 1,
+              "tag": "Mo",
+              "person": "bernd",
+              "text": "Montag fehlt"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-803-02",
+    "modul": "M06",
+    "ebene": "daten",
+    "beschreibung": "Statuswechsel lassen sich an der Fachlogik vorbei nicht löschen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            },
+            {
+              "als": "bernd",
+              "aktion": "ablehnen",
+              "kommentar": "Bitte ergänzen",
+              "tageskommentare": {
+                "Mo": "Montag fehlt"
+              },
+              "uhr": "2026-10-06T11:00:00+02:00"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "aktion": "historie_loeschen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "eintrag": "statuswechsel",
+        "nummer": 2
+      },
+      {
+        "aktion": "historie_loeschen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "eintrag": "statuswechsel",
+        "nummer": 1
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "historie_unveraenderlich"
+        },
+        {
+          "fehler": "historie_unveraenderlich"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T11:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 1,
+              "tag": null,
+              "person": "bernd",
+              "text": "Bitte ergänzen"
+            },
+            {
+              "runde": 1,
+              "tag": "Mo",
+              "person": "bernd",
+              "text": "Montag fehlt"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-803-03",
+    "modul": "M06",
+    "ebene": "daten",
+    "beschreibung": "Gesamt- und Tageskommentare lassen sich an der Fachlogik vorbei weder ändern noch löschen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            },
+            {
+              "als": "bernd",
+              "aktion": "ablehnen",
+              "kommentar": "Bitte ergänzen",
+              "tageskommentare": {
+                "Mo": "Montag fehlt"
+              },
+              "uhr": "2026-10-06T11:00:00+02:00"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "aktion": "historie_aendern",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "eintrag": "kommentar",
+        "nummer": 1,
+        "werte": {
+          "text": "geändert"
+        }
+      },
+      {
+        "aktion": "historie_aendern",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "eintrag": "kommentar",
+        "nummer": 2,
+        "werte": {
+          "person": "clara",
+          "runde": 2
+        }
+      },
+      {
+        "aktion": "historie_loeschen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "eintrag": "kommentar",
+        "nummer": 1
+      },
+      {
+        "aktion": "historie_loeschen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "eintrag": "kommentar",
+        "nummer": 2
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "historie_unveraenderlich"
+        },
+        {
+          "fehler": "historie_unveraenderlich"
+        },
+        {
+          "fehler": "historie_unveraenderlich"
+        },
+        {
+          "fehler": "historie_unveraenderlich"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T11:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 1,
+              "tag": null,
+              "person": "bernd",
+              "text": "Bitte ergänzen"
+            },
+            {
+              "runde": 1,
+              "tag": "Mo",
+              "person": "bernd",
+              "text": "Montag fehlt"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-803-04",
+    "modul": "M06",
+    "ebene": "daten",
+    "beschreibung": "Ein Bericht mit Historie lässt sich nicht einzeln löschen; die Historie läuft danach normal weiter",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            },
+            {
+              "als": "bernd",
+              "aktion": "ablehnen",
+              "kommentar": "Bitte ergänzen",
+              "tageskommentare": {
+                "Mo": "Montag fehlt"
+              },
+              "uhr": "2026-10-06T11:00:00+02:00"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "aktion": "bericht_loeschen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "anna",
+        "aktion": "erneut_einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T12:00:00+02:00"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "historie_unveraenderlich"
+        },
+        {
+          "status": "Eingereicht"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T11:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Abgelehnt",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T12:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 1,
+              "tag": null,
+              "person": "bernd",
+              "text": "Bitte ergänzen"
+            },
+            {
+              "runde": 1,
+              "tag": "Mo",
+              "person": "bernd",
+              "text": "Montag fehlt"
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

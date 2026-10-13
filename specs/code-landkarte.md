@@ -290,3 +290,110 @@ Reihenfolge der Prüfungen ist M05-R21), dann `src/domain/report-submission.ts`,
 **Ersetzt durch Bordmittel:** Nichts fachlich: Die Regeln in `report-status.ts` und `report-submission.ts` werden 1:1
 übersetzt. Transaktion, Sperre, Versionsstand und Schreibschutz baut jede Plattform mit ihren Mitteln nach; ob dabei
 ein Workflow der Plattform genutzt wird, legt das Profil fest (G4).
+
+## M06 Historie
+
+Fach-Spec: `specs/M06-historie.md` · Prüffälle: `specs/pruefung/M06.json` (Ebenen `fachlogik` und `daten`)
+
+| Datei / Funktion | Rolle | Regeln / AK | Plattformgebunden | Übertragung |
+| --- | --- | --- | --- | --- |
+| `src/domain/report-history.ts` → `HistoryChange`, `HistoryComment`, `HistoryRound`, `groupHistory()` | Historie nach Runde gruppieren, neueste zuerst; Statuswechsel nach `seq`, Tageskommentare Mo–Fr | M06-R02, M06-R04, M06-R06; AK-801, AK-802 | nein | 1:1 übersetzen |
+| `src/domain/report-history.ts` → `changeLabel()` | Bezeichnung eines Statuswechsels („Erneut eingereicht“, „Freigabe zurückgenommen“ …) | M06-R05; AK-801 | nein | 1:1 übersetzen |
+| `src/domain/report-history.ts` → `formatDateTime()` | Datum und Uhrzeit in Berliner Zeit („07.10.2026, 14:05 Uhr“); auch für Prüfliste, Benachrichtigungen und PDF genutzt | M06-R03, M01; AK-801, AK-903 | nein | 1:1 übersetzen oder durch Datumsformat der Plattform ersetzen |
+| `src/domain/report-history.ts` → `currentFeedback()`, `CurrentFeedback` | Rückmeldung der letzten Ablehnung bzw. Rücknahme (gehört fachlich M05, M05-R16) | M05-R16; AK-606, AK-703 | nein | 1:1 übersetzen |
+| `src/domain/report-history.ts` → `currentApproval()` | aktuell gültige Freigabe (Person, Zeitpunkt) für Berichtsseite und Freigabevermerk (M07) | M07-R05; AK-603, AK-903, AK-905 | nein | 1:1 übersetzen |
+| `src/lib/reports.ts` → `loadReportHistory()` | Statuswechsel (nach `seq`) und Kommentare eines Berichts mit Namen laden | M06-R01, M06-R02; AK-801, AK-802 | ja (Prisma) | nach Profil neu bauen |
+| `src/lib/history-guard.ts` → `isHistoryImmutableError()`, `HISTORY_IMMUTABLE_SQLSTATE` | erkennt die Abweisung eines Schreibversuchs auf die Historie am festen SQLSTATE `BH803`, nie am Meldungstext | M06-R08, M06-R09; AK-803 | ja (PostgreSQL, Prisma-Fehlerform) | nach Profil neu bauen |
+| `prisma/schema.prisma` → `StatusChange`, `Comment`; Migrationen `20261006130221_init` (`status_change_immutable`, `weekly_report_delete_guard`), `20261007090000_einreichen_pruefen` (`comment_immutable`), `20261013090000_historie_fehlercode` (fester SQLSTATE) | Datenmodell der Historie; Trigger weisen UPDATE und DELETE ab, außer als Kaskade aus dem Löschen der Person | M06-R08 bis M06-R10; AK-803 | ja (PostgreSQL-Trigger) | nach Profil neu bauen |
+
+**Einstieg:** zuerst `src/domain/report-history.ts` (`groupHistory()`, `changeLabel()`), dann `loadReportHistory()` in
+`src/lib/reports.ts`, dann die Trigger per Suche in `prisma/migrations/` (`status_change_immutable`,
+`comment_immutable`, `weekly_report_delete_guard`). Geschrieben werden Statuswechsel und Kommentare nur in
+`transitionReport()` (M05, `src/lib/report-transitions.ts`). Die Oberfläche dazu (nicht in der Landkarte, M09):
+`src/components/ReportHistory.tsx`, eingebunden in `src/app/(app)/berichte/[id]/ReportView.tsx`.
+
+**Belege:**
+
+- Vitest: `src/domain/report-history.test.ts` (Gruppierung, Bezeichnungen, Rückmeldung, Freigabe),
+  `tests/db/transitions.test.ts` („Historie (AK-801 – AK-803)“), `tests/db/status-change.test.ts` (Unveränderlichkeit,
+  fester Code, Kaskade beim Löschen der Person, fremde Historie), `tests/db/timezone.test.ts` (Zeitpunkte in Berliner
+  Zeit, auch bei Roh-SQL).
+- Prüf-Runner: `tests/pruefung/fachlogik.test.ts` (`historieGruppieren`) und `tests/pruefung/daten.test.ts` mit
+  `tests/pruefung/daten-adapter.ts` (Block „M06 Historie, M07 PDF-Export“: `historie_lesen`, Schreibversuche
+  `historie_aendern`, `historie_loeschen`, `bericht_loeschen` direkt über den Prisma-Client) führen
+  `specs/pruefung/M06.json` aus.
+- Playwright: `e2e/ak-501-803-einreichen-pruefen.spec.ts`, `e2e/beispielszenarien.spec.ts` („Vertretung nimmt Freigabe
+  zurück“).
+
+**Fallen:**
+
+- Die Historie ist per Trigger unveränderlich; auch Testdaten lassen sich nicht einfach löschen. Zurücksetzen der
+  Test-Datenbank nur über `resetDatabase` (`tests/db/helpers.ts`), die über das Löschen der Personen kaskadiert.
+- Gleicher Zeitpunkt: Statuswechsel tragen `seq` für die Reihenfolge; Kommentare nicht. `loadReportHistory()` sortiert
+  Kommentare nach Runde und Zeitpunkt, `groupHistory()` die Tageskommentare nach Datum.
+- `loadReportHistory()` liefert Namen (`actorName`, `authorName`), keine Personen-IDs; der Daten-Adapter führt Namen auf
+  Schlüssel zurück bzw. liest den Bestand direkt.
+- Die Prüfrunde steht am Statuswechsel und am Kommentar; sie wird beim Schreiben bestimmt (`reviewRoundFor()`, M05),
+  nie nachträglich berechnet. Runde 0 gibt es nur theoretisch (Wechsel vor der ersten Einreichung).
+- Fehlerform: `@prisma/adapter-pg` liefert den SQLSTATE unter `meta.driverAdapterError.cause.originalCode`. Die Trigger
+  der Historie melden `BH803`, der Schreibschutz der Tage (M05) weiterhin `P0001`.
+- „Kaskade“ heißt hier: Der Trigger lässt ein DELETE nur zu, wenn es aus dem Löschen des Berichts kommt
+  (`pg_trigger_depth() > 1`) und der Bericht nicht mehr existiert; den Bericht selbst schützt
+  `weekly_report_delete_guard`, solange seine Person existiert.
+
+**Ersetzt durch Bordmittel:** Unveränderlichkeit und Kaskade baut jede Plattform mit ihren Mitteln nach (Trigger,
+Berechtigungen der Datenhaltung oder ein nur anfügendes Protokoll); ein Audit-Log der Plattform genügt nur, wenn es
+Ändern und Löschen technisch ausschließt und M06-R10 abbildet. Die Regeln in `report-history.ts` werden 1:1 übersetzt.
+
+## M07 PDF-Export
+
+Fach-Spec: `specs/M07-pdf-export.md` · Prüffälle: `specs/pruefung/M07.json` (Ebenen `fachlogik` und `daten`)
+
+| Datei / Funktion | Rolle | Regeln / AK | Plattformgebunden | Übertragung |
+| --- | --- | --- | --- | --- |
+| `src/domain/report-pdf.ts` → `pdfMarking()`, `PdfMarking` | Freigabevermerk der aktuell gültigen Freigabe bzw. Kennzeichnung „Nicht freigegeben – Status: …“, Kurzform für die Kopfzeile | M07-R05 bis M07-R07; AK-903 bis AK-905 | nein | 1:1 übersetzen |
+| `src/domain/report-pdf.ts` → `toPdfWeek()`, `pdfDayTypeLabel()`, `PdfWeek`, `PdfDay`, `ReportForPdf`, `DayForPdf` | Druckdaten einer Woche: Name, KW, Zeitraum, Tage mit Datum, Tagesart, Tätigkeiten, Status, „ganz außerhalb“ | M07-R01, M07-R02, M07-R04; AK-901 | nein | 1:1 übersetzen |
+| `src/domain/report-pdf.ts` → `isWeekInRange()`, `selectExportWeeks()`, `withExportFlags()`, `WeekForExport` | Wochen eines Zeitraums: berührt Mo–Fr, ohne ausgeblendete Wochen (`classifyWeek()`, M03), zeitlich sortiert | M07-R08, M07-R09; AK-902 | nein | 1:1 übersetzen |
+| `src/domain/report-pdf.ts` → `exportRange()`, `parseExportRange()`, `defaultExportRange()`, `parseDateInput()`, `RangeResult`, `RangeReason`, `RANGE_MESSAGES`, `rangeLabel()` | Zeitraum aus Von/Bis mit Vorbelegung; fester Grund bei ungültiger Eingabe | M07-R10, M07-R11; AK-902 | nein | 1:1 übersetzen |
+| `src/domain/report-pdf.ts` → `weekExport()`, `rangeExport()`, `weekPdfDocument()`, `rangePdfDocument()`, `PdfDocument`, `PdfExport` | Inhalt eines PDF (Titel, Erstellungszeitpunkt, Wochen) und Dateiname; Einstieg der Prüffälle | M07-R01 bis M07-R13; AK-901 bis AK-905, AK-907 | nein | 1:1 übersetzen |
+| `src/domain/report-pdf.ts` → `fileNamePart()`, `weekPdfFileName()`, `rangePdfFileName()` | Dateiname mit umschriebenem Namen | M07-R13; AK-901, AK-902, AK-907 | nein | 1:1 übersetzen |
+| `src/lib/report-export.ts` → `loadWeekExport()`, `loadRangeExport()`, `exportRangeDefaults()`, `ExportResult`, `ExportFailureReason`, `NOT_FOUND_MESSAGE` | Laden aus der Datenbank, Zugriff wie die Berichtsseite (`canViewReport()`, M02), fehlende Wochen anlegen (M03), fester Grund und HTTP-Status | M07-R03, M07-R14; AK-901, AK-902, AK-905, AK-906 | ja (Prisma) | nach Profil neu bauen |
+
+Rendering (nicht unter `src/domain/` oder `src/lib/`, plattformgebunden, „nach Profil neu bauen“): `src/pdf/ReportPdf.tsx`
+(Layout mit `@react-pdf/renderer`: je Woche eine `Page`, Kopf- und Fußzeile `fixed`, Umbruch überlanger Wörter),
+`src/pdf/fonts.ts` (eingebettete Schrift Noto Sans aus `assets/fonts/`), `src/pdf/render.tsx` (Daten rein, PDF raus),
+`src/pdf/response.ts` (HTTP-Antwort, `Cache-Control` mit `no-store`). Routen (M09): `src/app/(app)/berichte/[id]/pdf/route.ts`,
+`src/app/(app)/azubis/[id]/pdf/route.ts`.
+
+**Einstieg:** zuerst `src/domain/report-pdf.ts` von `pdfMarking()` über `toPdfWeek()` bis `weekExport()` und
+`rangeExport()`, dann `src/lib/report-export.ts`, zuletzt zum Verständnis `src/pdf/ReportPdf.tsx`.
+
+**Belege:**
+
+- Vitest: `src/domain/report-pdf.test.ts` (Vermerk, Druckdaten, Zeitraum, Dateiname), `src/pdf/report-pdf.test.ts` (PDF
+  erzeugen und Text mit pdfjs-dist auslesen: Inhalt, Seiten je Woche, Kopf- und Fußzeile, Umlaute, 5.000 Zeichen,
+  überlange Wörter, Laufzeit 150 Wochen), `src/pdf/beispiel-pdf.test.ts` (Beispiel-PDFs aus den Seed-Daten, `npm run
+  pdf:beispiel`), `tests/db/pdf-export.test.ts` (Zugriff, Vermerk nach Freigabe und Rücknahme, Sammel-PDF),
+  `tests/db/timezone.test.ts` (Uhrzeit im Vermerk).
+- Prüf-Runner: `tests/pruefung/fachlogik.test.ts` (`pdfWoche`, `pdfZeitraum`) und `tests/pruefung/daten.test.ts` mit
+  `tests/pruefung/daten-adapter.ts` (`pdf_woche_exportieren`, `pdf_zeitraum_exportieren`) führen
+  `specs/pruefung/M07.json` aus.
+- Playwright: `e2e/ak-901-907-pdf-export.spec.ts` (Download, Zugriff), `e2e/ak-301-408-berichte-erfassen.spec.ts`
+  (Hinweis vor dem Download bei ungespeicherten Änderungen).
+
+**Fallen:**
+
+- Der Inhalt entsteht in den reinen Funktionen, das Layout in `src/pdf/`. Ein Text, der im PDF steht, aber nicht in
+  `PdfDocument` (z. B. „Freigabevermerk“ als Überschrift, „Keine Tätigkeiten eingetragen.“, der Hinweis ohne Wochen),
+  gehört zum Layout und wird von den Prüffällen nicht erfasst.
+- „Jede Woche auf neuer Seite“ steckt im Layout (eine `Page` je Eintrag in `weeks`); im Inhalt ist es nur die Liste.
+- Der Erstellungszeitpunkt und „heute“ für die Vorbelegung kommen aus `now()` (M01) und werden hineingereicht; nie
+  `new Date()` im Export.
+- Der Vermerk nutzt `currentApproval()` (M06): nur bei Status „Freigegeben“, sonst gibt es keinen, auch wenn die Historie
+  eine Freigabe enthält.
+- `loadRangeExport()` prüft den Zeitraum vor `ensureReportsForTrainee()`, damit ein abgewiesener Zeitraum keine Wochen
+  anlegt.
+- `src/pdf/**` ist Änderungsklasse L (`docs/ci-richtlinie.md`): Änderungen daran lösen die volle Prüfung aus.
+
+**Ersetzt durch Bordmittel:** Das Rendering (Seiten, Kopf- und Fußzeile, Seitenzahlen, Schrift, Umbruch) baut jede
+Plattform mit ihrer PDF-Bibliothek nach Profil; der Inhalt aus `report-pdf.ts` wird 1:1 übersetzt.
