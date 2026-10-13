@@ -180,6 +180,9 @@ export function ReportEditor({
       action={formAction}
       noValidate
       aria-label="Bericht erfassen"
+      // Nach dem Neuladen gilt der gespeicherte Stand (AK-408): Firefox stellt sonst die verworfenen Eingaben wieder
+      // her, und die Seite meldet sie als ungespeicherte Änderungen.
+      autoComplete="off"
       data-ungespeichert={dirty ? "true" : "false"}
       data-warnung-verlassen={dirty ? LEAVE_WARNING_CODE : undefined}
       data-ausstehend={pending ? "true" : undefined}
