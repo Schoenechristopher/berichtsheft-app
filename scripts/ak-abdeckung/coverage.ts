@@ -361,7 +361,8 @@ export function parseCheckCases(json: string, file: string): { cases: CheckCase[
     const required = ["id", "modul", "ebene", "erwartet"];
     if (entry.ebene === "fachlogik") {
       required.push("schnittstelle", "eingabe");
-    } else if (entry.ebene === "ablauf") {
+    } else if (entry.ebene === "ablauf" || entry.ebene === "daten") {
+      // Ein Daten-Fall legt seinen Ausgangsbestand zu „uhr“ an und braucht deshalb immer die Uhr.
       required.push("uhr", "schritte");
     }
     const missing = required.filter((name) => !(name in entry));

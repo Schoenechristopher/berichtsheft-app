@@ -23,7 +23,7 @@ wird in G2 und G3 festgelegt.
 | M02 Personen und Zugang | `M02-personen-und-zugang.md` | AK-101 bis AK-106, AK-201 bis AK-209 | beschrieben (G2) |
 | M03 Wochenberichte entstehen | `M03-wochenberichte-entstehen.md` | AK-301 bis AK-306 | beschrieben (G2) |
 | M04 Bericht erfassen | `M04-bericht-erfassen.md` | AK-401 bis AK-408 (ohne AK-404) | beschrieben (G2) |
-| M05 Status und Prüfung | – | AK-501 bis AK-508, AK-601 bis AK-607, AK-701 bis AK-704 | G2 |
+| M05 Status und Prüfung | `M05-status-und-pruefung.md` | AK-501 bis AK-508, AK-601 bis AK-607, AK-701 bis AK-704 | beschrieben (G2) |
 | M06 Historie | – | AK-801 bis AK-803 | G2 |
 | M07 PDF-Export | – | AK-901 bis AK-907 | G2 |
 | M08 Benachrichtigungen und Erinnerung | – | AK-1001 bis AK-1025 | G2 |
@@ -81,6 +81,9 @@ Jeder Azubi hat genau einen zugeordneten Ausbilder; prüfen darf jeder Ausbilder
 | Konto-ID | stabile Kennung des Firmenkontos; nach dem ersten Login zählt nur sie, siehe M02 |
 | Admin | jeder aktive Ausbilder in seiner Rolle für Nutzerverwaltung und Einstellungen, siehe M02 |
 | Aktiv / deaktiviert | Zustand einer Person; „Entfernen“ deaktiviert, Berichte bleiben lesbar, siehe M02 |
+| Status | Entwurf, Eingereicht, Freigegeben oder Abgelehnt; Übergänge nur nach dem Statusmodell, siehe M05 |
+| Prüfrunde | Abschnitt von einer Einreichung bis zur nächsten; Ablehnung, Freigabe, Rücknahme und Kommentare gehören zur laufenden Runde, siehe M05 |
+| Gesehener Stand | Stand des Berichts, den eine Person beim Auslösen einer Aktion vor sich hatte; ist er veraltet, scheitert die Aktion mit Meldung, siehe M05 |
 | Kanal | Weg einer Benachrichtigung: E-Mail, Teams oder App |
 | Prüffall | neutraler, maschinenlesbarer Test einer AK-ID, siehe `pruefung/format.md` |
 

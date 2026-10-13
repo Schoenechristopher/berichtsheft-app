@@ -71,7 +71,7 @@ describe("Pflichtfelder beim Einreichen", () => {
     ).toEqual([]);
   });
 
-  it("Beispielszenario: KW 52/2026, Freitag 25.12. von „Feiertag“ auf „Berufsschule“ ohne Text → „Tätigkeiten fehlen“", () => {
+  it("AK-502 Beispielszenario: KW 52/2026, Freitag 25.12. von „Feiertag“ auf „Berufsschule“ ohne Text → „Tätigkeiten fehlen“", () => {
     const planned = planReportDays({ isoYear: 2026, isoWeek: 52 }, { start: new Date("2026-09-01"), end: null }, "NW");
     expect(planned[4].dayType).toBe("HOLIDAY");
     const days: DayForSubmission[] = planned.map((day, index) => ({

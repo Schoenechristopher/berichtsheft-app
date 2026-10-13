@@ -193,9 +193,12 @@ export async function listTraineeWeeks(prisma: PrismaClient, viewer: Viewer, tra
 }
 
 /** Ergebnis des Speicherns, so wie die Oberfläche es anzeigt. */
+/** Fester Grund eines gescheiterten Speicherns, unabhängig vom Meldungstext (neutrale Prüffälle). */
+export type SaveFailureReason = "forbidden" | "not-editable" | "day-input-invalid";
+
 export type SaveResult =
   | { ok: true; days: { id: string; dayType: string; activities: string }[] }
-  | { ok: false; formError?: string; dayErrors?: DayErrors };
+  | { ok: false; reason: SaveFailureReason; formError?: string; dayErrors?: DayErrors };
 
 const NOT_EDITABLE = "Dieser Bericht kann nicht mehr bearbeitet werden.";
 
@@ -211,7 +214,7 @@ export async function saveReportDays(
   inputs: ReadonlyMap<string, DayInput>,
 ): Promise<SaveResult> {
   if (!isUuid(reportId)) {
-    return { ok: false, formError: "Bericht nicht gefunden." };
+    return { ok: false, reason: "forbidden", formError: "Bericht nicht gefunden." };
   }
   return prisma.$transaction(async (tx) => {
     // Sperrt den Bericht bis zum Ende der Transaktion: Ein gleichzeitiger Statuswechsel wartet,
@@ -222,14 +225,14 @@ export async function saveReportDays(
       include: { trainee: { select: { active: true } }, days: { orderBy: { date: "asc" } } },
     });
     if (!report || !canViewReport(viewer, report)) {
-      return { ok: false, formError: "Zugriff verweigert" };
+      return { ok: false, reason: "forbidden", formError: "Zugriff verweigert" };
     }
     if (!canEditReport(viewer, { ...report, traineeActive: report.trainee.active })) {
-      return { ok: false, formError: NOT_EDITABLE };
+      return { ok: false, reason: "not-editable", formError: NOT_EDITABLE };
     }
     const validation = validateDayInputs(report.days, inputs, new Map(report.days.map((day) => [day.id, day])));
     if (!validation.ok) {
-      return { ok: false, dayErrors: validation.errors };
+      return { ok: false, reason: "day-input-invalid", dayErrors: validation.errors };
     }
     await applyDayUpdates(tx, validation.updates);
     const days = await tx.reportDay.findMany({ where: { reportId }, orderBy: { date: "asc" } });

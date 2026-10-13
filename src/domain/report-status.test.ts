@@ -48,7 +48,7 @@ describe("Statusmodell als Tabelle: jeder Status × jede Aktion × Rolle", () =>
   const cases = REPORT_STATUSES.flatMap((status) =>
     REPORT_ACTIONS.flatMap((action) => ACTORS.map(([role, actor]) => ({ status, action, role, actor }))),
   );
-  it("deckt 4 Status × 6 Aktionen × 4 Rollen ab", () => {
+  it("AK-507 AK-607 AK-704 deckt 4 Status × 6 Aktionen × 4 Rollen ab", () => {
     expect(cases).toHaveLength(96);
   });
 
@@ -78,6 +78,7 @@ describe("Meldungen bei verbotenen Übergängen", () => {
       expect(decideTransition({ action: "WITHDRAW", actor: anna, report: report(status) })).toEqual({
         ok: false,
         code: "NOT_ALLOWED",
+        reason: "not-allowed",
         message: TRANSITION_MESSAGES.notWithdrawable,
       });
     }
@@ -136,7 +137,12 @@ describe("Gleichzeitigkeit (AK-508)", () => {
           seen: seenSubmitted,
           text: "x",
         }),
-      ).toEqual({ ok: false, code: "CONFLICT", message: "Bericht wurde zurückgezogen" });
+      ).toEqual({
+        ok: false,
+        code: "CONFLICT",
+        reason: "withdrawn-meanwhile",
+        message: "Bericht wurde zurückgezogen",
+      });
     }
   });
 
@@ -149,7 +155,12 @@ describe("Gleichzeitigkeit (AK-508)", () => {
           report: report(status, { version: 4 }),
           seen: seenSubmitted,
         }),
-      ).toEqual({ ok: false, code: "CONFLICT", message: TRANSITION_MESSAGES.reviewedMeanwhile });
+      ).toEqual({
+        ok: false,
+        code: "CONFLICT",
+        reason: "reviewed-meanwhile",
+        message: TRANSITION_MESSAGES.reviewedMeanwhile,
+      });
     }
   });
 
@@ -185,6 +196,7 @@ describe("Pflichttexte", () => {
       expect(decideTransition({ action: "REJECT", actor: bernd, report: report("SUBMITTED"), text })).toEqual({
         ok: false,
         code: "TEXT",
+        reason: "comment-required",
         field: "comment",
         message: TRANSITION_MESSAGES.commentRequired,
       });
@@ -197,7 +209,13 @@ describe("Pflichttexte", () => {
   it("AK-703 Freigabe nur mit nicht leerer Begründung zurücknehmen", () => {
     expect(
       decideTransition({ action: "REVOKE_APPROVAL", actor: clara, report: report("APPROVED"), text: " " }),
-    ).toEqual({ ok: false, code: "TEXT", field: "reason", message: TRANSITION_MESSAGES.reasonRequired });
+    ).toEqual({
+      ok: false,
+      code: "TEXT",
+      reason: "reason-required",
+      field: "reason",
+      message: TRANSITION_MESSAGES.reasonRequired,
+    });
     expect(
       decideTransition({
         action: "REVOKE_APPROVAL",
@@ -208,7 +226,7 @@ describe("Pflichttexte", () => {
     ).toEqual({ ok: true, from: "APPROVED", to: "REJECTED", text: "Mittwoch falsches Datum" });
   });
 
-  it("zu lange Kommentare werden am Feld abgewiesen", () => {
+  it("AK-604 zu lange Kommentare werden am Feld abgewiesen", () => {
     expect(
       decideTransition({ action: "REJECT", actor: bernd, report: report("SUBMITTED"), text: "x".repeat(5001) }),
     ).toMatchObject({ ok: false, field: "comment", message: TRANSITION_MESSAGES.tooLong });
@@ -216,7 +234,7 @@ describe("Pflichttexte", () => {
 });
 
 describe("AK-602 deaktivierter Azubi (bestätigte Auslegung)", () => {
-  it("Freigeben geht, Ablehnen und Rücknahme nicht; der Azubi selbst kann nichts mehr", () => {
+  it("AK-602 Freigeben geht, Ablehnen und Rücknahme nicht; der Azubi selbst kann nichts mehr", () => {
     const inactive = (status: ReportStatus) => report(status, { traineeActive: false });
     expect(decideTransition({ action: "APPROVE", actor: bernd, report: inactive("SUBMITTED") }).ok).toBe(true);
     expect(

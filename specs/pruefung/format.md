@@ -26,10 +26,11 @@ Jede JSON-Datei unter `specs/pruefung/` außer `testdaten.json` ist eine Prüffa
 | `modul` | ja | `M01` … `M09` oder `Q`; das Modul, dem die AK-ID gehört |
 | `ebene` | ja | `fachlogik`, `ablauf`, `daten` oder `upgrade` |
 | `beschreibung` | nein | ein Satz für Menschen; wird nicht ausgewertet |
-| `uhr` | bei `ablauf` ja, sonst nein | Zeitpunkt, auf den die Uhr vor dem Fall gestellt wird. Ein Fachlogik-Fall ohne `uhr` hängt nicht von „jetzt“ ab |
+| `uhr` | bei `ablauf` und `daten` ja, sonst nein | Zeitpunkt, auf den die Uhr vor dem Fall gestellt wird. Ein Fachlogik-Fall ohne `uhr` hängt nicht von „jetzt“ ab |
 | `schnittstelle` | bei `fachlogik` | Name einer Schnittstelle aus der Liste unten |
 | `eingabe` | bei `fachlogik` | Parameter der Schnittstelle als Objekt |
-| `schritte` | bei `ablauf` | Liste von Schritten `{ "als": <Person>, "aktion": <Aktion>, … }` (ab G3) |
+| `ausgangsbestand` | nein, nur bei `daten` | fallbezogene Ergänzungen zu den Testdaten, siehe „Aufbau eines Daten-Falls“ |
+| `schritte` | bei `ablauf` und `daten` | Liste von Schritten `{ "als": <Person>, "aktion": <Aktion>, … }` (Ablauf ab G3) |
 | `erwartet` | ja | erwartetes Ergebnis als Objekt; bei einem Fehler `{ "fehler": "<Fehlercode>" }` |
 | `abweichend` | nein | `{ "<plattform>": "<Verweis auf den Abschnitt im freigegebenen Profil>" }`, siehe „Abweichend, begründet“ |
 
@@ -76,6 +77,93 @@ als Prüffall zählen.
 
 Ein Prüffall mit einer Eingabe, die nicht diesem Format folgt, ist fehlerhaft: Der Runner scheitert an ihm. Ein
 Fehlercode beschreibt dagegen eine fachlich abgewiesene Eingabe im richtigen Format (z. B. KW 53/2027).
+
+## Aufbau eines Daten-Falls
+
+Ein Fall der Ebene `daten` prüft eine Regel am gespeicherten Bestand: Er stellt einen Ausgangsbestand her, lässt
+Personen Aktionen ausführen und vergleicht die Ergebnisse der Aktionen und den Bestand danach. Er nennt keine Tabelle,
+Spalte oder technische Kennung; der Adapter der Plattform übersetzt.
+
+**Ausgangsbestand** (in dieser Reihenfolge hergestellt):
+
+1. Die Datenhaltung ist leer. Geladen werden die Testdaten aus `testdaten.json`: alle Personen mit `"angelegt": true`
+   und das Bundesland.
+2. `ausgangsbestand.personen` (optional): weitere Personen für diesen Fall, je
+   `{ "schluessel", "name", "rolle" }`, bei `azubi` zusätzlich `"ausbilder": <Schlüssel>` und
+   `"ausbildungsbeginn": <Kalendertag>`, optional `"ausbildungsende"`. Die E-Mail ergänzt der Adapter.
+3. Die Uhr steht auf `uhr`. Für jeden Azubi entstehen die Berichte wie in M03 (alle fälligen Wochen bis „jetzt“, Tage
+   außerhalb markiert, Feiertage vorbelegt).
+4. `ausgangsbestand.berichte` (optional), je Bericht `{ "azubi", "woche", "tage"?, "verlauf"? }`:
+   - `tage`: Eingaben wie bei der Aktion `tage_speichern`, gespeichert vom Azubi selbst;
+   - `verlauf`: Liste von Schritten (ohne `azubi`, `woche` und `gesehen`), die diesen Bericht in seinen Ausgangsstatus
+     bringen, z. B. einreichen und freigeben. Sie stehen danach in der Historie.
+
+   Gelingt eine dieser Eingaben oder einer dieser Schritte nicht, ist der Fall fehlerhaft.
+
+**Schritte:** `schritte` ist eine nicht leere Liste `{ "als": <Schlüssel>, "aktion": <Aktion>, … }`, ausgeführt in
+dieser Reihenfolge. Die Aktionen und ihre Felder stehen beim Modul (für M05 in „Schnittstellen und Aktionen von M05“).
+Für alle Schritte gilt:
+
+- `als` ist die handelnde Person; die Plattform prüft ihre Rechte mit ihrem aktuellen Stand (Rolle, aktiv).
+- `azubi` und `woche` benennen einen Bericht. Gibt es ihn nicht, ist der Fall fehlerhaft.
+- `uhr` (optional) stellt die Uhr vor dem Schritt; sie bleibt danach auf diesem Zeitpunkt. Auch Schritte im `verlauf`
+  dürfen `uhr` tragen.
+- `gesehen` (optional, nur bei Statuswechseln) ist eine Schrittnummer `n`: Die Person handelt auf dem Stand des
+  Berichts, wie er nach Schritt `n` war (`0` = Ausgangsbestand). So werden konkurrierende Änderungen deterministisch
+  nachgestellt, z. B. zwei Personen auf demselben Stand. Ohne `gesehen` prüft die Plattform nur gegen den aktuellen
+  Stand.
+- Ein Feld, das die Aktion nicht kennt, und ein fehlendes Pflichtfeld machen den Fall fehlerhaft.
+
+**Erwartet:** `{ "ergebnisse": [ … ], "berichte": [ … ] }`.
+
+- `ergebnisse`: je Schritt das Ergebnis der Aktion, in derselben Reihenfolge; ein fachlicher Fehler als
+  `{ "fehler": "<Code>" }` (ggf. mit Zusatzfeldern). Ein Fehlschlag ändert nichts am Bestand.
+- `berichte`: der Bestand aller Berichte, die der Fall nennt (im Ausgangsbestand oder in einem Schritt), in der
+  Reihenfolge ihrer ersten Nennung, je Bericht:
+
+| Feld | Inhalt |
+| --- | --- |
+| `azubi`, `woche` | Schlüssel des Azubis, Woche |
+| `status` | Status (M03) |
+| `tage` | `[{ "tag": <Wochentag>, "tagesart": <Tagesart> \| null, "text": <Text> } × 5]`, Mo bis Fr |
+| `historie` | alle Statuswechsel in ihrer Reihenfolge: `{ "von": <Status>, "nach": <Status>, "person": <Schlüssel>, "zeitpunkt": <Zeitpunkt>, "runde": <Zahl>, "begruendung": <Text> \| null }` |
+| `kommentare` | alle Kommentare: `{ "runde": <Zahl>, "tag": <Wochentag> \| null, "person": <Schlüssel>, "text": <Text> }`; je Runde zuerst der Gesamtkommentar (`tag` = `null`), dann die Tage Mo bis Fr |
+
+Der Bestand wird nur gelesen, nicht bewertet: Der Adapter liefert, was gespeichert ist. Einen Versionsstand nennt ein
+Daten-Fall nie; ob ein gesehener Stand veraltet ist, entscheidet die Plattform. Gleichzeitige Zeitpunkte ordnet die
+Plattform nicht verlässlich; ein Fall, der eine Reihenfolge nach Zeitpunkt erwartet, gibt seinen Schritten
+verschiedene `uhr`.
+
+**Beispiel** (AK-508: Anna zieht zurück, während Bernd den eingereichten Stand offen hat):
+
+```json
+{
+  "id": "AK-508-01",
+  "modul": "M05",
+  "ebene": "daten",
+  "uhr": "2026-10-06T10:00:00+02:00",
+  "ausgangsbestand": {
+    "berichte": [
+      {
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "tage": { "alle": { "tagesart": "Betrieb", "text": "Netzwerk geplant" } },
+        "verlauf": [{ "als": "anna", "aktion": "einreichen" }]
+      }
+    ]
+  },
+  "schritte": [
+    { "als": "anna", "aktion": "zurueckziehen", "azubi": "anna", "woche": "2026-W40", "gesehen": 0 },
+    { "als": "bernd", "aktion": "freigeben", "azubi": "anna", "woche": "2026-W40", "gesehen": 0 }
+  ],
+  "erwartet": {
+    "ergebnisse": [{ "status": "Entwurf" }, { "fehler": "bericht_zurueckgezogen" }],
+    "berichte": [{ "azubi": "anna", "woche": "2026-W40", "status": "Entwurf", "tage": ["…"], "historie": ["…"], "kommentare": [] }]
+  }
+}
+```
+
+(`"…"` steht hier abgekürzt für die vollständigen Listen; ein echter Fall nennt sie ganz.)
 
 ## Schnittstellen von M01 (Fachlogik)
 
@@ -200,6 +288,71 @@ betroffenem Tag stehen die Codes in der Reihenfolge `tagesart_unbekannt`, `text_
 | `tagesart_unbekannt` | Die Tagesart ist keine der fünf (je Tag in `tage_ungueltig`). | AK-402 |
 | `text_zu_lang` | „Tätigkeiten“ hat mehr als 5.000 Zeichen (je Tag in `tage_ungueltig`). | AK-407 |
 
+## Schnittstellen und Aktionen von M05
+
+Die Signaturen stehen in `specs/M05-status-und-pruefung.md`, Abschnitt 6. Status, Tagesart und Wochentage wie bei M03
+und M04, Person und Bericht wie bei M02.
+
+**Aktionen (Statuswechsel):** `einreichen` (Entwurf → Eingereicht), `zurueckziehen` (Eingereicht → Entwurf),
+`freigeben` (Eingereicht → Freigegeben), `ablehnen` (Eingereicht → Abgelehnt), `erneut_einreichen` (Abgelehnt →
+Eingereicht), `freigabe_zuruecknehmen` (Freigegeben → Abgelehnt). Sie gelten für `schnittstelle` `uebergangPruefen`,
+für `moeglicheAktionen` und als Aktionen der Daten-Fälle; Liste in dieser Reihenfolge.
+
+**Datenformate von M05:**
+
+| Art | Format | Beispiel |
+| --- | --- | --- |
+| Bericht | `{ "azubi": <Schlüssel>, "azubiAktiv": <Wahrheitswert>, "status": <Status> }` | `{ "azubi": "anna", "azubiAktiv": true, "status": "Eingereicht" }` |
+| Gesehener Stand | `{ "status": <Status>, "veraltet": <Wahrheitswert> }` oder `null`; `veraltet` heißt: Der Bericht wurde seitdem geändert (auch bei gleichem Status) | `{ "status": "Eingereicht", "veraltet": true }` |
+| Tag zum Einreichen | `{ "tag": <Wochentag>, "tagesart": <Tagesart> \| null, "text": <Text>, "ausserhalb": <Wahrheitswert> }` | `{ "tag": "Fr", "tagesart": "Berufsschule", "text": "", "ausserhalb": false }` |
+
+**Schnittstellen (Fachlogik):**
+
+| Schnittstelle | `eingabe` | `erwartet` (Erfolg) | Fehlercodes |
+| --- | --- | --- | --- |
+| `uebergangPruefen` | `{ "aktion": <Aktion>, "person": <Person>, "bericht": <Bericht>, "gesehen": <Gesehener Stand>, "text": <Text> \| null }`; `text` = Gesamtkommentar bzw. Begründung | `{ "von": <Status>, "nach": <Status>, "text": <Text> \| null }`, `text` mit einheitlichen Zeilenumbrüchen, nur bei `ablehnen` und `freigabe_zuruecknehmen` | `zugriff_verweigert`, `uebergang_unzulaessig`, `bericht_zurueckgezogen`, `bereits_geprueft`, `bereits_eingereicht`, `bereits_zurueckgezogen`, `bereits_zurueckgenommen`, `inzwischen_geaendert`, `azubi_deaktiviert`, `kommentar_fehlt`, `begruendung_fehlt`, `text_zu_lang` (mit `"feld"`) |
+| `moeglicheAktionen` | `{ "person": <Person>, "bericht": <Bericht> }` | `{ "aktionen": [<Aktion>, …] }` in der Reihenfolge oben | – |
+| `einreichenPruefen` | `{ "tage": [<Tag zum Einreichen> × 5] }` | `{ "einreichbar": true }` | `pflichtangaben_fehlen` mit `"tage": [{ "tag", "fehler": "tagesart_fehlt" \| "taetigkeiten_fehlen" }]` in Kalenderreihenfolge |
+| `darfBearbeiten` | `{ "person": <Person>, "bericht": <Bericht> }` | `{ "bearbeitbar": <Wahrheitswert> }` | – |
+| `pruefrunde` | `{ "aktion": <Aktion>, "einreichungen": <Zahl> }` (bisherige Einreichungen des Berichts) | `{ "runde": <Zahl> }` (Runde des neuen Statuswechsels) | – |
+
+**Aktionen der Daten-Fälle** (Felder außer `aktion`; `?` = optional):
+
+| Aktion | Felder | Ergebnis (Erfolg) | Fehlercodes |
+| --- | --- | --- | --- |
+| `einreichen`, `erneut_einreichen` | `als`, `azubi`, `woche`, `gesehen?`, `tage?` (ungespeicherte Eingaben, werden mitgespeichert) | `{ "status": <Status> }` | wie `uebergangPruefen`, dazu `pflichtangaben_fehlen` (mit `"tage"`), `woche_ausserhalb`, `tage_ungueltig` (M04, mit `"tage"`) |
+| `zurueckziehen` | `als`, `azubi`, `woche`, `gesehen?` | `{ "status": <Status> }` | wie `uebergangPruefen` |
+| `freigeben` | `als`, `azubi`, `woche`, `gesehen?`, `kommentar?`, `tageskommentare?` (eingetippt, werden nicht gespeichert) | `{ "status": <Status> }` | wie `uebergangPruefen` |
+| `ablehnen` | `als`, `azubi`, `woche`, `kommentar`, `tageskommentare?` (`{ "Mo": <Text>, … }`), `gesehen?` | `{ "status": <Status> }` | wie `uebergangPruefen`; zu langer Tageskommentar: `text_zu_lang` mit `"feld": "tageskommentar"` und `"tage": [<Wochentag>, …]` |
+| `freigabe_zuruecknehmen` | `als`, `azubi`, `woche`, `begruendung`, `gesehen?` | `{ "status": <Status> }` | wie `uebergangPruefen` |
+| `tage_speichern` | `als`, `azubi`, `woche`, `tage`: `{ "alle"?, "Mo"? … "Fr"? }` je `{ "tagesart", "text" }` wie die Eingaben von `tageSpeichern` (M04); `alle` gilt für jeden nicht genannten Tag | `{ "gespeichert": true }` | `zugriff_verweigert`, `nicht_bearbeitbar`, `tage_ungueltig` (mit `"tage"`) |
+| `pruefliste_lesen` | `als`, `filter`: `eigene` \| `alle` | `{ "berichte": [{ "azubi", "woche", "eingereicht": <Zeitpunkt>, "azubiAktiv" }, …] }`, älteste Einreichung zuerst | – |
+| `rueckmeldung_lesen` | `azubi`, `woche` (ohne `als`: liest, was die Berichtsseite dem Azubi oben und bei den Tagen zeigt) | `{ "rueckmeldung": null }` oder `{ "rueckmeldung": { "art": "ablehnung" \| "ruecknahme", "text": <Text>, "tage": [{ "tag", "texte": [<Text>, …] }] } }` | – |
+| `person_deaktivieren` | `als`, `person` (Aktion von M02, hier nur zum Herstellen eines Bestands) | `{ "deaktiviert": true }` | – (ein Fehlschlag macht den Fall fehlerhaft) |
+| `ausbildungszeitraum_aendern` | `als`, `person`, `beginn`, `ende` (Aktion von M02, wie oben) | `{ "geaendert": true }` | – (wie oben) |
+
+**Fehlercodes von M05:**
+
+| Code | Bedeutung | AK |
+| --- | --- | --- |
+| `uebergang_unzulaessig` | Die Aktion ist im aktuellen Status nicht vorgesehen (z. B. Entwurf freigeben, freigegebenen Bericht zurückziehen). | AK-507, AK-607, AK-704 |
+| `bericht_zurueckgezogen` | Der Ausbilder prüft einen Stand „Eingereicht“, der Azubi hat inzwischen zurückgezogen („Bericht wurde zurückgezogen“). | AK-508 |
+| `bereits_geprueft` | Der gesehene Stand „Eingereicht“ wurde inzwischen geprüft (Zurückziehen oder zweite Prüfung). | AK-508 |
+| `bereits_eingereicht` | Der Bericht ist schon eingereicht. | AK-508 |
+| `bereits_zurueckgezogen` | Der Bericht wurde auf diesem Stand schon zurückgezogen. | AK-508 |
+| `bereits_zurueckgenommen` | Die Freigabe wurde auf diesem Stand schon zurückgenommen. | AK-508 |
+| `inzwischen_geaendert` | Der gesehene Stand ist veraltet (z. B. zurückgezogen und erneut eingereicht). | AK-508 |
+| `azubi_deaktiviert` | Der Azubi des Berichts ist deaktiviert: Er selbst ändert nichts mehr, Ausbilder dürfen nur noch freigeben. | AK-602 (bestätigte Auslegung) |
+| `kommentar_fehlt` | Ablehnen ohne nicht leeren Gesamtkommentar. | AK-604 |
+| `begruendung_fehlt` | Freigabe zurücknehmen ohne nicht leere Begründung. | AK-703 |
+| `text_zu_lang` | Gesamtkommentar, Tageskommentar oder Begründung hat mehr als 5.000 Zeichen; `"feld"` ist `kommentar`, `tageskommentar` oder `begruendung`. | AK-604 |
+| `pflichtangaben_fehlen` | Einreichen scheitert an fehlenden Pflichtangaben; `"tage"` nennt je Tag `tagesart_fehlt` oder `taetigkeiten_fehlen`. | AK-501, AK-502 |
+| `woche_ausserhalb` | Die Woche liegt ganz außerhalb der Ausbildung und wird nicht eingereicht. | AK-501 (bestätigte Auslegung) |
+| `nicht_bearbeitbar` | Der Bericht ist in seinem Status oder für diese Person nicht bearbeitbar. | AK-505, AK-704 |
+
+`zugriff_verweigert` ist der Code aus M02 (fremder Bericht, falsche Rolle, deaktivierte Person); `text_zu_lang` und
+`tage_ungueltig` sind die Codes aus M04, hier mit `"feld"` bzw. wie bei `tageSpeichern`.
+
 ## Fehlercodes
 
 | Code | Bedeutung | AK |
@@ -210,12 +363,9 @@ betroffenem Tag stehen die Codes in der Reihenfolge `tagesart_unbekannt`, `text_
 
 ## Aktionen und Status
 
-Aktionen (`schritte[].aktion`) und Status kommen mit den Ablauf-Prüffällen in G3 dazu. Bis dahin legt `docs/01`
-fest:
-
 - **Status:** `Entwurf`, `Eingereicht`, `Freigegeben`, `Abgelehnt` (Statusmodell in `docs/01`).
-- **Aktionen:** werden mit G2 (M04, M05) aus den Statusübergängen in `docs/01` abgeleitet und hier abschließend
-  aufgezählt.
+- **Aktionen:** die Statuswechsel und die Aktionen der Daten-Fälle in „Schnittstellen und Aktionen von M05“
+  (seit G2). Aktionen der Ablauf-Fälle kommen in G3 dazu.
 
 ## Regeln für Adapter
 
@@ -226,6 +376,8 @@ fest:
   Liste oben. Die Zuordnung Fehler → Code erfolgt über die Fehlerart der Plattform, nicht über den Meldungstext. Jeder
   andere Fehler lässt den Fall scheitern.
 - **Uhr:** Nennt ein Fall `uhr`, stellt der Runner die Uhr der Plattform vor dem Fall darauf und danach zurück.
+- **Daten-Fälle:** Der Runner stellt vor jedem Fall einen sauberen Ausgangsbestand her; kein Fall hängt vom Bestand
+  eines anderen ab. Ein Fehler der Plattform wird nur über ihren festen Grund auf einen Fehlercode abgebildet.
 - **Kein stilles Überspringen:** Eine unbekannte Schnittstelle, eine Ebene ohne Runner oder ein fehlerhafter Prüffall
   lassen den Runner scheitern. Es gibt kein Auslassen ohne Markierung.
 

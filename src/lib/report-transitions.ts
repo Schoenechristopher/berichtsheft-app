@@ -20,6 +20,7 @@ import {
   reviewRoundFor,
   type ReportAction,
   type SeenState,
+  type TransitionReason,
 } from "@/domain/report-status";
 import {
   WEEK_OUTSIDE_TRAINING_MESSAGE,
@@ -47,10 +48,18 @@ export interface TransitionInput {
   dayInputs?: ReadonlyMap<string, DayInput>;
 }
 
+/**
+ * Fester Grund eines gescheiterten Statuswechsels, unabhängig vom Meldungstext (für die neutralen
+ * Prüffälle): die Gründe der Fachlogik (`TransitionReason`) und die des Servers.
+ */
+export type TransitionFailureReason =
+  TransitionReason | "not-found" | "submission-incomplete" | "week-outside-training" | "day-input-invalid";
+
 export type TransitionResult =
   | { ok: true; status: ReportStatus; version: number }
   | {
       ok: false;
+      reason: TransitionFailureReason;
       formError?: string;
       /** Fehler am Feld: Gesamtkommentar, Begründung oder ein Tageskommentar (Tag-ID). */
       fieldErrors?: Partial<Record<"comment" | "reason", string>> & { dayComments?: Record<string, string> };
@@ -93,7 +102,7 @@ export async function transitionReport(
   input: TransitionInput,
 ): Promise<TransitionResult> {
   if (!isUuid(reportId)) {
-    return { ok: false, formError: NOT_FOUND };
+    return { ok: false, reason: "not-found", formError: NOT_FOUND };
   }
   return prisma.$transaction(async (tx) => {
     // Sperrt den Bericht bis zum Ende der Transaktion: Gleichzeitige Wechsel und Speichervorgänge
@@ -107,10 +116,10 @@ export async function transitionReport(
       },
     });
     if (!report) {
-      return { ok: false, formError: NOT_FOUND };
+      return { ok: false, reason: "not-found", formError: NOT_FOUND };
     }
     if (!canViewReport(viewer, report)) {
-      return { ok: false, formError: TRANSITION_MESSAGES.forbidden };
+      return { ok: false, reason: "forbidden", formError: TRANSITION_MESSAGES.forbidden };
     }
 
     const decision = decideTransition({
@@ -122,27 +131,27 @@ export async function transitionReport(
     });
     if (!decision.ok) {
       return decision.field
-        ? { ok: false, fieldErrors: { [decision.field]: decision.message } }
-        : { ok: false, formError: decision.message };
+        ? { ok: false, reason: decision.reason, fieldErrors: { [decision.field]: decision.message } }
+        : { ok: false, reason: decision.reason, formError: decision.message };
     }
 
     const dayComments = input.action === "REJECT" ? collectDayComments(input.dayComments, report.days) : null;
     if (dayComments && Object.keys(dayComments.errors).length > 0) {
-      return { ok: false, fieldErrors: { dayComments: dayComments.errors } };
+      return { ok: false, reason: "text-too-long", fieldErrors: { dayComments: dayComments.errors } };
     }
 
     if (decision.to === "SUBMITTED") {
       const start = report.trainee.trainingStart;
       // Bestätigte Auslegung: Wochen ganz außerhalb der Ausbildung werden nicht eingereicht.
       if (start && isWeekOutsideTraining(report, { start, end: report.trainee.trainingEnd })) {
-        return { ok: false, formError: WEEK_OUTSIDE_TRAINING_MESSAGE };
+        return { ok: false, reason: "week-outside-training", formError: WEEK_OUTSIDE_TRAINING_MESSAGE };
       }
       let savedDraft = false;
       if (input.dayInputs) {
         const stored = new Map(report.days.map((day) => [day.id, day]));
         const validation = validateDayInputs(report.days, input.dayInputs, stored);
         if (!validation.ok) {
-          return { ok: false, dayErrors: validation.errors };
+          return { ok: false, reason: "day-input-invalid", dayErrors: validation.errors };
         }
         for (const update of validation.updates) {
           await tx.reportDay.update({
@@ -155,7 +164,13 @@ export async function transitionReport(
       const issues = validateSubmission(await tx.reportDay.findMany({ where: { reportId: report.id } }));
       if (issues.length > 0) {
         // Die Transaktion endet regulär: Gespeicherte Eingaben bleiben als Entwurf erhalten.
-        return { ok: false, formError: submissionSummary(issues), submissionIssues: issues, savedDraft };
+        return {
+          ok: false,
+          reason: "submission-incomplete",
+          formError: submissionSummary(issues),
+          submissionIssues: issues,
+          savedDraft,
+        };
       }
     }
 
@@ -174,7 +189,9 @@ export async function transitionReport(
         seen: { status: decision.from, version: report.version },
         text: input.text,
       });
-      return { ok: false, formError: retry.ok ? TRANSITION_MESSAGES.changedMeanwhile : retry.message };
+      return retry.ok
+        ? { ok: false, reason: "changed-meanwhile", formError: TRANSITION_MESSAGES.changedMeanwhile }
+        : { ok: false, reason: retry.reason, formError: retry.message };
     }
 
     const submissions = await tx.statusChange.count({ where: { reportId: report.id, toStatus: "SUBMITTED" } });
