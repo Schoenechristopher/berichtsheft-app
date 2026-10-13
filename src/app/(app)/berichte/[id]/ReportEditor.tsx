@@ -171,8 +171,15 @@ export function ReportEditor({
   const issues = showIssues ? currentIssues() : [];
   const issueOf = new Map(issues.map((issue) => [issue.dayId, issue.problem]));
 
-  const update = (id: string, field: "dayType" | "activities", value: string) =>
+  // Bis die Seite interaktiv ist, sind die Felder gesperrt; eine Änderung davor kommt nicht von der Person, sondern
+  // vom Browser (Firefox stellt nach dem Neuladen verworfene Eingaben wieder her, React spielt sie beim Hydrieren als
+  // Änderung nach). Sie wird ignoriert: Nach dem Laden gilt der gespeicherte Stand (AK-408).
+  const update = (id: string, field: "dayType" | "activities", value: string) => {
+    if (!hydrated) {
+      return;
+    }
     setValues((current) => ({ ...current, [id]: { ...current[id], [field]: value } }));
+  };
 
   return (
     <form
@@ -313,6 +320,7 @@ export function ReportEditor({
                   data-feld="taetigkeiten"
                   rows={4}
                   readOnly={!hydrated}
+                  autoComplete="off"
                   value={value.activities}
                   onChange={(event) => update(day.id, "activities", event.target.value)}
                   aria-invalid={textError && !day.outsideTraining ? true : undefined}

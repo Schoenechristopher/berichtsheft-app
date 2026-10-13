@@ -110,6 +110,7 @@ export function DayTypeInput({
       id={id}
       name={name}
       data-feld="tagesart"
+      autoComplete="off"
       value={value}
       disabled={disabled}
       onChange={(event) => onChange(event.target.value)}

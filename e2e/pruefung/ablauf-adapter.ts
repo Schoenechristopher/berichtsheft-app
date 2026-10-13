@@ -468,6 +468,20 @@ export class FlowAdapter {
         })),
       };
     });
+    if (raw.ungespeichert) {
+      // Diagnose ohne Einfluss auf das Ergebnis: Welche Felder weichen ab, und ist es ein frisch geladenes Dokument?
+      // Nur Testdaten; erscheint im Testprotokoll, wenn die Seite ungespeicherte Änderungen meldet.
+      const detail = await page.evaluate(() => ({
+        timeOrigin: performance.timeOrigin,
+        readyState: document.readyState,
+        felder: [...document.querySelectorAll("fieldset[data-datum]")].map((day) => ({
+          datum: day.getAttribute("data-datum"),
+          tagesart: day.querySelector<HTMLSelectElement>("select[data-feld=tagesart]")?.value ?? null,
+          text: day.querySelector<HTMLTextAreaElement>("textarea[data-feld=taetigkeiten]")?.value ?? null,
+        })),
+      }));
+      console.log(`[ablauf-adapter] Seite meldet ungespeicherte Änderungen: ${JSON.stringify(detail)}`);
+    }
     const status = (value: string | null) => (value === null ? null : (statusName(value as ReportStatus) ?? value));
     return {
       woche: raw.woche,
