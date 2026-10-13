@@ -463,6 +463,7 @@ describe("Entwurf speichern", () => {
     const tooLong = await saveReportDays(prisma, anna, kw41.id, new Map([[di.id, input("WORK", `${long}x`)]]));
     expect(tooLong).toEqual({
       ok: false,
+      reason: "day-input-invalid",
       dayErrors: { [di.id]: { activities: "Höchstens 5.000 Zeichen – bitte um 1 kürzen." } },
     });
     expect((await report(prisma, anna.id, 2026, 41)).days[1].activities).toBe(long);
@@ -501,14 +502,23 @@ describe("Entwurf speichern", () => {
     });
     const change = new Map([[kw41.days[0].id, input("WORK", "fremd")]]);
 
-    expect(await saveReportDays(prisma, otto, kw41.id, change)).toEqual({ ok: false, formError: "Zugriff verweigert" });
+    expect(await saveReportDays(prisma, otto, kw41.id, change)).toEqual({
+      ok: false,
+      reason: "forbidden",
+      formError: "Zugriff verweigert",
+    });
     for (const trainer of [bernd, clara]) {
       expect(await saveReportDays(prisma, trainer, kw41.id, change)).toEqual({
         ok: false,
+        reason: "not-editable",
         formError: "Dieser Bericht kann nicht mehr bearbeitet werden.",
       });
     }
-    expect(await saveReportDays(prisma, otto, "kein-bericht", change)).toMatchObject({ ok: false });
+    expect(await saveReportDays(prisma, otto, "kein-bericht", change)).toEqual({
+      ok: false,
+      reason: "not-found",
+      formError: "Bericht nicht gefunden.",
+    });
     expect((await report(prisma, kw41.traineeId, 2026, 41)).days[0].activities).toBe("");
   });
 

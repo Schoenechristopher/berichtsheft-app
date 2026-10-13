@@ -225,6 +225,31 @@ describe("Prüffälle in der Abdeckung (specs/pruefung)", () => {
     expect(cases).toHaveLength(6);
   });
 
+  it("verlangt bei der Ebene „daten“ Uhr und Schritte; ein vollständiger Daten-Fall zählt als Prüffall", () => {
+    const { cases, errors } = read([
+      { id: "AK-506-01", modul: "M05", ebene: "daten", erwartet: {} },
+      { id: "AK-506-02", modul: "M05", ebene: "daten", uhr: "2026-10-06T10:00:00+02:00", erwartet: {} },
+      {
+        id: "AK-506-03",
+        modul: "M05",
+        ebene: "daten",
+        uhr: "2026-10-06T10:00:00+02:00",
+        ausgangsbestand: { berichte: [{ azubi: "anna", woche: "2026-W40" }] },
+        schritte: [{ als: "anna", aktion: "zurueckziehen", azubi: "anna", woche: "2026-W40" }],
+        erwartet: { ergebnisse: [], berichte: [] },
+      },
+    ]);
+    expect(errors).toEqual([
+      "specs/pruefung/M01.json, Eintrag 1: Pflichtfeld fehlt: uhr, schritte.",
+      "specs/pruefung/M01.json, Eintrag 2: Pflichtfeld fehlt: schritte.",
+    ]);
+    expect(casesAsTests(cases).map((test) => [test.name, test.level])).toEqual([
+      ["AK-506-01", "Prüffall"],
+      ["AK-506-02", "Prüffall"],
+      ["AK-506-03", "Prüffall"],
+    ]);
+  });
+
   it("meldet doppelte IDs, unbekannte AK-IDs, falsches Modul und AKs beschriebener Module ohne Prüffall", () => {
     const { cases } = read([
       fall("AK-101-01"),

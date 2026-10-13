@@ -49,6 +49,16 @@ import {
 } from "@/domain/people";
 import { canManagePeople, canViewReport, type Viewer } from "@/domain/report-access";
 
+import { canEditReport } from "@/domain/report-access";
+import {
+  availableActions,
+  decideTransition,
+  reviewRoundFor,
+  type ReportAction,
+  type TransitionReason,
+} from "@/domain/report-status";
+import { validateSubmission, type SubmissionProblem } from "@/domain/report-submission";
+
 export type Input = Record<string, unknown>;
 export type Result = Record<string, unknown>;
 
@@ -71,14 +81,14 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?[+-]\d{2}:\d{2}$/;
 const WEEK = /^(\d{4})-W(\d{2})$/;
 
-function field(input: Input, name: string): unknown {
+export function field(input: Input, name: string): unknown {
   if (!(name in input)) {
     throw new CaseFormatError(`Eingabe „${name}“ fehlt.`);
   }
   return input[name];
 }
 
-function text(input: Input, name: string): string {
+export function text(input: Input, name: string): string {
   const value = field(input, name);
   if (typeof value !== "string") {
     throw new CaseFormatError(`Eingabe „${name}“ muss Text sein.`);
@@ -86,7 +96,7 @@ function text(input: Input, name: string): string {
   return value;
 }
 
-function integer(input: Input, name: string): number {
+export function integer(input: Input, name: string): number {
   const value = field(input, name);
   if (typeof value !== "number" || !Number.isInteger(value)) {
     throw new CaseFormatError(`Eingabe „${name}“ muss eine ganze Zahl sein.`);
@@ -145,7 +155,7 @@ export function formatInstant(instant: Date): string {
   return `${local}${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(abs % 60).padStart(2, "0")}`;
 }
 
-function bool(input: Input, name: string): boolean {
+export function bool(input: Input, name: string): boolean {
   const value = field(input, name);
   if (typeof value !== "boolean") {
     throw new CaseFormatError(`Eingabe „${name}“ muss ein Wahrheitswert sein.`);
@@ -153,7 +163,7 @@ function bool(input: Input, name: string): boolean {
   return value;
 }
 
-function object(input: Input, name: string): Input {
+export function object(input: Input, name: string): Input {
   const value = field(input, name);
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     throw new CaseFormatError(`Eingabe „${name}“ muss ein Objekt sein.`);
@@ -161,11 +171,11 @@ function object(input: Input, name: string): Input {
   return value as Input;
 }
 
-function objectOrNull(input: Input, name: string): Input | null {
+export function objectOrNull(input: Input, name: string): Input | null {
   return field(input, name) === null ? null : object(input, name);
 }
 
-function textOrNull(input: Input, name: string): string | null {
+export function textOrNull(input: Input, name: string): string | null {
   return field(input, name) === null ? null : text(input, name);
 }
 
@@ -355,7 +365,7 @@ const peopleOperations: Record<string, (input: Input) => Result> = {
   },
 };
 
-function list(input: Input, name: string): Input[] {
+export function list(input: Input, name: string): Input[] {
   const value = field(input, name);
   if (!Array.isArray(value) || value.some((entry) => typeof entry !== "object" || entry === null)) {
     throw new CaseFormatError(`Eingabe „${name}“ muss eine Liste von Objekten sein.`);
@@ -367,14 +377,21 @@ function list(input: Input, name: string): Input[] {
 // M03 Wochenberichte entstehen, M04 Bericht erfassen
 // ---------------------------------------------------------------------------
 
-const STATUSES: Record<string, ReportStatus> = {
+export const STATUSES: Record<string, ReportStatus> = {
   Entwurf: "DRAFT",
   Eingereicht: "SUBMITTED",
   Freigegeben: "APPROVED",
   Abgelehnt: "REJECTED",
 };
 
-function status(input: Input, name: string): ReportStatus {
+const STATUS_NAMES = new Map(Object.entries(STATUSES).map(([name, value]) => [value, name]));
+
+/** Status der App → neutraler Name (`Entwurf` …). */
+export function statusName(value: ReportStatus): string | undefined {
+  return STATUS_NAMES.get(value);
+}
+
+export function status(input: Input, name: string): ReportStatus {
   const value = text(input, name);
   if (!Object.hasOwn(STATUSES, value)) {
     throw new CaseFormatError(`Unbekannter Status: ${value}`);
@@ -383,7 +400,7 @@ function status(input: Input, name: string): ReportStatus {
 }
 
 /** Tagesart der App → neutraler Name (`Betrieb` …), leer → null. */
-function dayTypeName(dayType: DayType | null): string | null {
+export function dayTypeName(dayType: DayType | null): string | null {
   return dayType === null ? null : DAY_TYPE_LABELS[dayType];
 }
 
@@ -405,7 +422,7 @@ function storedDayType(value: unknown): DayType | null {
  * Eingabe einer Tagesart aus dem Formular: null = nicht mitgeschickt, "" = leer. Bekannte Namen
  * werden übersetzt; jeder andere Text geht unverändert an die App, die ihn abweisen muss.
  */
-function inputDayType(value: unknown): string | null {
+export function inputDayType(value: unknown): string | null {
   if (value === null || value === "") {
     return value;
   }
@@ -424,15 +441,142 @@ function trainingPeriod(input: Input): TrainingPeriod {
   return { start: parseDate(text(input, "beginn")), end: end === null ? null : parseDate(end) };
 }
 
-const WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr"];
+export const WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr"];
 
-function weekday(input: Input): string {
+export function weekday(input: Input): string {
   const day = text(input, "tag");
   if (!WEEKDAYS.includes(day)) {
     throw new CaseFormatError(`Tag muss Mo bis Fr sein: ${day}`);
   }
   return day;
 }
+
+// ---------------------------------------------------------------------------
+// M05 Status und Prüfung
+// ---------------------------------------------------------------------------
+
+/** Aktionen der Statuswechsel (`format.md`, „Schnittstellen und Aktionen von M05“) und der App. */
+export const TRANSITION_ACTIONS: Record<string, ReportAction> = {
+  einreichen: "SUBMIT",
+  zurueckziehen: "WITHDRAW",
+  freigeben: "APPROVE",
+  ablehnen: "REJECT",
+  erneut_einreichen: "RESUBMIT",
+  freigabe_zuruecknehmen: "REVOKE_APPROVAL",
+};
+
+const ACTION_NAMES = new Map(Object.entries(TRANSITION_ACTIONS).map(([name, action]) => [action, name]));
+
+/** Feste Fehlercodes je Grund, aus dem die Fachlogik einen Statuswechsel ablehnt. */
+export const TRANSITION_REASON_CODES: Record<TransitionReason, string> = {
+  forbidden: "zugriff_verweigert",
+  "trainee-inactive": "azubi_deaktiviert",
+  "not-allowed": "uebergang_unzulaessig",
+  "withdrawn-meanwhile": "bericht_zurueckgezogen",
+  "reviewed-meanwhile": "bereits_geprueft",
+  "already-submitted": "bereits_eingereicht",
+  "already-withdrawn": "bereits_zurueckgezogen",
+  "already-revoked": "bereits_zurueckgenommen",
+  "changed-meanwhile": "inzwischen_geaendert",
+  "comment-required": "kommentar_fehlt",
+  "reason-required": "begruendung_fehlt",
+  "text-too-long": "text_zu_lang",
+};
+
+/** Feste Fehlercodes je fehlender Pflichtangabe beim Einreichen. */
+export const SUBMISSION_PROBLEM_CODES: Record<SubmissionProblem, string> = {
+  DAY_TYPE_MISSING: "tagesart_fehlt",
+  ACTIVITIES_MISSING: "taetigkeiten_fehlen",
+};
+
+function transitionAction(input: Input): ReportAction {
+  const name = text(input, "aktion");
+  if (!Object.hasOwn(TRANSITION_ACTIONS, name)) {
+    throw new CaseFormatError(`Unbekannte Aktion: ${name}`);
+  }
+  return TRANSITION_ACTIONS[name];
+}
+
+/** Bericht für die Statusprüfung: `{ azubi, azubiAktiv, status }`. */
+function reportForTransition(input: Input) {
+  const report = object(input, "bericht");
+  return {
+    traineeId: text(report, "azubi"),
+    traineeActive: bool(report, "azubiAktiv"),
+    status: status(report, "status"),
+    // Die Version selbst ist Sache der Plattform; der Fall sagt nur, ob der gesehene Stand veraltet ist.
+    version: 1,
+  };
+}
+
+/** Gesehener Stand `{ status, veraltet }` oder null (es wird nur gegen den aktuellen Stand geprüft). */
+function seenState(input: Input) {
+  const seen = objectOrNull(input, "gesehen");
+  return seen === null ? undefined : { status: status(seen, "status"), version: bool(seen, "veraltet") ? 0 : 1 };
+}
+
+/** Wochentag → Kalendertag einer festen Woche (Mo 05.10.2026); nur für die Reihenfolge der Tage. */
+function weekdayDate(day: string): Date {
+  return new Date(Date.UTC(2026, 9, 5 + WEEKDAYS.indexOf(day)));
+}
+
+const statusOperations: Record<string, (input: Input) => Result> = {
+  uebergangPruefen: (input) => {
+    const decision = decideTransition({
+      action: transitionAction(input),
+      actor: viewer(object(input, "person")),
+      report: reportForTransition(input),
+      seen: seenState(input),
+      text: textOrNull(input, "text"),
+    });
+    if (!decision.ok) {
+      const code = TRANSITION_REASON_CODES[decision.reason];
+      return decision.reason === "text-too-long"
+        ? { fehler: code, feld: decision.field === "comment" ? "kommentar" : "begruendung" }
+        : { fehler: code };
+    }
+    return { von: statusName(decision.from), nach: statusName(decision.to), text: decision.text };
+  },
+  moeglicheAktionen: (input) => ({
+    aktionen: availableActions(viewer(object(input, "person")), reportForTransition(input)).map((action) =>
+      ACTION_NAMES.get(action),
+    ),
+  }),
+  einreichenPruefen: (input) => {
+    const issues = validateSubmission(
+      list(input, "tage").map((day) => ({
+        id: weekday(day),
+        date: weekdayDate(weekday(day)),
+        dayType: storedDayType(field(day, "tagesart")),
+        activities: text(day, "text"),
+        outsideTraining: bool(day, "ausserhalb"),
+      })),
+    );
+    return issues.length === 0
+      ? { einreichbar: true }
+      : {
+          fehler: "pflichtangaben_fehlen",
+          tage: issues.map((issue) => ({ tag: issue.dayId, fehler: SUBMISSION_PROBLEM_CODES[issue.problem] })),
+        };
+  },
+  darfBearbeiten: (input) => {
+    const report = object(input, "bericht");
+    return {
+      bearbeitbar: canEditReport(viewer(object(input, "person")), {
+        traineeId: text(report, "azubi"),
+        traineeActive: bool(report, "azubiAktiv"),
+        status: status(report, "status"),
+      }),
+    };
+  },
+  pruefrunde: (input) => {
+    const submissions = integer(input, "einreichungen");
+    if (submissions < 0) {
+      throw new CaseFormatError(`„einreichungen“ darf nicht negativ sein: ${submissions}`);
+    }
+    return { runde: reviewRoundFor(transitionAction(input), submissions) };
+  },
+};
 
 const operations: Record<string, (input: Input) => Result> = {
   jetzt: () => ({ zeitpunkt: formatInstant(now()) }),
@@ -560,6 +704,9 @@ const operations: Record<string, (input: Input) => Result> = {
       })),
     };
   },
+
+  // --- M05 Status und Prüfung ---
+  ...statusOperations,
 };
 
 /** Namen aller Schnittstellen, die der Adapter kennt. */

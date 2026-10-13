@@ -228,3 +228,65 @@ Tagesart mit „Feiertag (vorbelegt)“).
 
 **Ersetzt durch Bordmittel:** Formular, Fehlermeldungen am Feld und die Warnung beim Verlassen baut eine Plattform mit
 ihren eigenen Mitteln nach (M09, Profil); die Regeln in `report-days.ts` werden 1:1 übersetzt.
+
+## M05 Status und Prüfung
+
+Fach-Spec: `specs/M05-status-und-pruefung.md` · Prüffälle: `specs/pruefung/M05.json` (Ebenen `fachlogik` und `daten`)
+
+| Datei / Funktion | Rolle | Regeln / AK | Plattformgebunden | Übertragung |
+| --- | --- | --- | --- | --- |
+| `src/domain/report-status.ts` → `REPORT_STATUSES`, `STATUS_LABELS`, `REPORT_ACTIONS`, `ACTION_LABELS`, `TRANSITIONS` | Status, Aktionen und die sechs erlaubten Übergänge mit Rolle | M05-R01, M05-R02; AK-507, AK-607, AK-704 | nein | 1:1 übersetzen |
+| `src/domain/report-status.ts` → `decideTransition()`, `TransitionDecision`, `TransitionReason`, `TRANSITION_MESSAGES`, `SeenState` | Entscheidung je Aktion: Person, Rolle, Besitz, Status und gesehener Stand, deaktivierter Azubi, Pflichttext; fester Grund und Meldung | M05-R02, M05-R03, M05-R12, M05-R14, M05-R15, M05-R19 bis M05-R21; AK-501, AK-507, AK-508, AK-602, AK-604, AK-607, AK-703, AK-704 | nein | 1:1 übersetzen |
+| `src/domain/report-status.ts` → `availableActions()` | angebotene Aktionen (Schaltflächen) | M05-R04; AK-507, AK-607, AK-704 | nein | 1:1 übersetzen |
+| `src/domain/report-status.ts` → `isBlank()`, `normalizeComment()`, `commentTooLong()`, `MAX_COMMENT_LENGTH` | Pflichttext, Zeilenumbrüche, 5.000 Zeichen | M05-R14, M05-R15; AK-604 | nein | 1:1 übersetzen |
+| `src/domain/report-status.ts` → `reviewRoundFor()` | Prüfrunde eines neuen Statuswechsels | M05-R18; AK-702, AK-802 (M06) | nein | 1:1 übersetzen |
+| `src/domain/report-status.ts` → `OPEN_STATUSES`, `isOpenStatus()` | offener Status (Definition „offen“ gehört M03, M03-R14; liegt hier, weil das Statusmodell ihn festlegt) | M03-R14, M05-R09 | nein | 1:1 übersetzen |
+| `src/domain/report-submission.ts` → `validateSubmission()`, `SubmissionIssue`, `SubmissionProblem`, `SUBMISSION_PROBLEM_LABELS` | Pflichtangaben beim Einreichen, betroffene Tage in Kalenderreihenfolge | M05-R05, M05-R06; AK-501 bis AK-504 | nein | 1:1 übersetzen |
+| `src/domain/report-submission.ts` → `submissionHeadline()`, `submissionSummary()`, `WEEK_OUTSIDE_TRAINING_MESSAGE` | Texte der Fehlerleiste und Meldung „ganz außerhalb“ | M05-R06, M05-R07; AK-502, AK-501 | nein | 1:1 übersetzen oder durch Meldungen der Plattform ersetzen |
+| `src/domain/report-access.ts` → `canEditReport()`, `ReportForAccess` | Bearbeitbarkeit nach Status, nur eigener aktiver Azubi (M02-Teile `canViewReport()`, `canManagePeople()` siehe M02) | M05-R09; AK-505, AK-506, AK-701, AK-703, AK-704, AK-204 (M02) | nein | 1:1 übersetzen |
+| `src/domain/report-access.ts` → `ReportStatus`, `reportStatusLabel()` | Typ und Anzeigename des Status | M05-R01 | nein | 1:1 übersetzen |
+| `src/lib/report-transitions.ts` → `transitionReport()`, `TransitionInput`, `TransitionResult`, `TransitionFailureReason`, `TransitionEvent` | Statuswechsel in einer Transaktion: Bericht sperren (`FOR UPDATE`), entscheiden, Eingaben beim Einreichen speichern, bedingtes Update auf Status und Version, Historieneintrag, Kommentare, Outbox (M08) | M05-R05 bis M05-R08, M05-R13, M05-R14, M05-R20 bis M05-R22; AK-501 bis AK-508, AK-602 bis AK-606, AK-701 bis AK-704 | ja (Prisma, PostgreSQL) | nach Profil neu bauen |
+| `src/lib/reports.ts` → `listReviewQueue()`, `ReviewScope` | Prüfliste: eingereichte Berichte, eigene oder alle, letzte Einreichung, älteste zuerst | M05-R11, M05-R12; AK-601, AK-602 | ja (Prisma) | nach Profil neu bauen |
+| `src/lib/reports.ts` → `rejectionTexts()` | Gesamtkommentar bzw. Begründung der aktuellen Ablehnung für „Zu erledigen“ (Start Azubi), über `currentFeedback()` (M06) | M05-R16; AK-606 | ja (Prisma) | nach Profil neu bauen |
+| `prisma/schema.prisma` → `WeeklyReport.status`, `WeeklyReport.version`; Migration `20261007090000_einreichen_pruefen` (Schreibschutz der Tage) | Status und Versionsstand; Datenbank weist Änderungen an Tagen eingereichter und freigegebener Berichte ab | M05-R09, M05-R20; AK-505, AK-704 | ja (Prisma, PostgreSQL-Trigger) | nach Profil neu bauen |
+
+**Einstieg:** zuerst `src/domain/report-status.ts` (`TRANSITIONS`, dann `decideTransition()` von oben nach unten: die
+Reihenfolge der Prüfungen ist M05-R21), dann `src/domain/report-submission.ts`, dann `transitionReport()` in
+`src/lib/report-transitions.ts`. Die Oberfläche dazu (nicht in der Landkarte, M09): `src/app/(app)/berichte/[id]/actions.ts`
+(Serveraktionen, schicken Status und Version des gesehenen Stands mit), `ReportView.tsx` und
+`src/app/(app)/ausbilder/pruefliste/page.tsx`.
+
+**Belege:**
+
+- Vitest: `src/domain/report-status.test.ts` (Statusmodell als Tabelle 4 Status × 6 Aktionen × Rollen, AK-507, AK-508,
+  AK-604, AK-607, AK-703, AK-704), `src/domain/report-submission.test.ts` (AK-501 bis AK-504),
+  `src/domain/report-access.test.ts` (Bearbeitbarkeit), `tests/db/transitions.test.ts` (AK-501 bis AK-508, AK-601 bis
+  AK-607, AK-701 bis AK-704, auch echte Gleichzeitigkeit mit `Promise.all`), `tests/db/status-change.test.ts`
+  (Schreibschutz und Unveränderlichkeit, M06).
+- Prüf-Runner: `tests/pruefung/fachlogik.test.ts` (Ebene `fachlogik`) und `tests/pruefung/daten.test.ts` mit
+  `tests/pruefung/daten-adapter.ts` (Ebene `daten`, gegen die Test-Datenbank) führen `specs/pruefung/M05.json` aus.
+- Playwright: `e2e/ak-501-803-einreichen-pruefen.spec.ts` (Einreichen, Prüfliste, Zurückziehen, AK-508 in zwei
+  Browsern, Ablehnen mit Kommentaren, Rücknahme), `e2e/beispielszenarien.spec.ts` („Einreichen scheitert an fehlendem
+  Text“, „Vertretung nimmt Freigabe zurück“).
+
+**Fallen:**
+
+- Transaktion und Version: `transitionReport()` sperrt den Bericht und schreibt den Wechsel als bedingtes Update
+  (`where: { status, version }`). Scheitert es, wird mit dem aktuellen Stand neu entschieden, damit die Meldung stimmt.
+  Eine Plattform ohne Versionsstand verliert AK-508.
+- Beim Einreichen werden die Tageseingaben in derselben Transaktion gespeichert; scheitert danach nur die
+  Pflichtprüfung, endet die Transaktion regulär (Eingaben bleiben). Ein Rollback an dieser Stelle verletzt AK-505.
+- „Jetzt“ für den Zeitpunkt des Statuswechsels kommt aus `now()` (M01), nie aus `new Date()` oder einem
+  Datenbank-Default; sonst lassen sich Prüffälle mit fester Uhr nicht prüfen.
+- Datenbankverbindungen nur über `createPrismaClient` (fest UTC); sonst liest `@prisma/adapter-pg` die Zeitpunkte der
+  Historie bei einem Server in Europe/Berlin verschoben.
+- Fehlergründe stehen als `reason` an Entscheidung und Ergebnis (`TransitionReason`, `TransitionFailureReason`,
+  `SaveFailureReason` in `src/lib/reports.ts`); Meldungstexte können sich ändern, die Gründe nicht ohne Änderung an
+  `format.md`.
+- Die Prüfrunde zählt die bisherigen Einreichungen aus der Historie (`statusChange.count`); sie wird nicht am Bericht
+  gespeichert.
+- Tageskommentare werden nur beim Ablehnen gelesen; beim Freigeben ignoriert der Server sie.
+
+**Ersetzt durch Bordmittel:** Nichts fachlich: Die Regeln in `report-status.ts` und `report-submission.ts` werden 1:1
+übersetzt. Transaktion, Sperre, Versionsstand und Schreibschutz baut jede Plattform mit ihren Mitteln nach; ob dabei
+ein Workflow der Plattform genutzt wird, legt das Profil fest (G4).

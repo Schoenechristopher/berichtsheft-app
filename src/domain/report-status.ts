@@ -121,9 +121,34 @@ export interface TransitionRequest {
 
 export type TransitionErrorCode = "FORBIDDEN" | "NOT_ALLOWED" | "CONFLICT" | "TRAINEE_INACTIVE" | "TEXT";
 
+/**
+ * Fester Grund einer Ablehnung, unabhängig vom Meldungstext (für die neutralen Prüffälle,
+ * `specs/pruefung/format.md`, „Schnittstellen und Aktionen von M05“). Jede Meldung hat genau einen Grund;
+ * mehrere Meldungen können denselben Grund haben (z. B. `not-allowed`).
+ */
+export type TransitionReason =
+  | "forbidden"
+  | "trainee-inactive"
+  | "not-allowed"
+  | "withdrawn-meanwhile"
+  | "reviewed-meanwhile"
+  | "already-submitted"
+  | "already-withdrawn"
+  | "already-revoked"
+  | "changed-meanwhile"
+  | "comment-required"
+  | "reason-required"
+  | "text-too-long";
+
 export type TransitionDecision =
   | { ok: true; from: ReportStatus; to: ReportStatus; text: string | null }
-  | { ok: false; code: TransitionErrorCode; message: string; field?: "comment" | "reason" };
+  | {
+      ok: false;
+      code: TransitionErrorCode;
+      reason: TransitionReason;
+      message: string;
+      field?: "comment" | "reason";
+    };
 
 /** Ein Text gilt als leer, wenn er nur aus Leerraum besteht (wie bei „Tätigkeiten“, AK-501). */
 export function isBlank(text: string | null | undefined): boolean {
@@ -139,35 +164,36 @@ export function decideTransition(request: TransitionRequest): TransitionDecision
   const { action, actor, report, seen } = request;
   const rule = TRANSITIONS[action];
   if (!actor.active) {
-    return fail("FORBIDDEN", TRANSITION_MESSAGES.forbidden);
+    return fail("FORBIDDEN", "forbidden", TRANSITION_MESSAGES.forbidden);
   }
   if (rule.role === "TRAINEE") {
     if (actor.role !== "TRAINEE") {
-      return fail("FORBIDDEN", TRANSITION_MESSAGES.traineeOnly);
+      return fail("FORBIDDEN", "forbidden", TRANSITION_MESSAGES.traineeOnly);
     }
     if (report.traineeId !== actor.id) {
-      return fail("FORBIDDEN", TRANSITION_MESSAGES.forbidden);
+      return fail("FORBIDDEN", "forbidden", TRANSITION_MESSAGES.forbidden);
     }
   } else if (actor.role !== "TRAINER") {
-    return fail("FORBIDDEN", TRANSITION_MESSAGES.trainerOnly);
+    return fail("FORBIDDEN", "forbidden", TRANSITION_MESSAGES.trainerOnly);
   }
 
   if (report.status !== rule.from) {
     const sawValidState = seen !== undefined && seen.status === rule.from;
-    return sawValidState
-      ? fail("CONFLICT", conflictMessage(action, report.status))
-      : fail("NOT_ALLOWED", notAllowedMessage(action, report.status));
+    const [reason, message] = sawValidState
+      ? conflictMessage(action, report.status)
+      : notAllowedMessage(action, report.status);
+    return fail(sawValidState ? "CONFLICT" : "NOT_ALLOWED", reason, message);
   }
   if (seen !== undefined && seen.version !== report.version) {
-    return fail("CONFLICT", TRANSITION_MESSAGES.changedMeanwhile);
+    return fail("CONFLICT", "changed-meanwhile", TRANSITION_MESSAGES.changedMeanwhile);
   }
 
   if (!report.traineeActive) {
     if (rule.role === "TRAINEE") {
-      return fail("TRAINEE_INACTIVE", TRANSITION_MESSAGES.traineeInactive);
+      return fail("TRAINEE_INACTIVE", "trainee-inactive", TRANSITION_MESSAGES.traineeInactive);
     }
     if (action !== "APPROVE") {
-      return fail("TRAINEE_INACTIVE", TRANSITION_MESSAGES.traineeInactiveReview);
+      return fail("TRAINEE_INACTIVE", "trainee-inactive", TRANSITION_MESSAGES.traineeInactiveReview);
     }
   }
 
@@ -178,63 +204,78 @@ export function decideTransition(request: TransitionRequest): TransitionDecision
       return {
         ok: false,
         code: "TEXT",
+        reason: action === "REJECT" ? "comment-required" : "reason-required",
         field,
         message: action === "REJECT" ? TRANSITION_MESSAGES.commentRequired : TRANSITION_MESSAGES.reasonRequired,
       };
     }
     text = normalizeComment(request.text ?? "");
     if (commentTooLong(text)) {
-      return { ok: false, code: "TEXT", field, message: TRANSITION_MESSAGES.tooLong };
+      return { ok: false, code: "TEXT", reason: "text-too-long", field, message: TRANSITION_MESSAGES.tooLong };
     }
   }
   return { ok: true, from: rule.from, to: rule.to, text };
 }
 
-/** Meldung, wenn jemand einen gültigen Stand gesehen hat, der sich inzwischen geändert hat. */
-function conflictMessage(action: ReportAction, current: ReportStatus): string {
+/** Grund und Meldung, wenn jemand einen gültigen Stand gesehen hat, der sich inzwischen geändert hat. */
+function conflictMessage(action: ReportAction, current: ReportStatus): [TransitionReason, string] {
   switch (action) {
     case "APPROVE":
     case "REJECT":
-      return current === "DRAFT" ? TRANSITION_MESSAGES.withdrawnMeanwhile : TRANSITION_MESSAGES.reviewedByOther;
+      return current === "DRAFT"
+        ? ["withdrawn-meanwhile", TRANSITION_MESSAGES.withdrawnMeanwhile]
+        : ["reviewed-meanwhile", TRANSITION_MESSAGES.reviewedByOther];
     case "WITHDRAW":
-      return current === "DRAFT" ? TRANSITION_MESSAGES.alreadyWithdrawn : TRANSITION_MESSAGES.reviewedMeanwhile;
+      return current === "DRAFT"
+        ? ["already-withdrawn", TRANSITION_MESSAGES.alreadyWithdrawn]
+        : ["reviewed-meanwhile", TRANSITION_MESSAGES.reviewedMeanwhile];
     case "SUBMIT":
     case "RESUBMIT":
-      return current === "SUBMITTED" ? TRANSITION_MESSAGES.alreadySubmitted : TRANSITION_MESSAGES.changedMeanwhile;
+      return current === "SUBMITTED"
+        ? ["already-submitted", TRANSITION_MESSAGES.alreadySubmitted]
+        : ["changed-meanwhile", TRANSITION_MESSAGES.changedMeanwhile];
     case "REVOKE_APPROVAL":
-      return current === "REJECTED" ? TRANSITION_MESSAGES.alreadyRevoked : TRANSITION_MESSAGES.changedMeanwhile;
+      return current === "REJECTED"
+        ? ["already-revoked", TRANSITION_MESSAGES.alreadyRevoked]
+        : ["changed-meanwhile", TRANSITION_MESSAGES.changedMeanwhile];
   }
 }
 
-/** Meldung, wenn der Übergang im aktuellen Status grundsätzlich nicht vorgesehen ist. */
-function notAllowedMessage(action: ReportAction, current: ReportStatus): string {
+/** Grund und Meldung, wenn der Übergang im aktuellen Status grundsätzlich nicht vorgesehen ist. */
+function notAllowedMessage(action: ReportAction, current: ReportStatus): [TransitionReason, string] {
   const status = STATUS_LABELS[current];
   switch (action) {
     case "APPROVE":
     case "REJECT":
-      return current === "DRAFT"
-        ? TRANSITION_MESSAGES.draftNotReviewable
-        : `Der Bericht ist nicht eingereicht (Status „${status}“) und kann nicht geprüft werden.`;
+      return [
+        "not-allowed",
+        current === "DRAFT"
+          ? TRANSITION_MESSAGES.draftNotReviewable
+          : `Der Bericht ist nicht eingereicht (Status „${status}“) und kann nicht geprüft werden.`,
+      ];
     case "WITHDRAW":
-      return current === "DRAFT"
-        ? "Nur eingereichte Berichte können zurückgezogen werden."
-        : TRANSITION_MESSAGES.notWithdrawable;
+      return [
+        "not-allowed",
+        current === "DRAFT"
+          ? "Nur eingereichte Berichte können zurückgezogen werden."
+          : TRANSITION_MESSAGES.notWithdrawable,
+      ];
     case "SUBMIT":
     case "RESUBMIT":
       if (current === "SUBMITTED") {
-        return TRANSITION_MESSAGES.alreadySubmitted;
+        return ["already-submitted", TRANSITION_MESSAGES.alreadySubmitted];
       }
       if (current === "APPROVED") {
-        return TRANSITION_MESSAGES.approvedLocked;
+        return ["not-allowed", TRANSITION_MESSAGES.approvedLocked];
       }
-      return `„${ACTION_LABELS[action]}“ ist im Status „${status}“ nicht möglich.`;
+      return ["not-allowed", `„${ACTION_LABELS[action]}“ ist im Status „${status}“ nicht möglich.`];
     case "REVOKE_APPROVAL":
-      return `Nur freigegebene Berichte können zurückgenommen werden (Status „${status}“).`;
+      return ["not-allowed", `Nur freigegebene Berichte können zurückgenommen werden (Status „${status}“).`];
   }
 }
 
-function fail(code: TransitionErrorCode, message: string): TransitionDecision {
-  return { ok: false, code, message };
+function fail(code: TransitionErrorCode, reason: TransitionReason, message: string): TransitionDecision {
+  return { ok: false, code, reason, message };
 }
 
 /** Kommentare werden wie „Tätigkeiten“ unverändert gespeichert, nur Zeilenumbrüche einheitlich. */

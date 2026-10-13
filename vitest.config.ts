@@ -1,5 +1,5 @@
 import path from "node:path";
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
   resolve: {
@@ -12,6 +12,8 @@ export default defineConfig({
         test: {
           name: "unit",
           include: ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.ts", "tests/pruefung/**/*.test.ts"],
+          // Der Daten-Runner läuft gegen die Test-Datenbank (Projekt „db“).
+          exclude: [...configDefaults.exclude, "tests/pruefung/daten.test.ts"],
           environment: "node",
         },
       },
@@ -19,7 +21,7 @@ export default defineConfig({
         extends: true,
         test: {
           name: "db",
-          include: ["tests/db/**/*.test.ts"],
+          include: ["tests/db/**/*.test.ts", "tests/pruefung/daten.test.ts"],
           environment: "node",
           globalSetup: ["tests/db/global-setup.ts"],
           // Alle Datenbanktests teilen sich eine Test-Datenbank.

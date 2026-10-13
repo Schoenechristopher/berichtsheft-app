@@ -152,7 +152,11 @@ describe("Einreichen (AK-501 – AK-505)", () => {
       report.id,
       new Map([[report.days[0].id, { dayType: "WORK", activities: "geändert" }]]),
     );
-    expect(save).toEqual({ ok: false, formError: "Dieser Bericht kann nicht mehr bearbeitet werden." });
+    expect(save).toEqual({
+      ok: false,
+      reason: "not-editable",
+      formError: "Dieser Bericht kann nicht mehr bearbeitet werden.",
+    });
     // Zweite Schranke: Die Datenbank weist das Ändern der Tage ab.
     await expect(
       prisma.reportDay.update({ where: { id: report.days[0].id }, data: { activities: "direkt" } }),
@@ -171,9 +175,14 @@ describe("Einreichen (AK-501 – AK-505)", () => {
         trainingStart: new Date("2026-09-01T00:00:00Z"),
       },
     });
-    expect(await act(otto, report.id, submit)).toEqual({ ok: false, formError: "Zugriff verweigert" });
+    expect(await act(otto, report.id, submit)).toEqual({
+      ok: false,
+      reason: "forbidden",
+      formError: "Zugriff verweigert",
+    });
     expect(await act(persons.bernd, report.id, submit)).toEqual({
       ok: false,
+      reason: "forbidden",
       formError: TRANSITION_MESSAGES.traineeOnly,
     });
     expect(await status(report.id)).toBe("DRAFT");
@@ -210,6 +219,7 @@ describe("Zurückziehen (AK-506, AK-507)", () => {
     for (const report of [approved, rejected]) {
       expect(await act(persons.anna, report.id, { action: "WITHDRAW" })).toEqual({
         ok: false,
+        reason: "not-allowed",
         formError: TRANSITION_MESSAGES.notWithdrawable,
       });
     }
@@ -235,10 +245,14 @@ describe("Gleichzeitigkeit (AK-508)", () => {
       const final = await status(report.id);
       if (withdraw.ok) {
         expect(final).toBe("DRAFT");
-        expect(approve).toEqual({ ok: false, formError: "Bericht wurde zurückgezogen" });
+        expect(approve).toEqual({ ok: false, reason: "withdrawn-meanwhile", formError: "Bericht wurde zurückgezogen" });
       } else {
         expect(final).toBe("APPROVED");
-        expect(withdraw).toEqual({ ok: false, formError: TRANSITION_MESSAGES.reviewedMeanwhile });
+        expect(withdraw).toEqual({
+          ok: false,
+          reason: "reviewed-meanwhile",
+          formError: TRANSITION_MESSAGES.reviewedMeanwhile,
+        });
       }
       // Genau ein Historieneintrag pro Wechsel, keiner vom Verlierer.
       expect(await prisma.statusChange.count({ where: { reportId: report.id } })).toBe(2);
@@ -257,6 +271,7 @@ describe("Gleichzeitigkeit (AK-508)", () => {
     ]) {
       expect(await act(persons.bernd, report.id, input)).toEqual({
         ok: false,
+        reason: "withdrawn-meanwhile",
         formError: "Bericht wurde zurückgezogen",
       });
     }
@@ -272,6 +287,7 @@ describe("Gleichzeitigkeit (AK-508)", () => {
 
     expect(await act(persons.anna, report.id, { action: "WITHDRAW", seen: seenByAnna })).toEqual({
       ok: false,
+      reason: "reviewed-meanwhile",
       formError: "Bericht wurde bereits geprüft und kann nicht mehr zurückgezogen werden.",
     });
     expect(await status(report.id)).toBe("REJECTED");
@@ -286,6 +302,7 @@ describe("Gleichzeitigkeit (AK-508)", () => {
 
     expect(await act(persons.bernd, report.id, { action: "APPROVE", seen: seenByBernd })).toEqual({
       ok: false,
+      reason: "changed-meanwhile",
       formError: TRANSITION_MESSAGES.changedMeanwhile,
     });
     expect(
@@ -368,6 +385,7 @@ describe("Prüfen (AK-601 – AK-607)", () => {
     for (const text of [undefined, "", "   \n "]) {
       expect(await act(persons.bernd, report.id, { action: "REJECT", text })).toEqual({
         ok: false,
+        reason: "comment-required",
         fieldErrors: { comment: TRANSITION_MESSAGES.commentRequired },
       });
     }
@@ -409,6 +427,7 @@ describe("Prüfen (AK-601 – AK-607)", () => {
     for (const input of [{ action: "APPROVE" as const }, { action: "REJECT" as const, text: "x" }]) {
       expect(await act(persons.bernd, report.id, input)).toEqual({
         ok: false,
+        reason: "not-allowed",
         formError: TRANSITION_MESSAGES.draftNotReviewable,
       });
     }
@@ -479,6 +498,7 @@ describe("Überarbeiten und Rücknahme (AK-701 – AK-704)", () => {
 
     expect(await act(persons.clara, report.id, { action: "REVOKE_APPROVAL", text: "  " })).toEqual({
       ok: false,
+      reason: "reason-required",
       fieldErrors: { reason: TRANSITION_MESSAGES.reasonRequired },
     });
     expect(await act(persons.anna, report.id, { action: "REVOKE_APPROVAL", text: "x" })).toMatchObject({ ok: false });
@@ -614,7 +634,7 @@ describe("Historie (AK-801 – AK-803)", () => {
 });
 
 describe("AK-602 deaktivierter Azubi (bestätigte Auslegung)", () => {
-  it("eingereichter Bericht eines deaktivierten Azubis kann freigegeben, aber nicht abgelehnt werden", async () => {
+  it("AK-602 eingereichter Bericht eines deaktivierten Azubis kann freigegeben, aber nicht abgelehnt werden", async () => {
     const one = await fillWeek(39);
     const two = await fillWeek(40);
     await act(persons.anna, one.id, submit);
@@ -624,18 +644,20 @@ describe("AK-602 deaktivierter Azubi (bestätigte Auslegung)", () => {
     expect((await listReviewQueue(prisma, persons.bernd, "mine")).map((r) => r.trainee.active)).toEqual([false, false]);
     expect(await act(persons.bernd, one.id, { action: "REJECT", text: "x" })).toEqual({
       ok: false,
+      reason: "trainee-inactive",
       formError: TRANSITION_MESSAGES.traineeInactiveReview,
     });
     expect((await act(persons.bernd, two.id, { action: "APPROVE" })).ok).toBe(true);
     expect(await act(persons.bernd, two.id, { action: "REVOKE_APPROVAL", text: "x" })).toEqual({
       ok: false,
+      reason: "trainee-inactive",
       formError: TRANSITION_MESSAGES.traineeInactiveReview,
     });
   });
 });
 
 describe("AK-501 Woche ganz außerhalb der Ausbildung (bestätigte Auslegung)", () => {
-  it("wird nicht eingereicht, auch mit Inhalt", async () => {
+  it("AK-501 wird nicht eingereicht, auch mit Inhalt", async () => {
     const report = await fillWeek(36);
     await prisma.person.update({
       where: { id: persons.anna.id },
@@ -643,6 +665,7 @@ describe("AK-501 Woche ganz außerhalb der Ausbildung (bestätigte Auslegung)", 
     });
     expect(await act(persons.anna, report.id, submit)).toEqual({
       ok: false,
+      reason: "week-outside-training",
       formError: "Diese Woche liegt ganz außerhalb der Ausbildung und wird nicht eingereicht.",
     });
   });

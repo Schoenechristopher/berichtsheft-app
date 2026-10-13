@@ -1,0 +1,6012 @@
+[
+  {
+    "id": "AK-501-01",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Alle Tage mit Tagesart, Betrieb und Berufsschule mit Text: einreichbar",
+    "schnittstelle": "einreichenPruefen",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Netzwerk geplant",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Berufsschule",
+          "text": "Subnetting",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Urlaub",
+          "text": "",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Krank",
+          "text": "",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Feiertag",
+          "text": "",
+          "ausserhalb": false
+        }
+      ]
+    },
+    "erwartet": {
+      "einreichbar": true
+    }
+  },
+  {
+    "id": "AK-501-02",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Text nur aus Leerzeichen, Tabulator und Zeilenumbruch gilt als leer",
+    "schnittstelle": "einreichenPruefen",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "   ",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Berufsschule",
+          "text": " \t\n ",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Betrieb",
+          "text": "x",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Betrieb",
+          "text": "x",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Betrieb",
+          "text": "x",
+          "ausserhalb": false
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "pflichtangaben_fehlen",
+      "tage": [
+        {
+          "tag": "Mo",
+          "fehler": "taetigkeiten_fehlen"
+        },
+        {
+          "tag": "Di",
+          "fehler": "taetigkeiten_fehlen"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-501-03",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Tage außerhalb der Ausbildung brauchen weder Tagesart noch Text",
+    "schnittstelle": "einreichenPruefen",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": null,
+          "text": "",
+          "ausserhalb": true
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "Einführung",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Betrieb",
+          "text": "x",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Betrieb",
+          "text": "x",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": null,
+          "text": "",
+          "ausserhalb": true
+        }
+      ]
+    },
+    "erwartet": {
+      "einreichbar": true
+    }
+  },
+  {
+    "id": "AK-501-04",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Entwurf wird eingereicht",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "einreichen",
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Entwurf"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "von": "Entwurf",
+      "nach": "Eingereicht",
+      "text": null
+    }
+  },
+  {
+    "id": "AK-501-05",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein abgelehnter Bericht wird erneut eingereicht",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "erneut_einreichen",
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Abgelehnt"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "von": "Abgelehnt",
+      "nach": "Eingereicht",
+      "text": null
+    }
+  },
+  {
+    "id": "AK-501-06",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Aus „Abgelehnt“ führt nur „erneut einreichen“ nach „Eingereicht“",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "einreichen",
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Abgelehnt"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "uebergang_unzulaessig"
+    }
+  },
+  {
+    "id": "AK-501-07",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein fremder Azubi reicht Annas Bericht nicht ein",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "einreichen",
+      "person": {
+        "schluessel": "otto",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Entwurf"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "zugriff_verweigert"
+    }
+  },
+  {
+    "id": "AK-501-08",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Ausbilder reicht keinen Bericht ein",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "einreichen",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Entwurf"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "zugriff_verweigert"
+    }
+  },
+  {
+    "id": "AK-501-09",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein bereits eingereichter Bericht wird nicht noch einmal eingereicht",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "einreichen",
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "bereits_eingereicht"
+    }
+  },
+  {
+    "id": "AK-501-10",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Die laufende Woche (KW 41, Dienstag) wird vor ihrem Ende eingereicht, sobald sie vollständig ist",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W41",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W41"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W41",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-501-11",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Bestätigte Auslegung: Eine Woche ganz außerhalb der Ausbildung wird nicht eingereicht, auch mit Inhalt",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W36",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "ausbildungszeitraum_aendern",
+        "person": "anna",
+        "beginn": "2026-09-14",
+        "ende": null
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W36"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "geaendert": true
+        },
+        {
+          "fehler": "woche_ausserhalb"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W36",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": null,
+              "text": ""
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-502-01",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Fehlende Tagesart und fehlender Text werden je Tag in Kalenderreihenfolge benannt",
+    "schnittstelle": "einreichenPruefen",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Fr",
+          "tagesart": "Berufsschule",
+          "text": "",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": null,
+          "text": "Notizen ohne Tagesart",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "x",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "x",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Betrieb",
+          "text": "x",
+          "ausserhalb": false
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "pflichtangaben_fehlen",
+      "tage": [
+        {
+          "tag": "Mi",
+          "fehler": "tagesart_fehlt"
+        },
+        {
+          "tag": "Fr",
+          "fehler": "taetigkeiten_fehlen"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-502-02",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Beispielszenario: KW 52/2026, Freitag 25.12. von „Feiertag“ auf „Berufsschule“ ohne Text → „Tätigkeiten fehlen“",
+    "schnittstelle": "einreichenPruefen",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "Server",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Betrieb",
+          "text": "Server",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Betrieb",
+          "text": "Server",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Betrieb",
+          "text": "Server",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Berufsschule",
+          "text": "",
+          "ausserhalb": false
+        }
+      ]
+    },
+    "erwartet": {
+      "fehler": "pflichtangaben_fehlen",
+      "tage": [
+        {
+          "tag": "Fr",
+          "fehler": "taetigkeiten_fehlen"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-502-03",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Ein unvollständiger Bericht wird nicht eingereicht; die Tage werden benannt, nichts landet in der Historie",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            "Di": {
+              "tagesart": "",
+              "text": ""
+            },
+            "Do": {
+              "tagesart": "Berufsschule",
+              "text": ""
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "pflichtangaben_fehlen",
+          "tage": [
+            {
+              "tag": "Di",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Do",
+              "fehler": "taetigkeiten_fehlen"
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": null,
+              "text": ""
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Berufsschule",
+              "text": ""
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-503-01",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Urlaub, Krank und Feiertag brauchen keinen Text",
+    "schnittstelle": "einreichenPruefen",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Urlaub",
+          "text": "",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Krank",
+          "text": "  ",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Feiertag",
+          "text": "",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Betrieb",
+          "text": "x",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Berufsschule",
+          "text": "y",
+          "ausserhalb": false
+        }
+      ]
+    },
+    "erwartet": {
+      "einreichbar": true
+    }
+  },
+  {
+    "id": "AK-503-02",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Ein Text bei Urlaub wird gespeichert, eingereicht und bleibt erhalten",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            "Mo": {
+              "tagesart": "Urlaub",
+              "text": "Familienfeier"
+            },
+            "Di": {
+              "tagesart": "Krank",
+              "text": ""
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Urlaub",
+              "text": "Familienfeier"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Krank",
+              "text": ""
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-504-01",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Eine Woche nur aus Urlaub und Feiertagen ist vollständig und einreichbar",
+    "schnittstelle": "einreichenPruefen",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "tagesart": "Urlaub",
+          "text": "",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Di",
+          "tagesart": "Urlaub",
+          "text": "",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Mi",
+          "tagesart": "Feiertag",
+          "text": "",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Do",
+          "tagesart": "Urlaub",
+          "text": "",
+          "ausserhalb": false
+        },
+        {
+          "tag": "Fr",
+          "tagesart": "Urlaub",
+          "text": "",
+          "ausserhalb": false
+        }
+      ]
+    },
+    "erwartet": {
+      "einreichbar": true
+    }
+  },
+  {
+    "id": "AK-504-02",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Eine Woche nur aus Urlaub wird eingereicht wie jede andere",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Urlaub",
+              "text": ""
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Urlaub",
+              "text": ""
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Urlaub",
+              "text": ""
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Urlaub",
+              "text": ""
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Urlaub",
+              "text": ""
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Urlaub",
+              "text": ""
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-505-01",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Nach dem Einreichen ist der Bericht „Eingereicht“ und für den Azubi schreibgeschützt",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "anna",
+        "aktion": "tage_speichern",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "tage": {
+          "Mo": {
+            "tagesart": "Berufsschule",
+            "text": "geändert"
+          }
+        }
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "fehler": "nicht_bearbeitbar"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-505-02",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Einreichen speichert ungespeicherte Änderungen mit",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "tage": {
+          "Fr": {
+            "tagesart": "Berufsschule",
+            "text": "Subnetting"
+          }
+        }
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Berufsschule",
+              "text": "Subnetting"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-505-03",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Scheitert das Einreichen an den Pflichtangaben, bleiben die mitgeschickten Eingaben als Entwurf gespeichert",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "tage": {
+          "Mo": {
+            "tagesart": "Betrieb",
+            "text": "Switch konfiguriert"
+          },
+          "Fr": {
+            "tagesart": "Berufsschule",
+            "text": ""
+          }
+        }
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "pflichtangaben_fehlen",
+          "tage": [
+            {
+              "tag": "Fr",
+              "fehler": "taetigkeiten_fehlen"
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Switch konfiguriert"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Berufsschule",
+              "text": ""
+            }
+          ],
+          "historie": [],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-505-04",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Eine ungültige mitgeschickte Eingabe verhindert das Einreichen; nichts wird gespeichert",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "tage": {
+          "Mo": {
+            "tagesart": "Homeoffice",
+            "text": "x"
+          }
+        }
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "tage_ungueltig",
+          "tage": [
+            {
+              "tag": "Mo",
+              "fehler": ["tagesart_unbekannt"]
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-505-05",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein eingereichter Bericht ist für den Azubi nicht bearbeitbar",
+    "schnittstelle": "darfBearbeiten",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      }
+    },
+    "erwartet": {
+      "bearbeitbar": false
+    }
+  },
+  {
+    "id": "AK-505-06",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Entwurf ist für den eigenen, aktiven Azubi bearbeitbar",
+    "schnittstelle": "darfBearbeiten",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Entwurf"
+      }
+    },
+    "erwartet": {
+      "bearbeitbar": true
+    }
+  },
+  {
+    "id": "AK-505-07",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Den Bericht eines deaktivierten Azubis bearbeitet niemand mehr",
+    "schnittstelle": "darfBearbeiten",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": false,
+        "status": "Entwurf"
+      }
+    },
+    "erwartet": {
+      "bearbeitbar": false
+    }
+  },
+  {
+    "id": "AK-506-01",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Anna zieht ihren eingereichten Bericht zurück: wieder Entwurf, bearbeitbar, nicht mehr in der Prüfliste",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "pruefliste_lesen",
+        "filter": "eigene"
+      },
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 0
+      },
+      {
+        "als": "bernd",
+        "aktion": "pruefliste_lesen",
+        "filter": "eigene"
+      },
+      {
+        "als": "anna",
+        "aktion": "tage_speichern",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "tage": {
+          "Fr": {
+            "tagesart": "Berufsschule",
+            "text": "Subnetting"
+          }
+        }
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "berichte": [
+            {
+              "azubi": "anna",
+              "woche": "2026-W40",
+              "eingereicht": "2026-10-06T10:00:00+02:00",
+              "azubiAktiv": true
+            }
+          ]
+        },
+        {
+          "status": "Entwurf"
+        },
+        {
+          "berichte": []
+        },
+        {
+          "gespeichert": true
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Berufsschule",
+              "text": "Subnetting"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-506-02",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Zurückziehen führt von „Eingereicht“ nach „Entwurf“",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "zurueckziehen",
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "von": "Eingereicht",
+      "nach": "Entwurf",
+      "text": null
+    }
+  },
+  {
+    "id": "AK-506-03",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Nur der Azubi selbst zieht zurück, kein Ausbilder",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "zurueckziehen",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "zugriff_verweigert"
+    }
+  },
+  {
+    "id": "AK-507-01",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein freigegebener Bericht kann nicht zurückgezogen werden",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "zurueckziehen",
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Freigegeben"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "uebergang_unzulaessig"
+    }
+  },
+  {
+    "id": "AK-507-02",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein abgelehnter Bericht kann nicht zurückgezogen werden",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "zurueckziehen",
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Abgelehnt"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "uebergang_unzulaessig"
+    }
+  },
+  {
+    "id": "AK-507-03",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Bei einem freigegebenen Bericht hat der Azubi keine Aktion (Schaltfläche fehlt)",
+    "schnittstelle": "moeglicheAktionen",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Freigegeben"
+      }
+    },
+    "erwartet": {
+      "aktionen": []
+    }
+  },
+  {
+    "id": "AK-507-04",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Bei einem abgelehnten Bericht bietet sich nur „erneut einreichen“ an, kein Zurückziehen",
+    "schnittstelle": "moeglicheAktionen",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Abgelehnt"
+      }
+    },
+    "erwartet": {
+      "aktionen": ["erneut_einreichen"]
+    }
+  },
+  {
+    "id": "AK-507-05",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Bei einem eingereichten Bericht kann der Azubi zurückziehen",
+    "schnittstelle": "moeglicheAktionen",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      }
+    },
+    "erwartet": {
+      "aktionen": ["zurueckziehen"]
+    }
+  },
+  {
+    "id": "AK-507-06",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Zurückziehen eines freigegebenen Berichts wird abgewiesen; der Bestand bleibt",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            },
+            {
+              "als": "bernd",
+              "aktion": "freigeben"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "uebergang_unzulaessig"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-508-01",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Bernd hat den eingereichten Bericht offen, Anna zieht zurück: Bernds Freigabe und Ablehnung scheitern mit „Bericht wurde zurückgezogen“",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 0
+      },
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 0
+      },
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 0,
+        "kommentar": "Bitte genauer",
+        "tageskommentare": {
+          "Mo": "Was genau?"
+        }
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Entwurf"
+        },
+        {
+          "fehler": "bericht_zurueckgezogen"
+        },
+        {
+          "fehler": "bericht_zurueckgezogen"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-508-02",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Umgekehrt: Clara lehnt ab, Annas Zurückziehen auf dem alten Stand scheitert mit Meldung",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "clara",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 0,
+        "kommentar": "Bitte ergänzen"
+      },
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 0
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "fehler": "bereits_geprueft"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "clara",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 1,
+              "tag": null,
+              "person": "clara",
+              "text": "Bitte ergänzen"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-508-03",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Zwei Ausbilder auf demselben Stand: Der zweite erfährt, dass schon geprüft wurde",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 0
+      },
+      {
+        "als": "clara",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 0,
+        "kommentar": "Bitte genauer"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Freigegeben"
+        },
+        {
+          "fehler": "bereits_geprueft"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-508-04",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Zurückgezogen und erneut eingereicht: Bernds alte Ansicht ist veraltet, erst auf dem aktuellen Stand gelingt die Freigabe",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 0
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 1
+      },
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 0
+      },
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 3
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Entwurf"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "fehler": "inzwischen_geaendert"
+        },
+        {
+          "status": "Freigegeben"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-508-05",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Anna zieht auf demselben Stand zweimal zurück: Das zweite Mal scheitert mit Meldung",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 0
+      },
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "gesehen": 0
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Entwurf"
+        },
+        {
+          "fehler": "bereits_zurueckgezogen"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-508-06",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ausbilder prüft auf dem Stand „Eingereicht“, der Bericht ist inzwischen Entwurf: zurückgezogen",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "freigeben",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Entwurf"
+      },
+      "gesehen": {
+        "status": "Eingereicht",
+        "veraltet": true
+      },
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "bericht_zurueckgezogen"
+    }
+  },
+  {
+    "id": "AK-508-07",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ablehnen auf veraltetem Stand eines inzwischen zurückgezogenen Berichts: zurückgezogen",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "ablehnen",
+      "person": {
+        "schluessel": "clara",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Entwurf"
+      },
+      "gesehen": {
+        "status": "Eingereicht",
+        "veraltet": true
+      },
+      "text": "Bitte genauer"
+    },
+    "erwartet": {
+      "fehler": "bericht_zurueckgezogen"
+    }
+  },
+  {
+    "id": "AK-508-08",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Azubi zieht auf dem Stand „Eingereicht“ zurück, der Bericht ist inzwischen freigegeben: bereits geprüft",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "zurueckziehen",
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Freigegeben"
+      },
+      "gesehen": {
+        "status": "Eingereicht",
+        "veraltet": true
+      },
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "bereits_geprueft"
+    }
+  },
+  {
+    "id": "AK-508-09",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Gleicher Status, aber veralteter Stand (zurückgezogen und erneut eingereicht): inzwischen geändert",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "freigeben",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      },
+      "gesehen": {
+        "status": "Eingereicht",
+        "veraltet": true
+      },
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "inzwischen_geaendert"
+    }
+  },
+  {
+    "id": "AK-508-10",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Auf dem aktuellen Stand gelingt die Freigabe",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "freigeben",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      },
+      "gesehen": {
+        "status": "Eingereicht",
+        "veraltet": false
+      },
+      "text": null
+    },
+    "erwartet": {
+      "von": "Eingereicht",
+      "nach": "Freigegeben",
+      "text": null
+    }
+  },
+  {
+    "id": "AK-508-11",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Rücknahme auf dem Stand „Freigegeben“, die Freigabe ist inzwischen zurückgenommen: bereits zurückgenommen",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "freigabe_zuruecknehmen",
+      "person": {
+        "schluessel": "clara",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Abgelehnt"
+      },
+      "gesehen": {
+        "status": "Freigegeben",
+        "veraltet": true
+      },
+      "text": "x"
+    },
+    "erwartet": {
+      "fehler": "bereits_zurueckgenommen"
+    }
+  },
+  {
+    "id": "AK-601-01",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Prüfliste: eingereichte Berichte mit Azubi, Woche und Einreichungsdatum, älteste zuerst; standardmäßig eigene Azubis, per Filter alle",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "personen": [
+        {
+          "schluessel": "otto",
+          "name": "Otto Azubi",
+          "rolle": "azubi",
+          "ausbilder": "clara",
+          "ausbildungsbeginn": "2026-09-01"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W39",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            },
+            {
+              "als": "bernd",
+              "aktion": "freigeben"
+            }
+          ]
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W38",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        },
+        {
+          "azubi": "otto",
+          "woche": "2026-W39",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W41",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T08:15:00+02:00"
+      },
+      {
+        "als": "otto",
+        "aktion": "einreichen",
+        "azubi": "otto",
+        "woche": "2026-W39",
+        "uhr": "2026-10-06T09:30:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W41",
+        "uhr": "2026-10-06T11:00:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "pruefliste_lesen",
+        "filter": "eigene"
+      },
+      {
+        "als": "bernd",
+        "aktion": "pruefliste_lesen",
+        "filter": "alle"
+      },
+      {
+        "als": "clara",
+        "aktion": "pruefliste_lesen",
+        "filter": "eigene"
+      },
+      {
+        "als": "anna",
+        "aktion": "pruefliste_lesen",
+        "filter": "alle"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "berichte": [
+            {
+              "azubi": "anna",
+              "woche": "2026-W40",
+              "eingereicht": "2026-10-06T08:15:00+02:00",
+              "azubiAktiv": true
+            },
+            {
+              "azubi": "anna",
+              "woche": "2026-W41",
+              "eingereicht": "2026-10-06T11:00:00+02:00",
+              "azubiAktiv": true
+            }
+          ]
+        },
+        {
+          "berichte": [
+            {
+              "azubi": "anna",
+              "woche": "2026-W40",
+              "eingereicht": "2026-10-06T08:15:00+02:00",
+              "azubiAktiv": true
+            },
+            {
+              "azubi": "otto",
+              "woche": "2026-W39",
+              "eingereicht": "2026-10-06T09:30:00+02:00",
+              "azubiAktiv": true
+            },
+            {
+              "azubi": "anna",
+              "woche": "2026-W41",
+              "eingereicht": "2026-10-06T11:00:00+02:00",
+              "azubiAktiv": true
+            }
+          ]
+        },
+        {
+          "berichte": [
+            {
+              "azubi": "otto",
+              "woche": "2026-W39",
+              "eingereicht": "2026-10-06T09:30:00+02:00",
+              "azubiAktiv": true
+            }
+          ]
+        },
+        {
+          "berichte": []
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W39",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W38",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [],
+          "kommentare": []
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T08:15:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        },
+        {
+          "azubi": "otto",
+          "woche": "2026-W39",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "otto",
+              "zeitpunkt": "2026-10-06T09:30:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W41",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T11:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-601-02",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Nach Zurückziehen und erneutem Einreichen zählt das letzte Einreichungsdatum",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T12:00:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-07T07:45:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "pruefliste_lesen",
+        "filter": "eigene"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Entwurf"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "berichte": [
+            {
+              "azubi": "anna",
+              "woche": "2026-W40",
+              "eingereicht": "2026-10-07T07:45:00+02:00",
+              "azubiAktiv": true
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T12:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-07T07:45:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-602-01",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Vertretung: Clara (nicht zugeordnet) gibt Annas Bericht frei",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "clara",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Freigegeben"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "clara",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-602-02",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Vertretung: Clara (nicht zugeordnet) lehnt Annas Bericht ab",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "clara",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Bitte Mittwoch ergänzen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Abgelehnt"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "clara",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 1,
+              "tag": null,
+              "person": "clara",
+              "text": "Bitte Mittwoch ergänzen"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-602-03",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Bestätigte Auslegung: Berichte eines deaktivierten Azubis bleiben in der Prüfliste; freigeben ja, ablehnen und Freigabe zurücknehmen nein",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W39",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen",
+              "uhr": "2026-10-06T09:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen",
+              "uhr": "2026-10-06T09:30:00+02:00"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "person_deaktivieren",
+        "person": "anna",
+        "uhr": "2026-10-06T10:00:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "pruefliste_lesen",
+        "filter": "eigene"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Bitte genauer"
+      },
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W39"
+      },
+      {
+        "als": "clara",
+        "aktion": "freigabe_zuruecknehmen",
+        "azubi": "anna",
+        "woche": "2026-W39",
+        "begruendung": "Falsches Datum"
+      },
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "deaktiviert": true
+        },
+        {
+          "berichte": [
+            {
+              "azubi": "anna",
+              "woche": "2026-W39",
+              "eingereicht": "2026-10-06T09:00:00+02:00",
+              "azubiAktiv": false
+            },
+            {
+              "azubi": "anna",
+              "woche": "2026-W40",
+              "eingereicht": "2026-10-06T09:30:00+02:00",
+              "azubiAktiv": false
+            }
+          ]
+        },
+        {
+          "fehler": "azubi_deaktiviert"
+        },
+        {
+          "status": "Freigegeben"
+        },
+        {
+          "fehler": "azubi_deaktiviert"
+        },
+        {
+          "fehler": "zugriff_verweigert"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W39",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T09:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T09:30:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-602-04",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Deaktivierter Azubi: Freigeben geht",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "freigeben",
+      "person": {
+        "schluessel": "clara",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": false,
+        "status": "Eingereicht"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "von": "Eingereicht",
+      "nach": "Freigegeben",
+      "text": null
+    }
+  },
+  {
+    "id": "AK-602-05",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Deaktivierter Azubi: Ablehnen geht nicht",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "ablehnen",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": false,
+        "status": "Eingereicht"
+      },
+      "gesehen": null,
+      "text": "Bitte genauer"
+    },
+    "erwartet": {
+      "fehler": "azubi_deaktiviert"
+    }
+  },
+  {
+    "id": "AK-602-06",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Deaktivierter Azubi: Freigabe zurücknehmen geht nicht",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "freigabe_zuruecknehmen",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": false,
+        "status": "Freigegeben"
+      },
+      "gesehen": null,
+      "text": "Falsches Datum"
+    },
+    "erwartet": {
+      "fehler": "azubi_deaktiviert"
+    }
+  },
+  {
+    "id": "AK-602-07",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein deaktivierter Ausbilder prüft nicht mehr",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "freigeben",
+      "person": {
+        "schluessel": "clara",
+        "rolle": "ausbilder",
+        "aktiv": false
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "zugriff_verweigert"
+    }
+  },
+  {
+    "id": "AK-603-01",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Bei der Freigabe werden Status, Ausbilder sowie Datum und Uhrzeit gespeichert",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-07T14:35:00+02:00"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Freigegeben"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-07T14:35:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-603-02",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Datum und Uhrzeit in Berliner Ortszeit, auch nach dem Ende der Sommerzeit",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-26T08:05:00+01:00"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Freigegeben"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-26T08:05:00+01:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-604-01",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ablehnen ohne Gesamtkommentar geht nicht",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "ablehnen",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "kommentar_fehlt"
+    }
+  },
+  {
+    "id": "AK-604-02",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Gesamtkommentar nur aus Leerzeichen, Tabulator und Zeilenumbruch gilt als leer",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "ablehnen",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      },
+      "gesehen": null,
+      "text": "  \n\t "
+    },
+    "erwartet": {
+      "fehler": "kommentar_fehlt"
+    }
+  },
+  {
+    "id": "AK-604-03",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ablehnen mit Gesamtkommentar; Zeilenumbrüche werden einheitlich gespeichert",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "ablehnen",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      },
+      "gesehen": null,
+      "text": "Zeile 1\r\nZeile 2\rZeile 3"
+    },
+    "erwartet": {
+      "von": "Eingereicht",
+      "nach": "Abgelehnt",
+      "text": "Zeile 1\nZeile 2\nZeile 3"
+    }
+  },
+  {
+    "id": "AK-604-04",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Gesamtkommentar mit genau 5.000 Zeichen (ein Emoji zählt als eins) ist erlaubt",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "ablehnen",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      },
+      "gesehen": null,
+      "text": "ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ😀"
+    },
+    "erwartet": {
+      "von": "Eingereicht",
+      "nach": "Abgelehnt",
+      "text": "ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ😀"
+    }
+  },
+  {
+    "id": "AK-604-05",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein Gesamtkommentar mit 5.001 Zeichen wird am Feld abgewiesen",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "ablehnen",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      },
+      "gesehen": null,
+      "text": "ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ😀x"
+    },
+    "erwartet": {
+      "fehler": "text_zu_lang",
+      "feld": "kommentar"
+    }
+  },
+  {
+    "id": "AK-604-06",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Eine Begründung der Rücknahme mit 5.001 Zeichen wird am Feld abgewiesen",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "freigabe_zuruecknehmen",
+      "person": {
+        "schluessel": "clara",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Freigegeben"
+      },
+      "gesehen": null,
+      "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "erwartet": {
+      "fehler": "text_zu_lang",
+      "feld": "begruendung"
+    }
+  },
+  {
+    "id": "AK-604-07",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Tageskommentare allein genügen nicht: ohne Gesamtkommentar wird nichts gespeichert",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": " ",
+        "tageskommentare": {
+          "Mo": "Montag fehlt etwas"
+        }
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "kommentar_fehlt"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-604-08",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Ein Tageskommentar mit 5.001 Zeichen wird am Tag abgewiesen; nichts wird gespeichert",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Bitte kürzen",
+        "tageskommentare": {
+          "Di": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+          "Mi": "kurz"
+        }
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "text_zu_lang",
+          "feld": "tageskommentar",
+          "tage": ["Di"]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-605-01",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Ablehnung mit Gesamtkommentar und optionalen Tageskommentaren; leere Tageskommentare entfallen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Bitte genauer beschreiben.",
+        "tageskommentare": {
+          "Fr": "Welche Themen?",
+          "Mo": "Welches Netzwerk?",
+          "Mi": "  "
+        }
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Abgelehnt"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 1,
+              "tag": null,
+              "person": "bernd",
+              "text": "Bitte genauer beschreiben."
+            },
+            {
+              "runde": 1,
+              "tag": "Mo",
+              "person": "bernd",
+              "text": "Welches Netzwerk?"
+            },
+            {
+              "runde": 1,
+              "tag": "Fr",
+              "person": "bernd",
+              "text": "Welche Themen?"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-605-02",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Ein Tageskommentar ist auch an einem Tag außerhalb der Ausbildung möglich (KW 36, Montag 31.08.)",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W36",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W36",
+        "kommentar": "Bitte prüfen",
+        "tageskommentare": {
+          "Mo": "Vor Ausbildungsbeginn"
+        }
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Abgelehnt"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W36",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": null,
+              "text": ""
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 1,
+              "tag": null,
+              "person": "bernd",
+              "text": "Bitte prüfen"
+            },
+            {
+              "runde": 1,
+              "tag": "Mo",
+              "person": "bernd",
+              "text": "Vor Ausbildungsbeginn"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-605-03",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Beim Freigeben werden eingetippte Kommentare nicht gespeichert",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Gut gemacht",
+        "tageskommentare": {
+          "Mo": "Prima"
+        }
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Freigegeben"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-606-01",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Nach der Ablehnung sieht der Azubi den Gesamtkommentar und jeden Tageskommentar beim Tag",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Bitte genauer.",
+        "tageskommentare": {
+          "Mo": "Welches Netzwerk?",
+          "Do": "Und Do?"
+        }
+      },
+      {
+        "aktion": "rueckmeldung_lesen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "rueckmeldung": {
+            "art": "ablehnung",
+            "text": "Bitte genauer.",
+            "tage": [
+              {
+                "tag": "Mo",
+                "texte": ["Welches Netzwerk?"]
+              },
+              {
+                "tag": "Do",
+                "texte": ["Und Do?"]
+              }
+            ]
+          }
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 1,
+              "tag": null,
+              "person": "bernd",
+              "text": "Bitte genauer."
+            },
+            {
+              "runde": 1,
+              "tag": "Mo",
+              "person": "bernd",
+              "text": "Welches Netzwerk?"
+            },
+            {
+              "runde": 1,
+              "tag": "Do",
+              "person": "bernd",
+              "text": "Und Do?"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-606-02",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Nach einer Rücknahme sieht der Azubi oben die Begründung",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            },
+            {
+              "als": "bernd",
+              "aktion": "freigeben"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "clara",
+        "aktion": "freigabe_zuruecknehmen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "begruendung": "Mittwoch falsches Datum"
+      },
+      {
+        "aktion": "rueckmeldung_lesen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "rueckmeldung": {
+            "art": "ruecknahme",
+            "text": "Mittwoch falsches Datum",
+            "tage": []
+          }
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Freigegeben",
+              "nach": "Abgelehnt",
+              "person": "clara",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": "Mittwoch falsches Datum"
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-606-03",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Nach dem erneuten Einreichen stehen die Kommentare nur noch in der Historie; die nächste Ablehnung zeigt nur ihre eigenen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            },
+            {
+              "als": "bernd",
+              "aktion": "ablehnen",
+              "kommentar": "Bitte genauer",
+              "tageskommentare": {
+                "Mo": "Montag?"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "erneut_einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "aktion": "rueckmeldung_lesen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Noch nicht",
+        "tageskommentare": {
+          "Di": "Dienstag fehlt"
+        }
+      },
+      {
+        "aktion": "rueckmeldung_lesen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "rueckmeldung": null
+        },
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "rueckmeldung": {
+            "art": "ablehnung",
+            "text": "Noch nicht",
+            "tage": [
+              {
+                "tag": "Di",
+                "texte": ["Dienstag fehlt"]
+              }
+            ]
+          }
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Abgelehnt",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 1,
+              "tag": null,
+              "person": "bernd",
+              "text": "Bitte genauer"
+            },
+            {
+              "runde": 1,
+              "tag": "Mo",
+              "person": "bernd",
+              "text": "Montag?"
+            },
+            {
+              "runde": 2,
+              "tag": null,
+              "person": "bernd",
+              "text": "Noch nicht"
+            },
+            {
+              "runde": 2,
+              "tag": "Di",
+              "person": "bernd",
+              "text": "Dienstag fehlt"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-607-01",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Einen Entwurf kann der Ausbilder nicht freigeben",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "freigeben",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Entwurf"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "uebergang_unzulaessig"
+    }
+  },
+  {
+    "id": "AK-607-02",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Einen Entwurf kann der Ausbilder nicht ablehnen, auch mit Kommentar nicht",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "ablehnen",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Entwurf"
+      },
+      "gesehen": null,
+      "text": "Bitte genauer"
+    },
+    "erwartet": {
+      "fehler": "uebergang_unzulaessig"
+    }
+  },
+  {
+    "id": "AK-607-03",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Bei einem Entwurf hat der Ausbilder keine Aktion",
+    "schnittstelle": "moeglicheAktionen",
+    "eingabe": {
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Entwurf"
+      }
+    },
+    "erwartet": {
+      "aktionen": []
+    }
+  },
+  {
+    "id": "AK-607-04",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Bei einem eingereichten Bericht kann der Ausbilder freigeben oder ablehnen",
+    "schnittstelle": "moeglicheAktionen",
+    "eingabe": {
+      "person": {
+        "schluessel": "clara",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      }
+    },
+    "erwartet": {
+      "aktionen": ["freigeben", "ablehnen"]
+    }
+  },
+  {
+    "id": "AK-607-05",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Freigeben und Ablehnen eines Entwurfs werden abgewiesen; es entsteht kein Eintrag",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "clara",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Bitte genauer"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "uebergang_unzulaessig"
+        },
+        {
+          "fehler": "uebergang_unzulaessig"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-701-01",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Ein abgelehnter Bericht ist bearbeitbar und erneut einreichbar; danach „Eingereicht“ und wieder in der Prüfliste",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            },
+            {
+              "als": "bernd",
+              "aktion": "ablehnen",
+              "kommentar": "Bitte genauer"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "tage_speichern",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "tage": {
+          "Mi": {
+            "tagesart": "Betrieb",
+            "text": "VLANs eingerichtet"
+          }
+        }
+      },
+      {
+        "als": "bernd",
+        "aktion": "pruefliste_lesen",
+        "filter": "eigene"
+      },
+      {
+        "als": "anna",
+        "aktion": "erneut_einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-07T09:00:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "pruefliste_lesen",
+        "filter": "eigene"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "gespeichert": true
+        },
+        {
+          "berichte": []
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "berichte": [
+            {
+              "azubi": "anna",
+              "woche": "2026-W40",
+              "eingereicht": "2026-10-07T09:00:00+02:00",
+              "azubiAktiv": true
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "VLANs eingerichtet"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Abgelehnt",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-07T09:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 1,
+              "tag": null,
+              "person": "bernd",
+              "text": "Bitte genauer"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-701-02",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein abgelehnter Bericht ist für den eigenen Azubi bearbeitbar",
+    "schnittstelle": "darfBearbeiten",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Abgelehnt"
+      }
+    },
+    "erwartet": {
+      "bearbeitbar": true
+    }
+  },
+  {
+    "id": "AK-701-03",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ein fremder Azubi bearbeitet den abgelehnten Bericht nicht",
+    "schnittstelle": "darfBearbeiten",
+    "eingabe": {
+      "person": {
+        "schluessel": "otto",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Abgelehnt"
+      }
+    },
+    "erwartet": {
+      "bearbeitbar": false
+    }
+  },
+  {
+    "id": "AK-702-01",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Dreimal ablehnen, dann freigeben: vier Prüfrunden, jede Ablehnung mit ihrem Kommentar",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Runde 1: bitte genauer"
+      },
+      {
+        "als": "anna",
+        "aktion": "erneut_einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Runde 2: bitte genauer"
+      },
+      {
+        "als": "anna",
+        "aktion": "erneut_einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Runde 3: bitte genauer"
+      },
+      {
+        "als": "anna",
+        "aktion": "erneut_einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "status": "Freigegeben"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Abgelehnt",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            },
+            {
+              "von": "Abgelehnt",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 3,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Abgelehnt",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 3,
+              "begruendung": null
+            },
+            {
+              "von": "Abgelehnt",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 4,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 4,
+              "begruendung": null
+            }
+          ],
+          "kommentare": [
+            {
+              "runde": 1,
+              "tag": null,
+              "person": "bernd",
+              "text": "Runde 1: bitte genauer"
+            },
+            {
+              "runde": 2,
+              "tag": null,
+              "person": "bernd",
+              "text": "Runde 2: bitte genauer"
+            },
+            {
+              "runde": 3,
+              "tag": null,
+              "person": "bernd",
+              "text": "Runde 3: bitte genauer"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-702-02",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Die erste Einreichung beginnt Runde 1",
+    "schnittstelle": "pruefrunde",
+    "eingabe": {
+      "aktion": "einreichen",
+      "einreichungen": 0
+    },
+    "erwartet": {
+      "runde": 1
+    }
+  },
+  {
+    "id": "AK-702-03",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Nach drei Einreichungen beginnt das erneute Einreichen Runde 4",
+    "schnittstelle": "pruefrunde",
+    "eingabe": {
+      "aktion": "erneut_einreichen",
+      "einreichungen": 3
+    },
+    "erwartet": {
+      "runde": 4
+    }
+  },
+  {
+    "id": "AK-702-04",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Ablehnen gehört zur laufenden Runde",
+    "schnittstelle": "pruefrunde",
+    "eingabe": {
+      "aktion": "ablehnen",
+      "einreichungen": 3
+    },
+    "erwartet": {
+      "runde": 3
+    }
+  },
+  {
+    "id": "AK-702-05",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Die Rücknahme gehört zur Runde der Freigabe",
+    "schnittstelle": "pruefrunde",
+    "eingabe": {
+      "aktion": "freigabe_zuruecknehmen",
+      "einreichungen": 2
+    },
+    "erwartet": {
+      "runde": 2
+    }
+  },
+  {
+    "id": "AK-702-06",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Zurückziehen gehört zur laufenden Runde; das erneute Einreichen danach öffnet die nächste",
+    "schnittstelle": "pruefrunde",
+    "eingabe": {
+      "aktion": "zurueckziehen",
+      "einreichungen": 1
+    },
+    "erwartet": {
+      "runde": 1
+    }
+  },
+  {
+    "id": "AK-703-01",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Rücknahme ohne Begründung geht nicht",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "freigabe_zuruecknehmen",
+      "person": {
+        "schluessel": "clara",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Freigegeben"
+      },
+      "gesehen": null,
+      "text": "  "
+    },
+    "erwartet": {
+      "fehler": "begruendung_fehlt"
+    }
+  },
+  {
+    "id": "AK-703-02",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Rücknahme mit Begründung führt nach „Abgelehnt“",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "freigabe_zuruecknehmen",
+      "person": {
+        "schluessel": "clara",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Freigegeben"
+      },
+      "gesehen": null,
+      "text": "Mittwoch falsches Datum"
+    },
+    "erwartet": {
+      "von": "Freigegeben",
+      "nach": "Abgelehnt",
+      "text": "Mittwoch falsches Datum"
+    }
+  },
+  {
+    "id": "AK-703-03",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Der Azubi kann die Freigabe nicht zurücknehmen",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "freigabe_zuruecknehmen",
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Freigegeben"
+      },
+      "gesehen": null,
+      "text": "x"
+    },
+    "erwartet": {
+      "fehler": "zugriff_verweigert"
+    }
+  },
+  {
+    "id": "AK-703-04",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Zurücknehmen geht nur bei einem freigegebenen Bericht",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "freigabe_zuruecknehmen",
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Eingereicht"
+      },
+      "gesehen": null,
+      "text": "x"
+    },
+    "erwartet": {
+      "fehler": "uebergang_unzulaessig"
+    }
+  },
+  {
+    "id": "AK-703-05",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Beispielszenario: Vertretung Clara nimmt Bernds Freigabe mit Begründung zurück; danach „Abgelehnt“ und für Anna bearbeitbar",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            },
+            {
+              "als": "bernd",
+              "aktion": "freigeben"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "clara",
+        "aktion": "freigabe_zuruecknehmen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "begruendung": "  ",
+        "gesehen": 0
+      },
+      {
+        "als": "clara",
+        "aktion": "freigabe_zuruecknehmen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "begruendung": "Mittwoch falsches Datum",
+        "gesehen": 0,
+        "uhr": "2026-10-07T10:30:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "tage_speichern",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "tage": {
+          "Mi": {
+            "tagesart": "Betrieb",
+            "text": "Datum korrigiert"
+          }
+        }
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "begruendung_fehlt"
+        },
+        {
+          "status": "Abgelehnt"
+        },
+        {
+          "gespeichert": true
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Abgelehnt",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Datum korrigiert"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Freigegeben",
+              "nach": "Abgelehnt",
+              "person": "clara",
+              "zeitpunkt": "2026-10-07T10:30:00+02:00",
+              "runde": 1,
+              "begruendung": "Mittwoch falsches Datum"
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-704-01",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Bei einem freigegebenen Bericht hat der Ausbilder nur die Rücknahme",
+    "schnittstelle": "moeglicheAktionen",
+    "eingabe": {
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Freigegeben"
+      }
+    },
+    "erwartet": {
+      "aktionen": ["freigabe_zuruecknehmen"]
+    }
+  },
+  {
+    "id": "AK-704-02",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Einen freigegebenen Bericht reicht niemand erneut ein",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "erneut_einreichen",
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Freigegeben"
+      },
+      "gesehen": null,
+      "text": null
+    },
+    "erwartet": {
+      "fehler": "uebergang_unzulaessig"
+    }
+  },
+  {
+    "id": "AK-704-03",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Einen freigegebenen Bericht lehnt kein Ausbilder ab",
+    "schnittstelle": "uebergangPruefen",
+    "eingabe": {
+      "aktion": "ablehnen",
+      "person": {
+        "schluessel": "clara",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Freigegeben"
+      },
+      "gesehen": null,
+      "text": "Doch nicht"
+    },
+    "erwartet": {
+      "fehler": "uebergang_unzulaessig"
+    }
+  },
+  {
+    "id": "AK-704-04",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Einen freigegebenen Bericht bearbeitet der Azubi nicht",
+    "schnittstelle": "darfBearbeiten",
+    "eingabe": {
+      "person": {
+        "schluessel": "anna",
+        "rolle": "azubi",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Freigegeben"
+      }
+    },
+    "erwartet": {
+      "bearbeitbar": false
+    }
+  },
+  {
+    "id": "AK-704-05",
+    "modul": "M05",
+    "ebene": "fachlogik",
+    "beschreibung": "Inhalte bearbeitet kein Ausbilder, in keinem Status",
+    "schnittstelle": "darfBearbeiten",
+    "eingabe": {
+      "person": {
+        "schluessel": "bernd",
+        "rolle": "ausbilder",
+        "aktiv": true
+      },
+      "bericht": {
+        "azubi": "anna",
+        "azubiAktiv": true,
+        "status": "Abgelehnt"
+      }
+    },
+    "erwartet": {
+      "bearbeitbar": false
+    }
+  },
+  {
+    "id": "AK-704-06",
+    "modul": "M05",
+    "ebene": "daten",
+    "beschreibung": "Den freigegebenen Bericht ändert niemand: weder Azubi noch Ausbilder speichern, prüfen oder ziehen zurück",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            },
+            {
+              "als": "bernd",
+              "aktion": "freigeben"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "tage_speichern",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "tage": {
+          "Mo": {
+            "tagesart": "Urlaub",
+            "text": ""
+          }
+        }
+      },
+      {
+        "als": "bernd",
+        "aktion": "tage_speichern",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "tage": {
+          "Mo": {
+            "tagesart": "Urlaub",
+            "text": ""
+          }
+        }
+      },
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "clara",
+        "aktion": "ablehnen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "kommentar": "Doch nicht"
+      },
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "nicht_bearbeitbar"
+        },
+        {
+          "fehler": "nicht_bearbeitbar"
+        },
+        {
+          "fehler": "uebergang_unzulaessig"
+        },
+        {
+          "fehler": "uebergang_unzulaessig"
+        },
+        {
+          "fehler": "uebergang_unzulaessig"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  }
+]
