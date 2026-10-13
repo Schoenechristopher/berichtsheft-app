@@ -1,3 +1,3 @@
 # Schalter für das automatische Mergen (docs/07-spec-automatisches-mergen.md, AM-R12).
 # Geschützter Pfad: Nur Chris stellt auf `aktiv: true`, nach dem Schattenbetrieb (AM-R14).
-aktiv: false
+aktiv: true
