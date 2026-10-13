@@ -141,6 +141,14 @@ async function until(condition: () => boolean, ms: number) {
   }
 }
 
+/** Kennung des geladenen Dokuments (`performance.timeOrigin`); ein Neuladen ändert sie. `null` während eines Wechsels. */
+async function documentOrigin(page: Page): Promise<number | null> {
+  if (page.isClosed() || !page.url().startsWith("http")) {
+    return null;
+  }
+  return page.evaluate(() => performance.timeOrigin).catch(() => null);
+}
+
 /** Stellt Uhr und Bestand der laufenden App über die Testschnittstelle. */
 export async function setAppState(baseURL: string, body: { uhr: string | null; bestand?: "testdaten" }) {
   const response = await fetch(new URL("/api/test/zustand", baseURL), {
@@ -312,7 +320,9 @@ export class FlowAdapter {
         return this.leave(person, step, where, (page) => page.locator(`a[href="${path}"]:visible`).first().click());
       }
       case "neu_laden":
-        return this.leave(person, step, where, (page) => page.evaluate(() => window.location.reload()));
+        // Neuladen durch den Browser (wie F5), nicht per Seitenskript: Firefox setzt eine per Skript gestartete
+        // Navigation nach dem bestätigten Dialog nicht fort.
+        return this.leave(person, step, where, (page) => page.reload({ timeout: LOAD_MS }));
       case "zurueck":
         return this.leave(person, step, where, (page) => page.evaluate(() => window.history.back()));
       case "vor":
@@ -341,6 +351,7 @@ export class FlowAdapter {
         )
       : null;
     const before = page.url();
+    const origin = await documentOrigin(page);
     person.answer = answer;
     person.dialogs = [];
     let loads = 0;
@@ -354,7 +365,19 @@ export class FlowAdapter {
     // „Zurück“ verlässt zuerst den Schutzeintrag; die Rückfrage kommt danach.
     await sleep(300);
     if (person.dialogs.length > 0 && answer === "bestaetigen") {
-      await until(moved, LOAD_MS);
+      // Bestätigt: Die Seite muss verlassen werden – neue Adresse, geschlossen oder ein neues Dokument (Neuladen).
+      const left = async () =>
+        moved() && (page.isClosed() || page.url() !== before || (await documentOrigin(page)) !== origin);
+      const end = Date.now() + LOAD_MS;
+      while (!(await left()) && Date.now() < end) {
+        await sleep(100);
+      }
+      if (!(await left())) {
+        page.off("load", onLoad);
+        throw new Error(
+          `${where}: bestätigt, aber nicht neu geladen bzw. verlassen (Adresse ${page.url()}, Dokument ${origin}).`,
+        );
+      }
     }
     page.off("load", onLoad);
     if (!page.isClosed()) {
@@ -468,20 +491,6 @@ export class FlowAdapter {
         })),
       };
     });
-    if (raw.ungespeichert) {
-      // Diagnose ohne Einfluss auf das Ergebnis: Welche Felder weichen ab, und ist es ein frisch geladenes Dokument?
-      // Nur Testdaten; erscheint im Testprotokoll, wenn die Seite ungespeicherte Änderungen meldet.
-      const detail = await page.evaluate(() => ({
-        timeOrigin: performance.timeOrigin,
-        readyState: document.readyState,
-        felder: [...document.querySelectorAll("fieldset[data-datum]")].map((day) => ({
-          datum: day.getAttribute("data-datum"),
-          tagesart: day.querySelector<HTMLSelectElement>("select[data-feld=tagesart]")?.value ?? null,
-          text: day.querySelector<HTMLTextAreaElement>("textarea[data-feld=taetigkeiten]")?.value ?? null,
-        })),
-      }));
-      console.log(`[ablauf-adapter] Seite meldet ungespeicherte Änderungen: ${JSON.stringify(detail)}`);
-    }
     const status = (value: string | null) => (value === null ? null : (statusName(value as ReportStatus) ?? value));
     return {
       woche: raw.woche,

@@ -171,15 +171,8 @@ export function ReportEditor({
   const issues = showIssues ? currentIssues() : [];
   const issueOf = new Map(issues.map((issue) => [issue.dayId, issue.problem]));
 
-  // Bis die Seite interaktiv ist, sind die Felder gesperrt; eine Änderung davor kommt nicht von der Person, sondern
-  // vom Browser (Firefox stellt nach dem Neuladen verworfene Eingaben wieder her, React spielt sie beim Hydrieren als
-  // Änderung nach). Sie wird ignoriert: Nach dem Laden gilt der gespeicherte Stand (AK-408).
-  const update = (id: string, field: "dayType" | "activities", value: string) => {
-    if (!hydrated) {
-      return;
-    }
+  const update = (id: string, field: "dayType" | "activities", value: string) =>
     setValues((current) => ({ ...current, [id]: { ...current[id], [field]: value } }));
-  };
 
   return (
     <form
@@ -187,9 +180,6 @@ export function ReportEditor({
       action={formAction}
       noValidate
       aria-label="Bericht erfassen"
-      // Nach dem Neuladen gilt der gespeicherte Stand (AK-408): Firefox stellt sonst die verworfenen Eingaben wieder
-      // her, und die Seite meldet sie als ungespeicherte Änderungen.
-      autoComplete="off"
       data-ungespeichert={dirty ? "true" : "false"}
       data-warnung-verlassen={dirty ? LEAVE_WARNING_CODE : undefined}
       data-ausstehend={pending ? "true" : undefined}
@@ -320,7 +310,6 @@ export function ReportEditor({
                   data-feld="taetigkeiten"
                   rows={4}
                   readOnly={!hydrated}
-                  autoComplete="off"
                   value={value.activities}
                   onChange={(event) => update(day.id, "activities", event.target.value)}
                   aria-invalid={textError && !day.outsideTraining ? true : undefined}
