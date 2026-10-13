@@ -165,6 +165,108 @@ verschiedene `uhr`.
 
 (`"…"` steht hier abgekürzt für die vollständigen Listen; ein echter Fall nennt sie ganz.)
 
+## Aufbau eines Ablauf-Falls
+
+Ein Fall der Ebene `ablauf` prüft, was Personen in der laufenden App im Browser erleben: Er stellt einen
+Ausgangsbestand her, lässt Personen fachliche Aktionen ausführen und vergleicht je Schritt, was die Oberfläche zeigt.
+Er nennt keine Adresse, keinen Knopftext und keine Meldung; der Adapter der Plattform übersetzt die Aktionen in Klicks
+und liest das Ergebnis über feste Merker der Oberfläche (Codes, Status, Woche), nicht über Meldungstexte.
+
+**Ausgangsbestand** (vor jedem Fall neu hergestellt; kein Fall hängt von einem anderen ab):
+
+1. Die Uhr der laufenden App steht auf `uhr` (Pflicht), in Seiten und Aktionen gleichermaßen.
+2. Die Datenhaltung ist leer. Geladen werden die Testdaten aus `testdaten.json` (alle Personen mit
+   `"angelegt": true` und das Bundesland); für jeden Azubi entstehen die Berichte wie in M03 bis „jetzt“.
+3. `ausgangsbestand` (optional) wie bei Daten-Fällen (`personen`, `berichte`), siehe „Aufbau eines Daten-Falls“.
+4. Niemand ist angemeldet. Jede Person (`als`) hat einen eigenen Browser mit eigener Sitzung, der sich bei ihrem
+   ersten Schritt öffnet.
+
+Nach dem Fall stellt der Runner die Uhr zurück. Werkzeuge, mit denen der Runner Uhr und Bestand stellt (bei TypeScript
+die Testschnittstelle und der Test-Login), gibt es im Produktionsbetrieb nicht.
+
+**Seiten** werden neutral benannt, nie über ihre Adresse:
+
+| Seite | Inhalt |
+| --- | --- |
+| `anmelden` | Anmeldeseite |
+| `kein_zugang` | Hinweis „Kein Zugang“ (AK-102) |
+| `start` | Startseite der eigenen Rolle |
+| `wochen` | „Meine Wochen“ eines Azubis |
+| `bericht` | ein Wochenbericht; benannt mit `azubi` und `woche` |
+| `pruefliste` | Prüfliste der Ausbilder |
+
+**Schritte:** `schritte` ist eine nicht leere Liste `{ "als": <Schlüssel>, "aktion": <Aktion>, … }`, ausgeführt in
+dieser Reihenfolge. `uhr` (optional) stellt die Uhr vor dem Schritt; sie bleibt danach auf diesem Zeitpunkt. Ein Feld,
+das die Aktion nicht kennt, ein fehlendes Pflichtfeld, eine unbekannte Aktion und ein Bericht, den es nicht gibt,
+machen den Fall fehlerhaft.
+
+**Aktionen der Ablauf-Fälle** (Felder außer `aktion`; `?` = optional):
+
+| Aktion | Felder | Ergebnis | Bedeutung |
+| --- | --- | --- | --- |
+| `anmelden` | `als` | Seiten-Ergebnis | Die Person meldet sich an, wie sie es in der App kann, bis eine Seite erscheint. |
+| `abmelden` | `als`, `dialog?` | Seiten-Ergebnis | über „Abmelden“ der App |
+| `seite_aufrufen` | `als`, `seite`, bei `bericht` dazu `azubi`, `woche`; `dialog?` | Seiten-Ergebnis | direkt über die Adresse, wie eingetippt |
+| `seite_verlassen` | `als`, `weg`: `link` \| `neu_laden` \| `zurueck` \| `vor` \| `schliessen`; bei `link` dazu `ziel` (Seite, bei `bericht` mit `azubi`, `woche`); `dialog?` | Seiten-Ergebnis | über einen Link der App, Neuladen, Zurück oder Vor im Browser oder Schließen des Browserfensters |
+| `seite_lesen` | `als` | Seiteninhalt (unten) | liest die gerade angezeigte Seite, ohne etwas zu ändern |
+| `tag_erfassen` | `als`, `woche`, `tag`, `tagesart?` (eine der fünf oder `""` = leeren), `text?` | `{ "erfasst": true }` | Eingabe auf der geöffneten Berichtsseite dieser Woche, ohne zu speichern. Ist sie nicht geöffnet, ist der Fall fehlerhaft. |
+| `speichern` | `als` | `{ "gespeichert": true }` | „Speichern“ auf der geöffneten Berichtsseite |
+| `einreichen` | `als` | `{ "status": <Status> }`; Fehler `pflichtangaben_fehlen` mit `"tage"` wie bei `einreichenPruefen` (M05) | „Einreichen“ auf der geöffneten Berichtsseite, Rückfrage bestätigt; ungespeicherte Eingaben werden mitgespeichert |
+
+**Seiten-Ergebnis:** `{ "warnung": <Code> | null, "seite": <Seite> | null, "angemeldet": <Schlüssel> | null }`.
+
+- `warnung`: Die App hat vor dem Verlassen gewarnt (Rückfrage der App oder Dialog des Browsers), mit dem Code der
+  Warnung; `null` = ohne Warnung. `dialog` sagt, wie die Person antwortet: `abbrechen` (Voreinstellung, sie bleibt)
+  oder `bestaetigen` (sie verlässt die Seite).
+- `seite`: die Seite danach; `null`, wenn das Browserfenster geschlossen ist.
+- `angemeldet`: die Person, als die die Seite angemeldet zeigt, sonst `null`.
+
+**Seiteninhalt** (`seite_lesen`): immer `{ "seite", "angemeldet", "passwortfeld": <Wahrheitswert> }`
+(`passwortfeld`: Die Seite enthält ein Eingabefeld für ein Passwort), dazu je Seite:
+
+| Seite | weitere Felder |
+| --- | --- |
+| `anmelden` | `anmeldewege`: Liste der angebotenen Anmeldewege, z. B. `["firmenkonto"]`. Werkzeuge des Runners (Test-Login) zählen nicht. |
+| `start` eines Azubis | `aktuelle_woche`: Woche der großen Karte „Diese Woche“ oder `null` |
+| `bericht` | `woche`; `status`; `ungespeichert` (Wahrheitswert); `tage`: `[{ "tag": <Wochentag>, "felder": [<Feld>, …] } × 5]` mit allen Eingabefeldern des Tages, oder `null`, wenn die Seite keine Eingabe anbietet; `weitere_felder`: Eingabefelder des Berichts außerhalb der Tage; `historie`: `[{ "von": <Status> \| null, "nach": <Status>, "person": <Schlüssel>, "zeitpunkt": <Zeitpunkt> }]`, ältester zuerst |
+
+Felder heißen `tagesart` und `taetigkeiten`; ein Eingabefeld, das keines davon ist, liefert der Adapter als
+`ohne_merker` (so scheitert ein Fall, wenn ein weiteres Feld dazukommt, AK-403).
+
+**Codes der Ablauf-Fälle:**
+
+| Code | Bedeutung | AK |
+| --- | --- | --- |
+| `ungespeicherte_aenderungen` | Warnung beim Verlassen einer Seite mit ungespeicherten Änderungen | AK-408 |
+
+**Erwartet:** `{ "ergebnisse": [ … ] }`, je Schritt das Ergebnis in derselben Reihenfolge. Weitere Aktionen und
+Seiteninhalte kommen mit den Ablauf-Fällen der Module dazu (Welle 2 von G3); jede neue Aktion steht in dieser Tabelle.
+
+**Beispiel** (AK-408: Neuladen mit ungespeicherten Änderungen):
+
+```json
+{
+  "id": "AK-408-03",
+  "modul": "M04",
+  "ebene": "ablauf",
+  "uhr": "2026-09-16T09:00:00+02:00",
+  "schritte": [
+    { "als": "anna", "aktion": "anmelden" },
+    { "als": "anna", "aktion": "seite_aufrufen", "seite": "bericht", "azubi": "anna", "woche": "2026-W38" },
+    { "als": "anna", "aktion": "tag_erfassen", "woche": "2026-W38", "tag": "Mo", "text": "Netzwerk geplant" },
+    { "als": "anna", "aktion": "seite_verlassen", "weg": "neu_laden", "dialog": "abbrechen" }
+  ],
+  "erwartet": {
+    "ergebnisse": [
+      { "warnung": null, "seite": "start", "angemeldet": "anna" },
+      { "warnung": null, "seite": "bericht", "angemeldet": "anna" },
+      { "erfasst": true },
+      { "warnung": "ungespeicherte_aenderungen", "seite": "bericht", "angemeldet": "anna" }
+    ]
+  }
+}
+```
+
 ## Schnittstellen von M01 (Fachlogik)
 
 Die Signaturen stehen in `specs/M01-kalender-und-zeit.md`, Abschnitt 6.
@@ -576,7 +678,8 @@ desselben Ausbilders gibt seinen Schritten verschiedene `uhr` oder liest je Empf
 
 - **Status:** `Entwurf`, `Eingereicht`, `Freigegeben`, `Abgelehnt` (Statusmodell in `docs/01`).
 - **Aktionen:** die Statuswechsel und die Aktionen der Daten-Fälle in den Abschnitten „Schnittstellen und Aktionen von
-  …“ der Module (seit G2). Aktionen der Ablauf-Fälle kommen in G3 dazu.
+  …“ der Module (seit G2).
+- **Aktionen der Ablauf-Fälle:** in „Aufbau eines Ablauf-Falls“ (seit G3).
 
 ## Regeln für Adapter
 

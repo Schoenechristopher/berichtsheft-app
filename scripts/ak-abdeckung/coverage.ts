@@ -268,10 +268,11 @@ export function moduleOfSpecFile(fileName: string): string | null {
 }
 
 /**
- * Ebenen der AK-Tabelle einer Fach-Spec (fünfte Spalte „Ebene“, `specs/vorlage-fach-spec.md`). `Ablauf, G3`
- * markiert eine AK, die sich nur im Ablauf (Browser) prüfen lässt; ihr Prüffall folgt in G3 (Entscheidung E1).
+ * Ebenen der AK-Tabelle einer Fach-Spec (fünfte Spalte „Ebene“, `specs/vorlage-fach-spec.md`). `Ablauf` ist eine AK,
+ * die sich nur im Ablauf (Browser) prüfen lässt und Ablauf-Fälle hat (seit G3); `Ablauf, G3` markiert eine solche AK,
+ * deren Prüffall noch folgt (Entscheidung E1).
  */
-export const SPEC_LEVELS = ["Fachlogik", "Daten", "Ablauf, G3"] as const;
+export const SPEC_LEVELS = ["Fachlogik", "Daten", "Ablauf", "Ablauf, G3"] as const;
 /** Ebene „Ablauf, Prüffall folgt in G3“ (Entscheidung E1). */
 export const DEFERRED_LEVEL = "Ablauf, G3";
 /**

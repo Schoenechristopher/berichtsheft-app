@@ -98,6 +98,7 @@ async function StartContent({ person }: { person: Person }) {
             large
             headingLevel={3}
             testId="current-week"
+            week={thisWeek}
             eyebrow="Diese Woche"
             title={`KW ${thisWeek.isoWeek}/${thisWeek.isoYear}`}
             range={weekRangeShort(thisWeek.isoYear, thisWeek.isoWeek)}

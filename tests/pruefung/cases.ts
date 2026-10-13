@@ -1,7 +1,8 @@
 /**
  * Lädt die neutralen Prüffälle aus `specs/pruefung/*.json` für die Prüf-Runner und legt fest, welcher
  * Runner welche Ebene ausführt. Jeder Fall wird von genau einem Runner ausgeführt: Fälle der Ebene
- * `daten` vom Daten-Runner (`daten.test.ts`, gegen die Test-Datenbank), alle anderen vom
+ * `daten` vom Daten-Runner (`daten.test.ts`, gegen die Test-Datenbank), Fälle der Ebene `ablauf` vom
+ * Ablauf-Runner (`e2e/pruefung-ablauf.spec.ts`, Playwright gegen die laufende App), alle anderen vom
  * Fachlogik-Runner (`fachlogik.test.ts`), der an einer Ebene ohne Runner scheitert (kein stilles
  * Überspringen).
  */
@@ -23,9 +24,13 @@ export interface CheckCase {
 }
 
 /** Ebenen, die ein eigener Runner ausführt; alle übrigen Fälle laufen im Fachlogik-Runner. */
-export const OWN_RUNNER_LEVELS = { daten: "tests/pruefung/daten.test.ts" } as const;
+export const OWN_RUNNER_LEVELS = {
+  daten: "tests/pruefung/daten.test.ts",
+  ablauf: "e2e/pruefung-ablauf.spec.ts",
+} as const;
 
-const dir = path.resolve(import.meta.dirname, "../../specs/pruefung");
+// `__dirname` statt `import.meta.dirname`: Playwright lädt die Datei als CommonJS (Ablauf-Runner), Vitest kennt beides.
+const dir = path.resolve(__dirname, "../../specs/pruefung");
 
 /** Alle Prüffälle mit ihrer Datei, Dateien alphabetisch. */
 export function loadCases(): { file: string; entry: CheckCase }[] {

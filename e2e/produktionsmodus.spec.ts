@@ -34,4 +34,13 @@ test.describe("Produktionsmodus", () => {
     await page.goto("/ausbilder");
     await expect(page).toHaveURL(/\/anmelden/);
   });
+
+  test("AK-1201 im Produktionsmodus gibt es die Testschnittstelle für Uhr und Testdaten nicht", async ({ request }) => {
+    // Die Schnittstelle des Ablauf-Runners (src/app/api/test/zustand) antwortet wie eine unbekannte Adresse.
+    const response = await request.post("/api/test/zustand", {
+      data: { uhr: "2030-01-07T09:00:00+01:00", bestand: "testdaten" },
+    });
+    expect(response.status()).toBe(404);
+    expect((await request.get("/api/health")).ok()).toBe(true);
+  });
 });

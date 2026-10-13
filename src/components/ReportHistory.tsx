@@ -35,7 +35,15 @@ export function ReportHistory({ rounds }: { rounds: HistoryRound[] }) {
                   </h3>
                   <ul className="space-y-1 text-sm" aria-label={`Statuswechsel Runde ${round.round}`}>
                     {round.changes.map((change) => (
-                      <li key={change.id} data-testid="history-change" className="break-words">
+                      <li
+                        key={change.id}
+                        data-testid="history-change"
+                        data-von={change.fromStatus ?? undefined}
+                        data-nach={change.toStatus}
+                        data-zeitpunkt={change.createdAt.toISOString()}
+                        data-person={change.actorName}
+                        className="break-words"
+                      >
                         <span className="text-fg-muted tabular-nums">{formatDateTime(change.createdAt)}</span> ·{" "}
                         <span className="font-medium">{changeLabel(change)}</span> von {change.actorName} → Status „
                         {reportStatusLabel(change.toStatus)}“

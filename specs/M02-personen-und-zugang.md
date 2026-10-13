@@ -141,12 +141,12 @@ Text aus `docs/01-spezifikation.md`; Prüffälle in `specs/pruefung/M02.json`.
 
 | AK-ID | Kriterium (Kurzfassung) | Regeln | Prüffälle | Ebene |
 | --- | --- | --- | --- | --- |
-| AK-101 | Anmeldung nur über das Firmenkonto; ein eigenes Passwort in der App gibt es nicht. | M02-R02 | folgt in G3 | Ablauf, G3 |
+| AK-101 | Anmeldung nur über das Firmenkonto; ein eigenes Passwort in der App gibt es nicht. | M02-R02 | AK-101-01 bis AK-101-03 | Ablauf |
 | AK-102 | Firmenkonto ohne Eintrag oder mit deaktivierter Person wird abgewiesen, mit dem Hinweis „Kein Zugang – bitte an den Ausbilder wenden“. | M02-R03, M02-R04, M02-R08, M02-R11 | AK-102-01 bis AK-102-09 | Fachlogik |
 | AK-103 | Ein Azubi sieht nur eigene Berichte; ein fremder Bericht ergibt „Zugriff verweigert“. | M02-R09, M02-R13 | AK-103-01 bis AK-103-03 | Fachlogik |
 | AK-104 | Ein Azubi erreicht keine Prüf- oder Admin-Funktionen, auch nicht per direkt eingegebener Adresse. | M02-R12, M02-R13 | AK-104-01 bis AK-104-04 | Fachlogik |
 | AK-105 | Jeder Ausbilder kann die Berichte aller Azubis ansehen. | M02-R10 | AK-105-01 bis AK-105-03 | Fachlogik |
-| AK-106 | Nach dem Abmelden ist ohne erneute Anmeldung kein Zugriff möglich. | M02-R05 | folgt in G3 | Ablauf, G3 |
+| AK-106 | Nach dem Abmelden ist ohne erneute Anmeldung kein Zugriff möglich. | M02-R05 | AK-106-01, AK-106-02 | Ablauf |
 | AK-201 | Admin legt eine Person mit Firmen-E-Mail, Name und Rolle an; erster Login bindet über die bestätigte E-Mail, danach zählt nur die Konto-ID. | M02-R01, M02-R06 bis M02-R08, M02-R14, M02-R17 | AK-201-01 bis AK-201-11 | Fachlogik |
 | AK-202 | Ein Azubi braucht zugeordneten Ausbilder und Ausbildungsbeginn; fehlt eines, nennt die Meldung das Feld. | M02-R14 bis M02-R16 | AK-202-01 bis AK-202-09 | Fachlogik |
 | AK-203 | Der Admin ändert Rolle, zugeordneten Ausbilder sowie Ausbildungsbeginn und -ende. Die Folgen für die Berichte regelt M03. | M02-R16 bis M02-R18 | AK-203-01 bis AK-203-07 | Fachlogik |
@@ -157,7 +157,7 @@ Text aus `docs/01-spezifikation.md`; Prüffälle in `specs/pruefung/M02.json`.
 | AK-208 | Ausbilder mit zugeordneten Azubis erst nach Neuzuordnung deaktivierbar; fürs Löschen und Herabstufen zählen auch deaktivierte Azubis. | M02-R24, M02-R26 | AK-208-01 bis AK-208-05 | Fachlogik |
 | AK-209 | Der Admin kann das Bundesland der Firma für die Feiertage einstellen. | M02-R28 | AK-209-01 bis AK-209-05 | Fachlogik |
 
-Begründung der Ebene `Ablauf, G3` (Entscheidung E1):
+Begründung der Ebene `Ablauf` (Entscheidung E1; Ablauf-Fälle seit G3, `specs/pruefung/format.md`, „Aufbau eines Ablauf-Falls“):
 
 - **AK-101:** Dass es nur die Anmeldung über das Firmenkonto und kein eigenes Passwort gibt, zeigt sich nur im
   Anmeldeablauf mit dem Anmeldedienst; dafür gibt es keine Regel, die sich ohne ihn aufrufen ließe.

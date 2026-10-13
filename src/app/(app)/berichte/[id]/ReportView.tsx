@@ -2,7 +2,7 @@ import { canEditReport, canViewReport, type Viewer } from "@/domain/report-acces
 import { DAY_TYPE_LABELS } from "@/domain/report-days";
 import { currentApproval, currentFeedback, formatDateTime, groupHistory } from "@/domain/report-history";
 import { availableActions } from "@/domain/report-status";
-import { formatDate, toDateInput, weekdayLong, weekRangeLabel } from "@/domain/weeks";
+import { formatDate, isoWeekCode, toDateInput, weekdayLong, weekRangeLabel } from "@/domain/weeks";
 import { Badge, Notice, StatusChip } from "@/components/ui";
 import { ReportHistory } from "@/components/ReportHistory";
 import { PdfDownloadLink } from "@/components/PdfExport";
@@ -29,7 +29,10 @@ function ReportHeading({ report, level }: { report: LoadedReport; level: 1 | 2 }
   return (
     <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
       <div className="min-w-0 space-y-2">
-        <Heading className="text-2xl font-semibold tabular-nums">
+        <Heading
+          className="text-2xl font-semibold tabular-nums"
+          data-woche={isoWeekCode(report.isoYear, report.isoWeek)}
+        >
           KW {report.isoWeek}/{report.isoYear}{" "}
           <span className="text-fg-muted text-base font-normal whitespace-nowrap">({range})</span>
         </Heading>

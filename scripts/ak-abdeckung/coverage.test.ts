@@ -325,14 +325,14 @@ ${rows}
     const { criteria: rows, errors } = parseModuleTable(
       table(
         [
-          "| AK-101 | Text | M02-R01 | folgt in G3 | Ablauf |",
+          "| AK-101 | Text | M02-R01 | folgt in G3 | Browser |",
           "| AK-1102 | Text | M02-R01 | AK-1102-01 | Fachlogik | x |",
         ].join("\n"),
       ),
     );
     expect(rows.map((row) => row.id)).toEqual(["AK-101", "AK-1102"]);
     expect(errors).toEqual([
-      "AK-101: unbekannte Ebene „Ablauf“ (erlaubt: Fachlogik; Daten; Ablauf, G3).",
+      "AK-101: unbekannte Ebene „Browser“ (erlaubt: Fachlogik; Daten; Ablauf; Ablauf, G3).",
       "AK-1102: Zeile hat 6 statt 4 oder 5 Spalten.",
     ]);
   });

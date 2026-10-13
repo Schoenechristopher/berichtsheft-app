@@ -66,6 +66,7 @@ export function DayTypeInput({
         <div
           id={id}
           role="radiogroup"
+          data-feld="tagesart"
           aria-labelledby={labelId}
           aria-invalid={invalid || undefined}
           aria-describedby={describedBy}
@@ -108,6 +109,7 @@ export function DayTypeInput({
     <select
       id={id}
       name={name}
+      data-feld="tagesart"
       value={value}
       disabled={disabled}
       onChange={(event) => onChange(event.target.value)}

@@ -19,13 +19,13 @@ Fach-Spec: `specs/M01-kalender-und-zeit.md` · Prüffälle: `specs/pruefung/M01.
 
 | Datei / Funktion | Rolle | Regeln / AK | Plattformgebunden | Übertragung |
 | --- | --- | --- | --- | --- |
-| `src/domain/clock.ts` → `now()`, `setFixedNow()`, `resetClock()`, `setClock()`, `fixedClock()` | einzige Quelle für „jetzt“, für Tests stellbar | M01-R01, M01-R02; AK-1201 | nein | 1:1 übersetzen (auf Liferay als eigener Uhr-Service, siehe unten) |
+| `src/domain/clock.ts` → `now()`, `setFixedNow()`, `resetClock()`, `setClock()`, `fixedClock()` | einzige Quelle für „jetzt“, für Tests stellbar; die eingestellte Uhr liegt auf `globalThis` und gilt so in Route-Handlern, Seiten und Serveraktionen gleich | M01-R01, M01-R02; AK-1201 | nein | 1:1 übersetzen (auf Liferay als eigener Uhr-Service, siehe unten) |
 | `src/domain/clock.ts` → `clockFromEnvironment()` | `APP_FIXED_NOW` nur außerhalb von `NODE_ENV=production` | M01-R03; AK-1201 | ja (Umgebungsvariable, `NODE_ENV`) | nach Profil neu bauen (Konfiguration und Erkennung des Produktivbetriebs je Plattform) |
 | `src/domain/clock.ts` → `InvalidInstantError` | unlesbarer Zeitpunkt | M01-R04; AK-1201 | nein | 1:1 übersetzen |
 | `src/domain/weeks.ts` → `APP_TIME_ZONE`, `calendarDateIn()`, `today()` | Kalendertag in Europe/Berlin | M01-R05, M01-R06; AK-1202 | ja (`Intl.DateTimeFormat` mit Zeitzonen-Datenbank) | nach Profil neu bauen (Zeitzonen-API der Plattform) |
 | `src/domain/weeks.ts` → `isoWeekOf()`, `isoWeekMonday()`, `isoWeeksInYear()`, `isValidIsoWeek()`, `isoWeekWorkdays()`, `nextIsoWeek()`, `compareWeeks()`, `currentIsoWeek()` | ISO-Wochen, Arbeitstage, Folgewoche, Vergleich, aktuelle Woche | M01-R07 bis M01-R12; AK-1202 bis AK-1204 | nein | 1:1 übersetzen |
 | `src/domain/weeks.ts` → `InvalidIsoWeekError` | Woche, die es nicht gibt | M01-R12; AK-1204 | nein | 1:1 übersetzen |
-| `src/domain/weeks.ts` → `formatDate()`, `toDateInput()`, `weekLabel()`, `weekRangeLabel()`, `weekRangeShort()`, `weekdayShort()`, `weekdayLong()` | Texte für Oberfläche und PDF | – (Anzeige, M07/M09) | nein | 1:1 übersetzen oder durch Formatierung der Plattform ersetzen |
+| `src/domain/weeks.ts` → `formatDate()`, `toDateInput()`, `weekLabel()`, `weekRangeLabel()`, `weekRangeShort()`, `weekdayShort()`, `weekdayLong()`, `isoWeekCode()` | Texte für Oberfläche und PDF; `isoWeekCode()` für den festen Merker `data-woche` | – (Anzeige, M07/M09) | nein | 1:1 übersetzen oder durch Formatierung der Plattform ersetzen |
 | `src/domain/federal-states.ts` → `FEDERAL_STATES`, `isFederalState()`, `federalStateName()`, `UnknownFederalStateError` | die 16 Kürzel und Namen | M01-R13, M01-R14; AK-1205 | nein | 1:1 übersetzen |
 | `src/domain/holidays.ts` → `publicHolidays()`, `isPublicHoliday()` | gesetzliche Feiertage je Bundesland und Jahr | M01-R15, M01-R17 bis M01-R19; AK-404, AK-1206 | ja (Bibliothek feiertagejs) | nach Profil neu bauen (Feiertagsbibliothek der Plattform oder eigene Berechnung), Prüffälle AK-404 und AK-1206 als Maßstab |
 | `src/domain/holidays.ts` → `ONE_TIME_HOLIDAYS` und Korrektur Reformationstag vor 2018 | einmalige landesweite Feiertage, Ergänzung zu feiertagejs | M01-R15, M01-R16; AK-1206 | nein | 1:1 übersetzen (Referenzdaten aus der Fach-Spec, Abschnitt 5) |
@@ -42,6 +42,8 @@ und Zeitzone), dann `federal-states.ts` und `holidays.ts`. Aufgerufen werden die
 - Prüf-Runner: `tests/pruefung/fachlogik.test.ts` mit `tests/pruefung/adapter.ts` führt `specs/pruefung/M01.json` aus.
 - Playwright: `e2e/ak-301-408-berichte-erfassen.spec.ts` und `e2e/ui-ak.spec.ts` nutzen `currentIsoWeek()` und die
   feste Uhr (`APP_FIXED_NOW`) im Browser-Test.
+- Ablauf-Runner: `e2e/pruefung-ablauf.spec.ts` stellt die Uhr der laufenden App über die Testschnittstelle (Querschnitt);
+  AK-101-02 (Seite) und AK-408-07 (Serveraktion) hängen von dieser Uhr ab.
 
 **Fallen:**
 
@@ -483,6 +485,7 @@ Dateien unter `src/domain/` und `src/lib/`, die keinem Fachmodul gehören oder d
 | `src/domain/theme.ts` → `Theme`, `THEMES`, `THEME_LABELS`, `THEME_COOKIE`, `isTheme()`, `themeAttribute()`, `themeFromCookie()`, `resolveTheme()` | Darstellung Hell, Dunkel, System | M09, beschrieben in G3; UI-AK-14, UI-AK-15 | nein | 1:1 übersetzen oder durch Plattform ersetzen |
 | `src/lib/theme.ts` → `themeForRequest()` | Darstellung für das erste Rendern aus Konto und Cookie | M09, beschrieben in G3; UI-AK-15 | ja (Next.js-Cookies) | nach Profil neu bauen |
 | `src/domain/relative-time.ts` → `relativeTime()` | „vor 2 Std.“ in Listen | M09, beschrieben in G3 | nein | 1:1 übersetzen oder durch Formatierung der Plattform ersetzen |
+| `src/app/api/test/zustand/route.ts` → `POST` | Testschnittstelle des Ablauf-Runners: stellt die Uhr (`setFixedNow`, `resetClock`) und lädt die Testdaten; nur außerhalb von Produktion mit Test-Login, sonst 404 | – (Werkzeug der Prüffälle, `format.md`, „Aufbau eines Ablauf-Falls“); AK-1201 | ja (Next.js-Route-Handler, Prisma) | nach Profil neu bauen (Testzugang der Plattform, im Produktivbetrieb nicht vorhanden) |
 | `src/domain/week-progress.ts` → `weekProgress()`, `progressLabel()`, `firstLine()` | Fortschritt einer Woche („3 von 5 Tagen ausgefüllt“) für Start Azubi | M09, beschrieben in G3; UI-AK-04 | nein | 1:1 übersetzen |
 
 Zu M09 gehören außerdem `src/lib/people/labels.ts` und `updateOwnTheme()` in `src/lib/people/service.ts`; sie stehen

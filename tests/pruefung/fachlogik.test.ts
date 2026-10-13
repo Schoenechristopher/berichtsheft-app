@@ -1,6 +1,7 @@
 /**
  * Prüf-Runner für TypeScript (`specs/pruefung/format.md`): führt jeden Prüffall aus `specs/pruefung/*.json`
- * aus, außer den Fällen einer Ebene mit eigenem Runner (`OWN_RUNNER_LEVELS`: `daten` im Daten-Runner).
+ * aus, außer den Fällen einer Ebene mit eigenem Runner (`OWN_RUNNER_LEVELS`: `daten` im Daten-Runner, `ablauf`
+ * im Ablauf-Runner unter `e2e/`).
  * Fälle der Ebene `fachlogik` laufen über den Adapter; für jede andere Ebene gibt es noch keinen Runner,
  * deshalb scheitert ihr Test hier (kein stilles Überspringen).
  */

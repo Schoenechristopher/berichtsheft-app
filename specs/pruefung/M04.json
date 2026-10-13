@@ -722,5 +722,856 @@
         }
       ]
     }
+  },
+  {
+    "id": "AK-403-01",
+    "modul": "M04",
+    "ebene": "ablauf",
+    "beschreibung": "Der Bericht bietet je Tag nur Tagesart und Tätigkeiten an, keine Felder für Stunden, Abteilung oder Lernfeld.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "seite": "bericht",
+          "angemeldet": "anna",
+          "passwortfeld": false,
+          "woche": "2026-W38",
+          "status": "Entwurf",
+          "ungespeichert": false,
+          "tage": [
+            {
+              "tag": "Mo",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Di",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Mi",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Do",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Fr",
+              "felder": ["tagesart", "taetigkeiten"]
+            }
+          ],
+          "weitere_felder": [],
+          "historie": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-403-02",
+    "modul": "M04",
+    "ebene": "ablauf",
+    "beschreibung": "Auch in der ersten Woche mit Tagen vor Ausbildungsbeginn gibt es nur Tagesart und Tätigkeiten.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W36"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "seite": "bericht",
+          "angemeldet": "anna",
+          "passwortfeld": false,
+          "woche": "2026-W36",
+          "status": "Entwurf",
+          "ungespeichert": false,
+          "tage": [
+            {
+              "tag": "Mo",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Di",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Mi",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Do",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Fr",
+              "felder": ["tagesart", "taetigkeiten"]
+            }
+          ],
+          "weitere_felder": [],
+          "historie": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-408-01",
+    "modul": "M04",
+    "ebene": "ablauf",
+    "beschreibung": "Ein Link der App mit ungespeicherten Änderungen warnt; Abbrechen bleibt im Bericht, Bestätigen verlässt ihn.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mo",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "link",
+        "ziel": "wochen",
+        "dialog": "abbrechen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "link",
+        "ziel": "wochen",
+        "dialog": "bestaetigen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "warnung": "ungespeicherte_aenderungen",
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "seite": "bericht",
+          "angemeldet": "anna",
+          "passwortfeld": false,
+          "woche": "2026-W38",
+          "status": "Entwurf",
+          "ungespeichert": true,
+          "tage": [
+            {
+              "tag": "Mo",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Di",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Mi",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Do",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Fr",
+              "felder": ["tagesart", "taetigkeiten"]
+            }
+          ],
+          "weitere_felder": [],
+          "historie": []
+        },
+        {
+          "warnung": "ungespeicherte_aenderungen",
+          "seite": "wochen",
+          "angemeldet": "anna"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-408-02",
+    "modul": "M04",
+    "ebene": "ablauf",
+    "beschreibung": "„Abmelden“ mit ungespeicherten Änderungen warnt; erst nach Bestätigen ist Anna abgemeldet.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Di",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "abmelden",
+        "dialog": "abbrechen"
+      },
+      {
+        "als": "anna",
+        "aktion": "abmelden",
+        "dialog": "bestaetigen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "warnung": "ungespeicherte_aenderungen",
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": "ungespeicherte_aenderungen",
+          "seite": "anmelden",
+          "angemeldet": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-408-03",
+    "modul": "M04",
+    "ebene": "ablauf",
+    "beschreibung": "Neuladen mit ungespeicherten Änderungen warnt mit dem Dialog des Browsers; nach Bestätigen ist die Änderung verworfen.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mo",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "neu_laden",
+        "dialog": "abbrechen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "neu_laden",
+        "dialog": "bestaetigen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "warnung": "ungespeicherte_aenderungen",
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "seite": "bericht",
+          "angemeldet": "anna",
+          "passwortfeld": false,
+          "woche": "2026-W38",
+          "status": "Entwurf",
+          "ungespeichert": true,
+          "tage": [
+            {
+              "tag": "Mo",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Di",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Mi",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Do",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Fr",
+              "felder": ["tagesart", "taetigkeiten"]
+            }
+          ],
+          "weitere_felder": [],
+          "historie": []
+        },
+        {
+          "warnung": "ungespeicherte_aenderungen",
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "seite": "bericht",
+          "angemeldet": "anna",
+          "passwortfeld": false,
+          "woche": "2026-W38",
+          "status": "Entwurf",
+          "ungespeichert": false,
+          "tage": [
+            {
+              "tag": "Mo",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Di",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Mi",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Do",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Fr",
+              "felder": ["tagesart", "taetigkeiten"]
+            }
+          ],
+          "weitere_felder": [],
+          "historie": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-408-04",
+    "modul": "M04",
+    "ebene": "ablauf",
+    "beschreibung": "Zurück im Browser warnt; Abbrechen bleibt, Bestätigen geht zurück, Vor führt ohne Warnung in den Bericht.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "wochen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "link",
+        "ziel": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mi",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "zurueck",
+        "dialog": "abbrechen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "zurueck",
+        "dialog": "bestaetigen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "vor"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "wochen",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "warnung": "ungespeicherte_aenderungen",
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": "ungespeicherte_aenderungen",
+          "seite": "wochen",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "seite": "bericht",
+          "angemeldet": "anna",
+          "passwortfeld": false,
+          "woche": "2026-W38",
+          "status": "Entwurf",
+          "ungespeichert": false,
+          "tage": [
+            {
+              "tag": "Mo",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Di",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Mi",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Do",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Fr",
+              "felder": ["tagesart", "taetigkeiten"]
+            }
+          ],
+          "weitere_felder": [],
+          "historie": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-408-05",
+    "modul": "M04",
+    "ebene": "ablauf",
+    "beschreibung": "Schließen mit ungespeicherten Änderungen warnt mit dem Dialog des Browsers; Abbrechen lässt das Fenster mit der Eingabe offen.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Do",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "schliessen",
+        "dialog": "abbrechen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "warnung": "ungespeicherte_aenderungen",
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "seite": "bericht",
+          "angemeldet": "anna",
+          "passwortfeld": false,
+          "woche": "2026-W38",
+          "status": "Entwurf",
+          "ungespeichert": true,
+          "tage": [
+            {
+              "tag": "Mo",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Di",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Mi",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Do",
+              "felder": ["tagesart", "taetigkeiten"]
+            },
+            {
+              "tag": "Fr",
+              "felder": ["tagesart", "taetigkeiten"]
+            }
+          ],
+          "weitere_felder": [],
+          "historie": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-408-06",
+    "modul": "M04",
+    "ebene": "ablauf",
+    "beschreibung": "Nach dem Speichern gibt es keine Warnung mehr.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Fr",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "speichern"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "link",
+        "ziel": "wochen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "gespeichert": true
+        },
+        {
+          "warnung": null,
+          "seite": "wochen",
+          "angemeldet": "anna"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-408-07",
+    "modul": "M04",
+    "ebene": "ablauf",
+    "beschreibung": "Einreichen speichert die Eingaben mit; danach warnt kein Link mehr. Der Verlauf trägt die Zeit der gestellten Uhr.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "link",
+        "ziel": "wochen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "seite": "bericht",
+          "angemeldet": "anna",
+          "passwortfeld": false,
+          "woche": "2026-W38",
+          "status": "Eingereicht",
+          "ungespeichert": false,
+          "tage": null,
+          "weitere_felder": [],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-09-16T09:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "warnung": null,
+          "seite": "wochen",
+          "angemeldet": "anna"
+        }
+      ]
+    }
   }
 ]

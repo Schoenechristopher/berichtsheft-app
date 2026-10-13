@@ -39,6 +39,16 @@ type Action = (prev: SaveState, formData: FormData) => Promise<SaveState>;
 export const LEAVE_WARNING =
   "Es gibt ungespeicherte Änderungen. Seite trotzdem verlassen? Die Änderungen gehen verloren.";
 
+/**
+ * Feste Merker für die Prüffälle (`specs/pruefung/format.md`, „Aufbau eines Ablauf-Falls“): Codes statt
+ * Meldungstexte. Die Warnung beim Verlassen trägt das Formular, solange sie scharf ist.
+ */
+const LEAVE_WARNING_CODE = "ungespeicherte_aenderungen";
+const SUBMISSION_PROBLEM_CODES: Record<SubmissionIssue["problem"], string> = {
+  DAY_TYPE_MISSING: "tagesart_fehlt",
+  ACTIVITIES_MISSING: "taetigkeiten_fehlen",
+};
+
 /** Hinweis vor dem PDF-Download mit ungespeicherten Änderungen (bestätigte Auslegung zu AK-901). */
 export const EXPORT_SAVED_HINT = "Es wird der zuletzt gespeicherte Stand exportiert.";
 
@@ -170,6 +180,9 @@ export function ReportEditor({
       action={formAction}
       noValidate
       aria-label="Bericht erfassen"
+      data-ungespeichert={dirty ? "true" : "false"}
+      data-warnung-verlassen={dirty ? LEAVE_WARNING_CODE : undefined}
+      data-ausstehend={pending ? "true" : undefined}
       className="space-y-4"
       onSubmit={(event) => {
         const submitter = (event.nativeEvent as SubmitEvent).submitter;
@@ -182,6 +195,7 @@ export function ReportEditor({
           tabIndex={-1}
           role="alert"
           data-testid="submission-issues"
+          data-fehler="pflichtangaben_fehlen"
           className="border-danger bg-rejected-bg text-rejected space-y-2 rounded-md border p-3 text-sm"
         >
           <p className="flex items-center gap-2 font-medium">
@@ -233,6 +247,8 @@ export function ReportEditor({
               data-testid="report-day"
               data-outside-training={day.outsideTraining ? "true" : undefined}
               data-issue={problem}
+              data-datum={day.date}
+              data-fehler={problem ? SUBMISSION_PROBLEM_CODES[problem] : undefined}
               className={`rounded-card flex min-w-0 flex-col gap-3 border p-4 ${
                 day.outsideTraining
                   ? "border-border bg-surface-muted text-fg-muted"
@@ -291,6 +307,7 @@ export function ReportEditor({
                 <AutoGrowTextarea
                   id={textId}
                   name={textId}
+                  data-feld="taetigkeiten"
                   rows={4}
                   readOnly={!hydrated}
                   value={value.activities}
