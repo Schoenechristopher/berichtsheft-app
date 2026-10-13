@@ -1,0 +1,412 @@
+[
+  {
+    "id": "UI-AK-03-01",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Glocke mit 0 ungelesenen",
+    "schnittstelle": "glockenZaehler",
+    "eingabe": {
+      "ungelesen": 0
+    },
+    "erwartet": {
+      "anzeige": "0",
+      "beschriftung": "Benachrichtigungen"
+    }
+  },
+  {
+    "id": "UI-AK-03-02",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Glocke mit 3 ungelesenen",
+    "schnittstelle": "glockenZaehler",
+    "eingabe": {
+      "ungelesen": 3
+    },
+    "erwartet": {
+      "anzeige": "3",
+      "beschriftung": "Benachrichtigungen, 3 ungelesen"
+    }
+  },
+  {
+    "id": "UI-AK-03-03",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Glocke mit 99 ungelesenen",
+    "schnittstelle": "glockenZaehler",
+    "eingabe": {
+      "ungelesen": 99
+    },
+    "erwartet": {
+      "anzeige": "99",
+      "beschriftung": "Benachrichtigungen, 99 ungelesen"
+    }
+  },
+  {
+    "id": "UI-AK-03-04",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Glocke mit 100 ungelesenen",
+    "schnittstelle": "glockenZaehler",
+    "eingabe": {
+      "ungelesen": 100
+    },
+    "erwartet": {
+      "anzeige": "99+",
+      "beschriftung": "Benachrichtigungen, 100 ungelesen"
+    }
+  },
+  {
+    "id": "UI-AK-04-01",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Urlaub ohne Text zählt als ausgefüllt, Betrieb ohne Text und fehlende Tagesart nicht",
+    "schnittstelle": "wochenFortschritt",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": "Betrieb",
+          "text": "Montage"
+        },
+        {
+          "tag": "Di",
+          "ausserhalb": false,
+          "tagesart": "Berufsschule",
+          "text": "Schule"
+        },
+        {
+          "tag": "Mi",
+          "ausserhalb": false,
+          "tagesart": "Urlaub",
+          "text": ""
+        },
+        {
+          "tag": "Do",
+          "ausserhalb": false,
+          "tagesart": "Betrieb",
+          "text": ""
+        },
+        {
+          "tag": "Fr",
+          "ausserhalb": false,
+          "tagesart": null,
+          "text": ""
+        }
+      ]
+    },
+    "erwartet": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "markierung": "ausgefuellt"
+        },
+        {
+          "tag": "Di",
+          "markierung": "ausgefuellt"
+        },
+        {
+          "tag": "Mi",
+          "markierung": "ausgefuellt"
+        },
+        {
+          "tag": "Do",
+          "markierung": "leer"
+        },
+        {
+          "tag": "Fr",
+          "markierung": "leer"
+        }
+      ],
+      "ausgefuellt": 3,
+      "gesamt": 5,
+      "text": "3 von 5 Tagen ausgefüllt"
+    }
+  },
+  {
+    "id": "UI-AK-04-02",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Tage außerhalb der Ausbildung zählen nicht mit; Einzahl",
+    "schnittstelle": "wochenFortschritt",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": false,
+          "tagesart": "Betrieb",
+          "text": "x"
+        },
+        {
+          "tag": "Di",
+          "ausserhalb": true,
+          "tagesart": null,
+          "text": ""
+        },
+        {
+          "tag": "Mi",
+          "ausserhalb": true,
+          "tagesart": null,
+          "text": ""
+        },
+        {
+          "tag": "Do",
+          "ausserhalb": true,
+          "tagesart": null,
+          "text": ""
+        },
+        {
+          "tag": "Fr",
+          "ausserhalb": true,
+          "tagesart": null,
+          "text": ""
+        }
+      ]
+    },
+    "erwartet": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "markierung": "ausgefuellt"
+        },
+        {
+          "tag": "Di",
+          "markierung": "ausserhalb"
+        },
+        {
+          "tag": "Mi",
+          "markierung": "ausserhalb"
+        },
+        {
+          "tag": "Do",
+          "markierung": "ausserhalb"
+        },
+        {
+          "tag": "Fr",
+          "markierung": "ausserhalb"
+        }
+      ],
+      "ausgefuellt": 1,
+      "gesamt": 1,
+      "text": "1 von 1 Tag ausgefüllt"
+    }
+  },
+  {
+    "id": "UI-AK-04-03",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Nur die erste Zeile des Ablehnungskommentars",
+    "schnittstelle": "ersteZeile",
+    "eingabe": {
+      "text": "  Bitte Mittwoch ergänzen.\nUnd Freitag prüfen."
+    },
+    "erwartet": {
+      "zeile": "Bitte Mittwoch ergänzen."
+    }
+  },
+  {
+    "id": "UI-AK-04-04",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Zu lange erste Zeile wird mit Auslassungszeichen gekürzt",
+    "schnittstelle": "ersteZeile",
+    "eingabe": {
+      "text": "Abcdefghijklmnop",
+      "maxLaenge": 10
+    },
+    "erwartet": {
+      "zeile": "Abcdefghi…"
+    }
+  },
+  {
+    "id": "UI-AK-13-01",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Status-Chip Entwurf: Text und Symbol",
+    "schnittstelle": "statusChip",
+    "eingabe": {
+      "status": "Entwurf"
+    },
+    "erwartet": {
+      "text": "Entwurf",
+      "symbol": "Stift"
+    }
+  },
+  {
+    "id": "UI-AK-13-02",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Status-Chip Eingereicht: Text und Symbol",
+    "schnittstelle": "statusChip",
+    "eingabe": {
+      "status": "Eingereicht"
+    },
+    "erwartet": {
+      "text": "Eingereicht",
+      "symbol": "Pfeil nach oben"
+    }
+  },
+  {
+    "id": "UI-AK-13-03",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Status-Chip Freigegeben: Text und Symbol",
+    "schnittstelle": "statusChip",
+    "eingabe": {
+      "status": "Freigegeben"
+    },
+    "erwartet": {
+      "text": "Freigegeben",
+      "symbol": "Haken"
+    }
+  },
+  {
+    "id": "UI-AK-13-04",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Status-Chip Abgelehnt: Text und Symbol",
+    "schnittstelle": "statusChip",
+    "eingabe": {
+      "status": "Abgelehnt"
+    },
+    "erwartet": {
+      "text": "Abgelehnt",
+      "symbol": "Kreuz im Kreis"
+    }
+  },
+  {
+    "id": "UI-AK-14-01",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Wahl „Hell“",
+    "schnittstelle": "darstellungPruefen",
+    "eingabe": {
+      "wert": "Hell"
+    },
+    "erwartet": {
+      "darstellung": "Hell"
+    }
+  },
+  {
+    "id": "UI-AK-14-02",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Wahl „System“",
+    "schnittstelle": "darstellungPruefen",
+    "eingabe": {
+      "wert": "System"
+    },
+    "erwartet": {
+      "darstellung": "System"
+    }
+  },
+  {
+    "id": "UI-AK-14-03",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Wahl „Dunkel“",
+    "schnittstelle": "darstellungPruefen",
+    "eingabe": {
+      "wert": "Dunkel"
+    },
+    "erwartet": {
+      "darstellung": "Dunkel"
+    }
+  },
+  {
+    "id": "UI-AK-14-04",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Wahl „Lila“",
+    "schnittstelle": "darstellungPruefen",
+    "eingabe": {
+      "wert": "Lila"
+    },
+    "erwartet": {
+      "fehler": "darstellung_unbekannt"
+    }
+  },
+  {
+    "id": "UI-AK-14-05",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Wahl „dunkel“",
+    "schnittstelle": "darstellungPruefen",
+    "eingabe": {
+      "wert": "dunkel"
+    },
+    "erwartet": {
+      "fehler": "darstellung_unbekannt"
+    }
+  },
+  {
+    "id": "UI-AK-14-06",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Konto Dunkel, am Gerät gemerkt Hell",
+    "schnittstelle": "darstellungErmitteln",
+    "eingabe": {
+      "konto": "Dunkel",
+      "gemerkt": "Hell"
+    },
+    "erwartet": {
+      "darstellung": "Dunkel"
+    }
+  },
+  {
+    "id": "UI-AK-14-07",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Konto System, am Gerät gemerkt Dunkel",
+    "schnittstelle": "darstellungErmitteln",
+    "eingabe": {
+      "konto": "System",
+      "gemerkt": "Dunkel"
+    },
+    "erwartet": {
+      "darstellung": "System"
+    }
+  },
+  {
+    "id": "UI-AK-14-08",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Konto None, am Gerät gemerkt Hell",
+    "schnittstelle": "darstellungErmitteln",
+    "eingabe": {
+      "konto": null,
+      "gemerkt": "Hell"
+    },
+    "erwartet": {
+      "darstellung": "Hell"
+    }
+  },
+  {
+    "id": "UI-AK-14-09",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Konto None, am Gerät gemerkt None",
+    "schnittstelle": "darstellungErmitteln",
+    "eingabe": {
+      "konto": null,
+      "gemerkt": null
+    },
+    "erwartet": {
+      "darstellung": "System"
+    }
+  },
+  {
+    "id": "UI-AK-14-10",
+    "modul": "M09",
+    "ebene": "fachlogik",
+    "beschreibung": "Konto None, am Gerät gemerkt Lila",
+    "schnittstelle": "darstellungErmitteln",
+    "eingabe": {
+      "konto": null,
+      "gemerkt": "Lila"
+    },
+    "erwartet": {
+      "darstellung": "System"
+    }
+  }
+]

@@ -5,6 +5,7 @@ import {
   MAX_ACTIVITIES_LENGTH,
   activitiesError,
   activitiesLength,
+  hasContent,
   normalizeActivities,
   validateDayInputs,
   type DayInput,
@@ -95,5 +96,27 @@ describe("Bericht erfassen", () => {
       { mo: { dayType: "SICK", activities: "x" }, di: { dayType: "WORK", activities: "gleich" } },
     );
     expect(result).toEqual({ ok: true, updates: [] });
+  });
+});
+
+describe("AK-306 hasContent: Bericht mit Inhalt", () => {
+  it("AK-306 kein Tag mit Tagesart oder Text: kein Inhalt", () => {
+    expect(hasContent([])).toBe(false);
+    expect(
+      hasContent([
+        { dayType: null, activities: "" },
+        { dayType: null, activities: null },
+      ]),
+    ).toBe(false);
+  });
+
+  it("AK-306 eine Tagesart oder ein Text genügt", () => {
+    expect(
+      hasContent([
+        { dayType: null, activities: "" },
+        { dayType: "SCHOOL", activities: "" },
+      ]),
+    ).toBe(true);
+    expect(hasContent([{ dayType: null, activities: "Netzwerk" }])).toBe(true);
   });
 });

@@ -65,6 +65,14 @@ export interface DayUpdate {
   activities: string;
 }
 
+/**
+ * Hat der Bericht Inhalt (M03, „offen“ und Ausblendung, M03-R14 / AK-306)? Mindestens ein Tag mit
+ * Tagesart oder Text.
+ */
+export function hasContent(days: readonly { dayType: string | null; activities: string | null }[]): boolean {
+  return days.some((day) => day.dayType !== null || (day.activities ?? "") !== "");
+}
+
 export type DayErrors = Record<string, { dayType?: string; activities?: string }>;
 
 export type DaysValidation = { ok: true; updates: DayUpdate[] } | { ok: false; errors: DayErrors };

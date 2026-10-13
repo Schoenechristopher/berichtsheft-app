@@ -6,7 +6,7 @@
  * trägt und wie die Datei heißt. Das Layout selbst steht in `src/pdf/`.
  */
 import type { ReportStatus } from "./report-access";
-import { DAY_TYPE_LABELS } from "./report-days";
+import { DAY_TYPE_LABELS, hasContent } from "./report-days";
 import { classifyWeek, isWeekOutsideTraining, type DayType, type TrainingPeriod } from "./report-generation";
 import { currentApproval, formatDateTime, type HistoryChange } from "./report-history";
 import { STATUS_LABELS } from "./report-status";
@@ -141,7 +141,7 @@ export interface WeekForExport extends IsoWeek {
 export function withExportFlags<T extends ReportForPdf>(report: T): T & WeekForExport {
   return {
     ...report,
-    hasContent: report.days.some((day) => day.dayType !== null || day.activities !== ""),
+    hasContent: hasContent(report.days),
     hasHistory: report.changes.length > 0,
   };
 }
