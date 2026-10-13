@@ -54,7 +54,9 @@ const TRANSITION_CODES: Record<TransitionFailureReason, string | null> = {
   "not-found": null,
 };
 
-const SAVE_CODES: Record<SaveFailureReason, string> = {
+/** Feste Fehlercodes je Grund eines gescheiterten Speicherns; `null` = kein fachlicher Fehler. */
+const SAVE_CODES: Record<SaveFailureReason, string | null> = {
+  "not-found": null,
   forbidden: "zugriff_verweigert",
   "not-editable": "nicht_bearbeitbar",
   "day-input-invalid": "tage_ungueltig",
@@ -328,9 +330,13 @@ class DataCase {
         if (result.ok) {
           return { gespeichert: true };
         }
+        const code = SAVE_CODES[result.reason];
+        if (!code) {
+          throw new Error(`Speichern ohne fachlichen Fehlercode gescheitert: ${JSON.stringify(result)}`);
+        }
         return result.dayErrors
-          ? { fehler: SAVE_CODES[result.reason], tage: await this.dayErrorList(report.id, result.dayErrors) }
-          : { fehler: SAVE_CODES[result.reason] };
+          ? { fehler: code, tage: await this.dayErrorList(report.id, result.dayErrors) }
+          : { fehler: code };
       }
       case "pruefliste_lesen": {
         const filter = text(step, "filter");

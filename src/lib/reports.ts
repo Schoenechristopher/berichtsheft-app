@@ -192,10 +192,10 @@ export async function listTraineeWeeks(prisma: PrismaClient, viewer: Viewer, tra
   return { trainee, reports };
 }
 
-/** Ergebnis des Speicherns, so wie die Oberfläche es anzeigt. */
 /** Fester Grund eines gescheiterten Speicherns, unabhängig vom Meldungstext (neutrale Prüffälle). */
-export type SaveFailureReason = "forbidden" | "not-editable" | "day-input-invalid";
+export type SaveFailureReason = "not-found" | "forbidden" | "not-editable" | "day-input-invalid";
 
+/** Ergebnis des Speicherns, so wie die Oberfläche es anzeigt. */
 export type SaveResult =
   | { ok: true; days: { id: string; dayType: string; activities: string }[] }
   | { ok: false; reason: SaveFailureReason; formError?: string; dayErrors?: DayErrors };
@@ -214,7 +214,7 @@ export async function saveReportDays(
   inputs: ReadonlyMap<string, DayInput>,
 ): Promise<SaveResult> {
   if (!isUuid(reportId)) {
-    return { ok: false, reason: "forbidden", formError: "Bericht nicht gefunden." };
+    return { ok: false, reason: "not-found", formError: "Bericht nicht gefunden." };
   }
   return prisma.$transaction(async (tx) => {
     // Sperrt den Bericht bis zum Ende der Transaktion: Ein gleichzeitiger Statuswechsel wartet,

@@ -514,7 +514,11 @@ describe("Entwurf speichern", () => {
         formError: "Dieser Bericht kann nicht mehr bearbeitet werden.",
       });
     }
-    expect(await saveReportDays(prisma, otto, "kein-bericht", change)).toMatchObject({ ok: false });
+    expect(await saveReportDays(prisma, otto, "kein-bericht", change)).toEqual({
+      ok: false,
+      reason: "not-found",
+      formError: "Bericht nicht gefunden.",
+    });
     expect((await report(prisma, kw41.traineeId, 2026, 41)).days[0].activities).toBe("");
   });
 
