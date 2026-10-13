@@ -15,6 +15,8 @@ Diese Datei schreibt nur die Steuerungsinstanz, jeweils nach dem Merge eines Pak
 | G2 Zerlegung Fachlogik | E: M08 Benachrichtigungen und Erinnerung, Abschluss G2 | abgenommen, gemergt | 13.10.2026 | #22, Merge `1b1f4e7` |
 | G3 Oberfläche und Abläufe | Welle 1: H Nachträge G2, G M09 beschreiben, F Ablauf-Runner | in Arbeit | 13.10.2026 | – |
 | G3 Oberfläche und Abläufe | Welle 2: I Ablauf-Fälle M09, J Q, Szenarien, Abschluss | geplant | – | – |
+| A Automatisches Mergen | Welle 1: A1 AM-AK in `ak:abdeckung` | in Arbeit | 13.10.2026 | – |
+| A Automatisches Mergen | Welle 2: A2 CI-37 (nach #28, I, J), A3 Ablauf-Kriterien an Test-PRs (nach E1, E3) | geplant | – | – |
 
 ## G1 – Rahmen und Pilotmodul M01
 
@@ -269,6 +271,53 @@ grün, Ablauf-Fälle in allen Browsern grün, `CLAUDE.md` angepasst, Rückblick 
 ### Welle 1 – Pakete H, G und F (parallel)
 
 Gestartet am 13.10.2026 um 07:43 UTC. Einträge nach MW-R10 folgen nach der Abnahme.
+
+## A – Automatisches Mergen
+
+Plan „Etappe A“, freigegeben von Chris am 13.10.2026 mit E2 bis E7 wie vorgeschlagen; E1 offen. Grundlage:
+`docs/07-spec-automatisches-mergen.md`, Einführung Schritt 4 und 5. Stufen nach `docs/08` (MW-R03).
+
+**Stand Schritt 3 (lesend geprüft am 13.10.2026):** Über die REST-API ist für `main` kein Regelsatz sichtbar, der Branch ist
+nicht geschützt, es gab noch keinen Lauf bei `merge_group`; „Allow auto-merge“ ist an, Merge-Commits sind erlaubt.
+
+**Entscheidungen:**
+
+- **E1 (offen):** Chris prüft, ob Regelsatz und Merge-Warteschlange für `main` aktiv sind. A3 wartet darauf.
+- **E2** Schattenbetrieb (AM-R14) an Paket-PRs ab G3 Welle 2 und in G4: Die jeweilige Etappen-Steuerung schreibt nach
+  ihrer Abnahme den Abnahme-Kommentar, setzt das Label `automerge` und trägt das Ergebnis in die Tabelle unten ein. Nicht
+  an Doku-PRs. Automatisches Mergen bleibt aus.
+- **E3** Test-Basis `am-test/main`: Chris legt sie an bzw. nimmt `am-test/**` in den Regelsatz auf. Die Steuerung A darf
+  dort pushen, `aktiv: true` nur dort, Label und automatisches Mergen nur an Test-PRs; danach aufräumen.
+- **E4** „Ergebnis am PR“ (AM-AK-14) ist der Check „Merge-Kriterien“ mit seiner Zusammenfassung; den Kommentar nach dem
+  Merge (AM-AK-13) schreibt die Steuerung (AM-S04). Der Workflow bekommt kein Schreibrecht (CI-27).
+- **E5** CI-37 wählt nur die Ablauf-Fälle (Browser) nach Modul aus; Fachlogik- und Daten-Fälle laufen weiter vollständig.
+- **E6** Etappen-PRs laufen über die Warteschlange, sobald sie aktiv ist.
+- **E7** AM-S04 (`playbooks/00-steuerung.md`) und die Liferay-Teile von AM-R04 folgen in G4/P00, nicht in A.
+
+| Welle | Paket | Inhalt | Stufe | Größe, Richtwert | Klasse |
+| --- | --- | --- | --- | --- | --- |
+| 1 | A1 | AM-AK-01 bis AM-AK-14 in `ak:abdeckung`, `testsJeAk` für AM-AK-IDs | S2 mittel | klein, 3–5 US-Dollar | L |
+| 2 | A2 | CI-37: Auswahl der Ablauf-Fälle nach Modul (Datei → Modul aus der Landkarte, Modulgraph als Datei) | S3 hoch | mittel, 7–11 US-Dollar | I |
+| 2 | A3 | AM-AK-11 bis AM-AK-14 an Test-PRs gegen `am-test/main` bzw. `main` (nur AK-14), durch die Steuerung | Steuerung S3 | rund 3 US-Dollar | – |
+
+Merge-Reihenfolge: A1 vor G3-I (gemeinsam: `docs/03`, `scripts/ak-abdeckung/coverage.ts`); `.github/**` und
+`docs/ci-richtlinie.md`: #28 (F) → I → J → A2. Der spätere PR gleicht per Merge mit `main` ab. Steuerung je Welle
+höchstens 7 US-Dollar. Fertig A: A1 bis A3 gemergt bzw. belegt, 10 Paket-PRs im Schattenbetrieb ohne Widerspruch (oder
+Entscheidung von Chris), Rückblick und Übergabe. Danach setzt Chris `aktiv: true` und nimmt „Merge-Kriterien“ als
+Pflicht-Check in den Regelsatz auf.
+
+### Schattenbetrieb (AM-R14)
+
+Je Paket-PR eine Zeile, eingetragen von der Steuerung, die ihn abnimmt. „Kriterien“ ist das Ergebnis des Checks
+„Merge-Kriterien“ ohne den Grund „Schalter aus“ (AM-R12): Hätten die Kriterien den PR freigegeben? „Widerspruch“ heißt:
+Kriterien und Entscheidung von Chris weichen voneinander ab.
+
+| Nr. | PR | Etappe, Paket | Abnahme-Commit | Kriterien (ohne Schalter) | Gründe | Entscheidung Chris | Widerspruch |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+
+### Welle 1 – Paket A1
+
+Gestartet am 13.10.2026 um 10:13 UTC. Eintrag nach MW-R10 folgt nach der Abnahme.
 
 ## Übergabe an die Steuerung von G2
 
