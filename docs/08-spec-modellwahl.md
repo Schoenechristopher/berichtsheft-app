@@ -1,6 +1,6 @@
 # Spec Modellwahl für Arbeitspakete
 
-Stand: 12.10.2026 · Status: **Entwurf zur Freigabe** · gilt für die Steuerungsinstanz aus `docs/06-spec-architektur.md`
+Stand: 12.10.2026 · Status: **freigegeben (13.10.2026)** · gilt für die Steuerungsinstanz aus `docs/06-spec-architektur.md`
 
 ## Ziel und Geltungsbereich
 
@@ -125,7 +125,9 @@ nachvollziehbar bleibt.
   Stufe.
 - **MW-R11 Herunterstufen:** Sind auf einer Plattform drei Pakete mit Startstufe S3 in Folge beim ersten Anlauf
   abgenommen worden und ist das nächste Paket von gleicher Art, darf die Steuerung es auf S2 versuchen. Scheitert der
-  Versuch, gilt für diese Art von Paket wieder S3.
+  Versuch, gilt für diese Art von Paket wieder S3. Nach G2 (fünf S3-Pakete in Folge beim ersten Anlauf abgenommen) gilt
+  das für Beschreibungs-Pakete bestehenden Codes der Spec-Architektur (Art wie M03, M04, M07, M08, M09); Runner und
+  Browser-Infrastruktur bleiben S3 (freigegeben 13.10.2026).
 - **MW-R12 Rückblick:** Am Ende jeder Etappe wertet die Steuerung die Modellwahl-Einträge aus und schlägt Chris
   geänderte Richtwerte für MW-R05 vor:
   - Kosten je abgenommenem Paket und Stufe
