@@ -16,7 +16,7 @@ export async function updateChannelsAction(_prev: ChannelsFormState, formData: F
   const values = formData.getAll("channels").map(String);
   const result = await updateOwnChannels(db(), person, values);
   if (!result.ok) {
-    return result;
+    return { ok: false, formError: result.formError };
   }
   revalidatePath("/", "layout");
   return { ok: true, message: "Gespeichert. Die Kanäle gelten ab der nächsten Benachrichtigung." };

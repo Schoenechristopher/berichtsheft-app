@@ -353,6 +353,109 @@ für `moeglicheAktionen` und als Aktionen der Daten-Fälle; Liste in dieser Reih
 `zugriff_verweigert` ist der Code aus M02 (fremder Bericht, falsche Rolle, deaktivierte Person); `text_zu_lang` und
 `tage_ungueltig` sind die Codes aus M04, hier mit `"feld"` bzw. wie bei `tageSpeichern`.
 
+## Schnittstellen und Aktionen von M08
+
+Die Signaturen stehen in `specs/M08-benachrichtigungen-und-erinnerung.md`, Abschnitt 6. Status, Woche und Personen wie
+bei M02, M03 und M05; die Aktionen der Statuswechsel sind die von M05.
+
+**Datenformate von M08:**
+
+| Art | Format | Beispiel |
+| --- | --- | --- |
+| Kanal | `email`, `teams`, `app`; Listen in dieser Reihenfolge | `teams` |
+| Empfänger | `{ "schluessel": <Text>, "aktiv": <Wahrheitswert>, "kanaele": [<Kanal>, …] }` | `{ "schluessel": "bernd", "aktiv": true, "kanaele": ["email", "app"] }` |
+| Anlass | `eingereicht`, `erneut_eingereicht`, `freigegeben`, `abgelehnt`, `freigabe_zurueckgenommen`, `erinnerung`, `ueberfaellig` | `ueberfaellig` |
+| Nachricht | `{ "empfaenger": <Schlüssel>, "kanal": <Kanal>, "anlass": <Anlass>, "azubi": <Schlüssel>, "wochen": [<Woche>, …], "ziel": "bericht" \| "uebersicht" }`; `wochen` aufsteigend, `ziel` ist das Ziel des Links | siehe unten |
+| Azubi zur Erinnerung | `{ "schluessel", "aktiv", "kanaele", "beginn", "ende", "ausbilder": <Empfänger> \| null, "wochen": [{ "woche", "status", "inhalt", "historie" }, …] }`; `inhalt` und `historie` wie bei `wocheEinordnen` (M03) | |
+
+Betreff und Text nennt eine Nachricht nicht wörtlich: Ihr Wortlaut ist Sache der Plattform. Die neutrale Nachricht
+sagt, worüber sie informiert (Anlass, Azubi, Wochen) und wohin ihr Link führt. Die Reihenfolge der Nachrichten ist die
+der Plattform je Ereignis: je Azubi zuerst die Erinnerung, dann die Information; je Nachricht die Kanäle in der
+Reihenfolge oben.
+
+**Schnittstellen (Fachlogik):**
+
+| Schnittstelle | `eingabe` | `erwartet` (Erfolg) | Fehlercodes |
+| --- | --- | --- | --- |
+| `kanaeleWaehlen` | `{ "werte": [<Text>, …] }` (Auswahl im Formular, ungeprüft) | `{ "kanaele": [<Kanal>, …] }` | `kanal_unbekannt` |
+| `voreinstellungKanaele` | `{}` | `{ "kanaele": [<Kanal>, …] }` | – |
+| `benachrichtigungenPlanen` | `{ "aktion": <Aktion>, "woche": <Woche>, "azubi": <Empfänger>, "ausbilder": <Empfänger> \| null }` (`ausbilder` = zugeordneter Ausbilder) | `{ "nachrichten": [<Nachricht>, …] }` | – |
+| `erinnerungenPlanen` | `{ "azubis": [<Azubi zur Erinnerung>, …] }`; der Fall nennt `uhr` = Stichtag | `{ "nachrichten": [<Nachricht>, …] }` | – |
+| `erinnerungFaellig` | `{ "zeitpunkt": <Zeitpunkt> }` | `{ "woche": <Woche>, "stichtag": <Zeitpunkt>, "faellig": <Wahrheitswert> }`; `faellig` = zwischen Stichtag und Ende des Nachholens | – |
+| `wartezeitNachFehlversuch` | `{ "versuche": <Zahl ab 1> }` (bisherige Fehlversuche) | `{ "sekunden": <Zahl> }` | – |
+| `ruecksprungZiel` | `{ "ziel": <Text> \| null }` (aufgerufene Adresse) | `{ "ziel": <Text> \| null }`; `null` = zur Startseite | – |
+
+Ein unbekannter Kanal in `kanaeleWaehlen` geht unverändert an die Plattform, die ihn abweisen muss. In den anderen
+Schnittstellen macht ein unbekannter Kanal den Fall fehlerhaft.
+
+**Aktionen der Daten-Fälle** (Felder außer `aktion`; `?` = optional). Nachrichten an E-Mail und Teams gehen über einen
+Test-Kanal der Plattform, nie an einen echten Dienst; er zählt die Übergaben je Nachricht und lässt sich je Versandlauf
+stören.
+
+| Aktion | Felder | Ergebnis (Erfolg) | Fehlercodes |
+| --- | --- | --- | --- |
+| `kanaele_einstellen` | `als`, `kanaele` (Liste von Texten, ungeprüft) | `{ "gespeichert": true }` | `zugriff_verweigert`, `kanal_unbekannt` |
+| `kanaele_lesen` | `person` | `{ "kanaele": [<Kanal>, …] }` | – |
+| `erinnerung_ausloesen` | – (der Erinnerungslauf, wie ihn die Plattform zu „jetzt“ startet) | `{ "lauf": "ausgefuehrt", "angelegt": <Zahl> }`, `{ "lauf": "nicht_faellig" }` oder `{ "lauf": "schon_erledigt" }` | – |
+| `nachrichten_versenden` | `stoerung?` (Liste von `email`, `teams`: in diesem Lauf scheitert jede Übergabe) | `{ "versendet": <Zahl>, "erneut": <Zahl>, "aufgegeben": <Zahl> }` | – |
+| `nachrichten_lesen` | `empfaenger?` (nur die Nachrichten an diese Person) | `{ "nachrichten": [<Gespeicherte Nachricht>, …] }` | – |
+| `ungelesen_zaehlen` | `als` | `{ "anzahl": <Zahl> }` (ungelesene eigene App-Nachrichten) | – |
+| `benachrichtigungen_oeffnen` | `als` | `{ "nachrichten": [{ "art", "woche", "neu": <Wahrheitswert> }, …] }`, eigene App-Nachrichten, neueste zuerst; markiert alle als gelesen | – |
+| `nicht_zustellbar_lesen` | `als` | `{ "nachrichten": [{ "empfaenger", "kanal", "versuche", "empfaengerAktiv" }, …] }`, zuletzt aufgegebene zuerst | `zugriff_verweigert` |
+| `erneut_versuchen` | `als`, `empfaenger`, `kanal` (benennen die eine aufgegebene Nachricht an diese Person über diesen Kanal) | `{ "erneut": true }` | `zugriff_verweigert`, `nicht_wiederholbar` |
+| `wochen_lesen` | `azubi` (liest, welche Wochenberichte es für den Azubi gibt; Bestand von M03) | `{ "wochen": [<Woche>, …] }` aufsteigend | – |
+
+Die Statuswechsel von M05 (`einreichen` … `freigabe_zuruecknehmen`) und `person_deaktivieren` gelten unverändert; ihre
+Nachrichten entstehen dabei.
+
+**Gespeicherte Nachricht** (`nachrichten_lesen`):
+
+| Feld | Inhalt |
+| --- | --- |
+| `empfaenger`, `kanal` | Schlüssel der Person, Kanal |
+| `art` | `statuswechsel`, `erinnerung` oder `ueberfaellig` (Information an den Ausbilder) |
+| `woche` | Woche des Berichts; `null`, wenn die Nachricht mehrere Wochen nennt |
+| `angelegt` | Zeitpunkt des Anlegens |
+| `zustand` | `offen` (wartet auf den Versand), `zugestellt` (App: beim Anlegen) oder `aufgegeben` |
+| `versuche` | Zahl der Versuche (Fehlversuche und der erfolgreiche) |
+| `naechsterVersuch` | frühester Zeitpunkt des nächsten Versuchs bei `offen`, sonst `null` |
+| `uebergaben` | wie oft der Test-Kanal die Nachricht in diesem Fall erhalten hat (App: immer 0) |
+
+Reihenfolge: Zeitpunkt des Anlegens, dann Empfänger (Schlüssel), dann Kanal. Ein Erinnerungsfall mit mehreren Azubis
+desselben Ausbilders gibt seinen Schritten verschiedene `uhr` oder liest je Empfänger.
+
+**Fehlercodes von M08:**
+
+| Code | Bedeutung | AK |
+| --- | --- | --- |
+| `kanal_unbekannt` | Ein gewählter Kanal ist keiner von E-Mail, Teams, App; nichts wird gespeichert. | AK-1011 |
+| `nicht_wiederholbar` | „Erneut versuchen“ geht nicht: Der Empfänger ist deaktiviert oder die Nachricht ist nicht (mehr) aufgegeben. | AK-1004 |
+
+`zugriff_verweigert` ist der Code aus M02 (deaktivierte Person, Azubi bei „nicht zustellbar“).
+
+**Beispiel** (AK-1001-01):
+
+```json
+{
+  "id": "AK-1001-01",
+  "modul": "M08",
+  "ebene": "fachlogik",
+  "schnittstelle": "benachrichtigungenPlanen",
+  "eingabe": {
+    "aktion": "einreichen",
+    "woche": "2026-W41",
+    "azubi": { "schluessel": "anna", "aktiv": true, "kanaele": ["email", "app"] },
+    "ausbilder": { "schluessel": "bernd", "aktiv": true, "kanaele": ["email", "app"] }
+  },
+  "erwartet": {
+    "nachrichten": [
+      { "empfaenger": "bernd", "kanal": "email", "anlass": "eingereicht", "azubi": "anna", "wochen": ["2026-W41"], "ziel": "bericht" },
+      { "empfaenger": "bernd", "kanal": "app", "anlass": "eingereicht", "azubi": "anna", "wochen": ["2026-W41"], "ziel": "bericht" }
+    ]
+  }
+}
+```
+
 ## Fehlercodes
 
 | Code | Bedeutung | AK |
@@ -364,8 +467,8 @@ für `moeglicheAktionen` und als Aktionen der Daten-Fälle; Liste in dieser Reih
 ## Aktionen und Status
 
 - **Status:** `Entwurf`, `Eingereicht`, `Freigegeben`, `Abgelehnt` (Statusmodell in `docs/01`).
-- **Aktionen:** die Statuswechsel und die Aktionen der Daten-Fälle in „Schnittstellen und Aktionen von M05“
-  (seit G2). Aktionen der Ablauf-Fälle kommen in G3 dazu.
+- **Aktionen:** die Statuswechsel und die Aktionen der Daten-Fälle in „Schnittstellen und Aktionen von M05“ und
+  „Schnittstellen und Aktionen von M08“ (seit G2). Aktionen der Ablauf-Fälle kommen in G3 dazu.
 
 ## Regeln für Adapter
 

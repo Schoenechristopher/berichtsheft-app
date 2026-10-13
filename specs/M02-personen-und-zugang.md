@@ -151,7 +151,7 @@ Text aus `docs/01-spezifikation.md`; Prüffälle in `specs/pruefung/M02.json`.
 | AK-202 | Ein Azubi braucht zugeordneten Ausbilder und Ausbildungsbeginn; fehlt eines, nennt die Meldung das Feld. | M02-R14 bis M02-R16 | AK-202-01 bis AK-202-09 | Fachlogik |
 | AK-203 | Der Admin ändert Rolle, zugeordneten Ausbilder sowie Ausbildungsbeginn und -ende. Die Folgen für die Berichte regelt M03. | M02-R16 bis M02-R18 | AK-203-01 bis AK-203-07 | Fachlogik |
 | AK-204 | Entfernen deaktiviert: keine Anmeldung, Berichte für Ausbilder lesbar, nicht änderbar; wieder aktivieren, einen Azubi nur mit aktivem Ausbilder. | M02-R03, M02-R10, M02-R19, M02-R20 | AK-204-01 bis AK-204-10 | Fachlogik |
-| AK-205 | Deaktivierte Azubis erhalten keine Erinnerungen, und für sie entstehen keine neuen Wochenberichte. | M02-R19 | folgt in G3 | Ablauf, G3 |
+| AK-205 | Deaktivierte Azubis erhalten keine Erinnerungen, und für sie entstehen keine neuen Wochenberichte. | M02-R19 | AK-205-01, AK-205-02 | Daten |
 | AK-206 | Endgültiges Löschen nur nach ausdrücklicher Bestätigung; Person in fremder Historie nur deaktivierbar, „Deaktivieren“ wird angeboten. | M02-R21, M02-R22 | AK-206-01 bis AK-206-07 | Fachlogik |
 | AK-207 | Der letzte aktive Ausbilder wird weder deaktiviert, gelöscht noch herabgestuft; niemand deaktiviert, löscht sich selbst oder ändert die eigene Rolle. | M02-R23, M02-R25 bis M02-R27 | AK-207-01 bis AK-207-08 | Fachlogik |
 | AK-208 | Ausbilder mit zugeordneten Azubis erst nach Neuzuordnung deaktivierbar; fürs Löschen und Herabstufen zählen auch deaktivierte Azubis. | M02-R24, M02-R26 | AK-208-01 bis AK-208-05 | Fachlogik |
@@ -163,9 +163,10 @@ Begründung der Ebene `Ablauf, G3` (Entscheidung E1):
   Anmeldeablauf mit dem Anmeldedienst; dafür gibt es keine Regel, die sich ohne ihn aufrufen ließe.
 - **AK-106:** Abmelden und der anschließende Zugriffsversuch sind ein Ablauf über Sitzung und Anmeldedienst; ohne
   Sitzung gibt es dazu keine Fachlogik.
-- **AK-205:** Die Regel wirkt beim Anlegen der Wochen (M03) und beim Planen der Erinnerung (M08) auf den gespeicherten
-  Bestand; M02 liefert dafür nur „aktiv“. Prüfbar ist sie an der Datenhaltung oder im Ablauf; einen Runner für Daten
-  gibt es in G2 noch nicht.
+
+AK-205 wirkt beim Anlegen der Wochen (M03) und beim Planen der Erinnerung (M08); M02 liefert dafür nur „aktiv“. Ihre
+Prüffälle nutzen deshalb Schnittstelle und Aktionen von M08 (`erinnerungenPlanen`, `erinnerung_ausloesen`,
+`nachrichten_lesen`, `wochen_lesen`; `format.md`, „Schnittstellen und Aktionen von M08“).
 
 Nicht als Fachlogik geprüft werden außerdem Teile, die nur der Ablauf zeigt: die Meldungstexte („Kein Zugang – bitte an
 den Ausbilder wenden“, „Zugriff verweigert“, die Meldung am Feld), dass eine Deaktivierung eine laufende Sitzung sofort
@@ -280,9 +281,10 @@ Genutzt:
 
 ## 10. Offene Punkte
 
-- [ ] **Bitte bestätigen:** AK-205 mit Ebene `Ablauf, G3` (Begründung in Abschnitt 4). Alternative: Prüffall über die
-      Erinnerung von M08 (Fachlogik) und über das Anlegen der Wochen von M03 an der Datenhaltung, sobald es den
-      Daten-Runner gibt.
+- [x] AK-205 ist seit G2 (Paket E, 13.10.2026) mit Ebene `Daten` belegt: AK-205-01 über die Erinnerung von M08
+      (Fachlogik, `erinnerungenPlanen`), AK-205-02 als Daten-Fall mit dem Erinnerungslauf von M08, der vorher die
+      fälligen Wochen anlegt (M03): Für die deaktivierte Anna entsteht keine neue Woche und keine Erinnerung, für einen
+      aktiven Azubi beides. Der Vorschlag vom 13.10.2026 ist damit umgesetzt.
 - [ ] **Bitte bestätigen:** Reihenfolge der Gründe bei mehreren zutreffenden Regeln (M02-R26). Sie entspricht dem
       heutigen Verhalten der App; fachlich vorgegeben ist nur „letzter aktiver Ausbilder vor eigener Person“ (AK-207).
 - [ ] **Bitte bestätigen:** Wechselt ein Azubi mit Berichten zum Ausbilder, bleiben seine Berichte erhalten, bekommen

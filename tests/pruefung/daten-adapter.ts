@@ -1,8 +1,9 @@
 /**
  * Daten-Adapter für die neutralen Prüffälle der Ebene `daten` (`specs/pruefung/format.md`, „Aufbau eines
  * Daten-Falls“): stellt den Ausgangsbestand in der Test-Datenbank her, übersetzt die Aktionen auf die
- * Serverfunktionen der App (`src/lib/report-transitions.ts`, `src/lib/reports.ts`, Nutzerverwaltung) und
- * liest den Bestand zurück. Er deutet kein Ergebnis um; fachliche Fehler werden über den festen Grund
+ * Serverfunktionen der App (`src/lib/report-transitions.ts`, `src/lib/reports.ts`, Nutzerverwaltung,
+ * Benachrichtigungen in `src/lib/notifications/`) und liest den Bestand zurück. Nachrichten gehen nie
+ * an echte Dienste: E-Mail und Teams laufen über einen Test-Kanal, der jede Übergabe zählt. Er deutet kein Ergebnis um; fachliche Fehler werden über den festen Grund
  * der App (`reason`) auf die Fehlercodes abgebildet, nie über den Meldungstext.
  */
 import { readFileSync } from "node:fs";
@@ -21,10 +22,26 @@ import {
   saveReportDays,
   type SaveFailureReason,
 } from "@/lib/reports";
+import type { Channel } from "@/domain/notifications";
+import type { ChannelAdapter, DeliveryAdapters } from "@/lib/notifications/adapters";
+import { appBaseUrl, notificationConfig } from "@/lib/notifications/config";
+import { deliverPendingNotifications } from "@/lib/notifications/outbox";
+import {
+  countUnread,
+  listUndeliverable,
+  openNotifications,
+  retryUndeliverable,
+  runDueReminders,
+  updateOwnChannels,
+  type ChannelsFailureReason,
+  type RetryFailureReason,
+} from "@/lib/notifications/service";
 import { createKeyedPersons, resetDatabase, type KeyedPerson, type TestDb } from "../db/helpers";
 import {
+  CHANNEL_NAMES,
   CaseFormatError,
   SUBMISSION_PROBLEM_CODES,
+  channelValue,
   TRANSITION_ACTIONS,
   TRANSITION_REASON_CODES,
   WEEKDAYS,
@@ -75,7 +92,48 @@ const STEP_FIELDS: Record<string, { required: string[]; optional: string[] }> = 
   rueckmeldung_lesen: { required: ["azubi", "woche"], optional: ["uhr"] },
   person_deaktivieren: { required: ["als", "person"], optional: ["uhr"] },
   ausbildungszeitraum_aendern: { required: ["als", "person", "beginn", "ende"], optional: ["uhr"] },
+  // M08 Benachrichtigungen und Erinnerung
+  kanaele_einstellen: { required: ["als", "kanaele"], optional: ["uhr"] },
+  kanaele_lesen: { required: ["person"], optional: ["uhr"] },
+  erinnerung_ausloesen: { required: [], optional: ["uhr"] },
+  nachrichten_versenden: { required: [], optional: ["uhr", "stoerung"] },
+  nachrichten_lesen: { required: [], optional: ["uhr", "empfaenger"] },
+  ungelesen_zaehlen: { required: ["als"], optional: ["uhr"] },
+  benachrichtigungen_oeffnen: { required: ["als"], optional: ["uhr"] },
+  nicht_zustellbar_lesen: { required: ["als"], optional: ["uhr"] },
+  erneut_versuchen: { required: ["als", "empfaenger", "kanal"], optional: ["uhr"] },
+  wochen_lesen: { required: ["azubi"], optional: ["uhr"] },
 };
+
+/** M08: feste Fehlercodes je Grund beim Speichern der Kanäle. */
+const CHANNELS_CODES: Record<ChannelsFailureReason, string> = {
+  forbidden: "zugriff_verweigert",
+  "unknown-channel": "kanal_unbekannt",
+};
+
+/** M08: feste Fehlercodes je Grund bei „Erneut versuchen“; `null` = kein fachlicher Fehler. */
+const RETRY_CODES: Record<RetryFailureReason, string | null> = {
+  forbidden: "zugriff_verweigert",
+  "not-found": null,
+  "not-retryable": "nicht_wiederholbar",
+};
+
+/** M08: Art des Ereignisses aus dem gespeicherten Ereignisschlüssel (Statuswechsel, Erinnerung, Information). */
+const EVENT_KINDS: [string, string][] = [
+  ["status-change:", "statuswechsel"],
+  ["reminder:", "erinnerung"],
+  ["trainer-info:", "ueberfaellig"],
+];
+
+function eventKind(eventKey: string): string {
+  const kind = EVENT_KINDS.find(([prefix]) => eventKey.startsWith(prefix))?.[1];
+  if (!kind) {
+    throw new Error(`Unbekannter Ereignisschlüssel: ${eventKey}`);
+  }
+  return kind;
+}
+
+const CHANNEL_ORDER = Object.keys(CHANNEL_NAMES);
 
 interface TestData {
   bundesland: string;
@@ -113,6 +171,13 @@ class DataCase {
   private readonly reports = new Map<string, { azubi: string; woche: string; id: string }>();
   /** Stand (Status und Version) aller Berichte nach jedem Schritt; Index 0 = Ausgangsbestand. */
   private readonly states: Map<string, SeenState>[] = [];
+  /** M08: Übergaben an den Test-Kanal je Benachrichtigung und Kanäle, die im laufenden Schritt gestört sind. */
+  private readonly handovers = new Map<string, number>();
+  private readonly disturbed = new Set<string>();
+  private readonly testChannels: DeliveryAdapters = {
+    EMAIL: this.testChannel("EMAIL"),
+    TEAMS: this.testChannel("TEAMS"),
+  };
 
   constructor(private readonly prisma: TestDb) {}
 
@@ -406,7 +471,189 @@ class DataCase {
         return { geaendert: true };
       }
     }
-    throw new CaseFormatError(`Unbekannte Aktion: ${action}`);
+    const result = await this.notificationStep(action, step);
+    if (!result) {
+      throw new CaseFormatError(`Unbekannte Aktion: ${action}`);
+    }
+    return result;
+  }
+
+  // ---------------------------------------------------------------------------
+  // M08 Benachrichtigungen und Erinnerung
+  // ---------------------------------------------------------------------------
+
+  /** Test-Kanal statt E-Mail bzw. Teams: zählt jede Übergabe; ist der Kanal gestört, scheitert sie. */
+  private testChannel(channel: Channel): ChannelAdapter {
+    return {
+      send: async (message) => {
+        if (this.disturbed.has(channel)) {
+          throw new Error(`Test-Kanal ${channel} gestört.`);
+        }
+        this.handovers.set(message.notificationId, (this.handovers.get(message.notificationId) ?? 0) + 1);
+      },
+    };
+  }
+
+  private async weekOfReport(reportId: string | null): Promise<string | null> {
+    if (reportId === null) {
+      return null;
+    }
+    return formatWeek(await this.prisma.weeklyReport.findUniqueOrThrow({ where: { id: reportId } }));
+  }
+
+  private async notificationStep(action: string, step: Input): Promise<Result | undefined> {
+    switch (action) {
+      case "kanaele_einstellen": {
+        const values = field(step, "kanaele");
+        if (!Array.isArray(values)) {
+          throw new CaseFormatError("„kanaele“ muss eine Liste sein.");
+        }
+        const result = await updateOwnChannels(
+          this.prisma,
+          await this.viewer(text(step, "als")),
+          values.map(channelValue),
+        );
+        return result.ok ? { gespeichert: true } : { fehler: CHANNELS_CODES[result.reason] };
+      }
+      case "kanaele_lesen": {
+        const person = await this.prisma.person.findUniqueOrThrow({
+          where: { id: this.personId(text(step, "person")) },
+        });
+        return { kanaele: person.channels.map((channel) => CHANNEL_NAMES[channel]) };
+      }
+      case "erinnerung_ausloesen": {
+        const result = await runDueReminders(this.prisma, { now: now(), baseUrl: appBaseUrl() });
+        if (result.ran) {
+          return { lauf: "ausgefuehrt", angelegt: result.created };
+        }
+        return { lauf: result.reason === "nicht-faellig" ? "nicht_faellig" : "schon_erledigt" };
+      }
+      case "nachrichten_versenden": {
+        const disturbed = "stoerung" in step ? field(step, "stoerung") : [];
+        if (!Array.isArray(disturbed)) {
+          throw new CaseFormatError("„stoerung“ muss eine Liste von Kanälen sein.");
+        }
+        for (const value of disturbed) {
+          const channel = channelValue(value);
+          if (channel !== "EMAIL" && channel !== "TEAMS") {
+            throw new CaseFormatError(`Gestört sein kann nur „email“ oder „teams“: ${String(value)}`);
+          }
+          this.disturbed.add(channel);
+        }
+        try {
+          const result = await deliverPendingNotifications(this.prisma, this.testChannels, {
+            now,
+            maxAttempts: notificationConfig({}).maxAttempts,
+          });
+          return { versendet: result.sent, erneut: result.retried, aufgegeben: result.failed };
+        } finally {
+          this.disturbed.clear();
+        }
+      }
+      case "nachrichten_lesen": {
+        const notifications = await this.prisma.notification.findMany({
+          where: "empfaenger" in step ? { recipientId: this.personId(text(step, "empfaenger")) } : {},
+        });
+        const rows = notifications.map((notification) => ({
+          notification,
+          key: this.personKey(notification.recipientId),
+        }));
+        // Reihenfolge: Zeitpunkt der Anlage, Empfänger, Kanal (E-Mail, Teams, App), Ereignis.
+        rows.sort(
+          (a, b) =>
+            a.notification.createdAt.getTime() - b.notification.createdAt.getTime() ||
+            a.key.localeCompare(b.key) ||
+            CHANNEL_ORDER.indexOf(a.notification.channel) - CHANNEL_ORDER.indexOf(b.notification.channel) ||
+            a.notification.eventKey.localeCompare(b.notification.eventKey),
+        );
+        const messages: Result[] = [];
+        for (const { notification, key } of rows) {
+          const state =
+            notification.sentAt !== null ? "zugestellt" : notification.failedAt !== null ? "aufgegeben" : "offen";
+          messages.push({
+            empfaenger: key,
+            kanal: CHANNEL_NAMES[notification.channel],
+            art: eventKind(notification.eventKey),
+            woche: await this.weekOfReport(notification.reportId),
+            angelegt: formatInstant(notification.createdAt),
+            zustand: state,
+            versuche: notification.attempts,
+            naechsterVersuch: state === "offen" ? formatInstant(notification.nextAttemptAt) : null,
+            uebergaben: this.handovers.get(notification.id) ?? 0,
+          });
+        }
+        return { nachrichten: messages };
+      }
+      case "ungelesen_zaehlen":
+        return { anzahl: await countUnread(this.prisma, this.personId(text(step, "als"))) };
+      case "benachrichtigungen_oeffnen": {
+        const opened = await openNotifications(this.prisma, this.personId(text(step, "als")), now());
+        const messages: Result[] = [];
+        for (const item of opened) {
+          const stored = await this.prisma.notification.findUniqueOrThrow({ where: { id: item.id } });
+          messages.push({
+            art: eventKind(stored.eventKey),
+            woche: await this.weekOfReport(stored.reportId),
+            neu: item.unread,
+          });
+        }
+        return { nachrichten: messages };
+      }
+      case "nicht_zustellbar_lesen": {
+        const list = await listUndeliverable(this.prisma, await this.viewer(text(step, "als")));
+        if (list === null) {
+          return { fehler: "zugriff_verweigert" };
+        }
+        const messages: Result[] = [];
+        for (const item of list) {
+          const stored = await this.prisma.notification.findUniqueOrThrow({ where: { id: item.id } });
+          messages.push({
+            empfaenger: this.personKey(stored.recipientId),
+            kanal: CHANNEL_NAMES[item.channel],
+            versuche: item.attempts,
+            empfaengerAktiv: item.recipient.active,
+          });
+        }
+        return { nachrichten: messages };
+      }
+      case "erneut_versuchen": {
+        const candidates = await this.prisma.notification.findMany({
+          where: {
+            recipientId: this.personId(text(step, "empfaenger")),
+            channel: channelValue(field(step, "kanal")) as Channel,
+            failedAt: { not: null },
+            sentAt: null,
+          },
+        });
+        if (candidates.length !== 1) {
+          throw new CaseFormatError(
+            `„erneut_versuchen“ braucht genau eine aufgegebene Nachricht an diesen Empfänger und Kanal (${candidates.length}).`,
+          );
+        }
+        const result = await retryUndeliverable(
+          this.prisma,
+          await this.viewer(text(step, "als")),
+          candidates[0].id,
+          now(),
+        );
+        if (result.ok) {
+          return { erneut: true };
+        }
+        const code = RETRY_CODES[result.reason];
+        if (!code) {
+          throw new Error(`„Erneut versuchen“ ohne fachlichen Fehlercode gescheitert: ${JSON.stringify(result)}`);
+        }
+        return { fehler: code };
+      }
+      case "wochen_lesen": {
+        const reports = await this.prisma.weeklyReport.findMany({
+          where: { traineeId: this.personId(text(step, "azubi")) },
+          orderBy: [{ isoYear: "asc" }, { isoWeek: "asc" }],
+        });
+        return { wochen: reports.map(formatWeek) };
+      }
+    }
+    return undefined;
   }
 
   private async transition(step: Input, action: ReportAction, index: number): Promise<Result> {

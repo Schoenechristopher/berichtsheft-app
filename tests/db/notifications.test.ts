@@ -177,6 +177,7 @@ describe("Kanäle (AK-1011 – AK-1014)", () => {
     }
     expect(await updateOwnChannels(prisma, persons.anna, ["SMS"])).toEqual({
       ok: false,
+      reason: "unknown-channel",
       formError: "Unbekannter Kanal.",
     });
     expect(await updateOwnChannels(prisma, { ...persons.anna, active: false }, ["APP"])).toMatchObject({ ok: false });
@@ -475,7 +476,7 @@ describe("Nicht zustellbare Nachrichten (bestätigte Auslegung 12)", () => {
     return prisma.notification.findFirstOrThrow({ where: { channel: "EMAIL" } });
   }
 
-  it("Ausbilder sehen Empfänger, Kanal, Anlass, letzten Versuch und Fehlermeldung; Azubis nicht", async () => {
+  it("AK-1004 Ausbilder sehen Empfänger, Kanal, Anlass, letzten Versuch und Fehlermeldung; Azubis nicht", async () => {
     const failed = await failedEmail();
     expect(failed.failedAt).toEqual(new Date("2026-10-06T10:03:00+02:00"));
 
@@ -500,7 +501,7 @@ describe("Nicht zustellbare Nachrichten (bestätigte Auslegung 12)", () => {
     expect(await prisma.notification.count()).toBe(2);
   });
 
-  it("auch Nachrichten an inzwischen deaktivierte Empfänger erscheinen, ohne „Erneut versuchen“", async () => {
+  it("AK-1004 auch Nachrichten an inzwischen deaktivierte Empfänger erscheinen, ohne „Erneut versuchen“", async () => {
     await act(persons.anna, (await filledReport(40)).id, { action: "SUBMIT" });
     await prisma.person.update({ where: { id: persons.bernd.id }, data: { active: false } });
     await deliverPendingNotifications(prisma, adapters(recordingAdapter().adapter), deliveryOptions);
@@ -510,11 +511,12 @@ describe("Nicht zustellbare Nachrichten (bestätigte Auslegung 12)", () => {
     expect(await retryUndeliverable(prisma, persons.clara, item.id, now())).toMatchObject({ ok: false });
   });
 
-  it("„Erneut versuchen“: Der Worker versendet die Nachricht beim nächsten Durchlauf genau einmal", async () => {
+  it("AK-1004 „Erneut versuchen“: Der Worker versendet die Nachricht beim nächsten Durchlauf genau einmal", async () => {
     const failed = await failedEmail();
     // Nur Ausbilder.
     expect(await retryUndeliverable(prisma, persons.anna, failed.id, now())).toEqual({
       ok: false,
+      reason: "forbidden",
       formError: "Zugriff verweigert",
     });
     expect(await retryUndeliverable(prisma, persons.clara, "kein-uuid", now())).toMatchObject({ ok: false });

@@ -59,6 +59,24 @@ import {
 } from "@/domain/report-status";
 import { validateSubmission, type SubmissionProblem } from "@/domain/report-submission";
 
+import { safeReturnPath } from "@/domain/access";
+import {
+  DEFAULT_CHANNELS,
+  TRAINEE_HOME_PATH,
+  parseChannels,
+  planReminders,
+  planTransitionNotifications,
+  reminderSchedule,
+  reportPath,
+  retryDelaySeconds,
+  traineeOverviewPath,
+  type Channel,
+  type NotificationDraft,
+  type NotificationTopic,
+  type Recipient,
+  type ReminderTrainee,
+} from "@/domain/notifications";
+
 export type Input = Record<string, unknown>;
 export type Result = Record<string, unknown>;
 
@@ -578,6 +596,145 @@ const statusOperations: Record<string, (input: Input) => Result> = {
   },
 };
 
+// ---------------------------------------------------------------------------
+// M08 Benachrichtigungen und Erinnerung
+// ---------------------------------------------------------------------------
+
+/** Kanäle (`format.md`, „Schnittstellen und Aktionen von M08“) und der App, in fester Reihenfolge. */
+export const CHANNEL_NAMES: Record<Channel, string> = { EMAIL: "email", TEAMS: "teams", APP: "app" };
+
+const CHANNEL_VALUES = new Map(Object.entries(CHANNEL_NAMES).map(([channel, name]) => [name, channel]));
+
+/** Neutraler Kanal → Wert der App; ein unbekannter Text geht unverändert an die App, die ihn abweisen muss. */
+export function channelValue(value: unknown): string {
+  if (typeof value !== "string") {
+    throw new CaseFormatError(`Kanal muss Text sein: ${JSON.stringify(value)}`);
+  }
+  return CHANNEL_VALUES.get(value) ?? value;
+}
+
+/** Anlass einer Nachricht. */
+export const TOPIC_NAMES: Record<NotificationTopic, string> = {
+  SUBMITTED: "eingereicht",
+  RESUBMITTED: "erneut_eingereicht",
+  APPROVED: "freigegeben",
+  REJECTED: "abgelehnt",
+  APPROVAL_REVOKED: "freigabe_zurueckgenommen",
+  REMINDER: "erinnerung",
+  OVERDUE: "ueberfaellig",
+};
+
+/** Gewählte Kanäle einer Person; nur die drei bekannten. */
+function channels(input: Input, name: string): Channel[] {
+  const values = field(input, name);
+  if (!Array.isArray(values)) {
+    throw new CaseFormatError(`„${name}“ muss eine Liste von Kanälen sein.`);
+  }
+  return values.map((value) => {
+    const channel = channelValue(value);
+    if (!Object.hasOwn(CHANNEL_NAMES, channel)) {
+      throw new CaseFormatError(`Unbekannter Kanal: ${String(value)}`);
+    }
+    return channel as Channel;
+  });
+}
+
+/** Empfänger `{ schluessel, aktiv, kanaele }`; der Name ist der Schlüssel (er steht nur im Text). */
+function recipient(input: Input): Recipient {
+  const key = text(input, "schluessel");
+  return { id: key, name: key, active: bool(input, "aktiv"), channels: channels(input, "kanaele") };
+}
+
+/** Bericht-ID für die Fachlogik: Azubi und Woche (eine Datenhaltung gibt es hier nicht). */
+function reportKey(azubi: string, woche: string): string {
+  return `${azubi}:${woche}`;
+}
+
+/** Nachricht der App → neutrale Nachricht; das Ziel des Links wird nur übersetzt, nie berechnet. */
+function message(draft: NotificationDraft): Result {
+  const { topic, traineeId, weeks } = draft.about;
+  let target: string;
+  if (draft.reportId !== null && draft.link === reportPath(draft.reportId)) {
+    target = "bericht";
+  } else if (draft.link === TRAINEE_HOME_PATH || draft.link === traineeOverviewPath(traineeId)) {
+    target = "uebersicht";
+  } else {
+    throw new Error(`Unbekanntes Ziel des Links: ${draft.link}`);
+  }
+  return {
+    empfaenger: draft.recipientId,
+    kanal: CHANNEL_NAMES[draft.channel],
+    anlass: TOPIC_NAMES[topic],
+    azubi: traineeId,
+    wochen: weeks.map(formatWeek),
+    ziel: target,
+  };
+}
+
+const notificationOperations: Record<string, (input: Input) => Result> = {
+  kanaeleWaehlen: (input) => {
+    const values = field(input, "werte");
+    if (!Array.isArray(values)) {
+      throw new CaseFormatError("„werte“ muss eine Liste sein.");
+    }
+    const chosen = parseChannels(values.map(channelValue));
+    return chosen === null
+      ? { fehler: "kanal_unbekannt" }
+      : { kanaele: chosen.map((channel) => CHANNEL_NAMES[channel]) };
+  },
+  voreinstellungKanaele: () => ({ kanaele: DEFAULT_CHANNELS.map((channel) => CHANNEL_NAMES[channel]) }),
+  benachrichtigungenPlanen: (input) => {
+    const trainee = recipient(object(input, "azubi"));
+    const trainer = objectOrNull(input, "ausbilder");
+    const week = parseWeek(text(input, "woche"));
+    const drafts = planTransitionNotifications({
+      statusChangeId: "statuswechsel",
+      action: transitionAction(input),
+      report: { ...week, id: reportKey(trainee.id, formatWeek(week)) },
+      trainee: { ...trainee, trainer: trainer === null ? null : recipient(trainer) },
+      // Name und Adresse stehen nur im Text der Nachricht, den die neutrale Schnittstelle nicht liefert.
+      actor: { name: "handelnd" },
+      baseUrl: "https://berichtsheft.test",
+    });
+    return { nachrichten: drafts.map(message) };
+  },
+  erinnerungenPlanen: (input) => {
+    const trainees: ReminderTrainee[] = list(input, "azubis").map((entry) => {
+      const trainee = recipient(entry);
+      const trainer = objectOrNull(entry, "ausbilder");
+      const period = trainingPeriod(entry);
+      return {
+        ...trainee,
+        trainingStart: period.start,
+        trainingEnd: period.end,
+        trainer: trainer === null ? null : recipient(trainer),
+        weeks: list(entry, "wochen").map((week) => ({
+          ...parseWeek(text(week, "woche")),
+          status: status(week, "status"),
+          hasContent: bool(week, "inhalt"),
+          hasHistory: bool(week, "historie"),
+          reportId: reportKey(trainee.id, text(week, "woche")),
+        })),
+      };
+    });
+    return {
+      nachrichten: planReminders({ now: now(), trainees, baseUrl: "https://berichtsheft.test" }).map(message),
+    };
+  },
+  erinnerungFaellig: (input) => {
+    const schedule = reminderSchedule(parseInstant(text(input, "zeitpunkt")));
+    return { woche: formatWeek(schedule.week), stichtag: formatInstant(schedule.dueAt), faellig: schedule.due };
+  },
+  wartezeitNachFehlversuch: (input) => {
+    const attempts = integer(input, "versuche");
+    if (attempts < 1) {
+      throw new CaseFormatError(`„versuche“ muss mindestens 1 sein: ${attempts}`);
+    }
+    return { sekunden: retryDelaySeconds(attempts) };
+  },
+  ruecksprungZiel: (input) => ({ ziel: safeReturnPath(field(input, "ziel")) }),
+};
+
 const operations: Record<string, (input: Input) => Result> = {
   jetzt: () => ({ zeitpunkt: formatInstant(now()) }),
   uhrVorgeben: (input) => {
@@ -707,6 +864,9 @@ const operations: Record<string, (input: Input) => Result> = {
 
   // --- M05 Status und Prüfung ---
   ...statusOperations,
+
+  // --- M08 Benachrichtigungen und Erinnerung ---
+  ...notificationOperations,
 };
 
 /** Namen aller Schnittstellen, die der Adapter kennt. */

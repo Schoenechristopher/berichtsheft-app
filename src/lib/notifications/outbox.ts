@@ -32,7 +32,7 @@ export interface DeliveryResult {
   failed: number;
 }
 
-/** Hinweis an der Zeile, wenn der Empfänger inzwischen deaktiviert ist (Vorschlag zur Bestätigung). */
+/** Hinweis an der Zeile, wenn der Empfänger inzwischen deaktiviert ist (AK-1004, Ergänzung Etappe 6). */
 export const RECIPIENT_INACTIVE = "Empfänger deaktiviert – nicht versendet.";
 
 type Outcome = "sent" | "retried" | "failed" | null;

@@ -1,13 +1,13 @@
 # Code-Landkarte
 
-Stand: 12.10.2026 · Status: **Entwurf zur Freigabe** (Etappe G1) · @Chris
+Stand: 13.10.2026 · Status: **Entwurf zur Freigabe** (Etappe G2) · @Chris
 
 Unterspec für Weg A (`docs/06-spec-architektur.md`, „Code-Landkarte“): welche Dateien der TypeScript-App ein Modul
 umsetzen, in welcher Reihenfolge sie zu lesen sind und was sich 1:1 übertragen lässt. Die Regeln selbst stehen in den
 Fach-Specs (`specs/Mxx-*.md`).
 
-`npm run landkarte` meldet Dateien unter `src/domain/` und `src/lib/`, die hier fehlen. In G1 ist das nur ein Bericht,
-weil erst M01 beschrieben ist; ab Ende G2 ist es Pflicht in der CI (`npm run landkarte -- --pruefen`).
+`npm run landkarte` meldet Dateien unter `src/domain/` und `src/lib/`, die hier fehlen. Seit Ende G2 ist das Pflicht in
+der CI (`npm run landkarte -- --pruefen`): Jede dieser Dateien steht in einem Modulabschnitt oder im „Querschnitt“.
 
 Spalten: **Plattformgebunden** = hängt an Next.js, Prisma, PostgreSQL oder einer Bibliothek, die es auf anderen
 Plattformen nicht gibt. **Übertragung**: „1:1 übersetzen“ (Logik ohne Änderung nachbauen), „nach Profil neu bauen“
@@ -290,3 +290,93 @@ Reihenfolge der Prüfungen ist M05-R21), dann `src/domain/report-submission.ts`,
 **Ersetzt durch Bordmittel:** Nichts fachlich: Die Regeln in `report-status.ts` und `report-submission.ts` werden 1:1
 übersetzt. Transaktion, Sperre, Versionsstand und Schreibschutz baut jede Plattform mit ihren Mitteln nach; ob dabei
 ein Workflow der Plattform genutzt wird, legt das Profil fest (G4).
+
+## M08 Benachrichtigungen und Erinnerung
+
+Fach-Spec: `specs/M08-benachrichtigungen-und-erinnerung.md` · Prüffälle: `specs/pruefung/M08.json` (Ebenen `fachlogik`
+und `daten`), dazu AK-205-01 und AK-205-02 in `specs/pruefung/M02.json`
+
+| Datei / Funktion | Rolle | Regeln / AK | Plattformgebunden | Übertragung |
+| --- | --- | --- | --- | --- |
+| `src/domain/notifications.ts` → `Channel`, `CHANNELS`, `CHANNEL_LABELS`, `DEFAULT_CHANNELS`, `parseChannels()`, `NO_CHANNEL_WARNING` | Kanäle, Voreinstellung, Auswahl aus dem Formular | M08-R04, M08-R05; AK-1011, AK-1012 | nein | 1:1 übersetzen |
+| `src/domain/notifications.ts` → `Recipient`, `NotificationDraft`, `NotificationAbout`, `NotificationTopic`, `fanOut()` | eine Nachricht je gewähltem Kanal, nichts an deaktivierte Empfänger; `about` = Anlass, Azubi, Wochen (wird nicht gespeichert) | M08-R02, M08-R06, M08-R07; AK-1013, AK-1014 | nein | 1:1 übersetzen |
+| `src/domain/notifications.ts` → `TransitionNotice`, `NOTICE_LABELS`, `noticeFor()`, `planTransitionNotifications()`, `TransitionNotificationInput` | Empfänger und Inhalt je Statuswechsel; Ereignisschlüssel = Historieneintrag | M08-R01, M08-R02, M08-R08; AK-1001 bis AK-1004 | nein | 1:1 übersetzen |
+| `src/domain/notifications.ts` → `reportPath()`, `TRAINEE_HOME_PATH`, `traineeOverviewPath()`, `absoluteUrl()`, `shortWeek()`, `longWeek()` | Links und Wochentexte in Nachrichten | M08-R08, M08-R09; AK-1003 | nein (Pfade der App) | 1:1 übersetzen, Pfade nach Profil |
+| `src/domain/notifications.ts` → `reminderWeeks()`, `planReminders()`, `ReminderTrainee`, `ReminderWeek`, `ReminderInput` | offene und überfällige Wochen zum Stichtag; Erinnerung und Information, eine pro Azubi; Ereignisschlüssel je Woche des Stichtags | M08-R19 bis M08-R22; AK-1021 bis AK-1025, AK-205 | nein | 1:1 übersetzen |
+| `src/domain/notifications.ts` → `reminderSchedule()`, `ReminderSchedule` | Stichtag Montag 9:00 Uhr Berlin, Nachholen bis Dienstag 23:59 Uhr | M08-R17; AK-1021 | ja (`Intl.DateTimeFormat` mit Zeitzonen-Datenbank) | nach Profil neu bauen (Zeitzonen-API), Prüffälle AK-1021-03 bis AK-1021-12 als Maßstab |
+| `src/domain/notifications.ts` → `retryDelaySeconds()` | Wartezeit nach Fehlversuchen | M08-R13; AK-1004 | nein | 1:1 übersetzen |
+| `src/domain/access.ts` → `RETURN_PARAM`, `safeReturnPath()` | Rücksprungziel nach der Anmeldung (Datei sonst M02) | M08-R10; AK-1003 | nein | 1:1 übersetzen |
+| `src/lib/notifications/service.ts` → `insertNotifications()`, `recordTransitionNotifications()`, `StatusChangeEvent` | Nachrichten in den Ausgangskorb, in der Transaktion des Statuswechsels (Einhängepunkt in `transitionReport()`, M05); Doppelte überspringt die Datenbank | M08-R03, M08-R07, M08-R11, M08-R12; AK-1001 bis AK-1004, AK-1014 | ja (Prisma, Unique-Index) | nach Profil neu bauen |
+| `src/lib/notifications/service.ts` → `loadReminderTrainees()`, `runWeeklyReminders()`, `runDueReminders()`, `DueRemindersResult` | Erinnerungslauf: fällige Wochen anlegen (M03), höchstens einmal pro Woche (Vermerk `reminder_run` in derselben Transaktion), Stichtag Montag | M08-R17 bis M08-R22; AK-1021 bis AK-1025, AK-205 | ja (Prisma, PostgreSQL) | nach Profil neu bauen |
+| `src/lib/notifications/service.ts` → `countUnread()`, `previewNotifications()`, `openNotifications()` | Glocke mit Zähler, Vorschau, Liste; Öffnen markiert als gelesen | M08-R16; AK-1015 | ja (Prisma) | nach Profil neu bauen (oder Benachrichtigungen der Plattform) |
+| `src/lib/notifications/service.ts` → `updateOwnChannels()`, `ChannelsResult`, `ChannelsFailureReason` | eigene Kanäle speichern; fester Grund | M08-R04; AK-1011 | ja (Prisma) | nach Profil neu bauen |
+| `src/lib/notifications/service.ts` → `countUndeliverable()`, `listUndeliverable()`, `retryUndeliverable()`, `RetryResult`, `RetryFailureReason` | nicht zustellbare Nachrichten, nur Ausbilder; „Erneut versuchen“ | M08-R15; AK-1004 | ja (Prisma) | nach Profil neu bauen |
+| `src/lib/notifications/service.ts` → `listDevMailbox()` | Teams-Postfach der Demo: Azubis eigene, Ausbilder alle | Abschnitt 8 und 9 der Fach-Spec | ja (Prisma) | ersetzt durch Bordmittel (echter Teams-Kanal), nur Demo |
+| `src/lib/notifications/outbox.ts` → `deliverPendingNotifications()`, `DeliveryOptions`, `DeliveryResult`, `RECIPIENT_INACTIVE` | Versandlauf: je Zeile eigene Transaktion mit `FOR NO KEY UPDATE SKIP LOCKED`, Übergabe an den Kanal, dann als zugestellt markiert; Fehlversuche mit Wartezeit, Aufgeben | M08-R11, M08-R13, M08-R14; AK-1004 | ja (PostgreSQL-Sperren, Prisma) | nach Profil neu bauen |
+| `src/lib/notifications/adapters.ts` → `ChannelAdapter`, `DeliveryAdapters`, `OutgoingMessage`, `createDeliveryAdapters()` | Schnittstelle je Kanal, Auswahl per Konfiguration | Abschnitt 8 der Fach-Spec | ja | nach Profil neu bauen |
+| `src/lib/notifications/adapters.ts` → `createEmailAdapter()`, `messageIdFor()` | E-Mail per SMTP (Nodemailer) mit fester Message-ID je Nachricht | M08-R11; AK-1003, AK-1004 | ja (Nodemailer, SMTP) | ersetzt durch Bordmittel (Mail-Dienst der Plattform), feste Kennung je Nachricht beibehalten |
+| `src/lib/notifications/adapters.ts` → `createDevMailboxAdapter()`, `createGraphTeamsAdapter()` | Teams: Postfach der Demo bzw. Microsoft Graph (noch nicht angebunden) | Abschnitt 8 der Fach-Spec | ja (Prisma, Microsoft Graph) | ersetzt durch Bordmittel |
+| `src/lib/notifications/config.ts` → `notificationConfig()`, `appBaseUrl()`, `teamsMode()`, `devMailboxEnabled()`, `NotificationConfig`, `SmtpConfig`, `GraphConfig`, `TeamsMode` | Konfiguration aus Umgebungsvariablen (`APP_URL`, `SMTP_*`, `TEAMS_MODE`, `NOTIFICATION_*`); Postfach im Produktivbetrieb nur ausdrücklich | Abschnitt 8 der Fach-Spec; AK-1003 (Basis der Links), AK-1004 | ja (Umgebungsvariablen, `NODE_ENV`) | nach Profil neu bauen |
+
+**Einstieg:** zuerst `src/domain/notifications.ts` von oben nach unten (Kanäle, `fanOut()`, Statuswechsel, Erinnerung,
+Zeitplan), dann `src/lib/notifications/service.ts` (`recordTransitionNotifications()` und `runDueReminders()`), dann
+`outbox.ts` und `adapters.ts`. Außerhalb der Landkarte (plattformgebunden): `src/worker/index.ts` (Zeitplan per
+pg-boss: Montag 9:00 Uhr Europe/Berlin, Nachholen beim Start und alle 10 Minuten, Versandlauf alle
+`NOTIFICATION_POLL_SECONDS`), `src/worker/run-reminders.ts` (`npm run erinnerung`, Lauf von Hand mit `APP_FIXED_NOW`),
+`src/proxy.ts` mit `src/lib/request-path.ts` (Rücksprungziel, Querschnitt) und die Seiten unter
+`src/app/(app)/benachrichtigungen`, `einstellungen`, `ausbilder/nicht-zustellbar`, `entwickler-postfach` (M09).
+
+**Belege:**
+
+- Vitest: `src/domain/notifications.test.ts` (AK-1001 bis AK-1004, AK-1011 bis AK-1013, AK-1021 bis AK-1025, AK-205),
+  `src/domain/access.test.ts` (AK-1003, Rücksprung), `src/lib/notifications/config.test.ts` (Teams-Postfach je
+  Betrieb), `tests/db/notifications.test.ts` (Ausgangskorb, Kanäle, Glocke, genau einmal mit zwei parallelen
+  Versandläufen, SMTP-Mock, nicht zustellbar), `tests/db/reminders.test.ts` (Beispielszenario, Nachholen, gleichzeitige
+  Läufe).
+- Prüf-Runner: `tests/pruefung/fachlogik.test.ts` (Ebene `fachlogik`) und `tests/pruefung/daten.test.ts` mit
+  `tests/pruefung/daten-adapter.ts` (Ebene `daten`; Test-Kanal statt E-Mail und Teams) führen `specs/pruefung/M08.json`
+  aus.
+- Playwright: `e2e/ak-1001-1025-benachrichtigungen.spec.ts` (Glocke, Mailpit, Kanäle, Rücksprung),
+  `e2e/beispielszenarien.spec.ts` („Erinnerung und Information an den Ausbilder“, „Vertretung nimmt Freigabe zurück“).
+
+**Fallen:**
+
+- „Jetzt“ nur aus `now()` (M01); der Stichtag ist Montag 9:00 Uhr in Europe/Berlin, nie in UTC oder der Zeitzone des
+  Servers. Zum Nachholen plant `runDueReminders()` mit `schedule.dueAt`, legt die Nachrichten aber mit dem tatsächlichen
+  Zeitpunkt an.
+- Datenbankverbindungen nur über `createPrismaClient` (fest UTC); sonst liest `@prisma/adapter-pg` die Zeitpunkte
+  (`created_at`, `next_attempt_at`) bei einem Server in Europe/Berlin verschoben, und Wartezeiten stimmen nicht.
+- Genau einmal hängt an zwei Stellen: dem Unique-Index (Ereignis, Empfänger, Kanal) mit `skipDuplicates` beim Anlegen
+  und der Zeilensperre `SKIP LOCKED` beim Versand. Wer nur eine nachbaut, verliert AK-1004.
+- Der Ereignisschlüssel trägt die Art (`status-change:`, `reminder:`, `trainer-info:`) und für die Erinnerung die
+  Woche des Stichtags; ein Lauf mit anderer Woche erzeugt neue Nachrichten (AK-1024), derselbe nicht.
+- `NotificationDraft.about` (Anlass, Azubi, Wochen) wird nicht gespeichert; `insertNotifications()` übernimmt nur die
+  Spalten der Tabelle. Der Kommentar am Feld `eventKey` in `prisma/schema.prisma` nennt noch das alte Muster
+  „submitted:<statusChangeId>“; maßgeblich ist `status-change:<statusChangeId>`.
+- Kommentartexte gelangen nie in eine Nachricht: `planTransitionNotifications()` bekommt sie gar nicht.
+- Fehlergründe stehen als `reason` am Ergebnis (`ChannelsFailureReason`, `RetryFailureReason`); Meldungstexte können
+  sich ändern.
+- In Tests nie echte E-Mail oder Teams: DB-Tests nutzen einen SMTP-Mock, die Daten-Fälle einen Test-Kanal je Fall.
+
+**Ersetzt durch Bordmittel:** Versand per E-Mail und Teams (Mail-Dienst bzw. Teams-Anbindung der Plattform), auf
+Liferay ggf. die Benachrichtigungen der Plattform für den Kanal App und der Zeitplan-Dienst für den Montag. Die Regeln
+in `notifications.ts` (Empfänger, Kanäle, offene und überfällige Wochen) werden 1:1 übersetzt; die Einzelheiten legt
+das Profil fest (G4).
+
+## Querschnitt
+
+Dateien unter `src/domain/` und `src/lib/`, die keinem Fachmodul gehören oder deren Modul erst in G3 beschrieben wird.
+
+| Datei / Funktion | Rolle | Regeln / AK | Plattformgebunden | Übertragung |
+| --- | --- | --- | --- | --- |
+| `src/lib/db.ts` → `createPrismaClient()`, `db()`, `DB_SESSION_OPTIONS` | einzige Stelle für Datenbankverbindungen, fest in UTC | – (Grundlage für M01-Zeitpunkte) | ja (Prisma, `@prisma/adapter-pg`) | nach Profil neu bauen (Zeitpunkte unabhängig von der Server-Zeitzone speichern) |
+| `src/lib/ids.ts` → `isUuid()` | ungültige IDs aus der Adresse führen zu „nicht gefunden“ statt zu einem Datenbankfehler | – | nein | 1:1 übersetzen oder durch Plattform ersetzen |
+| `src/lib/request-path.ts` → `PATH_HEADER` | aufgerufener Pfad vom Proxy (`src/proxy.ts`) an die Seiten; Grundlage für das Rücksprungziel | M08-R10; AK-1003 (M08) | ja (Next.js-Proxy, Request-Header) | ersetzt durch Bordmittel (Rücksprung der Anmeldung der Plattform) |
+| `src/lib/seed-data.ts` → `seedPersons`, `accountWithoutEntry`, `accountToCreate`, `testAccounts`, `seedFederalState`, `seedReport` | Testdaten für Seed und Keycloak-Realm (Anna, Bernd, Clara, Dora, Emil) | – (Gegenstück zu `specs/pruefung/testdaten.json`) | ja (Seed, Keycloak) | nach Profil neu bauen aus `testdaten.json` |
+| `src/domain/theme.ts` → `Theme`, `THEMES`, `THEME_LABELS`, `THEME_COOKIE`, `isTheme()`, `themeAttribute()`, `themeFromCookie()`, `resolveTheme()` | Darstellung Hell, Dunkel, System | M09, beschrieben in G3; UI-AK-14, UI-AK-15 | nein | 1:1 übersetzen oder durch Plattform ersetzen |
+| `src/lib/theme.ts` → `themeForRequest()` | Darstellung für das erste Rendern aus Konto und Cookie | M09, beschrieben in G3; UI-AK-15 | ja (Next.js-Cookies) | nach Profil neu bauen |
+| `src/domain/relative-time.ts` → `relativeTime()` | „vor 2 Std.“ in Listen | M09, beschrieben in G3 | nein | 1:1 übersetzen oder durch Formatierung der Plattform ersetzen |
+| `src/domain/week-progress.ts` → `weekProgress()`, `progressLabel()`, `firstLine()` | Fortschritt einer Woche („3 von 5 Tagen ausgefüllt“) für Start Azubi | M09, beschrieben in G3; UI-AK-04 | nein | 1:1 übersetzen |
+
+Zu M09 gehören außerdem `src/lib/people/labels.ts` und `updateOwnTheme()` in `src/lib/people/service.ts`; sie stehen
+heute im Abschnitt M02 und wandern in G3 in den Abschnitt M09.

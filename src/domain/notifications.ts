@@ -62,6 +62,19 @@ export interface Recipient {
   channels: readonly Channel[];
 }
 
+/** Anlass einer Nachricht: ein Statuswechsel, die Erinnerung an den Azubi oder die Information an den Ausbilder. */
+export type NotificationTopic = TransitionNotice | "REMINDER" | "OVERDUE";
+
+/**
+ * Worüber eine Nachricht informiert (AK-1003, AK-1025): Anlass, Azubi und alle genannten Wochen. Steckt in
+ * Betreff und Text; in der Outbox gespeichert werden nur diese (siehe `insertNotifications`).
+ */
+export interface NotificationAbout {
+  topic: NotificationTopic;
+  traineeId: string;
+  weeks: IsoWeek[];
+}
+
 /** Eine Zeile für die Outbox. */
 export interface NotificationDraft {
   /** Fachlicher Schlüssel des Ereignisses; mit Empfänger und Kanal eindeutig (AK-1004). */
@@ -74,10 +87,12 @@ export interface NotificationDraft {
   body: string;
   /** Pfad in der App (z. B. `/berichte/<id>`), Ziel des Links in der App. */
   link: string;
+  about: NotificationAbout;
 }
 
 /** Inhalt einer Nachricht, bevor sie je Kanal vervielfältigt wird. */
 interface Message {
+  about: NotificationAbout;
   eventKey: string;
   reportId: string | null;
   subject: string;
@@ -107,6 +122,14 @@ export function fanOut(recipient: Recipient | null | undefined, message: Message
 /** Pfad der Berichtsseite. */
 export function reportPath(reportId: string): string {
   return `/berichte/${reportId}`;
+}
+
+/** Übersicht des Azubis (eigene Wochen). */
+export const TRAINEE_HOME_PATH = "/azubi";
+
+/** Übersicht eines Azubis für Ausbilder (nur lesend). */
+export function traineeOverviewPath(traineeId: string): string {
+  return `/ausbilder/azubis/${traineeId}`;
 }
 
 /** Vollständige Adresse aus Basis-URL (APP_URL) und Pfad. */
@@ -148,8 +171,8 @@ export const NOTICE_LABELS: Record<TransitionNotice, string> = {
 };
 
 /**
- * Welcher Statuswechsel eine Benachrichtigung auslöst. Zurückziehen nicht: Die Spezifikation nennt
- * es nicht als Anlass, und der Bericht verschwindet ohnehin aus der Prüfliste (Vorschlag zur Bestätigung).
+ * Welcher Statuswechsel eine Benachrichtigung auslöst. Zurückziehen nicht (AK-1002, Ergänzung Etappe 6):
+ * Der Bericht verschwindet ohnehin aus der Prüfliste.
  */
 export function noticeFor(action: ReportAction): TransitionNotice | null {
   switch (action) {
@@ -209,6 +232,7 @@ export function planTransitionNotifications(input: TransitionNotificationInput):
     APPROVAL_REVOKED: `${actor.name} hat die Freigabe Ihres Wochenberichts ${week} zurückgenommen. Die Begründung finden Sie im Bericht; bitte überarbeiten Sie ihn und reichen Sie ihn erneut ein.`,
   };
   return fanOut(recipient, {
+    about: { topic: notice, traineeId: trainee.id, weeks: [{ isoYear: report.isoYear, isoWeek: report.isoWeek }] },
     eventKey: `status-change:${input.statusChangeId}`,
     reportId: report.id,
     subject: `${anlass}: ${trainee.name}, ${shortWeek(report)}`,
@@ -283,6 +307,10 @@ function reminderKey(kind: "reminder" | "trainer-info", now: Date, traineeId: st
   return `${kind}:${week.isoYear}-W${String(week.isoWeek).padStart(2, "0")}:${traineeId}`;
 }
 
+function isoWeekOnly(week: IsoWeek): IsoWeek {
+  return { isoYear: week.isoYear, isoWeek: week.isoWeek };
+}
+
 function weekList(weeks: readonly ReminderWeek[], baseUrl: string): string[] {
   return weeks.map((week) => `- ${longWeek(week)}: ${absoluteUrl(baseUrl, reportPath(week.reportId))}`);
 }
@@ -312,6 +340,7 @@ export function planReminders(input: ReminderInput): NotificationDraft[] {
     const single = open.length === 1;
     drafts.push(
       ...fanOut(trainee, {
+        about: { topic: "REMINDER", traineeId: trainee.id, weeks: open.map(isoWeekOnly) },
         eventKey: reminderKey("reminder", input.now, trainee.id),
         reportId: single ? open[0].reportId : null,
         subject: `Erinnerung: ${single ? "Wochenbericht" : "Wochenberichte"} noch offen – ${weeksSubject(open)}`,
@@ -330,19 +359,20 @@ export function planReminders(input: ReminderInput): NotificationDraft[] {
             ["Azubi", trainee.name],
             ["Wochen", open.map(shortWeek).join(", ")],
           ],
-          links: [`Zur Übersicht: ${absoluteUrl(input.baseUrl, "/azubi")}`],
+          links: [`Zur Übersicht: ${absoluteUrl(input.baseUrl, TRAINEE_HOME_PATH)}`],
         }),
-        link: single ? reportPath(open[0].reportId) : "/azubi",
+        link: single ? reportPath(open[0].reportId) : TRAINEE_HOME_PATH,
       }),
     );
 
     if (overdue.length === 0) {
       continue;
     }
-    const overviewPath = `/ausbilder/azubis/${trainee.id}`;
+    const overviewPath = traineeOverviewPath(trainee.id);
     const oneOverdue = overdue.length === 1;
     drafts.push(
       ...fanOut(trainee.trainer, {
+        about: { topic: "OVERDUE", traineeId: trainee.id, weeks: overdue.map(isoWeekOnly) },
         eventKey: reminderKey("trainer-info", input.now, trainee.id),
         reportId: oneOverdue ? overdue[0].reportId : null,
         subject: `Information: ${trainee.name} – ${oneOverdue ? "Wochenbericht" : "Wochenberichte"} überfällig – ${weeksSubject(overdue)}`,
