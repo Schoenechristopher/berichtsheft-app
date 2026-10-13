@@ -2,8 +2,8 @@
  * `npm run landkarte`: meldet, welche Dateien unter `src/domain/` und `src/lib/` die Code-Landkarte
  * (`specs/code-landkarte.md`) beschreibt und welche noch nicht.
  *
- * In G1 nur ein Bericht (Ausgang 0), weil erst M01 beschrieben ist. Mit `--pruefen` scheitert das Skript, wenn
- * eine Datei fehlt oder die Landkarte eine Datei nennt, die es nicht gibt; Pflicht in der CI ab Ende G2.
+ * Ohne Schalter nur ein Bericht (Ausgang 0). Mit `--pruefen` scheitert das Skript, wenn eine Datei fehlt oder die
+ * Landkarte eine Datei nennt, die es nicht gibt; seit Ende G2 Pflicht in der schnellen Prüfung der CI.
  */
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";

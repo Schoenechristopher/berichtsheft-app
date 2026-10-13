@@ -1709,6 +1709,183 @@
     }
   },
   {
+    "id": "AK-205-01",
+    "modul": "M02",
+    "ebene": "fachlogik",
+    "beschreibung": "Deaktivierte Azubi mit offener Vorwoche: keine Erinnerung, ihr Ausbilder keine Information (Schnittstelle von M08)",
+    "uhr": "2026-10-19T09:00:00+02:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": false,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": []
+    }
+  },
+  {
+    "id": "AK-205-02",
+    "modul": "M02",
+    "ebene": "daten",
+    "beschreibung": "Anna wird deaktiviert: Der Montags-Lauf erinnert nur den aktiven Fritz und legt nur für ihn die neue Woche an (Aktionen von M08)",
+    "uhr": "2026-09-07T10:00:00+02:00",
+    "ausgangsbestand": {
+      "personen": [
+        {
+          "schluessel": "fritz",
+          "name": "Fritz Azubi",
+          "rolle": "azubi",
+          "ausbilder": "bernd",
+          "ausbildungsbeginn": "2026-09-01"
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "person_deaktivieren",
+        "person": "anna"
+      },
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-14T09:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen"
+      },
+      {
+        "aktion": "wochen_lesen",
+        "azubi": "anna"
+      },
+      {
+        "aktion": "wochen_lesen",
+        "azubi": "fritz"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "deaktiviert": true
+        },
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 4
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "ueberfaellig",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-14T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "ueberfaellig",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "fritz",
+              "kanal": "email",
+              "art": "erinnerung",
+              "woche": null,
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-14T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "fritz",
+              "kanal": "app",
+              "art": "erinnerung",
+              "woche": null,
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        },
+        {
+          "wochen": ["2026-W36", "2026-W37"]
+        },
+        {
+          "wochen": ["2026-W36", "2026-W37", "2026-W38"]
+        }
+      ],
+      "berichte": []
+    }
+  },
+  {
     "id": "AK-206-01",
     "modul": "M02",
     "ebene": "fachlogik",

@@ -14,8 +14,8 @@ einem Widerspruch `docs/01`.
 
 ## Module
 
-Stand G1: beschrieben ist nur M01. Die AK-Zuordnung der übrigen Module ist vorläufig (`docs/06`, „Modulschnitt“) und
-wird in G2 und G3 festgelegt.
+Stand nach G2: beschrieben sind M01 bis M08; ihre AK-Zuordnung ist endgültig (`docs/06`, „Modulschnitt“). M09 und Q
+folgen in G3, ihre Zuordnung ist bis dahin vorläufig.
 
 | Modul | Fach-Spec | AK-IDs | Stand |
 | --- | --- | --- | --- |
@@ -26,7 +26,7 @@ wird in G2 und G3 festgelegt.
 | M05 Status und Prüfung | `M05-status-und-pruefung.md` | AK-501 bis AK-508, AK-601 bis AK-607, AK-701 bis AK-704 | beschrieben (G2) |
 | M06 Historie | `M06-historie.md` | AK-801 bis AK-803 | beschrieben (G2) |
 | M07 PDF-Export | `M07-pdf-export.md` | AK-901 bis AK-907 | beschrieben (G2) |
-| M08 Benachrichtigungen und Erinnerung | – | AK-1001 bis AK-1025 | G2 |
+| M08 Benachrichtigungen und Erinnerung | `M08-benachrichtigungen-und-erinnerung.md` | AK-1001 bis AK-1004, AK-1011 bis AK-1015, AK-1021 bis AK-1025 | beschrieben (G2) |
 | M09 Oberfläche | – | UI-AK-01 bis UI-AK-20 | G3 |
 | Q Plattform und Qualität | – | AK-1101, AK-1102 | G3 |
 
@@ -87,7 +87,9 @@ Jeder Azubi hat genau einen zugeordneten Ausbilder; prüfen darf jeder Ausbilder
 | Historie | alle Statuswechsel und Kommentare eines Berichts nach Prüfrunde; unveränderlich, nur das endgültige Löschen des Azubis entfernt sie, siehe M06 |
 | Freigabevermerk | „Freigegeben von <Name> am <Datum>, <Uhrzeit> Uhr“ einer freigegebenen Woche im PDF; gilt als Nachweis, siehe M07 |
 | Kennzeichnung | „Nicht freigegeben – Status: <Status>“ einer nicht freigegebenen Woche im PDF, siehe M07 |
-| Kanal | Weg einer Benachrichtigung: E-Mail, Teams oder App |
+| Kanal | Weg einer Benachrichtigung: E-Mail, Teams oder App; jede Person wählt selbst, siehe M08 |
+| Stichtag | Montag 9:00 Uhr Berliner Zeit; zu ihm prüft die Erinnerung die offenen Wochen, siehe M08 |
+| Überfällig | am Stichtag offene Woche vor der Vorwoche; der zugeordnete Ausbilder wird informiert, siehe M08 |
 | Prüffall | neutraler, maschinenlesbarer Test einer AK-ID, siehe `pruefung/format.md` |
 
 Weitere Begriffe stehen in `docs/01-spezifikation.md`, „Begriffe und bestätigte Annahmen“.

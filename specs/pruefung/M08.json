@@ -1,0 +1,5426 @@
+[
+  {
+    "id": "AK-1001-01",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Einreichen: nur der zugeordnete Ausbilder über seine Kanäle, nicht der Azubi",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "einreichen",
+      "woche": "2026-W41",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      },
+      "ausbilder": {
+        "schluessel": "bernd",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      }
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "bernd",
+          "kanal": "email",
+          "anlass": "eingereicht",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "app",
+          "anlass": "eingereicht",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1001-02",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Ohne zugeordneten Ausbilder geht beim Einreichen keine Nachricht raus (keine Vertretung)",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "einreichen",
+      "woche": "2026-W41",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      },
+      "ausbilder": null
+    },
+    "erwartet": {
+      "nachrichten": []
+    }
+  },
+  {
+    "id": "AK-1001-03",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Deaktivierter zugeordneter Ausbilder bekommt nichts",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "einreichen",
+      "woche": "2026-W41",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      },
+      "ausbilder": {
+        "schluessel": "bernd",
+        "aktiv": false,
+        "kanaele": ["email", "app"]
+      }
+    },
+    "erwartet": {
+      "nachrichten": []
+    }
+  },
+  {
+    "id": "AK-1002-01",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Freigabe benachrichtigt den Azubi",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "freigeben",
+      "woche": "2026-W41",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      },
+      "ausbilder": {
+        "schluessel": "bernd",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      }
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "freigegeben",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "freigegeben",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1002-02",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Ablehnung benachrichtigt den Azubi",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "ablehnen",
+      "woche": "2026-W41",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      },
+      "ausbilder": {
+        "schluessel": "bernd",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      }
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "abgelehnt",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "abgelehnt",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1002-03",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Rücknahme der Freigabe benachrichtigt den Azubi",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "freigabe_zuruecknehmen",
+      "woche": "2026-W41",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      },
+      "ausbilder": {
+        "schluessel": "bernd",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      }
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "freigabe_zurueckgenommen",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "freigabe_zurueckgenommen",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1002-04",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Erneutes Einreichen benachrichtigt den zugeordneten Ausbilder wie das erste",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "erneut_einreichen",
+      "woche": "2026-W41",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      },
+      "ausbilder": {
+        "schluessel": "bernd",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      }
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "bernd",
+          "kanal": "email",
+          "anlass": "erneut_eingereicht",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "app",
+          "anlass": "erneut_eingereicht",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1002-05",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Zurückziehen benachrichtigt niemanden",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "zurueckziehen",
+      "woche": "2026-W41",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      },
+      "ausbilder": {
+        "schluessel": "bernd",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      }
+    },
+    "erwartet": {
+      "nachrichten": []
+    }
+  },
+  {
+    "id": "AK-1003-01",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Nachricht nennt Anlass, Azubi und Woche und verlinkt den Bericht (Jahreswechsel KW 53)",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "ablehnen",
+      "woche": "2026-W53",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": true,
+        "kanaele": ["teams"]
+      },
+      "ausbilder": {
+        "schluessel": "bernd",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      }
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "teams",
+          "anlass": "abgelehnt",
+          "azubi": "anna",
+          "wochen": ["2026-W53"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1003-02",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Pfad eines Berichts bleibt Rücksprungziel",
+    "schnittstelle": "ruecksprungZiel",
+    "eingabe": {
+      "ziel": "/berichte/7f3c"
+    },
+    "erwartet": {
+      "ziel": "/berichte/7f3c"
+    }
+  },
+  {
+    "id": "AK-1003-03",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Jede geschützte Seite, auch mit Parametern",
+    "schnittstelle": "ruecksprungZiel",
+    "eingabe": {
+      "ziel": "/ausbilder/pruefliste?filter=alle"
+    },
+    "erwartet": {
+      "ziel": "/ausbilder/pruefliste?filter=alle"
+    }
+  },
+  {
+    "id": "AK-1003-04",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Fremde Adresse wird ignoriert",
+    "schnittstelle": "ruecksprungZiel",
+    "eingabe": {
+      "ziel": "https://boese.example/berichte/7f3c"
+    },
+    "erwartet": {
+      "ziel": null
+    }
+  },
+  {
+    "id": "AK-1003-05",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Adresse ohne Schema auf fremden Rechner wird ignoriert",
+    "schnittstelle": "ruecksprungZiel",
+    "eingabe": {
+      "ziel": "//boese.example/berichte"
+    },
+    "erwartet": {
+      "ziel": null
+    }
+  },
+  {
+    "id": "AK-1003-06",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Die Anmeldung selbst ist kein Ziel",
+    "schnittstelle": "ruecksprungZiel",
+    "eingabe": {
+      "ziel": "/anmelden"
+    },
+    "erwartet": {
+      "ziel": null
+    }
+  },
+  {
+    "id": "AK-1003-07",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Relativer Pfad ohne führenden Schrägstrich wird ignoriert",
+    "schnittstelle": "ruecksprungZiel",
+    "eingabe": {
+      "ziel": "berichte/7f3c"
+    },
+    "erwartet": {
+      "ziel": null
+    }
+  },
+  {
+    "id": "AK-1003-08",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Ohne Ziel geht es zur Startseite",
+    "schnittstelle": "ruecksprungZiel",
+    "eingabe": {
+      "ziel": null
+    },
+    "erwartet": {
+      "ziel": null
+    }
+  },
+  {
+    "id": "AK-1004-01",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Pro Ereignis und Kanal genau eine Nachricht, auch bei allen drei Kanälen",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "freigeben",
+      "woche": "2026-W41",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": true,
+        "kanaele": ["app", "teams", "email"]
+      },
+      "ausbilder": {
+        "schluessel": "bernd",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      }
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "freigegeben",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "teams",
+          "anlass": "freigegeben",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "freigegeben",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1004-02",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Wartezeit nach 1 Fehlversuch(en): wächst, höchstens eine Stunde",
+    "schnittstelle": "wartezeitNachFehlversuch",
+    "eingabe": {
+      "versuche": 1
+    },
+    "erwartet": {
+      "sekunden": 30
+    }
+  },
+  {
+    "id": "AK-1004-03",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Wartezeit nach 2 Fehlversuch(en): wächst, höchstens eine Stunde",
+    "schnittstelle": "wartezeitNachFehlversuch",
+    "eingabe": {
+      "versuche": 2
+    },
+    "erwartet": {
+      "sekunden": 60
+    }
+  },
+  {
+    "id": "AK-1004-04",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Wartezeit nach 3 Fehlversuch(en): wächst, höchstens eine Stunde",
+    "schnittstelle": "wartezeitNachFehlversuch",
+    "eingabe": {
+      "versuche": 3
+    },
+    "erwartet": {
+      "sekunden": 120
+    }
+  },
+  {
+    "id": "AK-1004-05",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Wartezeit nach 7 Fehlversuch(en): wächst, höchstens eine Stunde",
+    "schnittstelle": "wartezeitNachFehlversuch",
+    "eingabe": {
+      "versuche": 7
+    },
+    "erwartet": {
+      "sekunden": 1920
+    }
+  },
+  {
+    "id": "AK-1004-06",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Wartezeit nach 8 Fehlversuch(en): wächst, höchstens eine Stunde",
+    "schnittstelle": "wartezeitNachFehlversuch",
+    "eingabe": {
+      "versuche": 8
+    },
+    "erwartet": {
+      "sekunden": 3600
+    }
+  },
+  {
+    "id": "AK-1004-07",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Wartezeit nach 12 Fehlversuch(en): wächst, höchstens eine Stunde",
+    "schnittstelle": "wartezeitNachFehlversuch",
+    "eingabe": {
+      "versuche": 12
+    },
+    "erwartet": {
+      "sekunden": 3600
+    }
+  },
+  {
+    "id": "AK-1011-01",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Nur Teams",
+    "schnittstelle": "kanaeleWaehlen",
+    "eingabe": {
+      "werte": ["teams"]
+    },
+    "erwartet": {
+      "kanaele": ["teams"]
+    }
+  },
+  {
+    "id": "AK-1011-02",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Alle drei, doppelte zusammengefasst, feste Reihenfolge",
+    "schnittstelle": "kanaeleWaehlen",
+    "eingabe": {
+      "werte": ["app", "email", "teams", "app"]
+    },
+    "erwartet": {
+      "kanaele": ["email", "teams", "app"]
+    }
+  },
+  {
+    "id": "AK-1011-03",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Alle abgewählt ist erlaubt",
+    "schnittstelle": "kanaeleWaehlen",
+    "eingabe": {
+      "werte": []
+    },
+    "erwartet": {
+      "kanaele": []
+    }
+  },
+  {
+    "id": "AK-1011-04",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Unbekannter Kanal wird abgewiesen",
+    "schnittstelle": "kanaeleWaehlen",
+    "eingabe": {
+      "werte": ["email", "sms"]
+    },
+    "erwartet": {
+      "fehler": "kanal_unbekannt"
+    }
+  },
+  {
+    "id": "AK-1012-01",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Voreinstellung für neue Personen: E-Mail + App",
+    "schnittstelle": "voreinstellungKanaele",
+    "eingabe": {},
+    "erwartet": {
+      "kanaele": ["email", "app"]
+    }
+  },
+  {
+    "id": "AK-1013-01",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Nur über die gewählten Kanäle (nur App)",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "freigeben",
+      "woche": "2026-W41",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": true,
+        "kanaele": ["app"]
+      },
+      "ausbilder": {
+        "schluessel": "bernd",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      }
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "freigegeben",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1013-02",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Ohne Kanal keine Nachricht",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "freigeben",
+      "woche": "2026-W41",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": true,
+        "kanaele": []
+      },
+      "ausbilder": {
+        "schluessel": "bernd",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      }
+    },
+    "erwartet": {
+      "nachrichten": []
+    }
+  },
+  {
+    "id": "AK-1013-03",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Ausbilder ohne Kanal: beim Einreichen keine Nachricht",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "einreichen",
+      "woche": "2026-W41",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      },
+      "ausbilder": {
+        "schluessel": "bernd",
+        "aktiv": true,
+        "kanaele": []
+      }
+    },
+    "erwartet": {
+      "nachrichten": []
+    }
+  },
+  {
+    "id": "AK-1013-04",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Deaktivierter Azubi bekommt keine Nachricht über die Freigabe",
+    "schnittstelle": "benachrichtigungenPlanen",
+    "eingabe": {
+      "aktion": "freigeben",
+      "woche": "2026-W41",
+      "azubi": {
+        "schluessel": "anna",
+        "aktiv": false,
+        "kanaele": ["email", "app"]
+      },
+      "ausbilder": {
+        "schluessel": "bernd",
+        "aktiv": true,
+        "kanaele": ["email", "app"]
+      }
+    },
+    "erwartet": {
+      "nachrichten": []
+    }
+  },
+  {
+    "id": "AK-1021-01",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Beispielszenario, 12.10.2026: KW 41 offen, KW 36–40 freigegeben → Erinnerung an Anna, Bernd nichts",
+    "uhr": "2026-10-12T09:00:00+02:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1021-02",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Auch eine abgelehnte Vorwoche ist offen",
+    "uhr": "2026-10-12T09:00:00+02:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Abgelehnt",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1022-01",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Beispielszenario, 19.10.2026: KW 41 immer noch offen → Anna erneut, Bernd wird informiert",
+    "uhr": "2026-10-19T09:00:00+02:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Eingereicht",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W43",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "email",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "app",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1022-02",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Abgelehnte Woche vor der Vorwoche ist überfällig; Anna nennt beide, Bernd nur die überfällige",
+    "uhr": "2026-10-12T09:00:00+02:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Abgelehnt",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W40", "2026-W41"],
+          "ziel": "uebersicht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W40", "2026-W41"],
+          "ziel": "uebersicht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "email",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W40"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "app",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W40"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1022-03",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Anna ohne Kanal bekommt keine Erinnerung; Bernd wird trotzdem über seine Kanäle informiert",
+    "uhr": "2026-10-19T09:00:00+02:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": [],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["teams"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Eingereicht",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W43",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "bernd",
+          "kanal": "teams",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1022-04",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Ohne zugeordneten Ausbilder: nur die Erinnerung an Anna",
+    "uhr": "2026-10-19T09:00:00+02:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": null,
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Eingereicht",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W43",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1022-05",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Eine Information pro Azubi: Bernd erhält zwei Nachrichten für Anna und Fritz",
+    "uhr": "2026-10-19T09:00:00+02:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Eingereicht",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W43",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        },
+        {
+          "schluessel": "fritz",
+          "aktiv": true,
+          "kanaele": ["app"],
+          "beginn": "2026-10-05",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W41",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W43",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "email",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "fritz",
+          "kanal": "app",
+          "anlass": "erinnerung",
+          "azubi": "fritz",
+          "wochen": ["2026-W41", "2026-W42"],
+          "ziel": "uebersicht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "email",
+          "anlass": "ueberfaellig",
+          "azubi": "fritz",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1023-01",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Eingereichte und freigegebene Wochen und die laufende Woche: keine Erinnerung",
+    "uhr": "2026-10-12T09:00:00+02:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Eingereicht",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Eingereicht",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": []
+    }
+  },
+  {
+    "id": "AK-1023-02",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Sonntag 23:59 Uhr: KW 41 ist noch die laufende Woche",
+    "uhr": "2026-10-11T23:59:00+02:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": []
+    }
+  },
+  {
+    "id": "AK-1023-03",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Montag 0:00 Uhr Berlin (Sonntag 22:00 Uhr UTC) gehört schon zur neuen Woche: KW 41 ist die Vorwoche",
+    "uhr": "2026-10-12T00:00:00+02:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1023-04",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Woche ganz außerhalb der Ausbildung zählt nie als offen, auch mit Inhalt (M03-R14)",
+    "uhr": "2026-10-12T09:00:00+02:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": "2026-10-02",
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Entwurf",
+              "inhalt": true,
+              "historie": false
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": []
+    }
+  },
+  {
+    "id": "AK-1024-01",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "26.10.2026 (Winterzeit): KW 41 immer noch offen → erneut Erinnerung und Information",
+    "uhr": "2026-10-26T09:00:00+01:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Eingereicht",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W43",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W44",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "email",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "app",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W41"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1024-02",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Nach der Einreichung (auch noch ungeprüft) geht nichts mehr raus",
+    "uhr": "2026-10-26T09:00:00+01:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Eingereicht",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Eingereicht",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W43",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W44",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": []
+    }
+  },
+  {
+    "id": "AK-1024-03",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Nach Ablehnung ist die Woche wieder offen; überfällig nach Stichtag, nicht nach dem Datum der Ablehnung",
+    "uhr": "2026-10-26T09:00:00+01:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Abgelehnt",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Eingereicht",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W43",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W44",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W40"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W40"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "email",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W40"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "app",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W40"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1025-01",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Mehrere offene Wochen: eine Nachricht nennt alle, älteste zuerst, und verlinkt die Übersicht",
+    "uhr": "2026-10-12T09:00:00+02:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W42",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Abgelehnt",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W39", "2026-W40", "2026-W41"],
+          "ziel": "uebersicht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W39", "2026-W40", "2026-W41"],
+          "ziel": "uebersicht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "email",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W39", "2026-W40"],
+          "ziel": "uebersicht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "app",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W39", "2026-W40"],
+          "ziel": "uebersicht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1025-02",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Über den Jahreswechsel: KW 52/2026 und KW 53/2026 offen, Stichtag Montag 04.01.2027",
+    "uhr": "2027-01-04T09:00:00+01:00",
+    "schnittstelle": "erinnerungenPlanen",
+    "eingabe": {
+      "azubis": [
+        {
+          "schluessel": "anna",
+          "aktiv": true,
+          "kanaele": ["email", "app"],
+          "beginn": "2026-09-01",
+          "ende": null,
+          "ausbilder": {
+            "schluessel": "bernd",
+            "aktiv": true,
+            "kanaele": ["email", "app"]
+          },
+          "wochen": [
+            {
+              "woche": "2026-W36",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W37",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W38",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W39",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W40",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W41",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W42",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W43",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W44",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W45",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W46",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W47",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W48",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W49",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W50",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W51",
+              "status": "Freigegeben",
+              "inhalt": true,
+              "historie": true
+            },
+            {
+              "woche": "2026-W52",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2026-W53",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            },
+            {
+              "woche": "2027-W01",
+              "status": "Entwurf",
+              "inhalt": false,
+              "historie": false
+            }
+          ]
+        }
+      ]
+    },
+    "erwartet": {
+      "nachrichten": [
+        {
+          "empfaenger": "anna",
+          "kanal": "email",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W52", "2026-W53"],
+          "ziel": "uebersicht"
+        },
+        {
+          "empfaenger": "anna",
+          "kanal": "app",
+          "anlass": "erinnerung",
+          "azubi": "anna",
+          "wochen": ["2026-W52", "2026-W53"],
+          "ziel": "uebersicht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "email",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W52"],
+          "ziel": "bericht"
+        },
+        {
+          "empfaenger": "bernd",
+          "kanal": "app",
+          "anlass": "ueberfaellig",
+          "azubi": "anna",
+          "wochen": ["2026-W52"],
+          "ziel": "bericht"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1021-03",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Montag 9:00 Uhr Berliner Zeit (Sommerzeit) ist fällig",
+    "schnittstelle": "erinnerungFaellig",
+    "eingabe": {
+      "zeitpunkt": "2026-10-12T09:00:00+02:00"
+    },
+    "erwartet": {
+      "woche": "2026-W42",
+      "stichtag": "2026-10-12T09:00:00+02:00",
+      "faellig": true
+    }
+  },
+  {
+    "id": "AK-1021-04",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Eine Minute vorher noch nicht",
+    "schnittstelle": "erinnerungFaellig",
+    "eingabe": {
+      "zeitpunkt": "2026-10-12T08:59:00+02:00"
+    },
+    "erwartet": {
+      "woche": "2026-W42",
+      "stichtag": "2026-10-12T09:00:00+02:00",
+      "faellig": false
+    }
+  },
+  {
+    "id": "AK-1021-05",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "9:30 Uhr Berlin, obwohl in UTC erst 7:30 Uhr",
+    "schnittstelle": "erinnerungFaellig",
+    "eingabe": {
+      "zeitpunkt": "2026-10-12T07:30:00+00:00"
+    },
+    "erwartet": {
+      "woche": "2026-W42",
+      "stichtag": "2026-10-12T09:00:00+02:00",
+      "faellig": true
+    }
+  },
+  {
+    "id": "AK-1021-06",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "11:30 Uhr Berlin, verpasster Lauf wird nachgeholt",
+    "schnittstelle": "erinnerungFaellig",
+    "eingabe": {
+      "zeitpunkt": "2026-10-12T09:30:00+00:00"
+    },
+    "erwartet": {
+      "woche": "2026-W42",
+      "stichtag": "2026-10-12T09:00:00+02:00",
+      "faellig": true
+    }
+  },
+  {
+    "id": "AK-1021-07",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Dienstag 23:59 Uhr wird noch nachgeholt; Stichtag bleibt Montag",
+    "schnittstelle": "erinnerungFaellig",
+    "eingabe": {
+      "zeitpunkt": "2026-10-13T23:59:00+02:00"
+    },
+    "erwartet": {
+      "woche": "2026-W42",
+      "stichtag": "2026-10-12T09:00:00+02:00",
+      "faellig": true
+    }
+  },
+  {
+    "id": "AK-1021-08",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Ab Mittwoch nicht mehr",
+    "schnittstelle": "erinnerungFaellig",
+    "eingabe": {
+      "zeitpunkt": "2026-10-14T00:00:00+02:00"
+    },
+    "erwartet": {
+      "woche": "2026-W42",
+      "stichtag": "2026-10-12T09:00:00+02:00",
+      "faellig": false
+    }
+  },
+  {
+    "id": "AK-1021-09",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Erster Montag Winterzeit, 8:30 Uhr: noch nicht",
+    "schnittstelle": "erinnerungFaellig",
+    "eingabe": {
+      "zeitpunkt": "2026-10-26T08:30:00+01:00"
+    },
+    "erwartet": {
+      "woche": "2026-W44",
+      "stichtag": "2026-10-26T09:00:00+01:00",
+      "faellig": false
+    }
+  },
+  {
+    "id": "AK-1021-10",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Erster Montag Winterzeit, 9:30 Uhr Berlin",
+    "schnittstelle": "erinnerungFaellig",
+    "eingabe": {
+      "zeitpunkt": "2026-10-26T08:30:00+00:00"
+    },
+    "erwartet": {
+      "woche": "2026-W44",
+      "stichtag": "2026-10-26T09:00:00+01:00",
+      "faellig": true
+    }
+  },
+  {
+    "id": "AK-1021-11",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Erster Montag Sommerzeit: 9:00 Uhr Berlin ist 7:00 Uhr UTC",
+    "schnittstelle": "erinnerungFaellig",
+    "eingabe": {
+      "zeitpunkt": "2026-03-30T07:00:00+00:00"
+    },
+    "erwartet": {
+      "woche": "2026-W14",
+      "stichtag": "2026-03-30T09:00:00+02:00",
+      "faellig": true
+    }
+  },
+  {
+    "id": "AK-1021-12",
+    "modul": "M08",
+    "ebene": "fachlogik",
+    "beschreibung": "Sonntag: Woche des Stichtags, nichts mehr nachzuholen",
+    "schnittstelle": "erinnerungFaellig",
+    "eingabe": {
+      "zeitpunkt": "2026-10-18T23:00:00+02:00"
+    },
+    "erwartet": {
+      "woche": "2026-W42",
+      "stichtag": "2026-10-12T09:00:00+02:00",
+      "faellig": false
+    }
+  },
+  {
+    "id": "AK-1001-04",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Einreichen legt je Kanal des zugeordneten Ausbilders eine Nachricht an; die Vertretung (Clara) bekommt nichts",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "aktion": "nachrichten_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-10-06T10:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1002-06",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Freigabe durch die Vertretung (Clara) benachrichtigt Anna über ihre Kanäle; Bernd bekommt dazu nichts",
+    "uhr": "2026-10-06T09:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "clara",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T10:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Freigegeben"
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-10-06T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-10-06T10:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T09:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "clara",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1002-07",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Zurückziehen benachrichtigt niemanden; es bleiben nur die Nachrichten der Einreichung",
+    "uhr": "2026-10-06T09:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T10:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Entwurf"
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-10-06T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T09:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1004-08",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Genau einmal: der erste Versandlauf übergibt die E-Mail einmal, ein zweiter Lauf nichts; App wird nicht versendet",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "uhr": "2026-10-06T10:01:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "uhr": "2026-10-06T10:02:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "versendet": 1,
+          "erneut": 0,
+          "aufgegeben": 0
+        },
+        {
+          "versendet": 0,
+          "erneut": 0,
+          "aufgegeben": 0
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 1,
+              "naechsterVersuch": null,
+              "uebergaben": 1
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1004-09",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Gescheiterter Statuswechsel (Entwurf freigeben) erzeugt keine Nachricht",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "aktion": "nachrichten_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "fehler": "uebergang_unzulaessig"
+        },
+        {
+          "nachrichten": []
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1004-10",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Fehlschlag: Wiederholung erst nach der Wartezeit (30 s), dann genau eine Übergabe",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "stoerung": ["email"]
+      },
+      {
+        "aktion": "nachrichten_lesen",
+        "empfaenger": "bernd"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "uhr": "2026-10-06T10:00:29+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "uhr": "2026-10-06T10:00:30+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen",
+        "empfaenger": "bernd"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "versendet": 0,
+          "erneut": 1,
+          "aufgegeben": 0
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 1,
+              "naechsterVersuch": "2026-10-06T10:00:30+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        },
+        {
+          "versendet": 0,
+          "erneut": 0,
+          "aufgegeben": 0
+        },
+        {
+          "versendet": 1,
+          "erneut": 0,
+          "aufgegeben": 0
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 2,
+              "naechsterVersuch": null,
+              "uebergaben": 1
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1004-11",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Nach acht Fehlversuchen aufgegeben; nur Ausbilder sehen sie unter „nicht zustellbar“; „Erneut versuchen“ (auch Vertretung) versendet genau einmal",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "stoerung": ["email"],
+        "uhr": "2026-10-06T10:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "stoerung": ["email"],
+        "uhr": "2026-10-06T11:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "stoerung": ["email"],
+        "uhr": "2026-10-06T12:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "stoerung": ["email"],
+        "uhr": "2026-10-06T13:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "stoerung": ["email"],
+        "uhr": "2026-10-06T14:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "stoerung": ["email"],
+        "uhr": "2026-10-06T15:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "stoerung": ["email"],
+        "uhr": "2026-10-06T16:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "stoerung": ["email"],
+        "uhr": "2026-10-06T17:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen",
+        "empfaenger": "bernd"
+      },
+      {
+        "als": "bernd",
+        "aktion": "nicht_zustellbar_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "nicht_zustellbar_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "erneut_versuchen",
+        "empfaenger": "bernd",
+        "kanal": "email"
+      },
+      {
+        "als": "clara",
+        "aktion": "erneut_versuchen",
+        "empfaenger": "bernd",
+        "kanal": "email",
+        "uhr": "2026-10-06T18:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "uhr": "2026-10-06T18:01:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen",
+        "empfaenger": "bernd"
+      },
+      {
+        "als": "bernd",
+        "aktion": "nicht_zustellbar_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "versendet": 0,
+          "erneut": 1,
+          "aufgegeben": 0
+        },
+        {
+          "versendet": 0,
+          "erneut": 1,
+          "aufgegeben": 0
+        },
+        {
+          "versendet": 0,
+          "erneut": 1,
+          "aufgegeben": 0
+        },
+        {
+          "versendet": 0,
+          "erneut": 1,
+          "aufgegeben": 0
+        },
+        {
+          "versendet": 0,
+          "erneut": 1,
+          "aufgegeben": 0
+        },
+        {
+          "versendet": 0,
+          "erneut": 1,
+          "aufgegeben": 0
+        },
+        {
+          "versendet": 0,
+          "erneut": 1,
+          "aufgegeben": 0
+        },
+        {
+          "versendet": 0,
+          "erneut": 0,
+          "aufgegeben": 1
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "aufgegeben",
+              "versuche": 8,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "versuche": 8,
+              "empfaengerAktiv": true
+            }
+          ]
+        },
+        {
+          "fehler": "zugriff_verweigert"
+        },
+        {
+          "fehler": "zugriff_verweigert"
+        },
+        {
+          "erneut": true
+        },
+        {
+          "versendet": 1,
+          "erneut": 0,
+          "aufgegeben": 0
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 1,
+              "naechsterVersuch": null,
+              "uebergaben": 1
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        },
+        {
+          "nachrichten": []
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1004-12",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Empfänger inzwischen deaktiviert: nichts versendet, aufgegeben und als nicht zustellbar gelistet, kein erneuter Versuch",
+    "uhr": "2026-10-06T09:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T10:00:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "person_deaktivieren",
+        "person": "anna",
+        "uhr": "2026-10-06T10:01:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "uhr": "2026-10-06T10:02:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen",
+        "empfaenger": "anna"
+      },
+      {
+        "als": "bernd",
+        "aktion": "nicht_zustellbar_lesen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "erneut_versuchen",
+        "empfaenger": "anna",
+        "kanal": "email"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Freigegeben"
+        },
+        {
+          "deaktiviert": true
+        },
+        {
+          "versendet": 1,
+          "erneut": 0,
+          "aufgegeben": 1
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "aufgegeben",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "versuche": 0,
+              "empfaengerAktiv": false
+            }
+          ]
+        },
+        {
+          "fehler": "nicht_wiederholbar"
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T09:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1011-05",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Anna stellt ihre Kanäle selbst ein: nur Teams, dann keinen; ein unbekannter Kanal ändert nichts; deaktiviert geht nichts mehr",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "kanaele_einstellen",
+        "kanaele": ["teams"]
+      },
+      {
+        "aktion": "kanaele_lesen",
+        "person": "anna"
+      },
+      {
+        "als": "anna",
+        "aktion": "kanaele_einstellen",
+        "kanaele": []
+      },
+      {
+        "aktion": "kanaele_lesen",
+        "person": "anna"
+      },
+      {
+        "als": "anna",
+        "aktion": "kanaele_einstellen",
+        "kanaele": ["app", "sms"]
+      },
+      {
+        "aktion": "kanaele_lesen",
+        "person": "anna"
+      },
+      {
+        "als": "bernd",
+        "aktion": "kanaele_einstellen",
+        "kanaele": ["teams", "email"]
+      },
+      {
+        "aktion": "kanaele_lesen",
+        "person": "bernd"
+      },
+      {
+        "als": "bernd",
+        "aktion": "person_deaktivieren",
+        "person": "anna"
+      },
+      {
+        "als": "anna",
+        "aktion": "kanaele_einstellen",
+        "kanaele": ["app"]
+      },
+      {
+        "aktion": "kanaele_lesen",
+        "person": "anna"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "gespeichert": true
+        },
+        {
+          "kanaele": ["teams"]
+        },
+        {
+          "gespeichert": true
+        },
+        {
+          "kanaele": []
+        },
+        {
+          "fehler": "kanal_unbekannt"
+        },
+        {
+          "kanaele": []
+        },
+        {
+          "gespeichert": true
+        },
+        {
+          "kanaele": ["email", "teams"]
+        },
+        {
+          "deaktiviert": true
+        },
+        {
+          "fehler": "zugriff_verweigert"
+        },
+        {
+          "kanaele": []
+        }
+      ],
+      "berichte": []
+    }
+  },
+  {
+    "id": "AK-1012-02",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Neu angelegte Personen (auch Fritz, nur für diesen Fall) haben E-Mail + App",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "personen": [
+        {
+          "schluessel": "fritz",
+          "name": "Fritz Azubi",
+          "rolle": "azubi",
+          "ausbilder": "bernd",
+          "ausbildungsbeginn": "2026-10-05"
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "aktion": "kanaele_lesen",
+        "person": "anna"
+      },
+      {
+        "aktion": "kanaele_lesen",
+        "person": "bernd"
+      },
+      {
+        "aktion": "kanaele_lesen",
+        "person": "fritz"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "kanaele": ["email", "app"]
+        },
+        {
+          "kanaele": ["email", "app"]
+        },
+        {
+          "kanaele": ["email", "app"]
+        }
+      ],
+      "berichte": []
+    }
+  },
+  {
+    "id": "AK-1013-05",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Anna ohne Kanal: keine Nachricht über die Freigabe; der Status ist im Bericht sichtbar",
+    "uhr": "2026-10-06T09:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "kanaele_einstellen",
+        "kanaele": [],
+        "uhr": "2026-10-06T09:30:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "freigeben",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T10:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen",
+        "empfaenger": "anna"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "gespeichert": true
+        },
+        {
+          "status": "Freigegeben"
+        },
+        {
+          "nachrichten": []
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T09:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1014-01",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Geänderte Kanäle gelten ab dem nächsten Ereignis; die schon angelegte E-Mail geht noch per E-Mail raus",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "bernd",
+        "aktion": "kanaele_einstellen",
+        "kanaele": ["teams"],
+        "uhr": "2026-10-06T10:01:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "uhr": "2026-10-06T10:02:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T10:03:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T10:04:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "uhr": "2026-10-06T10:05:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "gespeichert": true
+        },
+        {
+          "versendet": 1,
+          "erneut": 0,
+          "aufgegeben": 0
+        },
+        {
+          "status": "Entwurf"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "versendet": 1,
+          "erneut": 0,
+          "aufgegeben": 0
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 1,
+              "naechsterVersuch": null,
+              "uebergaben": 1
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "teams",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:04:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 1,
+              "naechsterVersuch": null,
+              "uebergaben": 1
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:03:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:04:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1014-02",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Eine noch nicht versendete Nachricht bleibt beim ursprünglichen Kanal, auch wenn der Empfänger ihn inzwischen abgewählt hat",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40"
+      },
+      {
+        "als": "bernd",
+        "aktion": "kanaele_einstellen",
+        "kanaele": [],
+        "uhr": "2026-10-06T10:01:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_versenden",
+        "uhr": "2026-10-06T10:02:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "gespeichert": true
+        },
+        {
+          "versendet": 1,
+          "erneut": 0,
+          "aufgegeben": 0
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 1,
+              "naechsterVersuch": null,
+              "uebergaben": 1
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1015-01",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "App: Zähler ungelesener Nachrichten; Öffnen der Liste zeigt sie als neu und markiert alle als gelesen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W39",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          }
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W39"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T10:01:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ungelesen_zaehlen"
+      },
+      {
+        "als": "anna",
+        "aktion": "ungelesen_zaehlen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "benachrichtigungen_oeffnen",
+        "uhr": "2026-10-06T10:05:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ungelesen_zaehlen"
+      },
+      {
+        "als": "anna",
+        "aktion": "zurueckziehen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T10:06:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W40",
+        "uhr": "2026-10-06T10:07:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ungelesen_zaehlen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "benachrichtigungen_oeffnen",
+        "uhr": "2026-10-06T10:08:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ungelesen_zaehlen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "anzahl": 2
+        },
+        {
+          "anzahl": 0
+        },
+        {
+          "nachrichten": [
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "neu": true
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W39",
+              "neu": true
+            }
+          ]
+        },
+        {
+          "anzahl": 0
+        },
+        {
+          "status": "Entwurf"
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "anzahl": 1
+        },
+        {
+          "nachrichten": [
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "neu": true
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "neu": false
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W39",
+              "neu": false
+            }
+          ]
+        },
+        {
+          "anzahl": 0
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W39",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:01:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:06:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:07:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1021-13",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Montag 07.09.2026, 9:00 Uhr: KW 36 offen → Erinnerung an Anna über ihre Kanäle; Bernd nichts",
+    "uhr": "2026-09-07T08:00:00+02:00",
+    "schritte": [
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-07T09:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 2
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-07T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-07T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "app",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-07T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ],
+      "berichte": []
+    }
+  },
+  {
+    "id": "AK-1021-14",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Vor Montag 9:00 Uhr läuft nichts; ab 9:00 Uhr genau ein Lauf pro Woche, ein zweiter tut nichts",
+    "uhr": "2026-09-07T08:00:00+02:00",
+    "schritte": [
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-07T08:59:00+02:00"
+      },
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-07T09:00:00+02:00"
+      },
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-07T09:10:00+02:00"
+      },
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-08T12:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen",
+        "empfaenger": "anna"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "lauf": "nicht_faellig"
+        },
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 2
+        },
+        {
+          "lauf": "schon_erledigt"
+        },
+        {
+          "lauf": "schon_erledigt"
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-07T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-07T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "app",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-07T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ],
+      "berichte": []
+    }
+  },
+  {
+    "id": "AK-1021-15",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Lief der Job um 9:00 Uhr nicht: am Dienstag 23:59 Uhr einmal nachgeholt",
+    "uhr": "2026-09-07T08:00:00+02:00",
+    "schritte": [
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-08T23:59:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 2
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-08T23:59:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-08T23:59:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "app",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-08T23:59:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ],
+      "berichte": []
+    }
+  },
+  {
+    "id": "AK-1021-16",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Ab Mittwoch 0:00 Uhr wird nicht mehr nachgeholt; die nächste Woche läuft wieder normal",
+    "uhr": "2026-09-07T08:00:00+02:00",
+    "schritte": [
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-09T00:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen"
+      },
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-14T09:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen",
+        "empfaenger": "anna"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "lauf": "nicht_faellig"
+        },
+        {
+          "nachrichten": []
+        },
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 4
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "art": "erinnerung",
+              "woche": null,
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-14T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "app",
+              "art": "erinnerung",
+              "woche": null,
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ],
+      "berichte": []
+    }
+  },
+  {
+    "id": "AK-1021-17",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Winterzeit: Montag 02.11.2026 um 8:30 Uhr (7:30 Uhr UTC) noch nicht, um 9:00 Uhr Berliner Zeit schon",
+    "uhr": "2026-11-02T07:00:00+01:00",
+    "schritte": [
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-11-02T08:30:00+01:00"
+      },
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-11-02T09:00:00+01:00"
+      },
+      {
+        "aktion": "nachrichten_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "lauf": "nicht_faellig"
+        },
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 4
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "art": "erinnerung",
+              "woche": null,
+              "angelegt": "2026-11-02T09:00:00+01:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-11-02T09:00:00+01:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "app",
+              "art": "erinnerung",
+              "woche": null,
+              "angelegt": "2026-11-02T09:00:00+01:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "ueberfaellig",
+              "woche": null,
+              "angelegt": "2026-11-02T09:00:00+01:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-11-02T09:00:00+01:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "ueberfaellig",
+              "woche": null,
+              "angelegt": "2026-11-02T09:00:00+01:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ],
+      "berichte": []
+    }
+  },
+  {
+    "id": "AK-1022-06",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Montag 14.09.2026: KW 36 seit einer Woche offen → Anna (KW 36 und 37, eine Nachricht) und Bernd (KW 36); die neue Woche KW 38 entsteht vorher",
+    "uhr": "2026-09-07T08:00:00+02:00",
+    "schritte": [
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-07T09:00:00+02:00"
+      },
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-14T09:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen"
+      },
+      {
+        "aktion": "wochen_lesen",
+        "azubi": "anna"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 2
+        },
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 4
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-07T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-07T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "app",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-07T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "art": "erinnerung",
+              "woche": null,
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-14T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "app",
+              "art": "erinnerung",
+              "woche": null,
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "ueberfaellig",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-14T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "ueberfaellig",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        },
+        {
+          "wochen": ["2026-W36", "2026-W37", "2026-W38"]
+        }
+      ],
+      "berichte": []
+    }
+  },
+  {
+    "id": "AK-1023-05",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Eingereichte Vorwoche und laufende Woche: kein Lauf erzeugt eine Erinnerung",
+    "uhr": "2026-09-07T08:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W36",
+          "tage": {
+            "Di": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            "Mi": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            "Do": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            "Fr": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-07T09:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen",
+        "empfaenger": "anna"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 0
+        },
+        {
+          "nachrichten": []
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W36",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": null,
+              "text": ""
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-09-07T08:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1024-04",
+    "modul": "M08",
+    "ebene": "daten",
+    "beschreibung": "Jeden Montag erneut, bis KW 36 eingereicht ist; danach weder Erinnerung noch Information zu KW 36",
+    "uhr": "2026-09-11T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W37",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-14T09:00:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W38",
+        "tage": {
+          "alle": {
+            "tagesart": "Betrieb",
+            "text": "Netzwerk geplant"
+          }
+        },
+        "uhr": "2026-09-18T10:00:00+02:00"
+      },
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-21T09:00:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen",
+        "azubi": "anna",
+        "woche": "2026-W36",
+        "tage": {
+          "Di": {
+            "tagesart": "Betrieb",
+            "text": "Netzwerk geplant"
+          },
+          "Mi": {
+            "tagesart": "Betrieb",
+            "text": "Netzwerk geplant"
+          },
+          "Do": {
+            "tagesart": "Betrieb",
+            "text": "Netzwerk geplant"
+          },
+          "Fr": {
+            "tagesart": "Betrieb",
+            "text": "Netzwerk geplant"
+          }
+        },
+        "uhr": "2026-09-22T10:00:00+02:00"
+      },
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-09-28T09:00:00+02:00"
+      },
+      {
+        "aktion": "nachrichten_lesen",
+        "empfaenger": "anna"
+      },
+      {
+        "aktion": "nachrichten_lesen",
+        "empfaenger": "bernd"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 4
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 4
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 2
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-14T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "app",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-21T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-21T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "app",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-21T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "art": "erinnerung",
+              "woche": "2026-W39",
+              "angelegt": "2026-09-28T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-28T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "app",
+              "art": "erinnerung",
+              "woche": "2026-W39",
+              "angelegt": "2026-09-28T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W37",
+              "angelegt": "2026-09-11T10:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-11T10:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W37",
+              "angelegt": "2026-09-11T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "ueberfaellig",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-14T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "ueberfaellig",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-14T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W38",
+              "angelegt": "2026-09-18T10:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-18T10:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W38",
+              "angelegt": "2026-09-18T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "ueberfaellig",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-21T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-21T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "ueberfaellig",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-21T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-22T10:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-22T10:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-22T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W37",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-09-11T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W38",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-09-18T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W36",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": null,
+              "text": ""
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-09-22T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  }
+]

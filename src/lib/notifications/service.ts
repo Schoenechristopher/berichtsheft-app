@@ -28,11 +28,18 @@ export async function insertNotifications(db: Db, drafts: readonly NotificationD
     return 0;
   }
   const { count } = await db.notification.createMany({
-    data: drafts.map((draft) => ({
-      ...draft,
+    // `about` steckt in Betreff und Text und wird nicht eigens gespeichert.
+    data: drafts.map(({ eventKey, recipientId, channel, reportId, subject, body, link }) => ({
+      eventKey,
+      recipientId,
+      channel,
+      reportId,
+      subject,
+      body,
+      link,
       createdAt: now,
       nextAttemptAt: now,
-      sentAt: draft.channel === "APP" ? now : null,
+      sentAt: channel === "APP" ? now : null,
     })),
     skipDuplicates: true,
   });
@@ -214,7 +221,7 @@ export async function openNotifications(prisma: PrismaClient, personId: string, 
 
 /**
  * Entwickler-Postfach (simulierter Kanal „Teams“): Azubis sehen ihre eigenen Nachrichten,
- * Ausbilder alle – wie sonst auch alle Berichte (Vorschlag zur Bestätigung).
+ * Ausbilder alle – wie sonst auch alle Berichte (`docs/01`, „Teams in der Demo“, Etappe 7).
  */
 export async function listDevMailbox(prisma: PrismaClient, viewer: Viewer, take = 100) {
   if (!viewer.active) {
@@ -228,7 +235,10 @@ export async function listDevMailbox(prisma: PrismaClient, viewer: Viewer, take 
   });
 }
 
-export type ChannelsResult = { ok: true } | { ok: false; formError: string };
+/** Fester Grund, aus dem das Speichern der Kanäle scheitert (unabhängig vom Meldungstext). */
+export type ChannelsFailureReason = "forbidden" | "unknown-channel";
+
+export type ChannelsResult = { ok: true } | { ok: false; reason: ChannelsFailureReason; formError: string };
 
 /**
  * Eigene Kanäle speichern (AK-1011): jede Kombination aus E-Mail, Teams und App, auch keine.
@@ -240,11 +250,11 @@ export async function updateOwnChannels(
   values: readonly string[],
 ): Promise<ChannelsResult> {
   if (!viewer.active) {
-    return { ok: false, formError: "Zugriff verweigert" };
+    return { ok: false, reason: "forbidden", formError: "Zugriff verweigert" };
   }
   const channels = parseChannels(values);
   if (!channels) {
-    return { ok: false, formError: "Unbekannter Kanal." };
+    return { ok: false, reason: "unknown-channel", formError: "Unbekannter Kanal." };
   }
   await prisma.person.update({ where: { id: viewer.id }, data: { channels } });
   return { ok: true };
@@ -285,7 +295,10 @@ export async function listUndeliverable(prisma: PrismaClient, viewer: Viewer, ta
   });
 }
 
-export type RetryResult = { ok: true } | { ok: false; formError: string };
+/** Fester Grund, aus dem „Erneut versuchen“ scheitert (unabhängig vom Meldungstext). */
+export type RetryFailureReason = "forbidden" | "not-found" | "not-retryable";
+
+export type RetryResult = { ok: true } | { ok: false; reason: RetryFailureReason; formError: string };
 
 /**
  * „Erneut versuchen“: Der Worker nimmt die Nachricht beim nächsten Durchlauf wieder auf, mit neuer
@@ -299,10 +312,10 @@ export async function retryUndeliverable(
   now: Date,
 ): Promise<RetryResult> {
   if (!canManagePeople(viewer)) {
-    return { ok: false, formError: "Zugriff verweigert" };
+    return { ok: false, reason: "forbidden", formError: "Zugriff verweigert" };
   }
   if (!isUuid(notificationId)) {
-    return { ok: false, formError: "Nachricht nicht gefunden." };
+    return { ok: false, reason: "not-found", formError: "Nachricht nicht gefunden." };
   }
   const { count } = await prisma.notification.updateMany({
     where: { id: notificationId, ...UNDELIVERABLE, recipient: { active: true } },
@@ -312,6 +325,7 @@ export async function retryUndeliverable(
     ? { ok: true }
     : {
         ok: false,
+        reason: "not-retryable",
         formError: "Die Nachricht kann nicht erneut versendet werden (bereits erledigt oder Empfänger deaktiviert).",
       };
 }

@@ -101,13 +101,13 @@ dem vorhandenen Code. Gebaut wird in der Reihenfolge M01 bis M09, weil jedes Mod
 | Modul | Inhalt | AK-IDs | Code heute | Hängt ab von | Empfohlener Weg |
 | --- | --- | --- | --- | --- | --- |
 | M01 Kalender und Zeit | Uhr-Modul, ISO-Wochen in Europe/Berlin, Bundesländer, Feiertage | AK-404, AK-1201 bis AK-1206; Hilfsfunktionen für AK-301 bis 304 (gehören M03) | `src/domain/clock`, `weeks`, `holidays`, `federal-states` | – | A Quellcode |
-| M02 Personen und Zugang | Rollen, Anmeldung, Zuordnung und Vertretung, Deaktivieren, Nutzerverwaltung | AK-101 bis AK-106, AK-201 bis AK-209 (AK-101, AK-106, AK-205: Prüffall folgt in G3) | `src/domain/people`, `access`, `report-access` (`canViewReport`, `canManagePeople`); `src/lib/auth`, `src/lib/people`, `src/lib/session` | – | B Spec (Liferay-Konten und -Rollen) |
+| M02 Personen und Zugang | Rollen, Anmeldung, Zuordnung und Vertretung, Deaktivieren, Nutzerverwaltung | AK-101 bis AK-106, AK-201 bis AK-209 (AK-101, AK-106: Prüffall folgt in G3; AK-205 über Schnittstellen und Aktionen von M08, G2) | `src/domain/people`, `access`, `report-access` (`canViewReport`, `canManagePeople`); `src/lib/auth`, `src/lib/people`, `src/lib/session` | – | B Spec (Liferay-Konten und -Rollen) |
 | M03 Wochenberichte entstehen | Automatische Wochen ab Ausbildungsbeginn, außerhalb der Ausbildung, Vorbelegen beim Anlegen, Definition „offen“, Übersicht | AK-301 bis 306 (endgültig, G2); nutzt AK-404 (M01) | `src/domain/report-generation`; `src/lib/reports` (Anlegen, Übersicht), `src/lib/trainee-overview` | M01, M02 | A Quellcode |
 | M04 Bericht erfassen | Tagesarten, Tätigkeiten, Längengrenze, Speichern, Warnung bei ungespeicherten Änderungen | AK-401 bis 408 ohne AK-404 (endgültig, G2; AK-403, AK-408: Prüffall folgt in G3); Bearbeitungsrechte nach M02 und M05 | `src/domain/report-days`, `src/lib/reports` (Speichern) | M03 | A für Regeln, B für Formular |
 | M05 Status und Prüfung | Statusmodell, Pflichtfelder, Einreichen, Zurückziehen, Freigeben, Ablehnen, Rücknahme, Gleichzeitigkeit, Bearbeitbarkeit nach Status | AK-501 bis 508, 601 bis 607, 701 bis 704 (endgültig, G2; Prüffälle der Ebenen Fachlogik und Daten, keine AK nur im Ablauf); nutzt „offen“ (M03) | `src/domain/report-status`, `report-submission`, `report-access` (`canEditReport`); `src/lib/report-transitions`, `src/lib/reports` (Prüfliste) | M02, M04 | A, Transaktion und Sperre nach Profil |
 | M06 Historie | Statuswechsel und Kommentare je Runde, unveränderlich | AK-801 bis 803 (endgültig, G2; Prüffälle der Ebenen Fachlogik und Daten, keine AK nur im Ablauf; Unveränderlichkeit als Daten-Fall an der Fachlogik vorbei) | `src/domain/report-history`; `src/lib/reports` (`loadReportHistory`), `src/lib/history-guard`, Datenbank-Trigger | M05 | A für Logik, B für Unveränderlichkeit |
 | M07 PDF-Export | Einzel- und Sammel-PDF, Freigabevermerk, Kennzeichnung, Umlaute | AK-901 bis 907 (endgültig, G2; Prüffälle über Inhaltsmerkmale, nicht das Layout; keine AK nur im Ablauf) | `src/domain/report-pdf`, `src/lib/report-export`, `src/pdf/` | M05, M06 | A für Inhalt, Profil für Rendering |
-| M08 Benachrichtigungen und Erinnerung | Kanäle je Person, Outbox, genau einmal senden, Montags-Erinnerung, Info an Ausbilder | AK-1001 bis 1025 | `src/domain/notifications`; `src/lib/notifications`; `src/worker/` | M02, M03, M05 | A für Regeln, B für Versand und Zeitplan |
+| M08 Benachrichtigungen und Erinnerung | Kanäle je Person, Outbox, genau einmal senden, Montags-Erinnerung, Info an Ausbilder, Rücksprung nach der Anmeldung | AK-1001 bis 1004, 1011 bis 1015, 1021 bis 1025 (endgültig, G2; Prüffälle der Ebenen Fachlogik und Daten, keine AK nur im Ablauf); nutzt „offen“ (M03) | `src/domain/notifications`; `src/lib/notifications`; `src/worker/` | M02, M03, M05 | A für Regeln, B für Versand und Zeitplan |
 | M09 Oberfläche | Tokens, Komponenten, Seiten, Dunkelmodus, Barrierefreiheit | UI-AK-01 bis 20 | `src/app/`, `src/components/` | alle | B Spec |
 | Q Plattform und Qualität | Browser, 375 px, Testdaten, Beispielszenarien | AK-1101, 1102 | `e2e/` | alle | B Spec |
 
@@ -407,8 +407,9 @@ U00 klären sie zuerst, bevor gebaut wird.
 - [ ] Ob Liferay-Bundles, Java 8/11 und die Bezugsquellen in der Cloud-Sitzung erreichbar sind (P00).
 - [ ] Ob OpenID Connect auf 7.2 CE optional mitgeliefert wird (Profil 7.2).
 - [ ] Umfang des Dunkelmodus auf 6.2.5 (Profil 6.2.5).
-- [ ] Die Landkarten-Prüfung (`npm run landkarte`) meldet in G1 nur einen Bericht, weil erst M01 beschrieben ist. Am
-      Ende von G2 wird sie Pflicht in der CI (`npm run landkarte -- --pruefen`).
+- [x] Die Landkarten-Prüfung (`npm run landkarte`) meldet in G1 nur einen Bericht, weil erst M01 beschrieben ist. Am
+      Ende von G2 wird sie Pflicht in der CI (`npm run landkarte -- --pruefen`). Erledigt am 13.10.2026 (G2, Paket E):
+      Schritt in der schnellen Prüfung, alle Dateien unter `src/domain/` und `src/lib/` erfasst.
 - [x] AK-301 bis 304 gehören M03; M01 liefert Hilfsfunktionen, auf die M03 verweist (12.10.2026).
 - [x] Blindtest bei einer Lücke: nicht fragen, Annahme treffen und in der Lückenliste vermerken; bestanden nur mit
       grünen Prüffällen und leerer Lückenliste (12.10.2026).

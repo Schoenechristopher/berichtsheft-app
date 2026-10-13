@@ -86,6 +86,8 @@ jobs:
         run: npm test
       - name: Testabdeckung der Akzeptanzkriterien (keine AK-ID ohne Test, docs/03-testabdeckung.md aktuell)
         run: npm run ak:abdeckung -- --pruefen
+      - name: Code-Landkarte vollständig (jede Datei unter src/domain/ und src/lib/ erfasst)
+        run: npm run landkarte -- --pruefen
       - name: Jede Datei gehört einer Änderungsklasse an (CI-34)
         run: npm run pruefumfang -- --pruefen
       - name: Beispiel-PDFs aus den Seed-Daten
