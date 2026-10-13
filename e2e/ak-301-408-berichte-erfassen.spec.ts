@@ -159,6 +159,44 @@ test.describe("Berichte erfassen", () => {
     await expect(day(page, "Donnerstag, 01.01.2026").getByLabel("Tagesart")).toHaveValue("SCHOOL");
   });
 
+  test("AK-404 Hinweis „Feiertag (vorbelegt)“ folgt dem beim Anlegen gültigen Bundesland, nicht dem aktuellen", async ({
+    page,
+  }) => {
+    // Emils Wochen entstehen beim ersten Aufruf mit Nordrhein-Westfalen.
+    await insertTrainee({
+      name: accounts.emil.name,
+      email: accounts.emil.email,
+      accountId: accounts.emil.accountId,
+      trainingStart: "2026-01-01",
+    });
+    await login(page, accounts.emil);
+    await page.goto("/azubi/wochen");
+    await expect(
+      page.getByRole("list", { name: "Wochenberichte" }).getByRole("link", { name: /KW 23\/2026/ }),
+    ).toBeVisible();
+    const openWeek = async (label: RegExp, heading: string) => {
+      await page.goto("/azubi/wochen");
+      await page.getByRole("list", { name: "Wochenberichte" }).getByRole("link", { name: label }).click();
+      await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+    };
+    const holidayOption = (label: string) => day(page, label).getByLabel("Tagesart").locator('option[value="HOLIDAY"]');
+    try {
+      // Bundesland jetzt Niedersachsen: Fronleichnam (Do 04.06.2026) bleibt vorbelegt.
+      await withDatabase((db) => db.query("UPDATE setting SET federal_state = 'NI' WHERE id = 1"));
+      await openWeek(/KW 23\/2026/, "KW 23/2026 (01.06.2026 – 05.06.2026)");
+      await expect(day(page, "Donnerstag, 04.06.2026").getByLabel("Tagesart")).toHaveValue("HOLIDAY");
+      await expect(holidayOption("Donnerstag, 04.06.2026")).toHaveText("Feiertag (vorbelegt)");
+
+      // Bundesland jetzt Bayern: Heilige Drei Könige (Di 06.01.2026) war beim Anlegen kein Feiertag.
+      await withDatabase((db) => db.query("UPDATE setting SET federal_state = 'BY' WHERE id = 1"));
+      await openWeek(/KW 2\/2026/, "KW 2/2026 (05.01.2026 – 09.01.2026)");
+      await expect(day(page, "Dienstag, 06.01.2026").getByLabel("Tagesart")).toHaveValue("");
+      await expect(holidayOption("Dienstag, 06.01.2026")).toHaveText("Feiertag");
+    } finally {
+      await withDatabase((db) => db.query("UPDATE setting SET federal_state = 'NW' WHERE id = 1"));
+    }
+  });
+
   test("AK-406 AK-407 Entwurf speichern; nach Ab- und erneuter Anmeldung unverändert, inkl. Umlaute, Zeilenumbrüche, langer Text", async ({
     page,
   }) => {

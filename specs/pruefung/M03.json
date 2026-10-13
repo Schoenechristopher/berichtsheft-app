@@ -1,0 +1,926 @@
+[
+  {
+    "id": "AK-301-01",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Beginn 01.09.2026, heute 06.10.2026 → Berichte KW 36 bis 41, keiner mehr",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "faelligeWochen",
+    "eingabe": {
+      "beginn": "2026-09-01",
+      "ende": null
+    },
+    "erwartet": {
+      "wochen": ["2026-W36", "2026-W37", "2026-W38", "2026-W39", "2026-W40", "2026-W41"]
+    }
+  },
+  {
+    "id": "AK-301-02",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Beginn am Montag der aktuellen Woche → genau diese Woche",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "faelligeWochen",
+    "eingabe": {
+      "beginn": "2026-10-05",
+      "ende": null
+    },
+    "erwartet": {
+      "wochen": ["2026-W41"]
+    }
+  },
+  {
+    "id": "AK-301-03",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Beginn heute (Dienstag) → die aktuelle Woche",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "faelligeWochen",
+    "eingabe": {
+      "beginn": "2026-10-06",
+      "ende": null
+    },
+    "erwartet": {
+      "wochen": ["2026-W41"]
+    }
+  },
+  {
+    "id": "AK-302-01",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Sonntag 11.10.2026, 23:59 Uhr Berliner Zeit: noch keine KW 42",
+    "uhr": "2026-10-11T23:59:00+02:00",
+    "schnittstelle": "faelligeWochen",
+    "eingabe": {
+      "beginn": "2026-09-01",
+      "ende": null
+    },
+    "erwartet": {
+      "wochen": ["2026-W36", "2026-W37", "2026-W38", "2026-W39", "2026-W40", "2026-W41"]
+    }
+  },
+  {
+    "id": "AK-302-02",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Montag 12.10.2026, 0:00 Uhr Berliner Zeit: KW 42 ist da",
+    "uhr": "2026-10-12T00:00:00+02:00",
+    "schnittstelle": "faelligeWochen",
+    "eingabe": {
+      "beginn": "2026-09-01",
+      "ende": null
+    },
+    "erwartet": {
+      "wochen": ["2026-W36", "2026-W37", "2026-W38", "2026-W39", "2026-W40", "2026-W41", "2026-W42"]
+    }
+  },
+  {
+    "id": "AK-302-03",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Beginn in der Zukunft: noch kein Bericht",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "faelligeWochen",
+    "eingabe": {
+      "beginn": "2026-11-02",
+      "ende": null
+    },
+    "erwartet": {
+      "wochen": []
+    }
+  },
+  {
+    "id": "AK-302-04",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Beginn am Montag der nächsten Woche: noch kein Bericht",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "faelligeWochen",
+    "eingabe": {
+      "beginn": "2026-10-12",
+      "ende": null
+    },
+    "erwartet": {
+      "wochen": []
+    }
+  },
+  {
+    "id": "AK-303-01",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Ende Mittwoch 16.09.2026: letzte Woche ist KW 38",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "faelligeWochen",
+    "eingabe": {
+      "beginn": "2026-09-01",
+      "ende": "2026-09-16"
+    },
+    "erwartet": {
+      "wochen": ["2026-W36", "2026-W37", "2026-W38"]
+    }
+  },
+  {
+    "id": "AK-303-02",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Ende in der Zukunft begrenzt nicht: bis zur aktuellen Woche",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "faelligeWochen",
+    "eingabe": {
+      "beginn": "2026-09-01",
+      "ende": "2029-08-31"
+    },
+    "erwartet": {
+      "wochen": ["2026-W36", "2026-W37", "2026-W38", "2026-W39", "2026-W40", "2026-W41"]
+    }
+  },
+  {
+    "id": "AK-303-03",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Ende am Freitag der aktuellen Woche: bis zur aktuellen Woche",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "faelligeWochen",
+    "eingabe": {
+      "beginn": "2026-09-01",
+      "ende": "2026-10-09"
+    },
+    "erwartet": {
+      "wochen": ["2026-W36", "2026-W37", "2026-W38", "2026-W39", "2026-W40", "2026-W41"]
+    }
+  },
+  {
+    "id": "AK-303-04",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Ende am Sonntag der Vorwoche: aktuelle Woche entsteht nicht mehr",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "faelligeWochen",
+    "eingabe": {
+      "beginn": "2026-09-01",
+      "ende": "2026-10-04"
+    },
+    "erwartet": {
+      "wochen": ["2026-W36", "2026-W37", "2026-W38", "2026-W39", "2026-W40"]
+    }
+  },
+  {
+    "id": "AK-304-01",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Jahreswechsel mit KW 53: jede Woche genau einmal",
+    "uhr": "2027-01-12T09:00:00+01:00",
+    "schnittstelle": "faelligeWochen",
+    "eingabe": {
+      "beginn": "2026-12-14",
+      "ende": null
+    },
+    "erwartet": {
+      "wochen": ["2026-W51", "2026-W52", "2026-W53", "2027-W01", "2027-W02"]
+    }
+  },
+  {
+    "id": "AK-304-02",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Jahreswechsel ohne KW 53: auf KW 52/2027 folgt KW 1/2028",
+    "uhr": "2028-01-04T09:00:00+01:00",
+    "schnittstelle": "faelligeWochen",
+    "eingabe": {
+      "beginn": "2027-12-20",
+      "ende": null
+    },
+    "erwartet": {
+      "wochen": ["2027-W51", "2027-W52", "2028-W01"]
+    }
+  },
+  {
+    "id": "AK-305-01",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Beginn Dienstag 01.09.2026: Montag liegt außerhalb der Ausbildung",
+    "schnittstelle": "berichtstageAnlegen",
+    "eingabe": {
+      "woche": "2026-W36",
+      "beginn": "2026-09-01",
+      "ende": "2026-09-17",
+      "bundesland": "NW"
+    },
+    "erwartet": {
+      "tage": [
+        {
+          "datum": "2026-08-31",
+          "tag": "Mo",
+          "tagesart": null,
+          "ausserhalb": true
+        },
+        {
+          "datum": "2026-09-01",
+          "tag": "Di",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-09-02",
+          "tag": "Mi",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-09-03",
+          "tag": "Do",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-09-04",
+          "tag": "Fr",
+          "tagesart": null,
+          "ausserhalb": false
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-305-02",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Ende Donnerstag 17.09.2026: Freitag liegt außerhalb, der letzte Tag selbst noch innerhalb",
+    "schnittstelle": "berichtstageAnlegen",
+    "eingabe": {
+      "woche": "2026-W38",
+      "beginn": "2026-09-01",
+      "ende": "2026-09-17",
+      "bundesland": "NW"
+    },
+    "erwartet": {
+      "tage": [
+        {
+          "datum": "2026-09-14",
+          "tag": "Mo",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-09-15",
+          "tag": "Di",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-09-16",
+          "tag": "Mi",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-09-17",
+          "tag": "Do",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-09-18",
+          "tag": "Fr",
+          "tagesart": null,
+          "ausserhalb": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-305-03",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Beginn Neujahr 01.01.2026: Mo bis Mi außerhalb, Neujahr als Feiertag vorbelegt",
+    "schnittstelle": "berichtstageAnlegen",
+    "eingabe": {
+      "woche": "2026-W01",
+      "beginn": "2026-01-01",
+      "ende": null,
+      "bundesland": "NW"
+    },
+    "erwartet": {
+      "tage": [
+        {
+          "datum": "2025-12-29",
+          "tag": "Mo",
+          "tagesart": null,
+          "ausserhalb": true
+        },
+        {
+          "datum": "2025-12-30",
+          "tag": "Di",
+          "tagesart": null,
+          "ausserhalb": true
+        },
+        {
+          "datum": "2025-12-31",
+          "tag": "Mi",
+          "tagesart": null,
+          "ausserhalb": true
+        },
+        {
+          "datum": "2026-01-01",
+          "tag": "Do",
+          "tagesart": "Feiertag",
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-01-02",
+          "tag": "Fr",
+          "tagesart": null,
+          "ausserhalb": false
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-305-04",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Feiertag außerhalb der Ausbildung (Neujahr 2027 nach Ende 31.12.2026) wird nicht vorbelegt",
+    "schnittstelle": "berichtstageAnlegen",
+    "eingabe": {
+      "woche": "2026-W53",
+      "beginn": "2026-09-01",
+      "ende": "2026-12-31",
+      "bundesland": "NW"
+    },
+    "erwartet": {
+      "tage": [
+        {
+          "datum": "2026-12-28",
+          "tag": "Mo",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-29",
+          "tag": "Di",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-30",
+          "tag": "Mi",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-31",
+          "tag": "Do",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2027-01-01",
+          "tag": "Fr",
+          "tagesart": null,
+          "ausserhalb": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-305-05",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Feiertag innerhalb der Ausbildung (Fr 25.12.2026) wird beim Anlegen vorbelegt",
+    "schnittstelle": "berichtstageAnlegen",
+    "eingabe": {
+      "woche": "2026-W52",
+      "beginn": "2026-09-01",
+      "ende": null,
+      "bundesland": "NW"
+    },
+    "erwartet": {
+      "tage": [
+        {
+          "datum": "2026-12-21",
+          "tag": "Mo",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-22",
+          "tag": "Di",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-23",
+          "tag": "Mi",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-24",
+          "tag": "Do",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-25",
+          "tag": "Fr",
+          "tagesart": "Feiertag",
+          "ausserhalb": false
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-305-06",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Geänderter Beginn (Mittwoch 23.12.2026): Markierung neu, Inhalt bleibt, neu einbezogener Feiertag vorbelegt",
+    "schnittstelle": "ausserhalbNeuBerechnen",
+    "eingabe": {
+      "tage": [
+        {
+          "datum": "2026-12-21",
+          "tagesart": "Betrieb",
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-22",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-23",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-24",
+          "tagesart": null,
+          "ausserhalb": true
+        },
+        {
+          "datum": "2026-12-25",
+          "tagesart": null,
+          "ausserhalb": true
+        }
+      ],
+      "beginn": "2026-12-23",
+      "ende": null,
+      "bundesland": "NW"
+    },
+    "erwartet": {
+      "aenderungen": [
+        {
+          "datum": "2026-12-21",
+          "ausserhalb": true
+        },
+        {
+          "datum": "2026-12-22",
+          "ausserhalb": true
+        },
+        {
+          "datum": "2026-12-24",
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-25",
+          "ausserhalb": false,
+          "tagesart": "Feiertag"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-305-07",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Unveränderter Zeitraum ändert nichts",
+    "schnittstelle": "ausserhalbNeuBerechnen",
+    "eingabe": {
+      "tage": [
+        {
+          "datum": "2026-12-21",
+          "tagesart": "Betrieb",
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-22",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-23",
+          "tagesart": null,
+          "ausserhalb": false
+        },
+        {
+          "datum": "2026-12-24",
+          "tagesart": null,
+          "ausserhalb": true
+        },
+        {
+          "datum": "2026-12-25",
+          "tagesart": null,
+          "ausserhalb": true
+        }
+      ],
+      "beginn": "2026-09-01",
+      "ende": "2026-12-23",
+      "bundesland": "NW"
+    },
+    "erwartet": {
+      "aenderungen": []
+    }
+  },
+  {
+    "id": "AK-305-08",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Neu einbezogener Tag mit eingetragener Tagesart behält sie, auch an einem Feiertag",
+    "schnittstelle": "ausserhalbNeuBerechnen",
+    "eingabe": {
+      "tage": [
+        {
+          "datum": "2026-12-25",
+          "tagesart": "Betrieb",
+          "ausserhalb": true
+        }
+      ],
+      "beginn": "2026-09-01",
+      "ende": null,
+      "bundesland": "NW"
+    },
+    "erwartet": {
+      "aenderungen": [
+        {
+          "datum": "2026-12-25",
+          "ausserhalb": false
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-305-09",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Tage außerhalb der Ausbildung lassen sich nicht ändern",
+    "schnittstelle": "tageSpeichern",
+    "eingabe": {
+      "tage": [
+        {
+          "tag": "Mo",
+          "ausserhalb": true,
+          "tagesart": null,
+          "text": ""
+        }
+      ],
+      "eingaben": [
+        {
+          "tag": "Mo",
+          "tagesart": "Betrieb",
+          "text": "versucht"
+        }
+      ]
+    },
+    "erwartet": {
+      "aenderungen": []
+    }
+  },
+  {
+    "id": "AK-306-01",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "„Entwurf“ ist offen",
+    "schnittstelle": "istOffen",
+    "eingabe": {
+      "status": "Entwurf"
+    },
+    "erwartet": {
+      "offen": true
+    }
+  },
+  {
+    "id": "AK-306-02",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "„Abgelehnt“ ist offen",
+    "schnittstelle": "istOffen",
+    "eingabe": {
+      "status": "Abgelehnt"
+    },
+    "erwartet": {
+      "offen": true
+    }
+  },
+  {
+    "id": "AK-306-03",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "„Eingereicht“ ist nicht offen",
+    "schnittstelle": "istOffen",
+    "eingabe": {
+      "status": "Eingereicht"
+    },
+    "erwartet": {
+      "offen": false
+    }
+  },
+  {
+    "id": "AK-306-04",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "„Freigegeben“ ist nicht offen",
+    "schnittstelle": "istOffen",
+    "eingabe": {
+      "status": "Freigegeben"
+    },
+    "erwartet": {
+      "offen": false
+    }
+  },
+  {
+    "id": "AK-306-05",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Entwurf der Vorwoche ist offen und hervorgehoben",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "wocheEinordnen",
+    "eingabe": {
+      "woche": "2026-W40",
+      "status": "Entwurf",
+      "inhalt": false,
+      "historie": false,
+      "beginn": "2026-09-01",
+      "ende": null
+    },
+    "erwartet": {
+      "ausgeblendet": false,
+      "ausserhalb": false,
+      "offen": true,
+      "vergangenOffen": true
+    }
+  },
+  {
+    "id": "AK-306-06",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Entwurf der aktuellen Woche ist offen, aber nicht hervorgehoben",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "wocheEinordnen",
+    "eingabe": {
+      "woche": "2026-W41",
+      "status": "Entwurf",
+      "inhalt": false,
+      "historie": false,
+      "beginn": "2026-09-01",
+      "ende": null
+    },
+    "erwartet": {
+      "ausgeblendet": false,
+      "ausserhalb": false,
+      "offen": true,
+      "vergangenOffen": false
+    }
+  },
+  {
+    "id": "AK-306-07",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Eingereichte vergangene Woche ist nicht offen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "wocheEinordnen",
+    "eingabe": {
+      "woche": "2026-W40",
+      "status": "Eingereicht",
+      "inhalt": true,
+      "historie": true,
+      "beginn": "2026-09-01",
+      "ende": null
+    },
+    "erwartet": {
+      "ausgeblendet": false,
+      "ausserhalb": false,
+      "offen": false,
+      "vergangenOffen": false
+    }
+  },
+  {
+    "id": "AK-306-08",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Freigegebene vergangene Woche ist nicht offen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "wocheEinordnen",
+    "eingabe": {
+      "woche": "2026-W39",
+      "status": "Freigegeben",
+      "inhalt": true,
+      "historie": true,
+      "beginn": "2026-09-01",
+      "ende": null
+    },
+    "erwartet": {
+      "ausgeblendet": false,
+      "ausserhalb": false,
+      "offen": false,
+      "vergangenOffen": false
+    }
+  },
+  {
+    "id": "AK-306-09",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Abgelehnte vergangene Woche ist offen und hervorgehoben",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "wocheEinordnen",
+    "eingabe": {
+      "woche": "2026-W36",
+      "status": "Abgelehnt",
+      "inhalt": true,
+      "historie": true,
+      "beginn": "2026-09-01",
+      "ende": null
+    },
+    "erwartet": {
+      "ausgeblendet": false,
+      "ausserhalb": false,
+      "offen": true,
+      "vergangenOffen": true
+    }
+  },
+  {
+    "id": "AK-306-10",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Offene Woche des Vorjahres ist hervorgehoben",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "wocheEinordnen",
+    "eingabe": {
+      "woche": "2025-W52",
+      "status": "Entwurf",
+      "inhalt": false,
+      "historie": false,
+      "beginn": "2025-12-01",
+      "ende": null
+    },
+    "erwartet": {
+      "ausgeblendet": false,
+      "ausserhalb": false,
+      "offen": true,
+      "vergangenOffen": true
+    }
+  },
+  {
+    "id": "AK-306-11",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Unberührter leerer Entwurf ganz außerhalb der Ausbildung ist ausgeblendet und nicht offen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "wocheEinordnen",
+    "eingabe": {
+      "woche": "2026-W35",
+      "status": "Entwurf",
+      "inhalt": false,
+      "historie": false,
+      "beginn": "2026-09-01",
+      "ende": null
+    },
+    "erwartet": {
+      "ausgeblendet": true,
+      "ausserhalb": true,
+      "offen": false,
+      "vergangenOffen": false
+    }
+  },
+  {
+    "id": "AK-306-12",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Woche ganz außerhalb mit Inhalt bleibt sichtbar, markiert, nicht offen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "wocheEinordnen",
+    "eingabe": {
+      "woche": "2026-W34",
+      "status": "Entwurf",
+      "inhalt": true,
+      "historie": false,
+      "beginn": "2026-09-01",
+      "ende": null
+    },
+    "erwartet": {
+      "ausgeblendet": false,
+      "ausserhalb": true,
+      "offen": false,
+      "vergangenOffen": false
+    }
+  },
+  {
+    "id": "AK-306-13",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Woche ganz außerhalb mit Historie bleibt sichtbar, markiert, nicht offen",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "wocheEinordnen",
+    "eingabe": {
+      "woche": "2026-W34",
+      "status": "Abgelehnt",
+      "inhalt": false,
+      "historie": true,
+      "beginn": "2026-09-01",
+      "ende": null
+    },
+    "erwartet": {
+      "ausgeblendet": false,
+      "ausserhalb": true,
+      "offen": false,
+      "vergangenOffen": false
+    }
+  },
+  {
+    "id": "AK-306-14",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Woche teilweise in der Ausbildung bleibt normal",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "wocheEinordnen",
+    "eingabe": {
+      "woche": "2026-W36",
+      "status": "Entwurf",
+      "inhalt": false,
+      "historie": false,
+      "beginn": "2026-09-01",
+      "ende": null
+    },
+    "erwartet": {
+      "ausgeblendet": false,
+      "ausserhalb": false,
+      "offen": true,
+      "vergangenOffen": true
+    }
+  },
+  {
+    "id": "AK-306-15",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Beginn zurückverschoben: die Woche erscheint wieder",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "wocheEinordnen",
+    "eingabe": {
+      "woche": "2026-W35",
+      "status": "Entwurf",
+      "inhalt": false,
+      "historie": false,
+      "beginn": "2026-08-01",
+      "ende": null
+    },
+    "erwartet": {
+      "ausgeblendet": false,
+      "ausserhalb": false,
+      "offen": true,
+      "vergangenOffen": true
+    }
+  },
+  {
+    "id": "AK-306-16",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Unberührter Entwurf nach dem Ausbildungsende ist ausgeblendet",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "wocheEinordnen",
+    "eingabe": {
+      "woche": "2026-W40",
+      "status": "Entwurf",
+      "inhalt": false,
+      "historie": false,
+      "beginn": "2026-09-01",
+      "ende": "2026-09-25"
+    },
+    "erwartet": {
+      "ausgeblendet": true,
+      "ausserhalb": true,
+      "offen": false,
+      "vergangenOffen": false
+    }
+  },
+  {
+    "id": "AK-306-17",
+    "modul": "M03",
+    "ebene": "fachlogik",
+    "beschreibung": "Eingereichte Woche ganz außerhalb mit Historie bleibt sichtbar und markiert",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "schnittstelle": "wocheEinordnen",
+    "eingabe": {
+      "woche": "2026-W34",
+      "status": "Eingereicht",
+      "inhalt": true,
+      "historie": true,
+      "beginn": "2026-09-01",
+      "ende": null
+    },
+    "erwartet": {
+      "ausgeblendet": false,
+      "ausserhalb": true,
+      "offen": false,
+      "vergangenOffen": false
+    }
+  }
+]

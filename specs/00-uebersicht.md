@@ -21,8 +21,8 @@ wird in G2 und G3 festgelegt.
 | --- | --- | --- | --- |
 | M01 Kalender und Zeit | `M01-kalender-und-zeit.md` | AK-404, AK-1201 bis AK-1206 | beschrieben (G1) |
 | M02 Personen und Zugang | `M02-personen-und-zugang.md` | AK-101 bis AK-106, AK-201 bis AK-209 | beschrieben (G2) |
-| M03 Wochenberichte entstehen | – | AK-301 bis AK-306 | G2 |
-| M04 Bericht erfassen | – | AK-401 bis AK-408 (ohne AK-404) | G2 |
+| M03 Wochenberichte entstehen | `M03-wochenberichte-entstehen.md` | AK-301 bis AK-306 | beschrieben (G2) |
+| M04 Bericht erfassen | `M04-bericht-erfassen.md` | AK-401 bis AK-408 (ohne AK-404) | beschrieben (G2) |
 | M05 Status und Prüfung | – | AK-501 bis AK-508, AK-601 bis AK-607, AK-701 bis AK-704 | G2 |
 | M06 Historie | – | AK-801 bis AK-803 | G2 |
 | M07 PDF-Export | – | AK-901 bis AK-907 | G2 |
@@ -72,7 +72,8 @@ Jeder Azubi hat genau einen zugeordneten Ausbilder; prüfen darf jeder Ausbilder
 | Jetzt | der Zeitpunkt laut Uhr von M01; für Tests stellbar, im Produktivbetrieb nicht |
 | Bundesland | eines der 16 Länder mit festem Kürzel; bestimmt die Feiertage, siehe M01 |
 | Feiertag | landesweiter gesetzlicher Feiertag des eingestellten Bundeslands, siehe M01 |
-| Offen | Status „Entwurf“ oder „Abgelehnt“; zählt für die Erinnerung als nicht eingereicht |
+| Offen | Status „Entwurf“ oder „Abgelehnt“ und Woche nicht ganz außerhalb der Ausbildung; zählt als nicht eingereicht, auch für die Erinnerung. Zentrale Definition: M03 (M03-R14) |
+| Vorbelegt | Tag, den das System beim Anlegen als „Feiertag“ gesetzt hat; der Merker bleibt bei einem Bundeslandwechsel, siehe M03 |
 | Außerhalb der Ausbildung | Tag vor Ausbildungsbeginn oder nach Ausbildungsende; ausgegraut, keine Pflicht |
 | Zugeordneter Ausbilder | der Ausbilder, den der Admin dem Azubi fest zugewiesen hat |
 | Vertretung | jeder andere Ausbilder; darf prüfen, wird aber nicht benachrichtigt |

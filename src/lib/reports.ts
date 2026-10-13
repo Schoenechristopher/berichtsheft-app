@@ -107,7 +107,12 @@ export async function ensureReportsForTrainee(
       for (const correction of correctOutsideTraining(report.days, period, federalState)) {
         await tx.reportDay.update({
           where: { id: correction.id },
-          data: { outsideTraining: correction.outsideTraining, dayType: correction.dayType },
+          data: {
+            outsideTraining: correction.outsideTraining,
+            dayType: correction.dayType,
+            // Vorbelegt wie beim Anlegen: Der Hinweis „Feiertag (vorbelegt)“ folgt diesem Merker (AK-404).
+            holidayPreset: correction.dayType === "HOLIDAY" ? true : undefined,
+          },
         });
         correctedDays++;
       }

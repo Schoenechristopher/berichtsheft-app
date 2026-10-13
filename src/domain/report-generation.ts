@@ -22,6 +22,8 @@ export interface PlannedDay {
   date: Date;
   dayType: DayType | null;
   outsideTraining: boolean;
+  /** Als „Feiertag“ vorbelegt; bestimmt den Hinweis „Feiertag (vorbelegt)“, auch nach einem Bundeslandwechsel. */
+  holidayPreset: boolean;
 }
 
 /**
@@ -52,11 +54,8 @@ export function isOutsideTraining(date: Date, period: TrainingPeriod): boolean {
 export function planReportDays(week: IsoWeek, period: TrainingPeriod, federalState: string): PlannedDay[] {
   return isoWeekWorkdays(week.isoYear, week.isoWeek).map((date) => {
     const outsideTraining = isOutsideTraining(date, period);
-    return {
-      date,
-      outsideTraining,
-      dayType: !outsideTraining && isPublicHoliday(date, federalState) ? "HOLIDAY" : null,
-    };
+    const holidayPreset = !outsideTraining && isPublicHoliday(date, federalState);
+    return { date, outsideTraining, dayType: holidayPreset ? "HOLIDAY" : null, holidayPreset };
   });
 }
 

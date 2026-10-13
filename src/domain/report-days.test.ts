@@ -89,7 +89,7 @@ describe("Bericht erfassen", () => {
     });
   });
 
-  it("nicht mitgeschickte Felder bleiben unverändert, unveränderte Tage werden nicht geschrieben", () => {
+  it("AK-406 nicht mitgeschickte Felder bleiben unverändert, unveränderte Tage werden nicht geschrieben", () => {
     const result = validate(
       { mo: { dayType: null, activities: null }, di: { dayType: "WORK", activities: "gleich" } },
       { mo: { dayType: "SICK", activities: "x" }, di: { dayType: "WORK", activities: "gleich" } },

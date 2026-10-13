@@ -2,13 +2,11 @@ import { canEditReport, canViewReport, type Viewer } from "@/domain/report-acces
 import { DAY_TYPE_LABELS } from "@/domain/report-days";
 import { currentApproval, currentFeedback, formatDateTime, groupHistory } from "@/domain/report-history";
 import { availableActions } from "@/domain/report-status";
-import { isPublicHoliday } from "@/domain/holidays";
 import { formatDate, toDateInput, weekdayLong, weekRangeLabel } from "@/domain/weeks";
 import { Badge, Notice, StatusChip } from "@/components/ui";
 import { ReportHistory } from "@/components/ReportHistory";
 import { PdfDownloadLink } from "@/components/PdfExport";
 import { db } from "@/lib/db";
-import { getFederalState } from "@/lib/people/service";
 import { loadReportHistory } from "@/lib/reports";
 import { saveReportAction, transitionAction } from "./actions";
 import { ReportEditor } from "./ReportEditor";
@@ -86,7 +84,6 @@ export async function ReportView({
       : day.dayType
         ? DAY_TYPE_LABELS[day.dayType]
         : "Tagesart noch offen";
-  const federalState = editable ? await getFederalState(db()) : null;
 
   const readOnlyText = !report.trainee.active
     ? "Nicht änderbar: Die Person ist deaktiviert. Der Bericht bleibt lesbar."
@@ -142,7 +139,8 @@ export async function ReportView({
             date: toDateInput(day.date),
             label: dayLabel(day.date),
             outsideTraining: day.outsideTraining,
-            holiday: !!federalState && isPublicHoliday(day.date, federalState),
+            // Beim Anlegen vorbelegt, nicht nach dem aktuellen Bundesland (AK-404).
+            holiday: day.holidayPreset,
             dayType: day.dayType ?? "",
             activities: day.activities,
           }))}
