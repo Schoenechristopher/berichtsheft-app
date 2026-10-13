@@ -10,8 +10,10 @@ Diese Datei schreibt nur die Steuerungsinstanz, jeweils nach dem Merge eines Pak
 | G1 Rahmen und Pilotmodul | Rahmen, `format.md`, Prüf-Runner TypeScript, M01 Kalender und Zeit | abgenommen, gemergt | 12.10.2026 | #16, Merge `b6d6220` (Inhalt `5e330f9`) |
 | G2 Zerlegung Fachlogik | A: M02 Personen und Zugang, `ak:abdeckung` mit Ebene (E1), Nachträge G1 | abgenommen, gemergt | 12.10.2026 | #18, Merge `c6af82c` |
 | G2 Zerlegung Fachlogik | B: M03 Wochenberichte entstehen, M04 Bericht erfassen, E4 (KW 53, „Feiertag (vorbelegt)“) | abgenommen, gemergt | 13.10.2026 | #19, Merge `ec70c70` |
-| G2 Zerlegung Fachlogik | C: M05 Status und Prüfung, Daten-Runner | in Arbeit | – | – |
-| G2 Zerlegung Fachlogik | D: M06 Historie, M07 PDF; E: M08 Benachrichtigungen, Abschluss G2 | offen (Welle 3) | – | – |
+| G2 Zerlegung Fachlogik | C: M05 Status und Prüfung, Daten-Runner | abgenommen, gemergt | 13.10.2026 | #21, Merge `8eb4bc7` |
+| G2 Zerlegung Fachlogik | D: M06 Historie, M07 PDF-Export | abgenommen, gemergt | 13.10.2026 | #23, Merge `13c22fe` |
+| G2 Zerlegung Fachlogik | E: M08 Benachrichtigungen und Erinnerung, Abschluss G2 | abgenommen, gemergt | 13.10.2026 | #22, Merge `1b1f4e7` |
+| G3 Oberfläche und Abläufe | M09, Q, Ablauf-Prüffälle | offen | – | – |
 
 ## G1 – Rahmen und Pilotmodul M01
 
@@ -42,18 +44,21 @@ Diese Datei schreibt nur die Steuerungsinstanz, jeweils nach dem Merge eines Pak
 
 ### Offene Punkte
 
-- [ ] `docs/01`, Kapitel 12: Die Stand-Zeile sagt noch „Entwurf zur Freigabe“. Mit dem Merge hat Chris den PR
+- [x] `docs/01`, Kapitel 12: Die Stand-Zeile sagt noch „Entwurf zur Freigabe“. Mit dem Merge hat Chris den PR
       freigegeben; den Vermerk auf „freigegeben“ ändern (mit dem ersten PR von G2).
-- [ ] Die Punkte aus „Bitte bestätigen“ (#16) mit dem Merge übernommen: Wortlaut AK-1201 bis AK-1206, `format.md` mit
+- [x] Die Punkte aus „Bitte bestätigen“ (#16) mit dem Merge übernommen: Wortlaut AK-1201 bis AK-1206, `format.md` mit
       `uhrVorgeben` und optionaler `uhr` bei Fachlogik, Reformationstag vor 2018, BE 17.06.2028, Mariä Himmelfahrt
       in BY für das ganze Land. Nachziehen in G2: der Satz „Jeder Fall nennt seine Uhrzeit“ in `docs/06` und die
       Auslegung zu Mariä Himmelfahrt unter „Bestätigte Auslegungen“ in `specs/M01-kalender-und-zeit.md`.
-- [ ] Die Datenbank-Regel für Kalenderwochen erlaubt KW 53 auch in Jahren mit 52 Wochen (G2, M03).
-- [ ] `ReportView.tsx` zeigt „Feiertag (vorbelegt)“ nach dem aktuellen statt nach dem beim Anlegen gültigen
+- [x] Die Datenbank-Regel für Kalenderwochen erlaubt KW 53 auch in Jahren mit 52 Wochen (G2, M03).
+- [x] `ReportView.tsx` zeigt „Feiertag (vorbelegt)“ nach dem aktuellen statt nach dem beim Anlegen gültigen
       Bundesland (G2, M04).
-- [ ] Die Landkarten-Prüfung wird am Ende von G2 Pflicht in der CI (`docs/06`, offene Punkte).
+- [x] Die Landkarten-Prüfung wird am Ende von G2 Pflicht in der CI (`docs/06`, offene Punkte).
 - [ ] Denkaufwand je Entwicklersitzung lässt sich beim Start nicht einstellen; er steht nur als Anweisung im Auftrag
       (`docs/08`, offener Punkt bleibt offen).
+
+Stand 13.10.2026: Die ersten fünf Punkte sind in G2 erledigt (#18: Stand-Zeile, Satz zur Uhr, Mariä Himmelfahrt; #19:
+KW 53 und „Feiertag (vorbelegt)“; #22: Landkarten-Prüfung in der CI). Der Denkaufwand bleibt offen.
 
 ### Rückblick (MW-R12, KE-R18)
 
@@ -105,12 +110,12 @@ AK-106, AK-205, AK-403, AK-408. Landkarte: 17 Dateien erfasst, 19 noch nicht bes
 
 **Offene Punkte aus Welle 1:**
 
-- [ ] `src/lib/request-path.ts` und `src/lib/seed-data.ts` gehören keinem Modul (→ Paket E, „Querschnitt“);
+- [x] `src/lib/request-path.ts` und `src/lib/seed-data.ts` gehören keinem Modul (→ Paket E, „Querschnitt“);
       `src/domain/week-progress.ts` gehört nach Einschätzung von B zu M09 (→ Paket E, Querschnitt oder M09 vermerken).
-- [ ] `safeReturnPath()` und `src/proxy.ts` gehören fachlich zu M08 (AK-1003); `labels.ts` und `updateOwnTheme()` zu M09.
-- [ ] `specs/00-uebersicht.md`: Satz „Stand G1: beschrieben ist nur M01“ am Ende von G2 anpassen (Paket E).
-- [ ] AK-205: Die Hälfte „keine Erinnerung“ lässt sich in M08 als Prüffall der Fachlogik belegen (Paket E).
-- [ ] `reminder_run.iso_week` ohne Prüfung der Wochennummer (M08, Paket E prüfen).
+- [x] `safeReturnPath()` und `src/proxy.ts` gehören fachlich zu M08 (AK-1003); `labels.ts` und `updateOwnTheme()` zu M09.
+- [x] `specs/00-uebersicht.md`: Satz „Stand G1: beschrieben ist nur M01“ am Ende von G2 anpassen (Paket E).
+- [x] AK-205: Die Hälfte „keine Erinnerung“ lässt sich in M08 als Prüffall der Fachlogik belegen (Paket E).
+- [x] `reminder_run.iso_week` ohne Prüfung der Wochennummer (M08, Paket E prüfen).
 
 **Fallen für spätere Aufträge:**
 
@@ -122,6 +127,111 @@ AK-106, AK-205, AK-403, AK-408. Landkarte: 17 Dateien erfasst, 19 noch nicht bes
 - Die Plattform abonniert eine Entwicklersitzung automatisch auf ihren eigenen PR; sie beendet das Abo wieder, damit die
   Ereignisse bei der Steuerung ankommen.
 - `src/lib/auth/**` ist geschützt, auch die Tests darin; Testnamen dort bleiben vorerst ohne AK-ID.
+
+### Welle 2 – Paket C (allein)
+
+| Feld | C: M05 Status und Prüfung + Daten-Runner (#21) |
+| --- | --- |
+| Stufe und Denkaufwand je Anlauf | Anlauf 1: S3, hoch (nur als Anweisung im Auftrag) |
+| Grund | Schwierigkeit hoch: Transaktion, Gleichzeitigkeit, neuer Runner (MW-R05, M05 = S3) |
+| Größenklasse und Budget | groß, 1 Sitzung, bis 2 Anläufe (Richtwert 10 bis 15 US-Dollar) |
+| Anläufe | 1 (dazu eine kleine Nacharbeit auf Bitte der Steuerung: eigener Grund „nicht gefunden“, verrutschter Kommentar) |
+| Beim ersten Anlauf abgenommen | ja |
+| Ausweichen auf ein anderes Modell | keins gemeldet |
+| Verbrauch der Entwicklersitzung | 1.196 Eingabe-, 145.245 Ausgabe-Token; 24.544.720 aus dem Zwischenspeicher gelesen, 334.572 geschrieben; 10,50 US-Dollar |
+| Dauer | Start 04:42 UTC, Runner lokal grün 04:58 UTC, Draft-PR 05:11 UTC (rund 29 Minuten); Nacharbeit 05:14 UTC |
+| CI-Läufe | 2 × schnelle Prüfung (grün), 1 × volle Prüfung (Klasse I wegen `vitest.config.ts`, alle Konfigurationen, grün) |
+| Rückfragen | keine blockierenden; 7 Punkte „Bitte bestätigen“, von Chris bestätigt |
+| Erreichte Abbruchkriterien | keine |
+
+**Ergebnis:** Daten-Runner `tests/pruefung/daten.test.ts` (Vitest-Projekt `db`) mit Daten-Adapter; Format eines
+Daten-Falls in `specs/pruefung/format.md`; Gleichzeitigkeit (AK-508) deterministisch über „gesehen = Schrittnummer“, echte
+Parallelität bleibt im DB-Test. M05 mit 95 Prüffällen (59 Fachlogik, 36 Daten); feste Gründe (`TransitionReason`) statt
+Meldungstexte.
+
+### Welle 3 – Pakete D und E (parallel)
+
+| Feld | D: M06 Historie, M07 PDF-Export (#23) | E: M08 Benachrichtigungen, Abschluss G2 (#22) |
+| --- | --- | --- |
+| Stufe und Denkaufwand je Anlauf | Anlauf 1: S3, hoch (nur als Anweisung) | Anlauf 1: S3, mittel (nur als Anweisung) |
+| Grund | Risiko hoch: Historie unveränderlich (MW-R05, M06 = S3) | S2 wäre nach MW-R11 erlaubt gewesen; S3 wegen Abschluss G2 (CI-Pflicht, alle Dateien erfasst); Chris hat nicht widersprochen |
+| Größenklasse und Budget | mittel, 1 Sitzung, bis 2 Anläufe | mittel, 1 Sitzung, bis 2 Anläufe |
+| Anläufe | 1 | 1 (dazu ein Abgleich mit `main` nach dem Merge von D, wie geplant) |
+| Beim ersten Anlauf abgenommen | ja | ja |
+| Ausweichen auf ein anderes Modell | keins gemeldet | keins gemeldet |
+| Verbrauch der Entwicklersitzung | 670 Eingabe-, 128.743 Ausgabe-Token; 20.581.040 aus dem Zwischenspeicher gelesen, 319.589 geschrieben; 9,25 US-Dollar | 1.198 Eingabe-, 136.048 Ausgabe-Token; 26.910.331 aus dem Zwischenspeicher gelesen, 374.562 geschrieben; 11,10 US-Dollar |
+| Dauer | Start 05:55 UTC, Draft-PR 06:23 UTC (rund 28 Minuten) | Start 05:55 UTC, Draft-PR 06:23 UTC (rund 28 Minuten); Abgleich 06:45 bis 06:55 UTC |
+| CI-Läufe | 1 × schnelle Prüfung (grün), 1 × volle Prüfung (Klasse L, grün) | 2 × schnelle Prüfung (vor dem Abgleich rot wie erwartet: Landkarte ohne die Dateien von D; danach grün), 1 × volle Prüfung (Klasse I und O, alle Konfigurationen, grün) |
+| Rückfragen | keine blockierenden; 6 Punkte „Bitte bestätigen“, von Chris bestätigt (u. a. Migration mit festem Fehlercode `BH803`) | keine blockierenden; 7 Punkte „Bitte bestätigen“, von Chris bestätigt |
+| Erreichte Abbruchkriterien | keine | keine |
+
+**Ergebnis Welle 3:** M06 und M07 mit 41 Prüffällen (Unveränderlichkeit der Historie, AK-803, als Daten-Fall; PDF über
+Inhaltsmerkmale). M08 mit 80 Prüffällen (Outbox und „genau einmal“ als Daten-Fälle, Montag 9:00 Uhr mit gestellter
+Uhr); AK-205 jetzt mit Daten-Fall. `npm run landkarte -- --pruefen` ist Pflicht in der schnellen Prüfung; alle 37 Dateien
+unter `src/domain/` und `src/lib/` sind erfasst (Abschnitt „Querschnitt“ für Dateien ohne Fachlogik).
+
+**Abnahme durch die Steuerung (C, D, E):** Diff gelesen (Migration von D Zeile für Zeile gegen die bisherigen
+Trigger-Funktionen geprüft: nur der Fehlercode ist neu); lokal Lint, Format, Typecheck, `npm test` (C: 822, D: 864,
+E nach Abgleich: 946 Tests), `ak:abdeckung -- --pruefen`, `pruefumfang -- --pruefen`, `landkarte` (bei E mit
+`--pruefen`), Browser Chromium und 375 px (je 89 bestanden, 2 übersprungen wie bisher). Gegenprobe beider Runner mit
+eigenen, danach zurückgenommenen Änderungen: falscher Erwartungswert und unbekannte Schnittstelle bzw. Aktion scheitern
+genau einzeln, ein Fall der Ebene `ablauf` scheitert; bei E zusätzlich eine nicht erfasste Datei unter `src/lib/`, die
+`landkarte -- --pruefen` scheitern lässt.
+
+### Ergebnis G2
+
+- M01 bis M08 beschrieben, Modultabelle in `docs/06` mit endgültiger AK-Zuordnung, `specs/00-uebersicht.md` auf Stand G2.
+- 407 Prüffälle (Fachlogik und Daten), alle grün; Runner für `fachlogik` und `daten`.
+- Ebene „Ablauf, G3“ (Prüffall folgt in G3): AK-101, AK-106, AK-403, AK-408.
+- Code-Landkarte vollständig (37 Dateien), Prüfung Pflicht in der CI.
+- Soll-Korrekturen: KW 53 nur in Jahren mit 53 Wochen (Migration), „Feiertag (vorbelegt)“ nach dem beim Anlegen
+  gültigen Bundesland (Merker je Tag, Migration), feste Fehlercodes der Historie (Migration), feste Gründe statt
+  Meldungstexte in Personen, Status, Speichern, PDF-Zeitraum und Benachrichtigungen.
+
+### Offene Punkte nach G2
+
+- [ ] Denkaufwand je Entwicklersitzung lässt sich beim Start nicht einstellen (`docs/08`, offen).
+- [ ] Ablauf-Prüffälle für AK-101, AK-106, AK-403, AK-408 (G3); danach `DEFERRED_CASES_REQUIRED` in
+      `scripts/ak-abdeckung/coverage.ts` umlegen.
+- [ ] Erinnerungsläufe: Prüfung der Wochennummer (KW 1 bis 53) als spätere Migration (von Chris bestätigt, nicht in G2).
+- [ ] Kaskade beim endgültigen Löschen einer Person (M06-R10) ohne neutralen Fall; Vorschlag G3 (M06, Abschnitt 10).
+- [ ] Echte Gleichzeitigkeit (AK-508) und der Schutz der Datenhaltung an der Fachlogik vorbei (AK-505) nur in DB-Tests;
+      in den Profilen (G4) je Plattform als eigener Nachweis vorsehen.
+- [ ] Kleinigkeiten: `hasContent` doppelt in `src/lib/reports.ts` und `src/lib/notifications/service.ts`; veralteter
+      Kommentar am `eventKey` im Schema; Tests in `src/lib/auth/config.test.ts` ohne AK-ID (geschützter Pfad).
+- [ ] M09: `src/domain/week-progress.ts`, `src/lib/people/labels.ts`, `updateOwnTheme()` in G3 beschreiben (stehen bis
+      dahin im Querschnitt bzw. bei M02).
+
+### Rückblick G2 (MW-R12, KE-R18)
+
+| Kennzahl | G2 |
+| --- | --- |
+| KZ-1 Abnahme beim ersten Anlauf | 5 von 5 (100 %) |
+| KZ-2 Rückfragen wegen unvollständigem Auftrag | 0 (eine Lücke ohne Rückfrage: E4 b brauchte eine Schemaänderung, die der Auftrag nicht vorsah) |
+| KZ-3 Läufe der vollen Prüfung je PR | 1 je Paket-PR (5 PRs); Doku-PRs nur schnelle Prüfung |
+| KZ-4 Pakete über Budget | 0 von 5 |
+| KZ-5 Verbrauch je abgenommenem Paket | S3 mittel: 7,33 / 8,69 / 9,25 / 11,10 US-Dollar (Mittel 9,09); S3 groß: 10,50 US-Dollar |
+| Steuerung | rund 31 US-Dollar statt geschätzt 5 US-Dollar (siehe unten) |
+| Eskalationen je Stufe | keine |
+
+Summe G2: Entwicklersitzungen 46,87 US-Dollar, Steuerung rund 31 US-Dollar; 5 volle CI-Läufe.
+
+**Vorschläge (zur Freigabe):**
+
+- **MW-R05:** Fünf S3-Pakete in Folge (dazu G1) beim ersten Anlauf abgenommen. Für Beschreibungs-Pakete bestehenden
+  Codes (Art wie M03, M04, M07, M08) in G3 einen Versuch auf S2 nach MW-R11; scheitert er, bleibt S3.
+- **KE-R14, Richtwerte in Token:** S3 mittel rund 0,1 bis 0,14 Mio. Ausgabe-Token und 15 bis 27 Mio. Token aus dem
+  Zwischenspeicher (7 bis 11 US-Dollar); S3 groß rund 0,15 Mio. Ausgabe- und 25 Mio. Zwischenspeicher-Token (rund
+  10,50 US-Dollar).
+- **Steuerung (größter Kostenblock):** Die eine Steuerungssitzung lief über drei Wellen und rund elf Stunden; ihr Kontext
+  wuchs auf rund 0,6 Mio. Token, und jede Benachrichtigung (PR-Ereignis, Bericht, Check-in) verarbeitet ihn erneut. Dazu
+  kamen die eigenen Abnahmeläufe. Vorschlag: KE-R03 enger fassen – nach jeder Welle Übergabe und frische
+  Steuerungssitzung; lokale Abnahmeläufe (Prüfbefehle, Gegenprobe, Browser) an einen Hilfsagenten der Stufe S1 geben,
+  der nur das Ergebnis meldet; PR-Abos erst setzen, wenn die Abnahme beginnt (weniger Zwischenereignisse).
+- **Auftragsvorlage (G4):** Der Block „Gemeinsame Regeln für alle Pakete“ hat sich bewährt (KZ-2 = 0) und gehört in
+  `playbooks/vorlage-arbeitspaket.md`. Ergänzen: „feste Gründe statt Meldungstexte“ von Anfang an; mögliche
+  Schemaänderungen im Auftrag benennen; Hinweis, dass die Plattform die Entwicklersitzung automatisch auf ihren PR
+  abonniert.
 
 ## Übergabe an die Steuerung von G2
 
@@ -144,3 +254,37 @@ AK-106, AK-205, AK-403, AK-408. Landkarte: 17 Dateien erfasst, 19 noch nicht bes
   - Seiten-Importe machen einen PR zur Klasse O; dann laufen alle Browser in der vollen Prüfung.
 - **Werkzeuge der Steuerung:** Bericht der Entwicklersitzung per Nachricht; PR-Abo; Verbrauch über die Sitzungsdaten
   (`usage`) der Entwicklersitzung.
+
+## Übergabe an die Steuerung von G3
+
+- **Stand:** G2 ist gemergt (#18, #19, #21, #22, #23; Fortschritt #20 und dieser PR). M01 bis M08 sind beschrieben, 407
+  Prüffälle laufen in zwei Runnern (`tests/pruefung/fachlogik.test.ts` im Vitest-Projekt `unit`,
+  `tests/pruefung/daten.test.ts` im Projekt `db`). `npm run ak:abdeckung -- --pruefen` und
+  `npm run landkarte -- --pruefen` sind Pflicht in der schnellen Prüfung.
+- **Nächstes (G3, `docs/06`, Etappen):** M09 Oberfläche und Q Plattform und Qualität beschreiben; Ablauf-Prüffälle mit
+  einem Runner für die Ebene `ablauf` (Browser, der Adapter übersetzt fachliche Aktionen in Klicks); Beispielszenarien;
+  Abdeckungsprüfung. Danach werden die Fach-Specs maßgeblich und `CLAUDE.md` wird angepasst.
+- **Pflicht ab G3:** Die Ablauf-AKs AK-101, AK-106, AK-403, AK-408 brauchen Prüffälle; dann
+  `DEFERRED_CASES_REQUIRED` in `scripts/ak-abdeckung/coverage.ts` umlegen.
+- **Schnitt:** M09 hängt von allen Modulen ab; Q hängt von M09 ab. Der Ablauf-Runner ist die Voraussetzung für die
+  Ablauf-Fälle aller Module; ihn zuerst bauen (wie den Daten-Runner in C). Gemeinsame Dateien wie in G2
+  (`specs/code-landkarte.md`, `specs/00-uebersicht.md`, `specs/pruefung/format.md`, die Adapter, `docs/06`, `docs/03`):
+  nur eigene Abschnitte, Merge-Reihenfolge vorgeben, `docs/03` nur über `npm run ak:abdeckung`.
+- **Stufe:** Nach MW-R11 darf ein Beschreibungs-Paket bestehenden Codes auf S2 versucht werden (siehe Rückblick G2).
+  Der Ablauf-Runner und alles mit Browser-Infrastruktur bleibt S3.
+- **Fallen aus G2:**
+  - Feste Gründe statt Meldungstexte: Prüffälle erkennen Fehler über Codes; die Domäne braucht dafür Gründe (Muster
+    `RuleReason`, `TransitionReason`), und bestehende `toEqual`-Erwartungen werden dadurch strenger.
+  - Daten-Fälle: `uhr` und `schritte` Pflicht; gleiche Zeitpunkte sortieren nicht stabil, daher je Schritt eine eigene
+    `uhr`; Gleichzeitigkeit über „gesehen = Schrittnummer“.
+  - Nach Schemaänderungen `npx prisma generate`, auch in der Steuerungssitzung vor der Abnahme; die Test-Datenbank
+    migriert `tests/db/global-setup.ts` bei jedem Lauf.
+  - Die Plattform abonniert Entwicklersitzungen automatisch auf ihren PR; sie beenden das Abo, damit die Ereignisse bei
+    der Steuerung ankommen.
+  - `src/app/**` macht einen PR zur Klasse O, `.github/**`, `vitest.config.ts` zur Klasse I (volle Prüfung in allen
+    Konfigurationen).
+  - E2E: Testpersonen entstehen erst beim ersten Seitenaufruf; in `describe.serial` überspringt ein Fehler alle
+    Folgetests.
+- **Werkzeuge der Steuerung:** Bericht der Entwicklersitzung per Nachricht; PR-Abo; Verbrauch über die Sitzungsdaten
+  (`usage`) der Entwicklersitzung; Check-ins per verzögerter Nachricht in großem Abstand. Frische Steuerungssitzung je
+  Welle erwägen (Rückblick G2).
