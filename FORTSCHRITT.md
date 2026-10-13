@@ -16,7 +16,8 @@ Diese Datei schreibt nur die Steuerungsinstanz, jeweils nach dem Merge eines Pak
 | G3 Oberfläche und Abläufe | Welle 1: H Nachträge G2, G M09 beschreiben, F Ablauf-Runner | in Arbeit | 13.10.2026 | – |
 | G3 Oberfläche und Abläufe | Welle 2: I Ablauf-Fälle M09, J Q, Szenarien, Abschluss | geplant | – | – |
 | A Automatisches Mergen | Welle 1: A1 AM-AK in `ak:abdeckung` | abgenommen, gemergt | 13.10.2026 | #30, Merge `e5e0adc` |
-| A Automatisches Mergen | Welle 2: A2 CI-37 (nach #28, I, J), A3 Ablauf-Kriterien an Test-PRs (nach E1, E3) | geplant | – | – |
+| A Automatisches Mergen | A3 Ablauf-Kriterien AM-AK-11 bis -14 an Test-PRs | nachgewiesen | 13.10.2026 | #32 (gemergt in `am-test/main`), #33, #34 (geschlossen) |
+| A Automatisches Mergen | Welle 2: A2 CI-37 (nach #28, I, J) | geplant | – | – |
 
 ## G1 – Rahmen und Pilotmodul M01
 
@@ -348,6 +349,41 @@ Zwischenspeicher gelesen, 288.673 geschrieben; rund 3,84 US-Dollar (Stand vor di
 **Falle für Abnahmeläufe:** Ein frischer Worktree hat keinen erzeugten Prisma-Client (`src/generated` ist ignoriert);
 vor Typecheck und Tests `npx prisma generate` ausführen.
 
+### A3 – Ablauf-Kriterien an Test-PRs (Steuerung)
+
+Erledigt am 13.10.2026 durch die Steuerung (AM-R02), nach E1 und E3.
+
+Voraussetzungen:
+- Regelsatz „main und am-test“ (Enforcement active) für den Default-Branch und `am-test/main`: Pflicht-Check „Prüfung
+  abgeschlossen“, Merge-Warteschlange mit Merge-Commit, kein Löschen, kein Force-Push.
+- Die Test-Basis `am-test/main` hat Chris angelegt (`main` plus ein Commit mit `aktiv: true`).
+- Die Rechteprüfung der Steuerungssitzung lehnt einen direkten Push dieses Commits ab („Merge Without Review“).
+
+| AM-AK | Test-PR | Aufbau | Ergebnis |
+| --- | --- | --- | --- |
+| AM-AK-11 | #32 gegen `am-test/main` | neue Datei unter `docs/`; Abnahme-Kommentar, Label, automatisches Mergen | „Merge-Kriterien“ zulässig; nach grüner „Prüfung abgeschlossen“ in die Warteschlange aufgenommen; dort `merge_group`-Lauf von CI und Merge-Kriterien grün; gemergt (`3a36894`) |
+| AM-AK-12 | #33 gegen `am-test/main` | absichtlich roter Unit-Test; Abnahme-Kommentar, Label, automatisches Mergen | „Merge-Kriterien“ grün, „Prüfung abgeschlossen“ rot → `blocked`, nicht in die Warteschlange, nicht gemergt; geschlossen |
+| AM-AK-13 | #32 | Kommentar der Steuerung nach dem Merge (AM-S04, E4) | Tabelle aller ausgewerteten Kriterien AM-R01 bis AM-R12 mit Ergebnis und Ablauf am PR |
+| AM-AK-14 | #34 gegen `main` | Abnahme-Kommentar und Label, automatisches Mergen aus (AM-R14) | „Merge-Kriterien“ rot mit genau einem Grund „Schalter aus (.github/automerge.yml: aktiv: false)“; nicht gemergt; geschlossen |
+
+Nebenbei: Doku-PR #31 lief als erster PR über die Warteschlange von `main`.
+
+**Befunde:**
+
+- **Ausgabe ohne Einzelkriterien:** Die Zusammenfassung von „Merge-Kriterien“ nennt nur Ergebnis, Antrag und
+  „zulässig ohne Schalter“, bei einem Verstoß die Gründe. Die einzelnen erfüllten Kriterien listet sie nicht. Den
+  Kommentar für AM-AK-13 hat die Steuerung deshalb von Hand zusammengestellt. Vorschlag für G4 (AM-S04, Playbook) oder
+  eine Nachbesserung: Die Zusammenfassung listet jedes ausgewertete Kriterium, die Steuerung übernimmt sie in den
+  Kommentar.
+- **Abgebrochene Läufe:** Ein neues Label startet die Prüfung neu und bricht den laufenden Lauf ab (CI-15). Am alten
+  Lauf steht dann kurz eine rote „Prüfung abgeschlossen“. Das ist erwartet und stört die Warteschlange nicht.
+- **AM-AK-12, Teil „fehlt der Check“:** Nicht getrennt geprüft. Ohne den Pflicht-Check lässt der Regelsatz keinen Merge
+  zu; das deckt die Konfiguration ab.
+- **Aufräumen:** PRs #33 und #34 sind geschlossen. Die Branches `am-test/a3-ak11`, `am-test/a3-ak12` und
+  `am-test/a3-ak14` kann die Sitzung nicht löschen (Proxy lehnt ab); das erledigt Chris. `am-test/main` bleibt bis zum
+  Ende von A für weitere Prüfungen (z. B. von A2) stehen.
+- **Verbrauch der Steuerung** (Welle 1 und A3 zusammen, Sitzung bis hier): siehe Rückblick am Ende von A.
+
 ### Übergabe an die nächste Steuerung A (Welle 2)
 
 - **Stand:** A1 gemergt (#30); Plan und Tabelle „Schattenbetrieb“ auf `main` (#29). `.github/automerge.yml` steht auf
@@ -358,10 +394,10 @@ vor Typecheck und Tests `npx prisma generate` ausführen.
   Überschriften von `specs/code-landkarte.md`; der Modulgraph steht in `docs/06` („Modulschnitt“) bzw. als Mermaid in
   `specs/00-uebersicht.md`. A2 legt ihn maschinenlesbar unter `specs/` ab. Die Status-Zeile in `docs/ci-richtlinie.md`
   sagt noch „Entwurf zur Freigabe“; korrigieren, falls J es nicht tut.
-- **A3 (Test-PRs), durch die Steuerung selbst:** wartet auf E1 (Regelsatz und Warteschlange für `main` aktiv?) und E3
-  (`am-test/main` im Regelsatz). Ablauf und Aufräumen stehen im Plan oben. Automatisches Mergen lässt sich über die
-  REST-Route `PUT /repos/{owner}/{repo}/pulls/{n}/ccr/auto_merge` einschalten, auf „bereit“ stellen über `POST
-  …/ccr/ready_for_review`. GraphQL ist aus der Sitzung nicht erreichbar.
+- **A3:** erledigt (siehe oben). Werkzeuge: Automatisches Mergen über die REST-Route `PUT
+  /repos/{owner}/{repo}/pulls/{n}/ccr/auto_merge` (ausschalten mit `DELETE`), auf „bereit“ stellen über `POST
+  …/ccr/ready_for_review`, Job-Logs über das GitHub-Werkzeug `get_job_logs`. GraphQL, das Löschen von Branches und der
+  direkte Download von Logs sind aus der Sitzung nicht erreichbar.
 - **Schattenbetrieb (E2):** Die Steuerungen von G3 Welle 2 und G4 tragen in die Tabelle oben ein; die Steuerung A zählt
   am Ende. Bisher 0 Einträge.
 - **Am Ende von A:** `docs/07` (Einführung Schritt 4, offene Punkte) in einem Doku-PR nachziehen (geschützter Pfad, Chris
