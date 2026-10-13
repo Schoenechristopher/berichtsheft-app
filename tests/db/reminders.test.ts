@@ -227,3 +227,20 @@ describe("Verpasste Erinnerung nachholen (bestätigte Auslegung 11)", () => {
     expect((await workerCheck("2026-10-19T09:00:00+02:00")).ran).toBe(true);
   });
 });
+
+describe("Wochennummer eines Erinnerungslaufs", () => {
+  const insertRun = (isoWeek: number) =>
+    prisma.reminderRun.create({ data: { isoYear: 2026, isoWeek, ranAt: new Date() } });
+
+  it("AK-1024 Woche 0 und 54 werden von der Datenhaltung abgewiesen", async () => {
+    await expect(insertRun(0)).rejects.toThrow();
+    await expect(insertRun(54)).rejects.toThrow();
+    expect(await prisma.reminderRun.count()).toBe(0);
+  });
+
+  it("AK-1024 Woche 1 und 53 sind zulässig", async () => {
+    await insertRun(1);
+    await insertRun(53);
+    expect(await prisma.reminderRun.count()).toBe(2);
+  });
+});

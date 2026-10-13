@@ -6,7 +6,7 @@
  * Die Regeln stehen als reine Funktionen in `src/domain/`; hier werden sie mit der Datenbank
  * verbunden. „Jetzt“ übergibt der Aufrufer aus dem Uhr-Modul.
  */
-import { validateDayInputs, type DayErrors, type DayInput, type DayUpdate } from "@/domain/report-days";
+import { hasContent, validateDayInputs, type DayErrors, type DayInput, type DayUpdate } from "@/domain/report-days";
 import { canEditReport, canManagePeople, canViewReport, type Viewer } from "@/domain/report-access";
 import { currentFeedback, type HistoryChange, type HistoryComment } from "@/domain/report-history";
 import { weekProgress } from "@/domain/week-progress";
@@ -181,7 +181,7 @@ export async function listTraineeWeeks(prisma: PrismaClient, viewer: Viewer, tra
       ...classifyWeek(
         {
           ...report,
-          hasContent: days.some((day) => day.dayType !== null || day.activities !== ""),
+          hasContent: hasContent(days),
           hasHistory: _count.statusChanges > 0,
         },
         period,

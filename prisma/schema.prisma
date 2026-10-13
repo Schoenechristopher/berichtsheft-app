@@ -179,7 +179,8 @@ model StatusChange {
 /// versendet der Worker (`src/lib/notifications/outbox.ts`) und setzt dann sentAt.
 model Notification {
   id            String        @id @default(uuid()) @db.Uuid
-  /// Fachlicher Schlüssel des Ereignisses, z. B. „submitted:<statusChangeId>“.
+  /// Fachlicher Schlüssel des Ereignisses (M08-R03): „status-change:<Statuswechsel-ID>“ bzw. für die
+  /// Montags-Läufe „reminder:“ und „trainer-info:“ mit Woche des Stichtags und Azubi.
   eventKey      String        @map("event_key")
   recipientId   String        @map("recipient_id") @db.Uuid
   recipient     Person        @relation(fields: [recipientId], references: [id], onDelete: Cascade)
@@ -227,6 +228,7 @@ model TeamsDevMessage {
 /// Nachholen (bis Dienstag 23:59 Uhr) prüfen hier, ob die Woche schon erledigt ist.
 model ReminderRun {
   isoYear Int      @map("iso_year")
+  /// 1 bis 53, geprüft durch CHECK `reminder_run_iso_week_range` (Migration, nicht von Prisma abgebildet).
   isoWeek Int      @map("iso_week")
   ranAt   DateTime @map("ran_at") @db.Timestamptz(3)
   /// Anzahl der dabei angelegten Benachrichtigungen.

@@ -13,6 +13,7 @@ import {
 } from "@/domain/notifications";
 import type { ReportAction } from "@/domain/report-status";
 import { canManagePeople, type Viewer } from "@/domain/report-access";
+import { hasContent } from "@/domain/report-days";
 import type { Prisma, PrismaClient } from "@/generated/prisma/client";
 import { isUuid } from "@/lib/ids";
 import { ensureReportsForAllTrainees } from "@/lib/reports";
@@ -118,7 +119,7 @@ export async function loadReminderTrainees(prisma: Db): Promise<ReminderTrainee[
     weeks: reports.map(({ id, days, _count, ...week }) => ({
       ...week,
       reportId: id,
-      hasContent: days.some((day) => day.dayType !== null || day.activities !== ""),
+      hasContent: hasContent(days),
       hasHistory: _count.statusChanges > 0,
     })),
   }));

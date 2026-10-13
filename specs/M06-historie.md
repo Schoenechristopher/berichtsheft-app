@@ -97,18 +97,17 @@ Text aus `docs/01-spezifikation.md`, Kapitel 8; Prüffälle in `specs/pruefung/M
 | --- | --- | --- | --- | --- |
 | AK-801 | Jeder Bericht hat eine Historie aller Statuswechsel (Einreichen, Zurückziehen, Freigabe, Ablehnung, Rücknahme) mit Datum, Uhrzeit, Person und neuem Status. | M06-R01 bis M06-R03, M06-R05, M06-R06 | AK-801-01 bis AK-801-04 | Daten |
 | AK-802 | Kommentare und Begründungen früherer Runden bleiben erhalten und sind ihrer Runde zugeordnet. | M06-R04, M06-R06 | AK-802-01 bis AK-802-04 | Daten |
-| AK-803 | Historieneinträge kann niemand bearbeiten oder löschen; nur das endgültige Löschen der Person entfernt sie. Gilt für Statuswechsel und Kommentare; die Datenhaltung weist ihr Ändern und Löschen ab. | M06-R08 bis M06-R11 | AK-803-01 bis AK-803-04 | Daten |
+| AK-803 | Historieneinträge kann niemand bearbeiten oder löschen; nur das endgültige Löschen der Person entfernt sie. Gilt für Statuswechsel und Kommentare; die Datenhaltung weist ihr Ändern und Löschen ab. | M06-R08 bis M06-R11 | AK-803-01 bis AK-803-05 | Daten |
 
 Keine AK von M06 ist nur im Browser prüfbar; es gibt deshalb keine Markierung `Ablauf, G3`. Die Fälle der Ebene
 `fachlogik` (`historieGruppieren`) prüfen Bezeichnung, Gruppierung und Reihenfolge ohne Speicher; die Fälle der Ebene
 `daten` prüfen den gespeicherten Bestand und was die Berichtsseite daraus zeigt (`historie_lesen`). Die Darstellung
 selbst (Aussehen, Platz auf der Seite) prüfen heute die Browser-Tests und ab G3 die Ablauf-Fälle.
 
-**AK-803, Kaskade beim endgültigen Löschen (M06-R10):** Kein neutraler Fall prüft, dass das endgültige Löschen des
-Azubis seine Berichte samt Historie entfernt, weil ein Daten-Fall einen danach fehlenden Bericht nicht beschreiben kann
-(`format.md`: der Bestand nennt nur vorhandene Berichte). Belegt ist das heute durch Tests der TypeScript-App gegen die
-Datenhaltung (Code-Landkarte, Belege); dass eine Person mit Einträgen in fremder Historie nicht gelöscht wird, prüfen
-die Fälle von M02 (`loeschenPruefen`, `fremde_historie`). Siehe Abschnitt 10.
+**AK-803, Kaskade beim endgültigen Löschen (M06-R10):** Der Fall AK-803-05 löscht einen Azubi mit eingereichtem
+Bericht endgültig (Aktion `person_loeschen`) und erwartet seinen Bericht als nicht mehr vorhanden (`"fehlt": true`,
+`format.md`, „Aufbau eines Daten-Falls“); damit sind Bericht samt Historie fort. Dass eine Person mit Einträgen in fremder
+Historie nicht gelöscht wird, prüfen die Fälle von M02 (`loeschenPruefen`, `fremde_historie`). Siehe Abschnitt 10.
 
 Gehört M05, wird hier nur genutzt: Statusmodell, Prüfrunde und was ein Statuswechsel schreibt (M05-R02, M05-R18,
 M05-R22), die Rückmeldung (AK-606). Gehört M02: Sichtbarkeit und endgültiges Löschen (AK-103 bis AK-105, AK-206).
@@ -196,7 +195,6 @@ vorkommt.
 - [ ] **Bitte bestätigen:** Die TypeScript-App erkennt die Abweisung über einen festen Fehlercode der Datenhaltung
       statt über den Meldungstext (Code-Landkarte, M06). Dafür meldet die Datenhaltung nach dieser Etappe einen eigenen
       Code; Verhalten und Meldungstexte bleiben gleich.
-- [ ] Die Kaskade beim endgültigen Löschen (M06-R10) hat keinen neutralen Fall, weil das Format einen nach dem Fall
-      fehlenden Bericht nicht beschreibt. Vorschlag für G3: im Daten-Fall-Format ein Bestandsmerkmal „Bericht gibt es
-      nicht mehr“ zulassen und dann einen Fall `person_loeschen` ergänzen.
+- [x] Die Kaskade beim endgültigen Löschen (M06-R10) prüft jetzt AK-803-05: Das Format kennt `"fehlt": true` für einen
+      Bericht, der nach dem Fall nicht mehr existiert, und die Aktion `person_loeschen` (G3, Paket H).
 - [ ] Ablauf-Fälle für die Darstellung der Historie auf der Berichtsseite folgen in G3 (M09).
