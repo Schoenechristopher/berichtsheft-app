@@ -35,6 +35,8 @@ export interface CoverageRow extends Criterion {
 const AK_ID = /(?<!UI-)AK-\d{3,4}/g;
 /** UI-AK-IDs der UI-Spezifikation (UI-AK-01 … UI-AK-20). */
 const UI_AK_ID = /UI-AK-\d{2}(?!\d)/g;
+/** AM-AK-IDs der Spec „Automatisches Mergen“ (`docs/07`, AM-AK-01 … AM-AK-14). */
+const AM_AK_ID = /AM-AK-\d{2}(?!\d)/g;
 
 /** Liest alle Akzeptanzkriterien aus den Tabellen der Spezifikation (`| AK-101 | Text |`). */
 export function parseCriteria(markdown: string): Criterion[] {
@@ -157,6 +159,7 @@ function idsOf(test: TestCase): string[] {
   return [test.name, ...(test.tags ?? [])].flatMap((text) => [
     ...(text.match(AK_ID) ?? []),
     ...(text.match(UI_AK_ID) ?? []),
+    ...(text.match(AM_AK_ID) ?? []),
   ]);
 }
 
@@ -203,6 +206,7 @@ export function renderMarkdown(
   rows: CoverageRow[],
   uiRows: CoverageRow[] = [],
   pending: ReadonlySet<string> = new Set(),
+  mergeRows: CoverageRow[] = [],
 ): string {
   const covered = rows.filter((row) => row.tests.length > 0).length;
   const lines = [
@@ -243,6 +247,7 @@ export function renderMarkdown(
       );
     }
   }
+  lines.push(...renderMergeSection(mergeRows));
   return `${lines.join("\n")}\n`;
 }
 
@@ -460,4 +465,75 @@ export function casesAsTests(cases: CheckCase[]): TestCase[] {
 export function pendingCriteria(deferred: ReadonlySet<string>, cases: CheckCase[]): string[] {
   const covered = new Set(cases.map((entry) => criterionOfCase(entry.id)));
   return [...deferred].filter((id) => !covered.has(id));
+}
+
+/** Ebenen der AM-AK-Tabelle in `docs/07`: Fachlogik (Unit-Test Pflicht) und Ablauf (Nachweis an Test-PRs). */
+export const MERGE_LEVELS = ["Fachlogik", "Ablauf"] as const;
+/** Ebene „Ablauf“ in der AM-AK-Tabelle: kein automatischer Test, Nachweis an Test-PRs (Paket A3). */
+export const MERGE_FLOW_LEVEL = "Ablauf";
+/** Kennzeichnung der AM-AK mit Ebene `Ablauf` im Bericht; sie lässt `--pruefen` nicht scheitern. */
+export const MERGE_FLOW_LABEL = "Ablauf, Nachweis an Test-PRs (docs/07)";
+
+/**
+ * Liest die Tabelle „Akzeptanzkriterien“ der Spec „Automatisches Mergen“
+ * (`| AM-AK-01 | Kriterium | Fachlogik |`). Eine unbekannte Ebene oder eine falsche Spaltenzahl ist ein Fehler.
+ */
+export function parseMergeCriteria(markdown: string): { criteria: Criterion[]; errors: string[] } {
+  const criteria: Criterion[] = [];
+  const errors: string[] = [];
+  for (const line of markdown.split("\n")) {
+    const id = /^\|\s*(AM-AK-\d{2})\s*\|/.exec(line)?.[1];
+    if (!id || criteria.some((criterion) => criterion.id === id)) {
+      continue;
+    }
+    const cells = line
+      .trim()
+      .replace(/^\|/, "")
+      .replace(/(?<!\\)\|$/, "")
+      .split(/(?<!\\)\|/)
+      .map((cell) => cell.trim());
+    if (cells.length !== 3) {
+      errors.push(`${id}: Zeile hat ${cells.length} statt 3 Spalten.`);
+      continue;
+    }
+    if (!(MERGE_LEVELS as readonly string[]).includes(cells[2])) {
+      errors.push(`${id}: unbekannte Ebene „${cells[2]}“ (erlaubt: ${MERGE_LEVELS.join("; ")}).`);
+    }
+    criteria.push({ id, text: cells[1], level: cells[2] });
+  }
+  return { criteria, errors };
+}
+
+/** AM-AK-IDs der Ebene Fachlogik ohne Test (lassen `--pruefen` scheitern); Ablauf-AKs sind ausgenommen. */
+export function missingMergeCriteria(rows: CoverageRow[]): string[] {
+  return rows.filter((row) => row.level !== MERGE_FLOW_LEVEL && row.tests.length === 0).map((row) => row.id);
+}
+
+/** Abschnitt „Automatisches Mergen (`docs/07`)“ für `docs/03-testabdeckung.md`; leer ohne Zeilen. */
+export function renderMergeSection(rows: CoverageRow[]): string[] {
+  if (rows.length === 0) {
+    return [];
+  }
+  const unit = rows.filter((row) => row.level !== MERGE_FLOW_LEVEL);
+  const covered = unit.filter((row) => row.tests.length > 0).length;
+  const lines = [
+    "",
+    "## Automatisches Mergen (`docs/07`)",
+    "",
+    "Aus `docs/07-spec-automatisches-mergen.md` (AM-AK-01 … AM-AK-14), gelesen aus der Tabelle „Akzeptanzkriterien“. Ein Test zählt, wenn sein Name die AM-AK-ID nennt. AM-AK mit Ebene Fachlogik brauchen mindestens einen Test, sonst scheitert `--pruefen`; die Zahl der Tests je ID vergleicht AM-R06 vor und nach einem PR.",
+    "",
+    `AM-AK mit Ebene Ablauf haben keinen automatischen Test; sie werden an Test-PRs nachgewiesen (Kennzeichnung „${MERGE_FLOW_LABEL}“) und lassen \`--pruefen\` nicht scheitern.`,
+    "",
+    `Abgedeckt (Fachlogik): ${covered} von ${unit.length} AM-Akzeptanzkriterien.`,
+    "",
+    "| AM-AK-ID | Kurztext | Tests | Ebene (Soll) | Anzahl | Nachweis |",
+    "| --- | --- | --- | --- | --- | --- |",
+  ];
+  for (const row of rows) {
+    const flow = row.level === MERGE_FLOW_LEVEL;
+    lines.push(
+      `| ${row.id} | ${escapeCell(shortText(row.text))} | ${testsCell(row)} | ${escapeCell(row.level ?? "–")} | ${row.tests.length} | ${flow ? MERGE_FLOW_LABEL : ""} |`,
+    );
+  }
+  return lines;
 }

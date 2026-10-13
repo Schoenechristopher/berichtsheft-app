@@ -119,3 +119,28 @@ Abgedeckt: 20 von 20 UI-Akzeptanzkriterien.
 | UI-AK-18 | Jeder Dialog fängt den Fokus, schließt mit Escape und gibt den Fokus an den auslösenden Knopf zurück. | `e2e/feinschliff.spec.ts`: UI-AK-18 Bestätigungsdialog per Tastatur: Fokus auf „Abbrechen“, Escape schließt, Enter bestätigt<br>`e2e/ui-ak.spec.ts`: UI-AK-18 Dialoge mit Pflichtgrund und Zeitraum fangen den Fokus, schließen mit Escape und geben ihn zurück | Browser | Browser | ja |
 | UI-AK-19 | Jede Seite hat einen eigenen Browser-Titel „&lt;Seite&gt; – Berichtsheft“ und genau eine `h1`. | `e2e/feinschliff.spec.ts`: UI-AK-19 Seitentitel nennen die Seite, jede Seite hat genau eine h1 | Browser | Browser | ja |
 | UI-AK-20 | Ladezustände zeigen Platzhalter in der Form des Inhalts; Listen ohne Einträge zeigen einen erklärenden Leerzustand. | `e2e/ui-ak.spec.ts`: UI-AK-20 Ladezustand mit Platzhaltern in Form des Inhalts (nach 300 ms); leere Listen erklären sich | Browser | Browser | ja |
+
+## Automatisches Mergen (`docs/07`)
+
+Aus `docs/07-spec-automatisches-mergen.md` (AM-AK-01 … AM-AK-14), gelesen aus der Tabelle „Akzeptanzkriterien“. Ein Test zählt, wenn sein Name die AM-AK-ID nennt. AM-AK mit Ebene Fachlogik brauchen mindestens einen Test, sonst scheitert `--pruefen`; die Zahl der Tests je ID vergleicht AM-R06 vor und nach einem PR.
+
+AM-AK mit Ebene Ablauf haben keinen automatischen Test; sie werden an Test-PRs nachgewiesen (Kennzeichnung „Ablauf, Nachweis an Test-PRs (docs/07)“) und lassen `--pruefen` nicht scheitern.
+
+Abgedeckt (Fachlogik): 10 von 10 AM-Akzeptanzkriterien.
+
+| AM-AK-ID | Kurztext | Tests | Ebene (Soll) | Anzahl | Nachweis |
+| --- | --- | --- | --- | --- | --- |
+| AM-AK-01 | Ohne Label `automerge` ist der Check „Merge-Kriterien“ grün und meldet „kein Antrag“, auch wenn der PR geschützte Pfade ändert. | `scripts/merge-kriterien/merge-kriterien.test.ts`: AM-AK-01 ohne Label automerge: grün mit „kein Antrag“, auch bei geschützten Pfaden | Fachlogik | 1 |  |
+| AM-AK-02 | Mit Antrag und einer Änderung an `docs/01-spezifikation.md` ist der Check rot und nennt „geschützter Pfad: docs/01-spezifikation.md“. | `scripts/merge-kriterien/merge-kriterien.test.ts`: AM-AK-02 Antrag und Änderung an der Spezifikation: rot mit geschütztem Pfad | Fachlogik | 1 |  |
+| AM-AK-03 | Ein PR aus einem Fork ist mit Antrag rot („PR von außen“). | `scripts/merge-kriterien/merge-kriterien.test.ts`: AM-AK-03 PR aus einem Fork: rot mit „PR von außen“ | Fachlogik | 1 |  |
+| AM-AK-04 | Ein nicht abgehakter Punkt unter „Bitte bestätigen“ macht den Check rot und nennt den Punkt. | `scripts/merge-kriterien/merge-kriterien.test.ts`: AM-AK-04 nicht abgehakter Punkt unter „Bitte bestätigen“: rot und nennt den Punkt | Fachlogik | 1 |  |
+| AM-AK-05 | Ein gelöschter Test, ein neues `.skip` oder weniger Tests zu einer AK-ID machen den Check rot und nennen Datei bzw. | `scripts/merge-kriterien/merge-kriterien.test.ts`: AM-AK-05 gelöschter Test, neues .skip oder weniger Tests zu einer ID: rot und nennt Datei bzw. ID<br>`scripts/merge-kriterien/merge-kriterien.test.ts`: AM-AK-05 umbenannte Testdatei und entfernter Prüffall sind ebenfalls rot | Fachlogik | 2 |  |
+| AM-AK-06 | Fehlt die Abnahme der Steuerung, ist sie älter als der letzte Push oder stammt sie von einem Konto ohne Schreibrecht, ist der Check rot. | `scripts/merge-kriterien/merge-kriterien.test.ts`: AM-AK-06 Abnahme fehlt, ist veraltet oder ohne Schreibrecht: rot<br>`scripts/merge-kriterien/merge-kriterien.test.ts`: AM-AK-06 eine Abnahme mit gekürztem Stand (7 Zeichen) gilt | Fachlogik | 2 |  |
+| AM-AK-07 | Ein Dependabot-PR mit einem Patch-Update ist bei grüner voller Prüfung zulässig; ein Major-Update ist rot („Major-Version“). | `scripts/merge-kriterien/merge-kriterien.test.ts`: AM-AK-07 Dependabot: Patch-Update zulässig, Major-Update rot<br>`scripts/merge-kriterien/merge-kriterien.test.ts`: AM-AK-07 Dependabot: Minor nur für Entwicklungsabhängigkeiten, Gruppen-Updates gibt Chris frei | Fachlogik | 2 |  |
+| AM-AK-08 | Ein PR mit mehr als 1.500 geänderten Zeilen (ohne Lockfiles und erzeugte Dateien) ist rot. | `scripts/merge-kriterien/merge-kriterien.test.ts`: AM-AK-08 mehr als 1.500 geänderte Zeilen: rot; Lockfile und erzeugte Datei zählen nicht | Fachlogik | 1 |  |
+| AM-AK-09 | Ist `main` rot oder der Schalter aus, ist der Check rot und nennt den Grund; ein Revert-PR nach AM-R13 ist trotz rotem `main` zulässig. | `scripts/merge-kriterien/merge-kriterien.test.ts`: AM-AK-09 main rot oder Schalter aus: rot mit Grund; der Revert ist trotz rotem main zulässig | Fachlogik | 1 |  |
+| AM-AK-10 | Verstößt ein PR gegen mehrere Regeln, nennt der Check alle Verstöße, nicht nur den ersten. | `scripts/merge-kriterien/merge-kriterien.test.ts`: AM-AK-10 mehrere Verstöße: alle werden genannt | Fachlogik | 1 |  |
+| AM-AK-11 | Erfüllt ein PR alle Regeln, ist der Check grün; mit eingeschaltetem automatischem Mergen kommt der PR in die Merge-Warteschlange und wird g… | **kein Test** | Ablauf | 0 | Ablauf, Nachweis an Test-PRs (docs/07) |
+| AM-AK-12 | Ist „Prüfung abgeschlossen“ rot oder fehlt der Check, wird nicht gemergt, auch nicht mit Antrag. | **kein Test** | Ablauf | 0 | Ablauf, Nachweis an Test-PRs (docs/07) |
+| AM-AK-13 | Nach jedem automatischen Merge steht am PR ein Kommentar mit allen ausgewerteten Kriterien. | **kein Test** | Ablauf | 0 | Ablauf, Nachweis an Test-PRs (docs/07) |
+| AM-AK-14 | Im Schattenbetrieb wird kein PR automatisch gemergt; das Ergebnis der Kriterien steht trotzdem am PR. | **kein Test** | Ablauf | 0 | Ablauf, Nachweis an Test-PRs (docs/07) |

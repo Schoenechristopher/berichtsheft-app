@@ -31,7 +31,7 @@
  * @property {string} headSha Aktueller Stand des PRs.
  * @property {Datei[]} dateien
  * @property {Kommentar[]} kommentare
- * @property {Record<string, number>} testsVorher Zahl der Tests je AK- und UI-AK-ID auf dem Ziel-Branch.
+ * @property {Record<string, number>} testsVorher Zahl der Tests je AK-, UI-AK- und AM-AK-ID auf dem Ziel-Branch.
  * @property {Record<string, number>} testsNachher Zahl der Tests je AK- und UI-AK-ID mit dem PR.
  * @property {string[]} prueffaelleVorher IDs der Prüffälle auf dem Ziel-Branch.
  * @property {string[]} prueffaelleNachher IDs der Prüffälle mit dem PR.
@@ -168,7 +168,7 @@ export function testsJeAk(markdown) {
   /** @type {Record<string, number>} */
   const zahlen = {};
   for (const zeile of markdown.split(/\r?\n/)) {
-    if (!/^\|\s*(UI-)?AK-\d+\s*\|/.test(zeile)) {
+    if (!/^\|\s*(UI-|AM-)?AK-\d+\s*\|/.test(zeile)) {
       continue;
     }
     // Zellen an nicht maskierten `|` trennen (die Datei schreibt `|` in Texten als `\|`).
