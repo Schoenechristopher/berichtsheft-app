@@ -15,7 +15,7 @@ Diese Datei schreibt nur die Steuerungsinstanz, jeweils nach dem Merge eines Pak
 | G2 Zerlegung Fachlogik | E: M08 Benachrichtigungen und Erinnerung, Abschluss G2 | abgenommen, gemergt | 13.10.2026 | #22, Merge `1b1f4e7` |
 | G3 Oberfläche und Abläufe | Welle 1: H Nachträge G2, G M09 beschreiben, F Ablauf-Runner | in Arbeit | 13.10.2026 | – |
 | G3 Oberfläche und Abläufe | Welle 2: I Ablauf-Fälle M09, J Q, Szenarien, Abschluss | geplant | – | – |
-| A Automatisches Mergen | Welle 1: A1 AM-AK in `ak:abdeckung` | in Arbeit | 13.10.2026 | – |
+| A Automatisches Mergen | Welle 1: A1 AM-AK in `ak:abdeckung` | abgenommen, gemergt | 13.10.2026 | #30, Merge `e5e0adc` |
 | A Automatisches Mergen | Welle 2: A2 CI-37 (nach #28, I, J), A3 Ablauf-Kriterien an Test-PRs (nach E1, E3) | geplant | – | – |
 
 ## G1 – Rahmen und Pilotmodul M01
@@ -317,7 +317,54 @@ Kriterien und Entscheidung von Chris weichen voneinander ab.
 
 ### Welle 1 – Paket A1
 
-Gestartet am 13.10.2026 um 10:13 UTC. Eintrag nach MW-R10 folgt nach der Abnahme.
+| Feld | A1: AM-AK in `ak:abdeckung` (#30) |
+| --- | --- |
+| Stufe und Denkaufwand je Anlauf | Anlauf 1: S2, mittel (nur als Anweisung im Auftrag) |
+| Grund | Erweiterung eines bestehenden Skripts, vollständig per Unit-Test prüfbar; Neuheit, Schwierigkeit und Risiko niedrig bis mittel (MW-R05 „S2“) |
+| Größenklasse und Budget | klein, 1 Sitzung, 1 Anlauf (Richtwert 3–5 US-Dollar) |
+| Anläufe | 1 |
+| Beim ersten Anlauf abgenommen | ja |
+| Ausweichen auf ein anderes Modell | keins gemeldet |
+| Verbrauch der Entwicklersitzung | 38 Eingabe-, 13.599 Ausgabe-Token; 1.773.050 aus dem Zwischenspeicher gelesen, 62.932 geschrieben; 0,57 US-Dollar |
+| Dauer | Start 10:13 UTC, Draft-PR 10:18 UTC (rund 5 Minuten) |
+| CI-Läufe | 1 × schnelle Prüfung (Entwurf, grün), 1 × volle Prüfung (bereit, Klasse L, grün) |
+| Rückfragen | keine blockierenden; 2 Punkte „Bitte bestätigen“ (Name der Kennzeichnung, erlaubte Ebenen „Fachlogik“ und „Ablauf“) |
+| Erreichte Abbruchkriterien | keine |
+
+**Abnahme durch die Steuerung:** Diff gelesen. Ein Hilfsagent der Stufe S1 hat lokal ausgeführt: Lint, Format,
+Typecheck, `npm test` (979 Tests), `ak:abdeckung`, `pruefumfang` und `landkarte` mit `--pruefen`. Gegenprobe mit
+zurückgenommenen Änderungen: Ein umbenannter Test zu AM-AK-08 und eine unbekannte Ebene bei AM-AK-12 lassen
+`ak:abdeckung -- --pruefen` scheitern; ein Lauf ohne `--pruefen` lässt `docs/03` unverändert.
+
+**Ergebnis:** `docs/03` hat einen Abschnitt „Automatisches Mergen (`docs/07`)“. Die IDs und Ebenen kommen aus der Tabelle
+in `docs/07`. AM-AK-01 bis -10 sind mit 1 bis 2 Tests je ID belegt. AM-AK-11 bis -14 tragen die Kennzeichnung „Ablauf,
+Nachweis an Test-PRs (docs/07)“. `testsJeAk` zählt auch AM-AK-Zeilen, damit gilt AM-R06 für sie. Kleinigkeit: Der
+Kurztext von AM-AK-05 in `docs/03` bricht nach „bzw.“ ab, weil die Kürzung am Satzende schneidet.
+
+**Steuerung Welle 1 (Planung, A1, zwei Doku-PRs):** 22.116 Eingabe-, 38.612 Ausgabe-Token; 9.771.676 aus dem
+Zwischenspeicher gelesen, 288.673 geschrieben; rund 3,84 US-Dollar (Stand vor diesem PR).
+
+**Falle für Abnahmeläufe:** Ein frischer Worktree hat keinen erzeugten Prisma-Client (`src/generated` ist ignoriert);
+vor Typecheck und Tests `npx prisma generate` ausführen.
+
+### Übergabe an die nächste Steuerung A (Welle 2)
+
+- **Stand:** A1 gemergt (#30); Plan und Tabelle „Schattenbetrieb“ auf `main` (#29). `.github/automerge.yml` steht auf
+  `aktiv: false`.
+- **A2 (CI-37), Stufe S3 hoch, Klasse I:** startet erst nach dem Merge von #28 (G3-F), I und J. J passt den Satz zu
+  CI-37 in `docs/ci-richtlinie.md` an; A2 gleicht danach mit `main` ab. Umfang nach E5: nur die Ablauf-Fälle (Browser)
+  nach Modul auswählen. Im Zweifel laufen alle Fälle (CI-34). Die Zuordnung Datei → Modul steht bisher nur in den
+  Überschriften von `specs/code-landkarte.md`; der Modulgraph steht in `docs/06` („Modulschnitt“) bzw. als Mermaid in
+  `specs/00-uebersicht.md`. A2 legt ihn maschinenlesbar unter `specs/` ab. Die Status-Zeile in `docs/ci-richtlinie.md`
+  sagt noch „Entwurf zur Freigabe“; korrigieren, falls J es nicht tut.
+- **A3 (Test-PRs), durch die Steuerung selbst:** wartet auf E1 (Regelsatz und Warteschlange für `main` aktiv?) und E3
+  (`am-test/main` im Regelsatz). Ablauf und Aufräumen stehen im Plan oben. Automatisches Mergen lässt sich über die
+  REST-Route `PUT /repos/{owner}/{repo}/pulls/{n}/ccr/auto_merge` einschalten, auf „bereit“ stellen über `POST
+  …/ccr/ready_for_review`. GraphQL ist aus der Sitzung nicht erreichbar.
+- **Schattenbetrieb (E2):** Die Steuerungen von G3 Welle 2 und G4 tragen in die Tabelle oben ein; die Steuerung A zählt
+  am Ende. Bisher 0 Einträge.
+- **Am Ende von A:** `docs/07` (Einführung Schritt 4, offene Punkte) in einem Doku-PR nachziehen (geschützter Pfad, Chris
+  mergt), dazu Rückblick nach MW-R12/KE-R18 und Übergabe.
 
 ## Übergabe an die Steuerung von G2
 
