@@ -14,7 +14,7 @@ import { currentFeedback, type HistoryComment } from "@/domain/report-history";
 import { STATUS_LABELS, type ReportAction, type SeenState } from "@/domain/report-status";
 import { toDateInput, weekdayShort } from "@/domain/weeks";
 import { isHistoryImmutableError } from "@/lib/history-guard";
-import { deactivatePerson, updatePerson } from "@/lib/people/service";
+import { deactivatePerson, deletePerson, updatePerson } from "@/lib/people/service";
 import { loadRangeExport, loadWeekExport, type ExportFailureReason, type ExportResult } from "@/lib/report-export";
 import { transitionReport, type TransitionFailureReason, type TransitionInput } from "@/lib/report-transitions";
 import {
@@ -116,6 +116,7 @@ const STEP_FIELDS: Record<string, { required: string[]; optional: string[] }> = 
   pruefliste_lesen: { required: ["als", "filter"], optional: ["uhr"] },
   rueckmeldung_lesen: { required: ["azubi", "woche"], optional: ["uhr"] },
   person_deaktivieren: { required: ["als", "person"], optional: ["uhr"] },
+  person_loeschen: { required: ["als", "person"], optional: ["uhr"] },
   ausbildungszeitraum_aendern: { required: ["als", "person", "beginn", "ende"], optional: ["uhr"] },
   ...HISTORY_PDF_STEP_FIELDS,
   // M08 Benachrichtigungen und Erinnerung
@@ -480,6 +481,16 @@ class DataCase {
           throw new Error(`Deaktivieren ist gescheitert: ${JSON.stringify(result)}`);
         }
         return { deaktiviert: true };
+      }
+      case "person_loeschen": {
+        // Wie der Admin im Dialog: Der Name wird zur Bestätigung eingetippt (M02, hier der gespeicherte Name).
+        const personId = this.personId(text(step, "person"));
+        const person = await this.prisma.person.findUniqueOrThrow({ where: { id: personId } });
+        const result = await deletePerson(this.prisma, await this.viewer(text(step, "als")), personId, person.name);
+        if (!result.ok) {
+          throw new Error(`Löschen ist gescheitert: ${JSON.stringify(result)}`);
+        }
+        return { geloescht: true };
       }
       case "ausbildungszeitraum_aendern": {
         // Wie der Admin im Formular: alle anderen Angaben der Person bleiben, nur der Zeitraum ändert sich.
@@ -903,7 +914,11 @@ class DataCase {
 
   /** Bestand eines Berichts: Status, Tage, Historie (Statuswechsel) und Kommentare. */
   private async readReport(report: { azubi: string; woche: string; id: string }): Promise<Result> {
-    const stored = await this.prisma.weeklyReport.findUniqueOrThrow({ where: { id: report.id } });
+    const stored = await this.prisma.weeklyReport.findUnique({ where: { id: report.id } });
+    if (!stored) {
+      // Der Bericht existiert nicht mehr (z. B. endgültiges Löschen des Azubis, M06-R10).
+      return { azubi: report.azubi, woche: report.woche, fehlt: true };
+    }
     const days = await this.days(report.id);
     const changes = await this.prisma.statusChange.findMany({
       where: { reportId: report.id },

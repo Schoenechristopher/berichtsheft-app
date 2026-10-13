@@ -277,5 +277,8 @@ Zeitpunkt Montag 9:00 Uhr (M08-R17). Ergebnis sind Benachrichtigungen; was eine 
 - [ ] Echte Gleichzeitigkeit (zwei Versandläufe oder zwei Erinnerungsläufe im selben Augenblick) prüft kein neutraler
       Fall, weil die Reihenfolge nicht feststeht; die Daten-Fälle prüfen „kein zweiter Lauf“ und „keine Dublette“
       nacheinander. Jede Plattform weist M08-R11 und M08-R17 mit eigenen Tests nach.
+- [x] Die Datenhaltung weist Erinnerungsläufe mit einer Wochennummer außerhalb 1 bis 53 ab (Migration
+      `20261013100000_erinnerungslauf_wochennummer`, Test AK-1024 in `tests/db/reminders.test.ts`); ob KW 53 im Jahr vorkommt,
+      bestimmt der Stichtag aus M01.
 - [ ] Ablauf-Fälle für die Anzeige (Glocke, Liste „Neu“, Wortlaut der Nachricht, tatsächlicher Rücksprung nach der
       Anmeldung) folgen in G3.
