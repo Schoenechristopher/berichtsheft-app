@@ -564,6 +564,39 @@ desselben Ausbilders gibt seinen Schritten verschiedene `uhr` oder liest je Empf
 }
 ```
 
+## Schnittstellen von M09 (Fachlogik)
+
+Die Signaturen stehen in `specs/M09-oberflaeche.md`, Abschnitt 6. Status wie bei M03, Tage eines Berichts mit ihrem
+Wochentag `Mo` bis `Fr` und mit `tagesart`, `text`, `ausserhalb` wie bei `einreichenPruefen` (M05). Darstellungen sind
+`System`, `Hell`, `Dunkel`.
+
+| Schnittstelle | `eingabe` | `erwartet` (Erfolg) | Fehlercodes |
+| --- | --- | --- | --- |
+| `statusChip` | `{ "status": <Status> }` | `{ "text": <Status>, "symbol": "Stift" \| "Pfeil nach oben" \| "Haken" \| "Kreuz im Kreis" }` | – |
+| `glockenZaehler` | `{ "ungelesen": <Zahl ≥ 0> }` | `{ "anzeige": <Text>, "beschriftung": <Text> }` | – |
+| `wochenFortschritt` | `{ "tage": [{ "tag", "ausserhalb", "tagesart", "text" }, …] }` | `{ "tage": [{ "tag", "markierung": "ausgefuellt" \| "leer" \| "ausserhalb" }, …], "ausgefuellt", "gesamt", "text" }` | – |
+| `ersteZeile` | `{ "text": <Text>, "maxLaenge"?: <Zahl> }` | `{ "zeile": <Text> }` | – |
+| `darstellungPruefen` | `{ "wert": <Text> }` | `{ "darstellung": <Darstellung> }` | `darstellung_unbekannt` |
+| `darstellungErmitteln` | `{ "konto": <Darstellung> \| null, "gemerkt": <Text> \| null }` | `{ "darstellung": <Darstellung> }` | – |
+
+- `statusChip`: Der Text ist der Name des Status; das Symbol ist das Symbol des Chips laut `docs/05`, „Statusfarben“.
+- `glockenZaehler`: `anzeige` ist die Zahl, ab 100 `99+`; `beschriftung` ist „Benachrichtigungen“, bei mindestens einer
+  ungelesenen „Benachrichtigungen, <n> ungelesen“ mit der genauen Zahl.
+- `wochenFortschritt`: `ausgefuellt` zählt Tage, die die Pflichtangaben fürs Einreichen erfüllen (M05); `gesamt` zählt
+  die Tage innerhalb der Ausbildung; `text` ist „<n> von <m> Tagen ausgefüllt“ (bei `gesamt` 1 „Tag“).
+- `ersteZeile`: erste nicht leere Zeile ohne Leerraum an den Rändern; ist sie länger als `maxLaenge` (Vorgabe 120),
+  wird sie auf diese Länge gekürzt und endet mit „…“.
+- `darstellungPruefen`: Ein Wert, der keine der drei Darstellungen ist (auch in anderer Schreibweise), gibt der Adapter
+  unverändert an die Plattform weiter, die ihn abweisen muss.
+- `darstellungErmitteln`: `konto` ist die am Konto gespeicherte Wahl (`null` ohne Anmeldung), `gemerkt` die am Gerät
+  gemerkte Wahl (`null` = keine). Das Konto gilt vor dem Gerät, ohne beides und bei unbekanntem `gemerkt` gilt `System`.
+
+**Fehlercodes von M09:**
+
+| Code | Bedeutung | AK |
+| --- | --- | --- |
+| `darstellung_unbekannt` | Der Wert ist keine der drei Darstellungen. | UI-AK-14 |
+
 ## Fehlercodes
 
 | Code | Bedeutung | AK |
