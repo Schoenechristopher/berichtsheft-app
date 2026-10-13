@@ -285,7 +285,7 @@ Gestartet am 13.10.2026 um 07:43 UTC, letzter Merge 21:24 UTC.
 | Verbrauch | 19.704 Ausgabe-, 4,24 Mio. Zwischenspeicher-Token; 0,99 US-Dollar | 66.130 Ausgabe-, 9,38 Mio. Zwischenspeicher-Token; 2,96 US-Dollar | 166.265 Ausgabe-, 48,78 Mio. Zwischenspeicher-Token; 21,74 US-Dollar |
 | Dauer | Draft-PR nach rund 14 Minuten | Draft-PR nach rund 14 Minuten | Draft-PR nach rund 41 Minuten; Firefox-Nacharbeit 10:21 bis 14:35 UTC |
 | CI-Läufe (volle Prüfung) | 1 (grün) | 2 (1 × quay.io 502 vor Testbeginn, 1 × Neustart grün) | 6 (5 × Firefox rot, 1 × grün) |
-| Rückfragen | keine blockierenden; 3 „Bitte bestätigen“, bestätigt | keine blockierenden; 4 „Bitte bestätigen“, bestätigt | 1 blockierende (CI-Weg, Port 3100, bestätigt); 2 Blocker an Chris (Weg 4, Option A); „Bitte bestätigen“ 4 bis 8 offen bei Chris |
+| Rückfragen | keine blockierenden; 3 „Bitte bestätigen“, bestätigt | keine blockierenden; 4 „Bitte bestätigen“, bestätigt | 1 blockierende (CI-Weg, Port 3100, bestätigt); 2 Blocker an Chris (Weg 4, Option A); „Bitte bestätigen“ von Chris bestätigt |
 | Erreichte Abbruchkriterien | keine | keine | KE-R12 (drei Lösungswege) erreicht, danach Freigaben durch Chris |
 
 **Abnahme durch die Steuerung:** Diffs gelesen (Migration, Testschnittstelle, Adapter); lokale Abnahmeläufe je PR über einen
@@ -310,8 +310,8 @@ rund 14 Stunden, Warten auf Entscheidungen.
 
 **Offene Punkte aus Welle 1:**
 
-- [ ] #28 „Bitte bestätigen“ 4 bis 8 (Ergebnis je Schritt, `ausgangsbestand` erst ab Welle 2, Ebene „Ablauf“, Warnung über
-      Merker, AK-408-05 nur Abbrechen): bei Chris, Empfehlung bestätigen.
+- [x] #28 „Bitte bestätigen“ (Ergebnis je Schritt, `ausgangsbestand` erst ab Welle 2, Ebene „Ablauf“, Warnung über
+      Merker, AK-408-05 nur Abbrechen): von Chris bestätigt (13.10.2026).
 - [ ] Beispiel `AK-503-01` in `docs/06` auf das Format „Ergebnis je Schritt“ bringen (Paket J).
 - [ ] Testgrenze Firefox AK-408-03 in der Spec Q dokumentieren (Paket J) und in G5 erneut prüfen.
 - [ ] `ausgangsbestand` im Ablauf-Runner unterstützen, sobald Welle 2 ihn braucht (Paket I oder J).
@@ -341,7 +341,7 @@ rund 14 Stunden, Warten auf Entscheidungen.
 - **Budget:** Firefox-Risiko einplanen: Richtwert I und J je 10–15 US-Dollar, harte Grenze je Paket vorab mit Chris
   vereinbaren. Steuerung: Abnahmeläufe und CI-Log-Auswertung nur über S1-Hilfsagenten; nach jedem Paket mit Blocker
   prüfen, ob eine frische Steuerung günstiger ist.
-- **Offen bei Chris:** #28 „Bitte bestätigen“ 4 bis 8.
+- **Offen bei Chris:** keine Punkte aus Welle 1.
 
 
 ## A – Automatisches Mergen
