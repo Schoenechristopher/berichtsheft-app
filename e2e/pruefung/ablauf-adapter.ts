@@ -508,6 +508,8 @@ export class FlowAdapter {
       }
       const select = fieldset.locator("select[data-feld=tagesart]");
       if ((await select.count()) > 0) {
+        // Wie eine Person: erst in die Auswahl klicken (Nutzerinteraktion, siehe unten), dann wählen.
+        await select.click();
         await select.selectOption(value);
       } else if (value === "") {
         throw new FlowCaseError(`${where}: Die Segment-Auswahl kann die Tagesart nicht leeren.`);
@@ -516,7 +518,11 @@ export class FlowAdapter {
       }
     }
     if ("text" in step) {
-      await fieldset.locator("textarea[data-feld=taetigkeiten]").fill(textField(step, "text", where));
+      // Wie eine Person erst ins Feld klicken, dann tippen: Firefox zeigt den Dialog beim Neuladen oder Schließen
+      // (`beforeunload`) nur nach einer echten Nutzerinteraktion mit der Seite, und `fill()` allein zählt dort nicht.
+      const textarea = fieldset.locator("textarea[data-feld=taetigkeiten]");
+      await textarea.click();
+      await textarea.fill(textField(step, "text", where));
     }
     return { erfasst: true };
   }
