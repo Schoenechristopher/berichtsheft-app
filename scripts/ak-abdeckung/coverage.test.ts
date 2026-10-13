@@ -8,6 +8,9 @@ import {
   parseModuleTable,
   pendingCriteria,
   levelOf,
+  missingMergeCriteria,
+  parseMergeCriteria,
+  MERGE_FLOW_LABEL,
   moduleOfSpecFile,
   parseCheckCases,
   parseModuleCriteria,
@@ -18,6 +21,7 @@ import {
   renderMarkdown,
   shortText,
   unknownIds,
+  type TestCase,
 } from "./coverage";
 
 const spec = `
@@ -370,5 +374,60 @@ ${rows}
     expect(checkCases(cases("AK-1102-01"), criteria, modules, new Set(["AK-101"]), true)).toEqual([
       "Modul M02: AK-101 hat keinen Prüffall.",
     ]);
+  });
+});
+
+describe("AM-AK aus docs/07 in der Abdeckung", () => {
+  const mergeSpec = `
+| ID | Kriterium | Ebene |
+| --- | --- | --- |
+| AM-AK-01 | Ohne Label ist der Check grün. | Fachlogik |
+| AM-AK-02 | Geschützter Pfad: rot. | Fachlogik |
+| AM-AK-11 | Alles erfüllt: gemergt. | Ablauf |
+Fließtext mit AM-AK-99 zählt nicht.
+`;
+
+  it("liest AM-AK-ID, Text und Ebene aus der Tabelle", () => {
+    expect(parseMergeCriteria(mergeSpec)).toEqual({
+      criteria: [
+        { id: "AM-AK-01", text: "Ohne Label ist der Check grün.", level: "Fachlogik" },
+        { id: "AM-AK-02", text: "Geschützter Pfad: rot.", level: "Fachlogik" },
+        { id: "AM-AK-11", text: "Alles erfüllt: gemergt.", level: "Ablauf" },
+      ],
+      errors: [],
+    });
+  });
+
+  it("meldet eine unbekannte Ebene und eine falsche Spaltenzahl", () => {
+    const { errors } = parseMergeCriteria("| AM-AK-01 | Text | Browser |\n| AM-AK-02 | Text |");
+    expect(errors).toEqual([
+      "AM-AK-01: unbekannte Ebene „Browser“ (erlaubt: Fachlogik; Ablauf).",
+      "AM-AK-02: Zeile hat 2 statt 3 Spalten.",
+    ]);
+  });
+
+  it("zählt Tests zu AM-AK-IDs; Ablauf-AKs ohne Test sind kein Fehlen, Fachlogik ohne Test schon", () => {
+    const { criteria } = parseMergeCriteria(mergeSpec);
+    const tests: TestCase[] = [
+      { file: "scripts/merge-kriterien/merge-kriterien.test.ts", name: "AM-AK-01 ohne Antrag", level: "Unit" },
+    ];
+    const rows = buildCoverage(criteria, tests);
+    expect(rows.map((row) => row.tests.length)).toEqual([1, 0, 0]);
+    expect(missingMergeCriteria(rows)).toEqual(["AM-AK-02"]);
+    expect(unknownIds(criteria, [{ ...tests[0], name: "AM-AK-77 Tippfehler" }])).toEqual(["AM-AK-77"]);
+  });
+
+  it("schreibt den Abschnitt mit Testzahl und der Kennzeichnung für Ablauf-AKs", () => {
+    const { criteria } = parseMergeCriteria(mergeSpec);
+    const tests: TestCase[] = [{ file: "a.test.ts", name: "AM-AK-01 ohne Antrag", level: "Unit" }];
+    const markdown = renderMarkdown([], [], new Set(), buildCoverage(criteria, tests));
+    expect(markdown).toContain("## Automatisches Mergen (`docs/07`)");
+    expect(markdown).toContain(
+      "| AM-AK-01 | Ohne Label ist der Check grün. | `a.test.ts`: AM-AK-01 ohne Antrag | Fachlogik | 1 |  |",
+    );
+    expect(markdown).toContain(
+      `| AM-AK-11 | Alles erfüllt: gemergt. | **kein Test** | Ablauf | 0 | ${MERGE_FLOW_LABEL} |`,
+    );
+    expect(renderMarkdown([], [])).not.toContain("Automatisches Mergen");
   });
 });

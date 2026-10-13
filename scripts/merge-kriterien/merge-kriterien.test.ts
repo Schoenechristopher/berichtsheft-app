@@ -258,6 +258,25 @@ describe("Hilfsfunktionen", () => {
     expect(testsJeAk(markdown)).toEqual({ "AK-901": 2, "AK-902": 0, "UI-AK-03": 1 });
   });
 
+  it("testsJeAk: erkennt auch AM-AK-Zeilen", () => {
+    const markdown = [
+      "| AM-AK-ID | Kurztext | Tests | Ebene (Soll) | Anzahl | Nachweis |",
+      "| --- | --- | --- | --- | --- | --- |",
+      "| AM-AK-03 | Fork | `a.test.ts`: AM-AK-03 eins<br>`a.test.ts`: AM-AK-03 zwei | Fachlogik | 2 |  |",
+      "| AM-AK-11 | Ablauf | **kein Test** | Ablauf | 0 | Ablauf, Nachweis an Test-PRs (docs/07) |",
+    ].join("\n");
+    expect(testsJeAk(markdown)).toEqual({ "AM-AK-03": 2, "AM-AK-11": 0 });
+  });
+
+  it("testsJeAk: weniger Tests zu einer AM-AK-ID lösen den Verstoß aus AM-R06 aus", () => {
+    const zeile = (n: number) =>
+      `| AM-AK-03 | Fork | ${Array(n).fill("`a.test.ts`: AM-AK-03 x").join("<br>")} | Fachlogik |`;
+    const entscheidung = entscheideAutomerge(
+      pr({ testsVorher: testsJeAk(zeile(2)), testsNachher: testsJeAk(zeile(1)) }),
+    );
+    expect(entscheidung.gruende).toEqual(["weniger Tests zu AM-AK-03: vorher 2, nachher 1"]);
+  });
+
   it("prueffallIds: liest die IDs aus dem JSON", () => {
     expect(prueffallIds('[{ "id": "AK-404-02", "modul": "M01" }, {"id":"AK-404-03"}]')).toEqual([
       "AK-404-02",
