@@ -10,10 +10,12 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { now, setFixedNow } from "@/domain/clock";
 import type { DayErrors, DayInput } from "@/domain/report-days";
-import { currentFeedback } from "@/domain/report-history";
+import { currentFeedback, type HistoryComment } from "@/domain/report-history";
 import { STATUS_LABELS, type ReportAction, type SeenState } from "@/domain/report-status";
 import { toDateInput, weekdayShort } from "@/domain/weeks";
+import { isHistoryImmutableError } from "@/lib/history-guard";
 import { deactivatePerson, updatePerson } from "@/lib/people/service";
+import { loadRangeExport, loadWeekExport, type ExportFailureReason, type ExportResult } from "@/lib/report-export";
 import { transitionReport, type TransitionFailureReason, type TransitionInput } from "@/lib/report-transitions";
 import {
   ensureReportsForTrainee,
@@ -40,6 +42,7 @@ import { createKeyedPersons, resetDatabase, type KeyedPerson, type TestDb } from
 import {
   CHANNEL_NAMES,
   CaseFormatError,
+  RANGE_REASON_CODES,
   SUBMISSION_PROBLEM_CODES,
   channelValue,
   TRANSITION_ACTIONS,
@@ -49,6 +52,7 @@ import {
   field,
   formatInstant,
   formatWeek,
+  historyRounds,
   inputDayType,
   integer,
   list,
@@ -56,6 +60,8 @@ import {
   parseDate,
   parseInstant,
   parseWeek,
+  pdfContent,
+  status,
   text,
   textOrNull,
   type Input,
@@ -79,6 +85,25 @@ const SAVE_CODES: Record<SaveFailureReason, string | null> = {
   "day-input-invalid": "tage_ungueltig",
 };
 
+// --- M06 Historie, M07 PDF-Export ---
+
+/** Feste Fehlercodes je Grund eines gescheiterten PDF-Exports. */
+const EXPORT_CODES: Record<ExportFailureReason, string> = {
+  ...RANGE_REASON_CODES,
+  forbidden: "zugriff_verweigert",
+  "not-found": "nicht_gefunden",
+};
+
+/** Aktionen von M06 und M07 mit ihren Feldern (außer `aktion`). */
+const HISTORY_PDF_STEP_FIELDS: Record<string, { required: string[]; optional: string[] }> = {
+  historie_lesen: { required: ["azubi", "woche"], optional: ["uhr"] },
+  historie_aendern: { required: ["azubi", "woche", "eintrag", "nummer", "werte"], optional: ["uhr"] },
+  historie_loeschen: { required: ["azubi", "woche", "eintrag", "nummer"], optional: ["uhr"] },
+  bericht_loeschen: { required: ["azubi", "woche"], optional: ["uhr"] },
+  pdf_woche_exportieren: { required: ["als", "azubi", "woche"], optional: ["uhr"] },
+  pdf_zeitraum_exportieren: { required: ["als", "azubi"], optional: ["uhr", "von", "bis"] },
+};
+
 /** Felder je Aktion (außer `aktion`); jedes andere Feld ist ein fehlerhafter Prüffall. */
 const STEP_FIELDS: Record<string, { required: string[]; optional: string[] }> = {
   einreichen: { required: ["als", "azubi", "woche"], optional: ["uhr", "gesehen", "tage"] },
@@ -92,6 +117,7 @@ const STEP_FIELDS: Record<string, { required: string[]; optional: string[] }> = 
   rueckmeldung_lesen: { required: ["azubi", "woche"], optional: ["uhr"] },
   person_deaktivieren: { required: ["als", "person"], optional: ["uhr"] },
   ausbildungszeitraum_aendern: { required: ["als", "person", "beginn", "ende"], optional: ["uhr"] },
+  ...HISTORY_PDF_STEP_FIELDS,
   // M08 Benachrichtigungen und Erinnerung
   kanaele_einstellen: { required: ["als", "kanaele"], optional: ["uhr"] },
   kanaele_lesen: { required: ["person"], optional: ["uhr"] },
@@ -382,6 +408,9 @@ class DataCase {
     }
     if (Object.hasOwn(TRANSITION_ACTIONS, action)) {
       return this.transition(step, TRANSITION_ACTIONS[action], index);
+    }
+    if (Object.hasOwn(HISTORY_PDF_STEP_FIELDS, action)) {
+      return this.historyPdfStep(step, action);
     }
     switch (action) {
       case "tage_speichern": {
@@ -717,6 +746,146 @@ class DataCase {
       default:
         return { fehler: code };
     }
+  }
+
+  // --- M06 Historie, M07 PDF-Export ---
+
+  private async historyPdfStep(step: Input, action: string): Promise<Result> {
+    switch (action) {
+      case "historie_lesen": {
+        // Liest, was die Berichtsseite als Historie zeigt; Namen werden auf die Schlüssel zurückgeführt.
+        const report = await this.report(text(step, "azubi"), text(step, "woche"));
+        const { changes, comments } = await loadReportHistory(this.prisma, report.id);
+        const days = await this.days(report.id);
+        const keys = await this.personKeysByName();
+        return historyRounds(
+          changes,
+          comments,
+          (name) => {
+            const key = keys.get(name);
+            if (!key) {
+              throw new Error(`Name „${name}“ gehört zu keiner oder mehreren Personen des Prüffalls.`);
+            }
+            return key;
+          },
+          (comment: HistoryComment) => days.find((day) => day.id === comment.dayId)?.tag ?? "",
+        );
+      }
+      case "historie_aendern":
+      case "historie_loeschen":
+      case "bericht_loeschen":
+        return this.writeAroundDomain(step, action);
+      case "pdf_woche_exportieren": {
+        const report = await this.report(text(step, "azubi"), text(step, "woche"));
+        return this.exportResult(
+          await loadWeekExport(this.prisma, await this.viewer(text(step, "als")), report.id, now()),
+        );
+      }
+      case "pdf_zeitraum_exportieren":
+        return this.exportResult(
+          await loadRangeExport(
+            this.prisma,
+            await this.viewer(text(step, "als")),
+            this.personId(text(step, "azubi")),
+            "von" in step ? textOrNull(step, "von") : null,
+            "bis" in step ? textOrNull(step, "bis") : null,
+            now(),
+          ),
+        );
+    }
+    throw new CaseFormatError(`Unbekannte Aktion: ${action}`);
+  }
+
+  /** Namen der Personen des Prüffalls → Schlüssel; ein mehrfach vergebener Name gilt als unbekannt. */
+  private async personKeysByName(): Promise<Map<string, string>> {
+    const persons = await this.prisma.person.findMany({ where: { id: { in: [...this.personKeys.keys()] } } });
+    const keys = new Map<string, string>();
+    for (const person of persons) {
+      keys.set(person.name, keys.has(person.name) ? "" : this.personKey(person.id));
+    }
+    return keys;
+  }
+
+  private exportResult(result: ExportResult): Result {
+    return result.ok ? { pdf: pdfContent(result) } : { fehler: EXPORT_CODES[result.reason] };
+  }
+
+  /**
+   * Schreibversuch an der Fachlogik vorbei, direkt gegen die Datenhaltung (AK-803): Eintrag ändern
+   * oder löschen, Bericht löschen. Eine Abweisung wird nur über den festen Code der Datenbank erkannt.
+   */
+  private async writeAroundDomain(step: Input, action: string): Promise<Result> {
+    const report = await this.report(text(step, "azubi"), text(step, "woche"));
+    try {
+      if (action === "bericht_loeschen") {
+        await this.prisma.weeklyReport.delete({ where: { id: report.id } });
+        return { geloescht: true };
+      }
+      const kind = text(step, "eintrag");
+      if (kind !== "statuswechsel" && kind !== "kommentar") {
+        throw new CaseFormatError(`„eintrag“ muss „statuswechsel“ oder „kommentar“ sein: ${kind}`);
+      }
+      const number = integer(step, "nummer");
+      const entries =
+        kind === "statuswechsel"
+          ? await this.prisma.statusChange.findMany({ where: { reportId: report.id }, orderBy: { seq: "asc" } })
+          : await this.sortedComments(report.id);
+      const entry = entries[number - 1];
+      if (number < 1 || !entry) {
+        throw new CaseFormatError(`Es gibt keinen ${kind} Nummer ${number} (vorhanden: ${entries.length}).`);
+      }
+      if (action === "historie_loeschen") {
+        if (kind === "statuswechsel") {
+          await this.prisma.statusChange.delete({ where: { id: entry.id } });
+        } else {
+          await this.prisma.comment.delete({ where: { id: entry.id } });
+        }
+        return { geloescht: true };
+      }
+      const values = asInput(step.werte, "„werte“");
+      if (kind === "statuswechsel") {
+        checkFields(
+          values,
+          { required: [], optional: ["von", "nach", "person", "zeitpunkt", "runde", "begruendung"] },
+          "„werte“",
+        );
+        await this.prisma.statusChange.update({
+          where: { id: entry.id },
+          data: {
+            ...("von" in values ? { fromStatus: field(values, "von") === null ? null : status(values, "von") } : {}),
+            ...("nach" in values ? { toStatus: status(values, "nach") } : {}),
+            ...("person" in values ? { actorId: this.personId(text(values, "person")) } : {}),
+            ...("zeitpunkt" in values ? { createdAt: parseInstant(text(values, "zeitpunkt")) } : {}),
+            ...("runde" in values ? { reviewRound: integer(values, "runde") } : {}),
+            ...("begruendung" in values ? { reason: textOrNull(values, "begruendung") } : {}),
+          },
+        });
+      } else {
+        checkFields(values, { required: [], optional: ["runde", "person", "text"] }, "„werte“");
+        await this.prisma.comment.update({
+          where: { id: entry.id },
+          data: {
+            ...("runde" in values ? { reviewRound: integer(values, "runde") } : {}),
+            ...("person" in values ? { authorId: this.personId(text(values, "person")) } : {}),
+            ...("text" in values ? { text: text(values, "text") } : {}),
+          },
+        });
+      }
+      return { geaendert: true };
+    } catch (error) {
+      if (isHistoryImmutableError(error)) {
+        return { fehler: "historie_unveraenderlich" };
+      }
+      throw error;
+    }
+  }
+
+  /** Kommentare in der Reihenfolge des Bestands: je Runde der Gesamtkommentar, dann Mo bis Fr. */
+  private async sortedComments(reportId: string) {
+    const days = await this.days(reportId);
+    const dayOrder = (dayId: string | null) => (dayId === null ? -1 : days.findIndex((day) => day.id === dayId));
+    const comments = await this.prisma.comment.findMany({ where: { reportId } });
+    return comments.sort((a, b) => a.reviewRound - b.reviewRound || dayOrder(a.dayId) - dayOrder(b.dayId));
   }
 
   /** Fehler je Tag wie bei M04 (`tageSpeichern`): Codes je Feld, Tage in Kalenderreihenfolge. */

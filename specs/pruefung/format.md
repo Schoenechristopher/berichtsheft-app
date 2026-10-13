@@ -353,6 +353,114 @@ für `moeglicheAktionen` und als Aktionen der Daten-Fälle; Liste in dieser Reih
 `zugriff_verweigert` ist der Code aus M02 (fremder Bericht, falsche Rolle, deaktivierte Person); `text_zu_lang` und
 `tage_ungueltig` sind die Codes aus M04, hier mit `"feld"` bzw. wie bei `tageSpeichern`.
 
+## Schnittstellen und Aktionen von M06
+
+Die Signaturen stehen in `specs/M06-historie.md`, Abschnitt 6. Status und Wochentage wie bei M03 und M04; Personen als
+Schlüssel wie bei M02.
+
+**Datenformate von M06:**
+
+| Art | Format | Beispiel |
+| --- | --- | --- |
+| Statuswechsel | `{ "von": <Status>, "nach": <Status>, "person": <Schlüssel>, "zeitpunkt": <Zeitpunkt>, "runde": <Zahl>, "begruendung": <Text> \| null }` (wie im Bestand eines Daten-Falls) | `{ "von": "Freigegeben", "nach": "Abgelehnt", "person": "clara", "zeitpunkt": "2026-10-06T12:00:00+02:00", "runde": 1, "begruendung": "Mittwoch falsches Datum" }` |
+| Kommentar | `{ "runde": <Zahl>, "tag": <Wochentag> \| null, "person": <Schlüssel>, "text": <Text> }`; `tag` = `null` ist der Gesamtkommentar (wie im Bestand) | `{ "runde": 1, "tag": "Mo", "person": "bernd", "text": "Montag ergänzen" }` |
+| Historie | `{ "runden": [{ "runde": <Zahl>, "eintraege": [{ "bezeichnung", "nach": <Status>, "person", "zeitpunkt", "begruendung" }], "gesamtkommentare": [{ "person", "text" }], "tageskommentare": [{ "tag", "person", "text" }] }] }`; Runden neueste zuerst, Einträge in ihrer Reihenfolge, Tageskommentare Mo bis Fr | was die Berichtsseite als Historie zeigt |
+| Bezeichnung | `Eingereicht`, `Erneut eingereicht`, `Zurückgezogen`, `Freigegeben`, `Abgelehnt`, `Freigabe zurückgenommen` (M06-R05) | `Erneut eingereicht` |
+
+**Schnittstellen (Fachlogik):**
+
+| Schnittstelle | `eingabe` | `erwartet` (Erfolg) | Fehlercodes |
+| --- | --- | --- | --- |
+| `historieGruppieren` | `{ "statuswechsel": [<Statuswechsel>, …] }` in ihrer Reihenfolge, `"kommentare": [<Kommentar>, …]` in beliebiger Reihenfolge | `<Historie>` | – |
+
+**Aktionen der Daten-Fälle** (Felder außer `aktion`; `?` = optional). Die drei Schreibaktionen sind Versuche **an der
+Fachlogik vorbei**: Der Adapter übersetzt sie in einen direkten Schreibzugriff auf die Datenhaltung, ohne Person und
+ohne Prüfung der Plattform-Fachlogik. Erwartet ist immer die Abweisung durch die Datenhaltung; ein Erfolg verletzt
+M06-R08 bzw. M06-R09.
+
+| Aktion | Felder | Ergebnis (Erfolg) | Fehlercodes |
+| --- | --- | --- | --- |
+| `historie_lesen` | `azubi`, `woche` (ohne `als`: liest, was die Berichtsseite als Historie zeigt) | `<Historie>` | – |
+| `historie_aendern` | `azubi`, `woche`, `eintrag`: `statuswechsel` \| `kommentar`, `nummer` (ab 1, Position in `historie` bzw. `kommentare` des Bestands), `werte`: neue Werte, bei `statuswechsel` aus `von`, `nach`, `person`, `zeitpunkt`, `runde`, `begruendung`, bei `kommentar` aus `runde`, `person`, `text` | `{ "geaendert": true }` | `historie_unveraenderlich` |
+| `historie_loeschen` | `azubi`, `woche`, `eintrag`, `nummer` (wie oben) | `{ "geloescht": true }` | `historie_unveraenderlich` |
+| `bericht_loeschen` | `azubi`, `woche` (den ganzen Bericht samt Tagen löschen) | `{ "geloescht": true }` | `historie_unveraenderlich` |
+
+Eine `nummer`, zu der es keinen Eintrag gibt, macht den Fall fehlerhaft. Die Zuordnung zur Abweisung erfolgt über den
+festen Grund der Datenhaltung, nie über ihren Meldungstext.
+
+**Fehlercodes von M06:**
+
+| Code | Bedeutung | AK |
+| --- | --- | --- |
+| `historie_unveraenderlich` | Die Datenhaltung weist das Ändern oder Löschen eines Statuswechsels oder Kommentars oder das Löschen eines Berichts mit Historie ab. | AK-803 |
+
+## Schnittstellen und Aktionen von M07
+
+Die Signaturen stehen in `specs/M07-pdf-export.md`, Abschnitt 6. Status, Tagesart, Woche und Wochentage wie bei M03 und
+M04. **Personen stehen hier mit ihrem Namen** (Text), weil das PDF Namen druckt.
+
+**Datenformate von M07:**
+
+| Art | Format | Beispiel |
+| --- | --- | --- |
+| Tag im PDF-Bericht | `{ "tag": <Wochentag>, "tagesart": <Tagesart> \| null, "text": <Text>, "ausserhalb": <Wahrheitswert> }`, gespeicherter Stand | `{ "tag": "Mo", "tagesart": null, "text": "", "ausserhalb": true }` |
+| Bericht für das PDF | `{ "woche": <Woche>, "status": <Status>, "tage": [<Tag im PDF-Bericht> × 5], "statuswechsel": [{ "von": <Status> \| null, "nach": <Status>, "person": <Name>, "zeitpunkt": <Zeitpunkt> }, …] }`, Statuswechsel in ihrer Reihenfolge | eine gespeicherte Woche mit ihrer Historie |
+| Ausbildung | `{ "beginn": <Kalendertag>, "ende": <Kalendertag> \| null }` | `{ "beginn": "2026-09-01", "ende": null }` |
+| PDF-Inhalt | siehe unten | |
+
+**PDF-Inhalt.** Ein Fall prüft, welche Texte und Vermerke ein PDF enthält, nicht das Layout. Texte stehen genau so, wie
+sie gedruckt werden:
+
+| Feld | Inhalt |
+| --- | --- |
+| `titel` | Titel des Dokuments, z. B. `Berichtsheft Anna Azubi – KW 40/2026` |
+| `dateiname` | z. B. `Berichtsheft_Anna-Azubi_KW40-2026.pdf` |
+| `erstellt` | Erstellungszeitpunkt aus der Uhr, z. B. `06.10.2026, 21:00 Uhr` (Fußzeile „Erstellt am …“) |
+| `zeitraum` | nur Sammel-PDF: gewählter Zeitraum, z. B. `01.09.2026 – 06.10.2026` |
+| `wochen` | Liste der gedruckten Wochen in Druckreihenfolge. **Jeder Eintrag beginnt im PDF auf einer neuen Seite** (M07-R09); eine leere Liste ergibt das PDF mit Hinweis |
+
+Je Woche: `{ "name", "kw", "zeitraum", "status", "vermerk", "kennzeichnung", "kopfzeile", "ausserhalb", "tage" }`:
+
+| Feld | Inhalt |
+| --- | --- |
+| `name` | Name des Azubis |
+| `kw` | z. B. `KW 40/2026` |
+| `zeitraum` | Montag bis Freitag, z. B. `28.09.2026 – 02.10.2026` |
+| `status` | Status der Woche |
+| `vermerk` | Freigabevermerk, z. B. `Freigegeben von Bernd Ausbilder am 05.10.2026, 14:05 Uhr`, sonst `null` |
+| `kennzeichnung` | z. B. `Nicht freigegeben – Status: Entwurf`, bei einer freigegebenen Woche `null` |
+| `kopfzeile` | Statusangabe der Kopfzeile jeder Seite: `Freigegeben` oder z. B. `Nicht freigegeben (Entwurf)` |
+| `ausserhalb` | `true`, wenn die Woche ganz außerhalb der Ausbildung liegt |
+| `tage` | `[{ "datum": <z. B. „Montag, 28.09.2026“>, "tagesart": <Text>, "taetigkeiten": <Text> } × 5]`, Mo bis Fr; `tagesart` wie gedruckt (M07-R02), `taetigkeiten` unverändert |
+
+**Schnittstellen (Fachlogik):** Der Fall nennt `uhr` (Erstellungszeitpunkt und „heute“ für die Vorbelegung).
+
+| Schnittstelle | `eingabe` | `erwartet` (Erfolg) | Fehlercodes |
+| --- | --- | --- | --- |
+| `pdfWoche` | `{ "name": <Text>, "ausbildung": <Ausbildung> \| null }` und die Felder von `<Bericht für das PDF>` (`woche`, `status`, `tage`, `statuswechsel`) | `<PDF-Inhalt>` ohne `zeitraum` | – |
+| `pdfZeitraum` | `{ "name": <Text>, "ausbildung": <Ausbildung>, "von": <Text> \| null, "bis": <Text> \| null, "berichte": [<Bericht für das PDF>, …] }`; `von`/`bis` wie im Formular eingegeben, `null` = nicht angegeben; `berichte` = alle Berichte des Azubis in beliebiger Reihenfolge | `<PDF-Inhalt>` mit `zeitraum` | `von_ungueltig`, `bis_ungueltig`, `bis_vor_von` |
+
+**Aktionen der Daten-Fälle** (Felder außer `aktion`; `?` = optional):
+
+| Aktion | Felder | Ergebnis (Erfolg) | Fehlercodes |
+| --- | --- | --- | --- |
+| `pdf_woche_exportieren` | `als`, `azubi`, `woche` | `{ "pdf": <PDF-Inhalt> }` | `zugriff_verweigert`, `nicht_gefunden` |
+| `pdf_zeitraum_exportieren` | `als`, `azubi` (Schlüssel der Person, deren Berichtsheft exportiert wird), `von?`, `bis?` (Text wie bei `pdfZeitraum`; fehlt = nicht angegeben) | `{ "pdf": <PDF-Inhalt> }` | `zugriff_verweigert`, `nicht_gefunden`, `von_ungueltig`, `bis_ungueltig`, `bis_vor_von` |
+
+Im Daten-Fall stehen die Namen im PDF-Inhalt wie in `testdaten.json` bzw. `ausgangsbestand.personen`. `pdf_zeitraum_exportieren` nennt keinen
+Bericht (nur eine Person); seine Wochen erscheinen deshalb nicht in `erwartet.berichte`.
+
+**Fehlercodes von M07:**
+
+| Code | Bedeutung | AK |
+| --- | --- | --- |
+| `nicht_gefunden` | Den Bericht gibt es nicht, oder die Person hat kein Berichtsheft (kein Azubi mit Ausbildungsbeginn): „Seite nicht gefunden“. | AK-906 |
+| `von_ungueltig` | „Von“ ist kein Kalendertag, den es gibt. | AK-902 |
+| `bis_ungueltig` | „Bis“ ist kein Kalendertag, den es gibt. | AK-902 |
+| `bis_vor_von` | „Bis“ liegt vor „Von“. | AK-902 |
+
+`zugriff_verweigert` ist der Code aus M02 (fremder Bericht, deaktivierte Person).
+
 ## Schnittstellen und Aktionen von M08
 
 Die Signaturen stehen in `specs/M08-benachrichtigungen-und-erinnerung.md`, Abschnitt 6. Status, Woche und Personen wie
@@ -467,8 +575,8 @@ desselben Ausbilders gibt seinen Schritten verschiedene `uhr` oder liest je Empf
 ## Aktionen und Status
 
 - **Status:** `Entwurf`, `Eingereicht`, `Freigegeben`, `Abgelehnt` (Statusmodell in `docs/01`).
-- **Aktionen:** die Statuswechsel und die Aktionen der Daten-Fälle in „Schnittstellen und Aktionen von M05“ und
-  „Schnittstellen und Aktionen von M08“ (seit G2). Aktionen der Ablauf-Fälle kommen in G3 dazu.
+- **Aktionen:** die Statuswechsel und die Aktionen der Daten-Fälle in den Abschnitten „Schnittstellen und Aktionen von
+  …“ der Module (seit G2). Aktionen der Ablauf-Fälle kommen in G3 dazu.
 
 ## Regeln für Adapter
 
