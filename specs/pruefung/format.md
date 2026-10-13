@@ -129,6 +129,10 @@ Für alle Schritte gilt:
 | `historie` | alle Statuswechsel in ihrer Reihenfolge: `{ "von": <Status>, "nach": <Status>, "person": <Schlüssel>, "zeitpunkt": <Zeitpunkt>, "runde": <Zahl>, "begruendung": <Text> \| null }` |
 | `kommentare` | alle Kommentare: `{ "runde": <Zahl>, "tag": <Wochentag> \| null, "person": <Schlüssel>, "text": <Text> }`; je Runde zuerst der Gesamtkommentar (`tag` = `null`), dann die Tage Mo bis Fr |
 
+Fehlt ein genannter Bericht am Ende (z. B. weil sein Azubi endgültig gelöscht wurde), steht an seiner Stelle
+`{ "azubi": <Schlüssel>, "woche": <Woche>, "fehlt": true }` ohne weitere Felder; „Bericht existiert nicht (mehr)“ ist
+damit erwartbar. Ein Bericht, der nicht fehlen soll, muss mit allen Feldern erwartet werden.
+
 Der Bestand wird nur gelesen, nicht bewertet: Der Adapter liefert, was gespeichert ist. Einen Versionsstand nennt ein
 Daten-Fall nie; ob ein gesehener Stand veraltet ist, entscheidet die Plattform. Gleichzeitige Zeitpunkte ordnet die
 Plattform nicht verlässlich; ein Fall, der eine Reihenfolge nach Zeitpunkt erwartet, gibt seinen Schritten
@@ -387,6 +391,11 @@ M06-R08 bzw. M06-R09.
 
 Eine `nummer`, zu der es keinen Eintrag gibt, macht den Fall fehlerhaft. Die Zuordnung zur Abweisung erfolgt über den
 festen Grund der Datenhaltung, nie über ihren Meldungstext.
+
+**Aktion `person_loeschen`** (M06-R10, AK-803; im Gegensatz zu den Schreibaktionen oben durch die Fachlogik der
+Verwaltung): Felder `als`, `person`; die Namensbestätigung des Dialogs ergänzt der Adapter. Ergebnis `{ "geloescht": true }`;
+eine Abweisung macht den Fall fehlerhaft (die Abweisungsgründe, auch `fremde_historie`, prüfen die Fälle von
+`loeschenPruefen`). Danach fehlen die Berichte der Person im Bestand (`"fehlt": true`, siehe „Aufbau eines Daten-Falls“).
 
 **Fehlercodes von M06:**
 

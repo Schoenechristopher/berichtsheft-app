@@ -1887,5 +1887,53 @@
         }
       ]
     }
+  },
+  {
+    "id": "AK-803-05",
+    "modul": "M06",
+    "ebene": "daten",
+    "beschreibung": "Das endgültige Löschen des Azubis entfernt seine Berichte samt Historie; der Bericht existiert danach nicht mehr (M06-R10)",
+    "uhr": "2026-10-06T10:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "person_loeschen",
+        "person": "anna"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "geloescht": true
+        }
+      ],
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "fehlt": true
+        }
+      ]
+    }
   }
 ]

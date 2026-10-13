@@ -1,6 +1,6 @@
 # Spec-Architektur Berichtsheft-App
 
-Stand: 12.10.2026 · Status: **Entwurf zur Freigabe** · @Chris
+Stand: 12.10.2026 · Status: **freigegeben (13.10.2026)** · @Chris
 
 Änderungen gegenüber der ersten Fassung vom 12.10.2026: Es gibt keinen VPS. Das Repository liegt in der Organisation
 `Schoenechristopher` und wird öffentlich; schwere Jobs laufen auf den Standard-Runnern von GitHub (siehe

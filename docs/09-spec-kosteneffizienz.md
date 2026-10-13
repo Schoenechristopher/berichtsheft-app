@@ -1,6 +1,6 @@
 # Spec Kosteneffizientes Arbeiten der Claude-Sitzungen
 
-Stand: 12.10.2026 · Status: **Entwurf zur Freigabe** · gilt für die Steuerungsinstanz und alle Entwicklersitzungen
+Stand: 12.10.2026 · Status: **freigegeben (13.10.2026)** · gilt für die Steuerungsinstanz und alle Entwicklersitzungen
 
 ## Ziel und Geltungsbereich
 
@@ -50,9 +50,14 @@ Entwicklersitzungen **mit möglichst wenig Verbrauch zu einem abgenommenen Ergeb
   Ein Auftrag verweist auf Abschnitte, statt ganze Dokumente zu kopieren.
 - **KE-R02 Zustand in Dateien, nicht im Gedächtnis:** Die Steuerung hält ihren Stand in `FORTSCHRITT.md` fest, nicht
   nur im eigenen Verlauf. So kann sie jederzeit in einer frischen Sitzung weitermachen.
-- **KE-R03 Frische Steuerung je Etappe:** Nach jeder Etappe, spätestens wenn die Plattform den Verlauf zusammenfasst,
-  schreibt die Steuerung eine Übergabe und endet. Die nächste Etappe startet eine neue Steuerungssitzung mit der
-  Übergabe. Ein langer Verlauf macht jede weitere Runde teurer.
+- **KE-R03 Frische Steuerung je Welle:** Nach jeder Welle einer Etappe, spätestens wenn die Plattform den Verlauf
+  zusammenfasst, schreibt die Steuerung eine Übergabe in `FORTSCHRITT.md` (Doku-PR) und endet. Die nächste Welle startet
+  eine neue Steuerungssitzung mit der Übergabe. Ein langer Verlauf macht jede weitere Runde teurer (Rückblick G2: eine
+  Steuerung über drei Wellen kostete rund 31 statt 5 US-Dollar). Dazu:
+  - Lokale Abnahmeläufe (Prüfbefehle, Gegenprobe, Browser) gibt die Steuerung an einen Hilfsagenten der Stufe S1, der
+    nur das Ergebnis meldet.
+  - PR-Abos setzt die Steuerung erst, wenn die Abnahme eines PRs beginnt; Entwicklersitzungen beenden das automatische
+    Abo auf ihren eigenen PR.
 - **KE-R04 Warten ohne Abfragen:** Die Steuerung wartet auf Ereignisse:
   - PR-Ereignisse, Benachrichtigungen aus Entwicklersitzungen, ein Check-in in großem Abstand.
   - Nie Abfragen im Minutentakt und nie aktives Warten mit Pausenbefehlen.
@@ -104,7 +109,14 @@ Entwicklersitzungen **mit möglichst wenig Verbrauch zu einem abgenommenen Ergeb
   | mittel | ein Modul mit Oberfläche oder Datenhaltung | 1 Sitzung, bis 2 Anläufe |
   | groß | P00, Upgrade-Schritt, mehrere Module | wird geteilt (`00-steuerung.md`), sonst wie mittel |
 
-  Meldet die Plattform den Verbrauch, ergänzt die Steuerung die Tabelle nach der ersten Etappe um Richtwerte in Token.
+  Richtwerte in Token (Rückblick G2, freigegeben 13.10.2026):
+
+  | Stufe und Klasse | Ausgabe-Token | aus dem Zwischenspeicher gelesen | Kosten |
+  | --- | --- | --- | --- |
+  | S3 mittel | rund 0,10 bis 0,14 Mio. | 15 bis 27 Mio. | 7 bis 11 US-Dollar |
+  | S3 groß | rund 0,15 Mio. | rund 25 Mio. | rund 10,50 US-Dollar |
+
+  Die Steuerung ergänzt die Tabelle nach jeder Etappe (z. B. um S2-Werte ab G3).
 - **KE-R15 Zwischenspeicher schonen:**
   - Eine Sitzung arbeitet ihr Paket ohne lange Pausen ab und wechselt nicht das Modell (MW-R08).
   - Stabile Texte stehen am Anfang des Kontexts und werden nicht umformuliert: Auftrag, `CLAUDE.md`, Playbook-Abschnitt.
@@ -155,7 +167,10 @@ Entwicklersitzungen **mit möglichst wenig Verbrauch zu einem abgenommenen Ergeb
   `.claude/hooks/session-start.sh` (12.10.2026): idempotent, `npm ci` nur bei geändertem `package-lock.json`; erster
   Lauf rund 40 Sekunden, jeder weitere rund 4 Sekunden.
 - **KE-S02 Auftragsvorlage:** `playbooks/vorlage-arbeitspaket.md` (G4) bekommt die Pflichtfelder aus KE-R01. Ein kleines
-  Prüfskript meldet fehlende Felder (KE-AK-01).
+  Prüfskript meldet fehlende Felder (KE-AK-01). Aus G2 übernehmen (freigegeben 13.10.2026): den Block „Gemeinsame
+  Regeln für alle Pakete“ (Rolle, Lesereihenfolge, Bausteine, gemeinsame Dateien, Prüfbefehle, Gegenprobe, Git/CI,
+  Budget und Abbruch, Bericht), „feste Gründe statt Meldungstexte“ von Anfang an, mögliche Schemaänderungen im Auftrag
+  benennen und den Hinweis, dass die Plattform eine Entwicklersitzung automatisch auf ihren PR abonniert.
 - **KE-S03 Leitfaden der Steuerung:** `playbooks/00-steuerung.md` bekommt die Regeln KE-R01 bis KE-R07, die Vorlage für
   die Übergabe und den Etappen-Rückblick.
 - **KE-S04 `CLAUDE.md`:** Die Regeln KE-R08 bis KE-R13 kommen kurz gefasst in `CLAUDE.md`, weil jede Entwicklersitzung
