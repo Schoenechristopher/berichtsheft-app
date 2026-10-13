@@ -1,4 +1,5 @@
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { isHistoryImmutableError } from "@/lib/history-guard";
 import { createPersons, resetDatabase, testDb } from "./helpers";
 
 const prisma = testDb();
@@ -67,6 +68,32 @@ describe("Historie der Statuswechsel ist unveränderlich (Vorbereitung AK-803)",
 
     expect(await prisma.weeklyReport.count({ where: { id: report.id } })).toBe(0);
     expect(await prisma.statusChange.count({ where: { reportId: report.id } })).toBe(0);
+  });
+
+  it("AK-803 Abweisungen der Historie tragen den festen Code, unabhängig vom Meldungstext", async () => {
+    const { report, approved } = await reportWithHistory();
+    const attempts = [
+      prisma.statusChange.update({ where: { id: approved.id }, data: { reason: "x" } }),
+      prisma.statusChange.delete({ where: { id: approved.id } }),
+      prisma.$executeRaw`DELETE FROM status_change`,
+      prisma.weeklyReport.delete({ where: { id: report.id } }),
+    ];
+    for (const attempt of attempts) {
+      const error: unknown = await attempt.then(
+        () => null,
+        (rejection: unknown) => rejection,
+      );
+      expect(isHistoryImmutableError(error)).toBe(true);
+    }
+    // Andere Datenbankfehler sind keine Abweisung der Historie.
+    const other: unknown = await prisma.weeklyReport
+      .create({ data: { traineeId: report.traineeId, isoYear: 2026, isoWeek: 40 } })
+      .then(
+        () => null,
+        (rejection: unknown) => rejection,
+      );
+    expect(other).not.toBeNull();
+    expect(isHistoryImmutableError(other)).toBe(false);
   });
 
   it("AK-803 Löschen einer Person mit Einträgen in fremder Historie scheitert", async () => {

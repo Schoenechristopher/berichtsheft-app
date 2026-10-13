@@ -24,8 +24,8 @@ wird in G2 und G3 festgelegt.
 | M03 Wochenberichte entstehen | `M03-wochenberichte-entstehen.md` | AK-301 bis AK-306 | beschrieben (G2) |
 | M04 Bericht erfassen | `M04-bericht-erfassen.md` | AK-401 bis AK-408 (ohne AK-404) | beschrieben (G2) |
 | M05 Status und Prüfung | `M05-status-und-pruefung.md` | AK-501 bis AK-508, AK-601 bis AK-607, AK-701 bis AK-704 | beschrieben (G2) |
-| M06 Historie | – | AK-801 bis AK-803 | G2 |
-| M07 PDF-Export | – | AK-901 bis AK-907 | G2 |
+| M06 Historie | `M06-historie.md` | AK-801 bis AK-803 | beschrieben (G2) |
+| M07 PDF-Export | `M07-pdf-export.md` | AK-901 bis AK-907 | beschrieben (G2) |
 | M08 Benachrichtigungen und Erinnerung | – | AK-1001 bis AK-1025 | G2 |
 | M09 Oberfläche | – | UI-AK-01 bis UI-AK-20 | G3 |
 | Q Plattform und Qualität | – | AK-1101, AK-1102 | G3 |
@@ -84,6 +84,9 @@ Jeder Azubi hat genau einen zugeordneten Ausbilder; prüfen darf jeder Ausbilder
 | Status | Entwurf, Eingereicht, Freigegeben oder Abgelehnt; Übergänge nur nach dem Statusmodell, siehe M05 |
 | Prüfrunde | Abschnitt von einer Einreichung bis zur nächsten; Ablehnung, Freigabe, Rücknahme und Kommentare gehören zur laufenden Runde, siehe M05 |
 | Gesehener Stand | Stand des Berichts, den eine Person beim Auslösen einer Aktion vor sich hatte; ist er veraltet, scheitert die Aktion mit Meldung, siehe M05 |
+| Historie | alle Statuswechsel und Kommentare eines Berichts nach Prüfrunde; unveränderlich, nur das endgültige Löschen des Azubis entfernt sie, siehe M06 |
+| Freigabevermerk | „Freigegeben von <Name> am <Datum>, <Uhrzeit> Uhr“ einer freigegebenen Woche im PDF; gilt als Nachweis, siehe M07 |
+| Kennzeichnung | „Nicht freigegeben – Status: <Status>“ einer nicht freigegebenen Woche im PDF, siehe M07 |
 | Kanal | Weg einer Benachrichtigung: E-Mail, Teams oder App |
 | Prüffall | neutraler, maschinenlesbarer Test einer AK-ID, siehe `pruefung/format.md` |
 

@@ -10,7 +10,7 @@ import { DAY_TYPE_LABELS } from "./report-days";
 import { classifyWeek, isWeekOutsideTraining, type DayType, type TrainingPeriod } from "./report-generation";
 import { currentApproval, formatDateTime, type HistoryChange } from "./report-history";
 import { STATUS_LABELS } from "./report-status";
-import { formatDate, isoWeekWorkdays, toDateInput, weekRangeLabel, weekdayLong, type IsoWeek } from "./weeks";
+import { formatDate, isoWeekWorkdays, toDateInput, today, weekRangeLabel, weekdayLong, type IsoWeek } from "./weeks";
 
 /** Freigabevermerk (AK-903) oder Kennzeichnung einer nicht freigegebenen Woche (AK-904). */
 export type PdfMarking =
@@ -135,6 +135,18 @@ export interface WeekForExport extends IsoWeek {
 }
 
 /**
+ * Merkmale für die Ausblendung (AK-306, M03): Inhalt = mindestens ein Tag mit Tagesart oder Text,
+ * Historie = mindestens ein Statuswechsel.
+ */
+export function withExportFlags<T extends ReportForPdf>(report: T): T & WeekForExport {
+  return {
+    ...report,
+    hasContent: report.days.some((day) => day.dayType !== null || day.activities !== ""),
+    hasHistory: report.changes.length > 0,
+  };
+}
+
+/**
  * Wochen eines Sammel-PDF (AK-902): alle Berichte, die den Zeitraum berühren, in zeitlicher
  * Reihenfolge. Ausgeblendete Wochen (unberührte leere Entwürfe ganz außerhalb der Ausbildung,
  * bestätigte Auslegung zu AK-306) erscheinen nicht – dieselbe Regel wie in der Übersicht.
@@ -178,7 +190,10 @@ export const RANGE_MESSAGES = {
   order: "„Bis“ darf nicht vor „Von“ liegen.",
 } as const;
 
-export type RangeResult = { ok: true; range: ExportRange } | { ok: false; message: string };
+/** Fester Grund, aus dem ein Zeitraum abgewiesen wird (für Prüffälle, unabhängig vom Meldungstext). */
+export type RangeReason = "invalid-from" | "invalid-to" | "to-before-from";
+
+export type RangeResult = { ok: true; range: ExportRange } | { ok: false; reason: RangeReason; message: string };
 
 /**
  * Zeitraum aus den Formularfeldern „von“ und „bis“ (JJJJ-MM-TT). Fehlt ein Feld, gilt die
@@ -191,16 +206,29 @@ export function parseExportRange(
 ): RangeResult {
   const fromDate = from?.trim() ? parseDateInput(from) : fallback.from;
   if (!fromDate) {
-    return { ok: false, message: RANGE_MESSAGES.invalidFrom };
+    return { ok: false, reason: "invalid-from", message: RANGE_MESSAGES.invalidFrom };
   }
   const toDate = to?.trim() ? parseDateInput(to) : fallback.to;
   if (!toDate) {
-    return { ok: false, message: RANGE_MESSAGES.invalidTo };
+    return { ok: false, reason: "invalid-to", message: RANGE_MESSAGES.invalidTo };
   }
   if (toDate.getTime() < fromDate.getTime()) {
-    return { ok: false, message: RANGE_MESSAGES.order };
+    return { ok: false, reason: "to-before-from", message: RANGE_MESSAGES.order };
   }
   return { ok: true, range: { from: fromDate, to: toDate } };
+}
+
+/**
+ * Zeitraum eines Sammel-PDF aus „von“ und „bis“ mit der Vorbelegung Ausbildungsbeginn bis heute
+ * (`now` aus dem Uhr-Modul).
+ */
+export function exportRange(
+  period: TrainingPeriod,
+  from: string | null | undefined,
+  to: string | null | undefined,
+  now: Date,
+): RangeResult {
+  return parseExportRange(from, to, defaultExportRange(period, today(now)));
 }
 
 /** Zeitraum als Text, z. B. „01.09.2026 – 09.10.2026“. */
@@ -282,5 +310,41 @@ export function rangePdfDocument(
     createdAt: formatDateTime(now),
     weeks: selectExportWeeks(reports, range, period).map((report) => toPdfWeek(report, traineeName, period)),
     rangeLabel: label,
+  };
+}
+
+/** Fertiger Export: Dateiname und Inhalt des PDF. */
+export interface PdfExport {
+  fileName: string;
+  document: PdfDocument;
+}
+
+/** Export einer Woche (AK-901): Dateiname und Inhalt. `now` kommt aus dem Uhr-Modul. */
+export function weekExport(
+  report: ReportForPdf,
+  traineeName: string,
+  period: TrainingPeriod | null,
+  now: Date,
+): PdfExport {
+  return {
+    fileName: weekPdfFileName(traineeName, report),
+    document: weekPdfDocument(report, traineeName, period, now),
+  };
+}
+
+/**
+ * Export eines Zeitraums (AK-902): Dateiname und Inhalt für einen Zeitraum aus `exportRange`.
+ * `now` kommt aus dem Uhr-Modul.
+ */
+export function rangeExport(
+  reports: readonly ReportForPdf[],
+  traineeName: string,
+  period: TrainingPeriod,
+  range: ExportRange,
+  now: Date,
+): PdfExport {
+  return {
+    fileName: rangePdfFileName(traineeName, range),
+    document: rangePdfDocument(reports.map(withExportFlags), traineeName, period, range, now),
   };
 }

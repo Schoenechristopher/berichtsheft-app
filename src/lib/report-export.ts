@@ -11,13 +11,12 @@ import type { TrainingPeriod } from "@/domain/report-generation";
 import { today } from "@/domain/weeks";
 import {
   defaultExportRange,
-  parseExportRange,
-  rangePdfDocument,
-  rangePdfFileName,
-  weekPdfDocument,
-  weekPdfFileName,
+  exportRange,
+  rangeExport,
+  weekExport,
   type ExportRange,
   type PdfDocument,
+  type RangeReason,
 } from "@/domain/report-pdf";
 import type { PrismaClient } from "@/generated/prisma/client";
 import { isUuid } from "@/lib/ids";
@@ -25,11 +24,15 @@ import { ensureReportsForTrainee } from "@/lib/reports";
 
 export const NOT_FOUND_MESSAGE = "Seite nicht gefunden";
 
-export type ExportResult =
-  { ok: true; fileName: string; document: PdfDocument } | { ok: false; status: 400 | 403 | 404; message: string };
+/** Fester Grund eines gescheiterten Exports (für Prüffälle, unabhängig vom Meldungstext). */
+export type ExportFailureReason = "not-found" | "forbidden" | RangeReason;
 
-const notFound: ExportResult = { ok: false, status: 404, message: NOT_FOUND_MESSAGE };
-const denied: ExportResult = { ok: false, status: 403, message: ACCESS_DENIED_MESSAGE };
+export type ExportResult =
+  | { ok: true; fileName: string; document: PdfDocument }
+  | { ok: false; reason: ExportFailureReason; status: 400 | 403 | 404; message: string };
+
+const notFound: ExportResult = { ok: false, reason: "not-found", status: 404, message: NOT_FOUND_MESSAGE };
+const denied: ExportResult = { ok: false, reason: "forbidden", status: 403, message: ACCESS_DENIED_MESSAGE };
 
 /** Was zu jedem Bericht geladen wird: Tage und Statuswechsel mit Namen (für den Freigabevermerk). */
 const reportInclude = {
@@ -50,8 +53,6 @@ function toReportForPdf(report: LoadedReport) {
     status: report.status,
     days: report.days,
     changes: report.statusChanges.map(({ actor, ...change }) => ({ ...change, actorName: actor.name })),
-    hasContent: report.days.some((day) => day.dayType !== null || day.activities !== ""),
-    hasHistory: report.statusChanges.length > 0,
   };
 }
 
@@ -79,11 +80,7 @@ export async function loadWeekExport(
   if (!canViewReport(viewer, report)) {
     return denied;
   }
-  return {
-    ok: true,
-    fileName: weekPdfFileName(report.trainee.name, report),
-    document: weekPdfDocument(toReportForPdf(report), report.trainee.name, periodOf(report.trainee), now),
-  };
+  return { ok: true, ...weekExport(toReportForPdf(report), report.trainee.name, periodOf(report.trainee), now) };
 }
 
 /** Vorbelegung des Zeitraums für das Formular (Ausbildungsbeginn bis heute). */
@@ -121,15 +118,11 @@ export async function loadRangeExport(
   if (!canViewReport(viewer, { traineeId })) {
     return denied;
   }
-  const parsed = parseExportRange(from, to, defaultExportRange(period, today(now)));
+  const parsed = exportRange(period, from, to, now);
   if (!parsed.ok) {
-    return { ok: false, status: 400, message: parsed.message };
+    return { ok: false, reason: parsed.reason, status: 400, message: parsed.message };
   }
   await ensureReportsForTrainee(prisma, traineeId, now);
   const reports = (await loadReports(prisma, traineeId)).map(toReportForPdf);
-  return {
-    ok: true,
-    fileName: rangePdfFileName(trainee.name, parsed.range),
-    document: rangePdfDocument(reports, trainee.name, period, parsed.range, now),
-  };
+  return { ok: true, ...rangeExport(reports, trainee.name, period, parsed.range, now) };
 }
