@@ -1,6 +1,6 @@
 # Spec Automatisches Mergen
 
-Stand: 12.10.2026 · Status: **Entwurf zur Freigabe** · gilt für `Schoenechristopher/berichtsheft-app`
+Stand: 12.10.2026 · Status: **freigegeben (13.10.2026)** · gilt für `Schoenechristopher/berichtsheft-app`
 
 ## Ziel und Geltungsbereich
 

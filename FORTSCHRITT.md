@@ -13,7 +13,8 @@ Diese Datei schreibt nur die Steuerungsinstanz, jeweils nach dem Merge eines Pak
 | G2 Zerlegung Fachlogik | C: M05 Status und Prüfung, Daten-Runner | abgenommen, gemergt | 13.10.2026 | #21, Merge `8eb4bc7` |
 | G2 Zerlegung Fachlogik | D: M06 Historie, M07 PDF-Export | abgenommen, gemergt | 13.10.2026 | #23, Merge `13c22fe` |
 | G2 Zerlegung Fachlogik | E: M08 Benachrichtigungen und Erinnerung, Abschluss G2 | abgenommen, gemergt | 13.10.2026 | #22, Merge `1b1f4e7` |
-| G3 Oberfläche und Abläufe | M09, Q, Ablauf-Prüffälle | offen | – | – |
+| G3 Oberfläche und Abläufe | Welle 1: H Nachträge G2, G M09 beschreiben, F Ablauf-Runner | in Arbeit | 13.10.2026 | – |
+| G3 Oberfläche und Abläufe | Welle 2: I Ablauf-Fälle M09, J Q, Szenarien, Abschluss | geplant | – | – |
 
 ## G1 – Rahmen und Pilotmodul M01
 
@@ -216,7 +217,7 @@ genau einzeln, ein Fall der Ebene `ablauf` scheitert; bei E zusätzlich eine nic
 
 Summe G2: Entwicklersitzungen 46,87 US-Dollar, Steuerung rund 31 US-Dollar; 5 volle CI-Läufe.
 
-**Vorschläge (zur Freigabe):**
+**Vorschläge (von Chris angenommen am 13.10.2026; umgesetzt in `docs/08`, MW-R11, und `docs/09`, KE-R03, KE-R14, KE-S02):**
 
 - **MW-R05:** Fünf S3-Pakete in Folge (dazu G1) beim ersten Anlauf abgenommen. Für Beschreibungs-Pakete bestehenden
   Codes (Art wie M03, M04, M07, M08) in G3 einen Versuch auf S2 nach MW-R11; scheitert er, bleibt S3.
@@ -232,6 +233,42 @@ Summe G2: Entwicklersitzungen 46,87 US-Dollar, Steuerung rund 31 US-Dollar; 5 vo
   `playbooks/vorlage-arbeitspaket.md`. Ergänzen: „feste Gründe statt Meldungstexte“ von Anfang an; mögliche
   Schemaänderungen im Auftrag benennen; Hinweis, dass die Plattform die Entwicklersitzung automatisch auf ihren PR
   abonniert.
+
+## G3 – Oberfläche und Abläufe
+
+Plan „Etappe G3“, freigegeben von Chris am 13.10.2026 mit den Entscheidungen E1 bis E8 wie vorgeschlagen. Gleichzeitig
+freigegeben: `docs/06` bis `docs/09` (Status „freigegeben“) und die Vorschläge aus dem Rückblick G2. Steuerung je Welle in
+einer frischen Sitzung (E8, KE-R03).
+
+**Entscheidungen:**
+
+- **E1 Testschnittstelle:** Uhr stellen und Testdaten zurücksetzen nur bei `NODE_ENV !== 'production'` und aktivem
+  Test-Login, im Produktions-Build per Test abgesichert. Auslegung aus Paket F, von Chris bestätigt am 13.10.2026: In CI
+  läuft der Ablauf-Runner gegen einen zusätzlichen Entwicklungs-Server auf Port 3100 mit Test-Login und der
+  Compose-Datenbank; die übrigen Browser-Tests laufen unverändert gegen den Produktions-Build.
+- **E2** Ablauf-Ergebnisse über unsichtbare feste Merker (Fehlercode, Status), Texte nur im Kern.
+- **E3** Alle UI-AK als Ablauf-Fälle mit kleinem festem Prüfvokabular (Variante A).
+- **E4** Code-Landkarte auch für `src/app/**` und `src/components/**`, Prüfung Pflicht.
+- **E5** Paket H (Nachträge G2) in G3; die Tests in `src/lib/auth/config.test.ts` bleiben ohne AK-ID.
+- **E6** CI-37 (Prüfung nach Modul) auf Etappe A verschoben; Paket J passt den Satz in `docs/ci-richtlinie.md` an.
+- **E7** S2-Versuche für H und G (MW-R11).
+- **E8** Frische Steuerung je Welle.
+
+| Welle | Paket | Inhalt | Stufe | Größe, Richtwert | Klasse |
+| --- | --- | --- | --- | --- | --- |
+| 1 | H | Migration Wochennummer `reminder_run`, `hasContent` einmal, Kommentar `eventKey`, Daten-Fall Kaskade (M06-R10) | S2 mittel | klein, 3–5 US-Dollar | L |
+| 1 | G | `specs/M09-oberflaeche.md`, Fachlogik-Fälle M09, Landkarte für `src/app` und `src/components` | S2 mittel | mittel, 5–7 US-Dollar | L |
+| 1 | F | Ablauf-Runner, Testschnittstelle, Merker, Fälle AK-101, 106, 403, 408 | S3 hoch | groß, 10–15 US-Dollar | O |
+| 2 | I | Ablauf-Fälle aller UI-AK, Prüfvokabular im Adapter | S3 mittel | mittel, 8–12 US-Dollar | O |
+| 2 | J | Q-Spec, Beispielszenarien, `DEFERRED_CASES_REQUIRED = true`, `CLAUDE.md` „Fach-Specs maßgeblich“, CI-37-Satz | S3 mittel | mittel, 8–12 US-Dollar | O |
+
+Merge-Reihenfolge: Welle 1 H → G → F, Welle 2 I → J; der spätere PR gleicht per Merge mit `main` ab. Steuerung je Welle
+höchstens 7 US-Dollar. Fertig G3: alle AK und UI-AK mit Prüffall, `DEFERRED_CASES_REQUIRED = true`, alle Prüfungen
+grün, Ablauf-Fälle in allen Browsern grün, `CLAUDE.md` angepasst, Rückblick und Übergabe.
+
+### Welle 1 – Pakete H, G und F (parallel)
+
+Gestartet am 13.10.2026 um 07:43 UTC. Einträge nach MW-R10 folgen nach der Abnahme.
 
 ## Übergabe an die Steuerung von G2
 
