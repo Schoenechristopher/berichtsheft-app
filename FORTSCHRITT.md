@@ -328,7 +328,7 @@ Kriterien und Entscheidung von Chris weichen voneinander ab.
 | Verbrauch der Entwicklersitzung | 38 Eingabe-, 13.599 Ausgabe-Token; 1.773.050 aus dem Zwischenspeicher gelesen, 62.932 geschrieben; 0,57 US-Dollar |
 | Dauer | Start 10:13 UTC, Draft-PR 10:18 UTC (rund 5 Minuten) |
 | CI-Läufe | 1 × schnelle Prüfung (Entwurf, grün), 1 × volle Prüfung (bereit, Klasse L, grün) |
-| Rückfragen | keine blockierenden; 2 Punkte „Bitte bestätigen“ (Name der Kennzeichnung, erlaubte Ebenen „Fachlogik“ und „Ablauf“) |
+| Rückfragen | keine blockierenden; 2 Punkte „Bitte bestätigen“ (Name der Kennzeichnung, erlaubte Ebenen „Fachlogik“ und „Ablauf“), von Chris bestätigt |
 | Erreichte Abbruchkriterien | keine |
 
 **Abnahme durch die Steuerung:** Diff gelesen. Ein Hilfsagent der Stufe S1 hat lokal ausgeführt: Lint, Format,
@@ -339,7 +339,8 @@ zurückgenommenen Änderungen: Ein umbenannter Test zu AM-AK-08 und eine unbekan
 **Ergebnis:** `docs/03` hat einen Abschnitt „Automatisches Mergen (`docs/07`)“. Die IDs und Ebenen kommen aus der Tabelle
 in `docs/07`. AM-AK-01 bis -10 sind mit 1 bis 2 Tests je ID belegt. AM-AK-11 bis -14 tragen die Kennzeichnung „Ablauf,
 Nachweis an Test-PRs (docs/07)“. `testsJeAk` zählt auch AM-AK-Zeilen, damit gilt AM-R06 für sie. Kleinigkeit: Der
-Kurztext von AM-AK-05 in `docs/03` bricht nach „bzw.“ ab, weil die Kürzung am Satzende schneidet.
+Kurztext von AM-AK-05 in `docs/03` bricht nach „bzw.“ ab, weil die Kürzung am Satzende schneidet; bleibt
+so (Chris, 13.10.2026).
 
 **Steuerung Welle 1 (Planung, A1, zwei Doku-PRs):** 22.116 Eingabe-, 38.612 Ausgabe-Token; 9.771.676 aus dem
 Zwischenspeicher gelesen, 288.673 geschrieben; rund 3,84 US-Dollar (Stand vor diesem PR).
