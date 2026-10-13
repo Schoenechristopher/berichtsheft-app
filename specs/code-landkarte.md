@@ -6,8 +6,9 @@ Unterspec für Weg A (`docs/06-spec-architektur.md`, „Code-Landkarte“): welc
 umsetzen, in welcher Reihenfolge sie zu lesen sind und was sich 1:1 übertragen lässt. Die Regeln selbst stehen in den
 Fach-Specs (`specs/Mxx-*.md`).
 
-`npm run landkarte` meldet Dateien unter `src/domain/` und `src/lib/`, die hier fehlen. Seit Ende G2 ist das Pflicht in
-der CI (`npm run landkarte -- --pruefen`): Jede dieser Dateien steht in einem Modulabschnitt oder im „Querschnitt“.
+`npm run landkarte` meldet Dateien unter `src/domain/`, `src/lib/`, `src/app/` und `src/components/`, die hier fehlen.
+Seit Ende G2 ist das Pflicht in der CI (`npm run landkarte -- --pruefen`); seit G3 gilt es auch für `src/app/` und
+`src/components/` (Entscheidung E4): Jede dieser Dateien steht in einem Modulabschnitt oder im „Querschnitt“.
 
 Spalten: **Plattformgebunden** = hängt an Next.js, Prisma, PostgreSQL oder einer Bibliothek, die es auf anderen
 Plattformen nicht gibt. **Übertragung**: „1:1 übersetzen“ (Logik ohne Änderung nachbauen), „nach Profil neu bauen“
@@ -86,14 +87,14 @@ Fach-Spec: `specs/M02-personen-und-zugang.md` · Prüffälle: `specs/pruefung/M0
 | `src/lib/people/service.ts` → `createPerson()`, `updatePerson()`, `deactivatePerson()`, `reactivatePerson()`, `deletePerson()`, `updateFederalState()` | Serveraktionen: Rolle prüfen, Personenstand laden, Regel aus `people.ts` anwenden, serialisierbar schreiben (bis zu fünf Versuche) | M02-R13, M02-R27; AK-201 bis AK-209 | ja (Prisma, PostgreSQL) | nach Profil neu bauen |
 | `src/lib/people/service.ts` → `hasForeignHistory()` | Statuswechsel oder Kommentare an fremden Berichten zählen | M02-R22; AK-206 | ja (Prisma) | nach Profil neu bauen (Abfrage an M06) |
 | `src/lib/people/service.ts` → `getFederalState()`, `listPeople()`, `listActiveTrainees()` | Abfragen: Bundesland (Voreinstellung NW), Personenliste, aktive Azubis für M03 und M08 | M02-R28; AK-205, AK-209 | ja (Prisma) | nach Profil neu bauen |
-| `src/lib/people/service.ts` → `updateOwnTheme()` | eigene Darstellung speichern | UI-AK-14 (gehört M09) | ja (Prisma) | nach Profil neu bauen |
-| `src/lib/people/labels.ts` → `trainingPeriod()`, `SUCCESS_MESSAGES` | Anzeige-Texte der Nutzerverwaltung | – (Anzeige, M09) | nein | 1:1 übersetzen oder durch Plattform ersetzen |
 | `src/lib/auth/config.ts` → `oidcConfig()`, `testLoginEnabled()`, `toInternalUrl()`, `SESSION_MAX_AGE_SECONDS` | Anmeldung aus Umgebungsvariablen; Test-Login nie in Produktion; Sitzung 8 Stunden | M02-R02, M02-R05; AK-101, AK-201, AK-204 | ja (Auth.js, OIDC, Umgebungsvariablen) | ersetzt durch Bordmittel |
 | `src/lib/auth/login.ts` → `resolveLoginPerson()` | Person zur Konto-ID bzw. E-Mail suchen und beim ersten Login bedingt binden | M02-R07, M02-R08; AK-201, AK-102 | ja (Prisma) | nach Profil neu bauen bzw. ersetzt durch Bordmittel |
 | `src/lib/auth/logout.ts` → `logout()`, `switchAccount()` | Abmelden in der App und beim Identity Provider (RP-initiated Logout) | M02-R05; AK-106, AK-102 | ja (Auth.js, Next.js, OIDC) | ersetzt durch Bordmittel |
 | `src/lib/session.ts` → `getCurrentPerson()`, `requirePerson()` | jede Anfrage prüft Person und Rolle gegen die Datenbank; ohne Sitzung zur Anmeldung, ohne Zugang zum Hinweis, falsche Rolle zur eigenen Startseite | M02-R04, M02-R12, M02-R13; AK-102, AK-104, AK-1003 | ja (Next.js, Auth.js) | nach Profil neu bauen |
 | `src/auth.ts` → `authConfig`, Callbacks `signIn`, `jwt`, `session` (außerhalb von `src/lib/`) | Provider, Test-Login, Bindung beim ersten Login, Sitzung als JWT | M02-R02 bis M02-R05, M02-R07, M02-R08; AK-101, AK-102, AK-201 | ja (Auth.js) | ersetzt durch Bordmittel |
 | `src/proxy.ts` → `proxy()` (außerhalb von `src/lib/`) | gibt den aufgerufenen Pfad als Rücksprungziel weiter | AK-1003 (gehört M08) | ja (Next.js) | nach Profil neu bauen |
+| `src/app/(app)/ausbilder/personen/actions.ts` → `createPersonAction()`, `updatePersonAction()`, `deactivatePersonAction()`, `reactivatePersonAction()`, `deletePersonAction()`, `updateSettingsAction()` | Serveraktionen der Nutzerverwaltung und des Bundeslands: Rolle prüfen, Service aus `src/lib/people/service.ts` aufrufen, Seite neu laden | AK-104, AK-201 bis AK-209; M02-R13 | ja (Next.js) | nach Profil neu bauen |
+| `src/app/api/auth/[...nextauth]/route.ts` → `GET`, `POST` | Auth.js-Handler der Anmeldung | M02-R02; AK-101 | ja (Next.js, Auth.js) | ersetzt durch Bordmittel |
 
 **Einstieg:** zuerst `src/domain/access.ts` (Zugang und Zuordnung beim Login, klein), dann `src/domain/people.ts`
 (alle Regeln der Nutzerverwaltung als reine Funktionen) und `canViewReport()`/`canManagePeople()` in
@@ -202,6 +203,7 @@ Fach-Spec: `specs/M04-bericht-erfassen.md` · Prüffälle: `specs/pruefung/M04.j
 | `src/domain/report-days.ts` → `hasContent()` | Hat der Bericht Inhalt (mindestens ein Tag mit Tagesart oder Text)? Einmal berechnet für Ausblendung, Erinnerung und PDF | M03-R14, M03-R17; AK-306 | nein | 1:1 übersetzen |
 | `src/domain/report-days.ts` → `validateDayInputs()`, `EditableDay`, `DayInput`, `DayUpdate`, `DayErrors` | Eingaben aller Tage prüfen: nicht mitgeschickt bleibt, leer erlaubt, Tage außerhalb unverändert, alle Fehler je Tag | M04-R04, M04-R06 bis M04-R11; AK-402, AK-405 bis AK-407, AK-305 | nein | 1:1 übersetzen |
 | `src/lib/reports.ts` → `saveReportDays()`, `SaveResult`, `dayInputsFromForm()` | Speichern mit Sperre des Berichts (`FOR UPDATE`), Rechte- und Statusprüfung (`canEditReport()`, M05) | M04-R06, M04-R12; AK-406, AK-204 | ja (Prisma, PostgreSQL, Formularfelder) | nach Profil neu bauen |
+| `src/app/(app)/berichte/[id]/actions.ts` → `saveReportAction()` | Serveraktion: Entwurf speichern (mit Absicht „Einreichen“ zuerst speichern, dann `transitionAction`) | M04-R06 bis M04-R12; AK-406 | ja (Next.js) | nach Profil neu bauen |
 
 **Einstieg:** zuerst `src/domain/report-days.ts` (klein, alle Regeln zum Speichern), dann `saveReportDays()` in
 `src/lib/reports.ts`. Die Oberfläche dazu (nicht in der Landkarte, M09): `src/app/(app)/berichte/[id]/ReportEditor.tsx`
@@ -250,6 +252,7 @@ Fach-Spec: `specs/M05-status-und-pruefung.md` · Prüffälle: `specs/pruefung/M0
 | `src/lib/reports.ts` → `listReviewQueue()`, `ReviewScope` | Prüfliste: eingereichte Berichte, eigene oder alle, letzte Einreichung, älteste zuerst | M05-R11, M05-R12; AK-601, AK-602 | ja (Prisma) | nach Profil neu bauen |
 | `src/lib/reports.ts` → `rejectionTexts()` | Gesamtkommentar bzw. Begründung der aktuellen Ablehnung für „Zu erledigen“ (Start Azubi), über `currentFeedback()` (M06) | M05-R16; AK-606 | ja (Prisma) | nach Profil neu bauen |
 | `prisma/schema.prisma` → `WeeklyReport.status`, `WeeklyReport.version`; Migration `20261007090000_einreichen_pruefen` (Schreibschutz der Tage) | Status und Versionsstand; Datenbank weist Änderungen an Tagen eingereichter und freigegebener Berichte ab | M05-R09, M05-R20; AK-505, AK-704 | ja (Prisma, PostgreSQL-Trigger) | nach Profil neu bauen |
+| `src/app/(app)/berichte/[id]/actions.ts` → `transitionAction()` | Serveraktion: Einreichen, Zurückziehen, Freigeben, Ablehnen, Freigabe zurücknehmen; Rolle und Besitz auf dem Server | M05-R03, M05-R08; AK-501 bis AK-508, AK-601 bis AK-607, AK-701, AK-703 | ja (Next.js) | nach Profil neu bauen |
 
 **Einstieg:** zuerst `src/domain/report-status.ts` (`TRANSITIONS`, dann `decideTransition()` von oben nach unten: die
 Reihenfolge der Prüfungen ist M05-R21), dann `src/domain/report-submission.ts`, dann `transitionReport()` in
@@ -359,6 +362,7 @@ Fach-Spec: `specs/M07-pdf-export.md` · Prüffälle: `specs/pruefung/M07.json` (
 | `src/domain/report-pdf.ts` → `weekExport()`, `rangeExport()`, `weekPdfDocument()`, `rangePdfDocument()`, `PdfDocument`, `PdfExport` | Inhalt eines PDF (Titel, Erstellungszeitpunkt, Wochen) und Dateiname; Einstieg der Prüffälle | M07-R01 bis M07-R13; AK-901 bis AK-905, AK-907 | nein | 1:1 übersetzen |
 | `src/domain/report-pdf.ts` → `fileNamePart()`, `weekPdfFileName()`, `rangePdfFileName()` | Dateiname mit umschriebenem Namen | M07-R13; AK-901, AK-902, AK-907 | nein | 1:1 übersetzen |
 | `src/lib/report-export.ts` → `loadWeekExport()`, `loadRangeExport()`, `exportRangeDefaults()`, `ExportResult`, `ExportFailureReason`, `NOT_FOUND_MESSAGE` | Laden aus der Datenbank, Zugriff wie die Berichtsseite (`canViewReport()`, M02), fehlende Wochen anlegen (M03), fester Grund und HTTP-Status | M07-R03, M07-R14; AK-901, AK-902, AK-905, AK-906 | ja (Prisma) | nach Profil neu bauen |
+| `src/app/(app)/berichte/[id]/pdf/route.ts`, `src/app/(app)/azubis/[id]/pdf/route.ts` → `GET` | Route-Handler: Einzel- und Sammel-PDF, Zugriffsprüfung bei jedem Aufruf | M07-Regeln; AK-901 bis AK-907 | ja (Next.js) | nach Profil neu bauen |
 
 Rendering (nicht unter `src/domain/` oder `src/lib/`, plattformgebunden, „nach Profil neu bauen“): `src/pdf/ReportPdf.tsx`
 (Layout mit `@react-pdf/renderer`: je Woche eine `Page`, Kopf- und Fußzeile `fixed`, Umbruch überlanger Wörter),
@@ -425,6 +429,9 @@ und `daten`), dazu AK-205-01 und AK-205-02 in `specs/pruefung/M02.json`
 | `src/lib/notifications/adapters.ts` → `createEmailAdapter()`, `messageIdFor()` | E-Mail per SMTP (Nodemailer) mit fester Message-ID je Nachricht | M08-R11; AK-1003, AK-1004 | ja (Nodemailer, SMTP) | ersetzt durch Bordmittel (Mail-Dienst der Plattform), feste Kennung je Nachricht beibehalten |
 | `src/lib/notifications/adapters.ts` → `createDevMailboxAdapter()`, `createGraphTeamsAdapter()` | Teams: Postfach der Demo bzw. Microsoft Graph (noch nicht angebunden) | Abschnitt 8 der Fach-Spec | ja (Prisma, Microsoft Graph) | ersetzt durch Bordmittel |
 | `src/lib/notifications/config.ts` → `notificationConfig()`, `appBaseUrl()`, `teamsMode()`, `devMailboxEnabled()`, `NotificationConfig`, `SmtpConfig`, `GraphConfig`, `TeamsMode` | Konfiguration aus Umgebungsvariablen (`APP_URL`, `SMTP_*`, `TEAMS_MODE`, `NOTIFICATION_*`); Postfach im Produktivbetrieb nur ausdrücklich | Abschnitt 8 der Fach-Spec; AK-1003 (Basis der Links), AK-1004 | ja (Umgebungsvariablen, `NODE_ENV`) | nach Profil neu bauen |
+| `src/app/(app)/ausbilder/nicht-zustellbar/actions.ts` → `retryAction()` | Serveraktion: nicht zustellbare Nachricht erneut senden, nur Ausbilder | AK-1004 | ja (Next.js) | nach Profil neu bauen |
+| `src/app/(app)/einstellungen/actions.ts` → `updateChannelsAction()` | Serveraktion: eigene Kanäle speichern (`updateThemeAction()` gehört M09) | AK-1011, AK-1012 | ja (Next.js) | nach Profil neu bauen |
+| `src/app/api/benachrichtigungen/ungelesen/route.ts`, `src/app/api/benachrichtigungen/vorschau/route.ts` → `GET` | Route-Handler: Zähler und Vorschau der Glocke, ohne etwas als gelesen zu markieren | AK-1015 | ja (Next.js) | nach Profil neu bauen |
 
 **Einstieg:** zuerst `src/domain/notifications.ts` von oben nach unten (Kanäle, `fanOut()`, Statuswechsel, Erinnerung,
 Zeitplan), dann `src/lib/notifications/service.ts` (`recordTransitionNotifications()` und `runDueReminders()`), dann
@@ -471,9 +478,78 @@ Liferay ggf. die Benachrichtigungen der Plattform für den Kanal App und der Zei
 in `notifications.ts` (Empfänger, Kanäle, offene und überfällige Wochen) werden 1:1 übersetzt; die Einzelheiten legt
 das Profil fest (G4).
 
+## M09 Oberfläche
+
+Fach-Spec: `specs/M09-oberflaeche.md` · Prüffälle: `specs/pruefung/M09.json`
+
+Seiten und Komponenten gehören M09. Serveraktionen (`actions.ts`) und Route-Handler stehen im Abschnitt des Moduls ihrer
+Fachregel (M02, M04, M05, M07, M08); `updateThemeAction()` gehört M09. Eine Datei mit Aktionen zweier Module steht in
+beiden Abschnitten.
+
+| Datei / Funktion | Rolle | Regeln / AK | Plattformgebunden | Übertragung |
+| --- | --- | --- | --- | --- |
+| `src/domain/week-progress.ts` → `weekProgress()`, `progressLabel()`, `firstLine()` | Fortschritt einer Woche („3 von 5 Tagen ausgefüllt“), erste Zeile eines Kommentars | M09-R05, M09-R06; UI-AK-04 | nein | 1:1 übersetzen |
+| `src/domain/theme.ts` → `Theme`, `THEMES`, `THEME_LABELS`, `THEME_COOKIE`, `isTheme()`, `themeAttribute()`, `themeFromCookie()`, `resolveTheme()` | Darstellung System, Hell, Dunkel; Konto vor Gerät | M09-R16 bis M09-R18; UI-AK-14, UI-AK-15 | nein | 1:1 übersetzen oder durch Plattform ersetzen |
+| `src/lib/theme.ts` → `themeForRequest()` | Darstellung für das erste Rendern aus Konto und Cookie | M09-R17, M09-R18; UI-AK-15 | ja (Next.js-Cookies) | nach Profil neu bauen |
+| `src/lib/people/service.ts` → `updateOwnTheme()` | eigene Darstellung speichern (nur aktive Person, nur eigene) | M09-R16, M09-R17; UI-AK-14 | ja (Prisma) | nach Profil neu bauen |
+| `src/lib/people/labels.ts` → `trainingPeriod()`, `SUCCESS_MESSAGES` | Anzeige-Texte der Nutzerverwaltung (Ausbildungszeitraum, Erfolgsmeldungen) | Anzeige (M09) | nein | 1:1 übersetzen oder durch Plattform ersetzen |
+| `src/domain/relative-time.ts` → `relativeTime()` | „vor 2 Std.“ in Listen | Anzeige (M09), kein UI-AK | nein | 1:1 übersetzen oder durch Formatierung der Plattform ersetzen |
+| `src/app/(app)/einstellungen/actions.ts` → `updateThemeAction()` | Serveraktion: Darstellung am Konto und im Cookie speichern (`updateChannelsAction()` gehört M08) | M09-R16, M09-R17; UI-AK-14, UI-AK-15 | ja (Next.js) | nach Profil neu bauen |
+| `src/components/ui/status-chip.tsx` → `StatusChip`, `OverdueChip`, `Badge`, `STATUS_STYLES` | Status-Chip mit Symbol und Text; Hinweis „Überfällig“ | M09-R15; UI-AK-13 | ja (Next.js) | nach Profil neu bauen (Symbole und Texte aus dem Prüffall `statusChip`) |
+| `src/components/ui/bell.tsx` → `NotificationBell`, `bellCount()`, `bellLabel()` | Glocke mit Zähler (ab 100 „99+“), Name mit genauer Zahl, Vorschau | M09-R03; UI-AK-03 | ja (Next.js) | nach Profil neu bauen (Prüffall `glockenZaehler`) |
+| `src/components/AppShell.tsx`, `src/app/(app)/layout.tsx` | Rahmen: Kopfzeile, Seitenleiste ab 1024 px, Schublade, Menüpunkte je Rolle, Konto, Demo-Hinweis | M09-R01, M09-R02, M09-R04; UI-AK-01, UI-AK-02 | ja (Next.js) | nach Profil neu bauen |
+| `src/app/layout.tsx`, `src/app/fonts.ts`, `src/app/error.tsx`, `src/app/not-found.tsx`, `src/app/(app)/error.tsx`, `src/app/(app)/page.tsx` | Wurzel-Layout mit Titelmuster „… – Berichtsheft“ und Schrift, Fehler- und Nicht-gefunden-Seiten, Einstieg nach Rolle | M09-R22, M09-R23; UI-AK-19, UI-AK-20; AK-103 | ja (Next.js) | nach Profil neu bauen |
+| `src/app/anmelden/page.tsx`, `src/app/kein-zugang/page.tsx`, `src/components/AuthCard.tsx` | Anmeldeseite und „Kein Zugang“ in der zentrierten Karte | AK-101, AK-102 (M02), AK-1003 (M08) | ja (Next.js) | ersetzt durch Bordmittel |
+| `src/app/(app)/azubi/page.tsx`, `src/components/ui/week-tile.tsx` | Start Azubi: aktuelle Woche, „Zu erledigen“ (Reihenfolge in der Seite), Leerzustand, Wochen-Kachel | M09-R05 bis M09-R07; UI-AK-04, UI-AK-05 | ja (Next.js) | nach Profil neu bauen |
+| `src/app/(app)/azubi/wochen/page.tsx`, `src/components/WeekOverview.tsx`, `src/components/PdfExport.tsx` | Meine Wochen mit Filter; PDF-Link und Dialog für das Sammel-PDF | AK-306 (M03), AK-901, AK-902 (M07) | ja (Next.js) | nach Profil neu bauen |
+| `src/app/(app)/berichte/[id]/page.tsx`, `src/app/(app)/berichte/[id]/ReportEditor.tsx`, `src/app/(app)/berichte/[id]/ReportView.tsx`, `src/components/ui/day-type.tsx`, `src/components/ui/autogrow.tsx` | Woche erfassen: Tage nebeneinander ab 1280 px, Fußleiste, Fehlerleiste, Einreichen mit Speichern, Warnung beim Verlassen | M09-R08 bis M09-R11; UI-AK-06 bis UI-AK-09; AK-401 bis AK-408 (M04) | ja (Next.js) | nach Profil neu bauen |
+| `src/app/(app)/berichte/[id]/ReviewForms.tsx`, `src/components/ReportHistory.tsx` | Prüfformulare (Freigeben, Ablehnen, Zurückziehen, Rücknahme) und Verlauf | M09-R13, M09-R21; AK-602 bis AK-605, AK-703 (M05), AK-801 bis AK-803 (M06) | ja (Next.js) | nach Profil neu bauen |
+| `src/app/(app)/ausbilder/pruefliste/page.tsx`, `src/app/(app)/ausbilder/pruefliste/ReviewQueueList.tsx` | Prüfansicht: Liste links, Bericht rechts, nächster Bericht nach der Entscheidung | M09-R12 bis M09-R14; UI-AK-10 bis UI-AK-12; AK-601 (M05) | ja (Next.js) | nach Profil neu bauen |
+| `src/app/(app)/ausbilder/layout.tsx`, `src/app/(app)/ausbilder/page.tsx`, `src/app/(app)/ausbilder/azubis/page.tsx`, `src/app/(app)/ausbilder/azubis/[id]/page.tsx`, `src/components/TraineeList.tsx` | Rollenschranke, Start Ausbilder, Azubi-Liste und Azubi-Detail | AK-104, AK-105 (M02), AK-306 (M03) | ja (Next.js) | nach Profil neu bauen |
+| `src/app/(app)/ausbilder/personen/page.tsx`, `src/app/(app)/ausbilder/personen/neu/page.tsx`, `src/app/(app)/ausbilder/personen/[id]/page.tsx`, `src/app/(app)/ausbilder/personen/PersonForm.tsx`, `src/app/(app)/ausbilder/personen/PersonActions.tsx` | Personenverwaltung: Liste, Formular, Deaktivieren, Löschen mit Namensbestätigung | AK-201 bis AK-208 (M02) | ja (Next.js) | nach Profil neu bauen |
+| `src/app/(app)/einstellungen/page.tsx`, `src/app/(app)/ausbilder/einstellungen/page.tsx`, `src/app/(app)/ausbilder/einstellungen/SettingsForm.tsx`, `src/components/ThemeSettings.tsx`, `src/components/ChannelSettingsForm.tsx` | Einstellungen: Kanäle, Darstellung, Konto, Zustellung (alte Adresse leitet um) | UI-AK-14, UI-AK-15; AK-209 (M02), AK-1011 bis AK-1013 (M08) | ja (Next.js) | nach Profil neu bauen |
+| `src/app/(app)/benachrichtigungen/page.tsx`, `src/app/(app)/ausbilder/nicht-zustellbar/page.tsx`, `src/app/(app)/entwickler-postfach/page.tsx`, `src/components/MessageText.tsx` | Benachrichtigungen, Nicht zustellbar, Teams-Postfach (Demo) | Leerzustand „Keine Benachrichtigungen.“ (UI-AK-20); AK-1004, AK-1015 (M08) | ja (Next.js) | nach Profil neu bauen |
+| `src/components/ui/button.tsx`, `src/components/ui/card.tsx`, `src/components/ui/field.tsx`, `src/components/ui/notice.tsx`, `src/components/ui/page-header.tsx`, `src/components/ui/segment-radio.tsx`, `src/components/ui/segmented.tsx`, `src/components/ui/data-list.tsx`, `src/components/ui/icons.tsx`, `src/components/ui/index.ts` | gemeinsame Bausteine: Knopf, Karte, Feld, Hinweisleiste, Kopf mit Zurück-Link, Segmentauswahl, Liste/Tabelle, Symbole | Komponenten (`docs/05`); M09-R04 | ja (Next.js) | nach Profil neu bauen oder durch Bausteine der Plattform ersetzen |
+| `src/components/ui/dialog.tsx`, `src/components/ui/toast.tsx`, `src/components/ui/use-hydrated.ts` | Dialog mit Fokusfalle und Fokusrückgabe, Toast, Sperre der Felder bis zur Interaktivität | M09-R09, M09-R21; UI-AK-07, UI-AK-18 | ja (Next.js) | nach Profil neu bauen |
+| `src/components/ui/empty-state.tsx`, `src/components/ui/skeleton.tsx` | Leerzustand und Platzhalter als Ladezustand | M09-R23; UI-AK-05, UI-AK-20 | ja (Next.js) | nach Profil neu bauen |
+
+**Einstieg:** zuerst die Fachlogik, die die Oberfläche speist (`src/domain/week-progress.ts`, `src/domain/theme.ts`,
+`bellCount()` und `STATUS_STYLES`), dann `src/app/layout.tsx` und `src/components/AppShell.tsx` (Rahmen), dann die vier
+Hauptseiten (`azubi/page.tsx`, `berichte/[id]/`, `ausbilder/pruefliste/`, `einstellungen/page.tsx`), zuletzt die
+Bausteine unter `src/components/ui/`.
+
+**Belege:**
+
+- Vitest: `src/components/ui/status-chip.test.tsx` (UI-AK-13), `src/domain/theme.test.ts` (UI-AK-14, UI-AK-15),
+  `src/domain/week-progress.test.ts` (UI-AK-04).
+- Datenbank: `tests/db/theme.test.ts` (UI-AK-14: speichern, Rechte, zweites Gerät).
+- Prüf-Runner: `tests/pruefung/fachlogik.test.ts` mit `tests/pruefung/adapter.ts` (Block „M09 Oberfläche“) führt
+  `specs/pruefung/M09.json` aus: `statusChip`, `glockenZaehler`, `wochenFortschritt`, `ersteZeile`,
+  `darstellungPruefen`, `darstellungErmitteln`.
+- Playwright: `e2e/ui-ak.spec.ts` (UI-AK-01 bis UI-AK-20 im Browser, auch bei 375 px) und die Beispielszenarien; sie sind
+  die Vorlage für die Ablauf-Fälle der Welle 2.
+
+**Fallen:**
+
+- Der Adapter importiert `bellCount()`/`bellLabel()` aus `bell.tsx` und `STATUS_STYLES` aus `status-chip.tsx`; wandert
+  diese Logik in `src/domain/`, muss er nur den Import ändern.
+- Die Reihenfolge unter „Zu erledigen“ (abgelehnt zuerst, sonst älteste zuerst) steht in `azubi/page.tsx`, nicht in der
+  Fachlogik; sie lässt sich nur im Browser prüfen.
+- Das Farbschema wird auf dem Server gesetzt (Konto vor Cookie, `themeForRequest()`), damit nichts aufblitzt; ein Wechsel
+  auf eine rein clientseitige Lösung bricht UI-AK-15.
+- Felder der Seite Woche erfassen sind gesperrt, bis die Seite interaktiv ist (`use-hydrated.ts`), sonst gehen frühe
+  Eingaben verloren; Browser-Tests warten darauf.
+- Jede Serveraktion prüft Rolle und Besitz selbst (M02-R13); die Rollenschranke in `ausbilder/layout.tsx` ist nur die
+  erste Prüfung.
+- Farben nie fest in Komponenten, nur über die Tokens in `src/app/globals.css` (Hell und Dunkel).
+
+**Ersetzt durch Bordmittel / Liferay:** offen für das Profil (G4). Liferay 6.2.5 bringt AlloyUI mit; der Dunkelmodus ist
+dort nur begrenzt möglich. Die Regeln und Prüffälle von M09 bleiben der Maßstab, die Umsetzung der Komponenten legt das
+Profil fest.
+
 ## Querschnitt
 
-Dateien unter `src/domain/` und `src/lib/`, die keinem Fachmodul gehören oder deren Modul erst in G3 beschrieben wird.
+Dateien, die keinem Fachmodul gehören.
 
 | Datei / Funktion | Rolle | Regeln / AK | Plattformgebunden | Übertragung |
 | --- | --- | --- | --- | --- |
@@ -481,10 +557,5 @@ Dateien unter `src/domain/` und `src/lib/`, die keinem Fachmodul gehören oder d
 | `src/lib/ids.ts` → `isUuid()` | ungültige IDs aus der Adresse führen zu „nicht gefunden“ statt zu einem Datenbankfehler | – | nein | 1:1 übersetzen oder durch Plattform ersetzen |
 | `src/lib/request-path.ts` → `PATH_HEADER` | aufgerufener Pfad vom Proxy (`src/proxy.ts`) an die Seiten; Grundlage für das Rücksprungziel | M08-R10; AK-1003 (M08) | ja (Next.js-Proxy, Request-Header) | ersetzt durch Bordmittel (Rücksprung der Anmeldung der Plattform) |
 | `src/lib/seed-data.ts` → `seedPersons`, `accountWithoutEntry`, `accountToCreate`, `testAccounts`, `seedFederalState`, `seedReport` | Testdaten für Seed und Keycloak-Realm (Anna, Bernd, Clara, Dora, Emil) | – (Gegenstück zu `specs/pruefung/testdaten.json`) | ja (Seed, Keycloak) | nach Profil neu bauen aus `testdaten.json` |
-| `src/domain/theme.ts` → `Theme`, `THEMES`, `THEME_LABELS`, `THEME_COOKIE`, `isTheme()`, `themeAttribute()`, `themeFromCookie()`, `resolveTheme()` | Darstellung Hell, Dunkel, System | M09, beschrieben in G3; UI-AK-14, UI-AK-15 | nein | 1:1 übersetzen oder durch Plattform ersetzen |
-| `src/lib/theme.ts` → `themeForRequest()` | Darstellung für das erste Rendern aus Konto und Cookie | M09, beschrieben in G3; UI-AK-15 | ja (Next.js-Cookies) | nach Profil neu bauen |
-| `src/domain/relative-time.ts` → `relativeTime()` | „vor 2 Std.“ in Listen | M09, beschrieben in G3 | nein | 1:1 übersetzen oder durch Formatierung der Plattform ersetzen |
-| `src/domain/week-progress.ts` → `weekProgress()`, `progressLabel()`, `firstLine()` | Fortschritt einer Woche („3 von 5 Tagen ausgefüllt“) für Start Azubi | M09, beschrieben in G3; UI-AK-04 | nein | 1:1 übersetzen |
+| `src/app/api/health/route.ts` → `GET` | Gesundheitsprüfung für Docker Compose (Datenbankabfrage) | – (Betrieb; Q ab G3) | ja (Next.js, Prisma) | nach Profil neu bauen |
 
-Zu M09 gehören außerdem `src/lib/people/labels.ts` und `updateOwnTheme()` in `src/lib/people/service.ts`; sie stehen
-heute im Abschnitt M02 und wandern in G3 in den Abschnitt M09.

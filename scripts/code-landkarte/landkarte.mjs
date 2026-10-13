@@ -1,11 +1,11 @@
 /**
  * Abgleich der Code-Landkarte (`specs/code-landkarte.md`) mit dem Quellcode (`docs/06-spec-architektur.md`,
- * „Code-Landkarte“): Welche Dateien unter `src/domain/` und `src/lib/` sind beschrieben, welche noch nicht?
+ * „Code-Landkarte“): Welche Dateien unter `src/domain/`, `src/lib/`, `src/app/` und `src/components/` sind beschrieben, welche noch nicht?
  * Reine Funktionen, ohne Dateizugriff.
  */
 
 /** Pfade, deren Dateien die Landkarte beschreiben muss. */
-export const MAPPED_DIRS = ["src/domain/", "src/lib/"];
+export const MAPPED_DIRS = ["src/domain/", "src/lib/", "src/app/", "src/components/"];
 
 /** Quelldatei, die in die Landkarte gehört (keine Tests). */
 export function isMappedSource(/** @type {string} */ file) {

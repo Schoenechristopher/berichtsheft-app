@@ -88,6 +88,12 @@ import {
   type ReminderTrainee,
 } from "@/domain/notifications";
 
+import { firstLine, progressLabel, weekProgress } from "@/domain/week-progress";
+import { THEMES, THEME_LABELS, isTheme, resolveTheme, themeAttribute, type Theme } from "@/domain/theme";
+import { bellCount, bellLabel } from "@/components/ui/bell";
+import { STATUS_STYLES } from "@/components/ui/status-chip";
+import { ArrowUpIcon, CheckIcon, PencilIcon, XCircleIcon } from "@/components/ui/icons";
+
 export type Input = Record<string, unknown>;
 export type Result = Record<string, unknown>;
 
@@ -897,6 +903,81 @@ const notificationOperations: Record<string, (input: Input) => Result> = {
   ruecksprungZiel: (input) => ({ ziel: safeReturnPath(field(input, "ziel")) }),
 };
 
+// ---------------------------------------------------------------------------
+// M09 Oberfläche
+// ---------------------------------------------------------------------------
+
+/** Symbole der Status-Chips (UI-Spezifikation, „Statusfarben“) als neutrale Namen. */
+const STATUS_SYMBOLS = new Map<unknown, string>([
+  [PencilIcon, "Stift"],
+  [ArrowUpIcon, "Pfeil nach oben"],
+  [CheckIcon, "Haken"],
+  [XCircleIcon, "Kreuz im Kreis"],
+]);
+
+const DAY_MARKS = { filled: "ausgefuellt", empty: "leer", outside: "ausserhalb" } as const;
+
+/** Darstellung (`System`, `Hell`, `Dunkel`) → Wert der App; Unbekanntes gibt der Adapter unverändert weiter. */
+function themeValue(name: string): string {
+  return THEMES.find((theme) => THEME_LABELS[theme] === name) ?? name;
+}
+
+function themeName(theme: Theme): string {
+  return THEME_LABELS[theme];
+}
+
+const interfaceOperations: Record<string, (input: Input) => Result> = {
+  statusChip: (input) => {
+    const value = status(input, "status");
+    const { Icon } = STATUS_STYLES[value];
+    return { text: statusName(value), symbol: STATUS_SYMBOLS.get(Icon) ?? null };
+  },
+  glockenZaehler: (input) => {
+    const unread = integer(input, "ungelesen");
+    if (unread < 0) {
+      throw new CaseFormatError(`„ungelesen“ darf nicht negativ sein: ${unread}`);
+    }
+    return { anzeige: bellCount(unread), beschriftung: bellLabel(unread) };
+  },
+  wochenFortschritt: (input) => {
+    const progress = weekProgress(
+      list(input, "tage").map((day) => ({
+        date: weekdayDate(weekday(day)),
+        dayType: storedDayType(field(day, "tagesart")),
+        activities: text(day, "text"),
+        outsideTraining: bool(day, "ausserhalb"),
+      })),
+    );
+    return {
+      tage: progress.days.map((day) => ({ tag: day.weekday, markierung: DAY_MARKS[day.mark] })),
+      ausgefuellt: progress.filled,
+      gesamt: progress.total,
+      text: progressLabel(progress),
+    };
+  },
+  ersteZeile: (input) => {
+    const maxLength = "maxLaenge" in input ? integer(input, "maxLaenge") : undefined;
+    return { zeile: firstLine(text(input, "text"), maxLength) };
+  },
+  darstellungPruefen: (input) => {
+    const value = themeValue(text(input, "wert"));
+    return isTheme(value) ? { darstellung: themeName(value) } : { fehler: "darstellung_unbekannt" };
+  },
+  darstellungErmitteln: (input) => {
+    const account = input.konto === null ? null : themeValue(text(input, "konto"));
+    const remembered = input.gemerkt === null ? null : themeValue(text(input, "gemerkt"));
+    return {
+      darstellung: themeName(
+        resolveTheme(
+          account === null ? null : (account as Theme),
+          // Das Gerät merkt sich die Wahl in der Schreibweise des html-Attributs (`dark`).
+          remembered === null ? null : isTheme(remembered) ? themeAttribute(remembered) : remembered,
+        ),
+      ),
+    };
+  },
+};
+
 const operations: Record<string, (input: Input) => Result> = {
   jetzt: () => ({ zeitpunkt: formatInstant(now()) }),
   uhrVorgeben: (input) => {
@@ -1033,6 +1114,9 @@ const operations: Record<string, (input: Input) => Result> = {
 
   // --- M08 Benachrichtigungen und Erinnerung ---
   ...notificationOperations,
+
+  // --- M09 Oberfläche ---
+  ...interfaceOperations,
 };
 
 /** Namen aller Schnittstellen, die der Adapter kennt. */

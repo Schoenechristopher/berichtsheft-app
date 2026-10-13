@@ -1,5 +1,5 @@
 /**
- * `npm run landkarte`: meldet, welche Dateien unter `src/domain/` und `src/lib/` die Code-Landkarte
+ * `npm run landkarte`: meldet, welche Dateien unter `src/domain/`, `src/lib/`, `src/app/` und `src/components/` die Code-Landkarte
  * (`specs/code-landkarte.md`) beschreibt und welche noch nicht.
  *
  * Ohne Schalter nur ein Bericht (Ausgang 0). Mit `--pruefen` scheitert das Skript, wenn eine Datei fehlt oder die
