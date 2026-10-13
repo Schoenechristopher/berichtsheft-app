@@ -1,4 +1,5 @@
 import type { ReportStatus } from "@/domain/report-access";
+import { isoWeekCode, type IsoWeek } from "@/domain/weeks";
 import { progressLabel, type WeekProgress } from "@/domain/week-progress";
 import { ButtonLink, type ButtonVariant } from "./button";
 import { Card } from "./card";
@@ -22,6 +23,7 @@ export function WeekTile({
   large = false,
   headingLevel = 2,
   testId,
+  week,
 }: {
   eyebrow?: string;
   /** „KW 41/2026“ */
@@ -39,6 +41,8 @@ export function WeekTile({
   large?: boolean;
   headingLevel?: 2 | 3;
   testId?: string;
+  /** Woche als fester Merker `data-woche` (`JJJJ-Www`) für die Prüffälle. */
+  week?: IsoWeek;
 }) {
   const Heading = `h${headingLevel}` as "h2" | "h3";
   return (
@@ -47,6 +51,7 @@ export function WeekTile({
       highlight={status === "REJECTED" ? "danger" : overdue ? "warning" : large ? "accent" : undefined}
       className="space-y-4"
       data-testid={testId}
+      data-woche={week ? isoWeekCode(week.isoYear, week.isoWeek) : undefined}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">

@@ -42,6 +42,8 @@ Werte der Spalte „Ebene“ (genau so geschrieben; ein anderer Wert lässt `npm
 
 - `Fachlogik`: geprüft mit Prüffällen der Ebene `fachlogik` (Regel ohne Speicher und ohne Oberfläche).
 - `Daten`: geprüft mit Prüffällen der Ebene `daten` (Regel am gespeicherten Bestand).
+- `Ablauf`: nur im Ablauf (Browser) prüfbar, geprüft mit Prüffällen der Ebene `ablauf` (seit G3); unter der Tabelle
+  begründet ein Satz je AK, warum sie sich nicht als Fachlogik prüfen lässt.
 - `Ablauf, G3`: nur im Ablauf (Browser) prüfbar; der Prüffall folgt in G3 (Entscheidung E1). In „Prüffälle“ steht
   dann `folgt in G3`, und unter der Tabelle begründet ein Satz je AK, warum sie sich nicht als Fachlogik prüfen lässt.
   Bis G3 ist eine solche AK ohne Prüffall kein Fehler; sie erscheint in `docs/03-testabdeckung.md` in der Spalte

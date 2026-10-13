@@ -92,13 +92,13 @@ Text aus `docs/01-spezifikation.md`, Kapitel 4; Prüffälle in `specs/pruefung/M
 | --- | --- | --- | --- | --- |
 | AK-401 | Jeder Bericht zeigt Mo–Fr mit Datum, pro Tag eine Auswahl der Tagesart und ein Freitextfeld „Tätigkeiten“. | M04-R01 | AK-401-01, AK-401-02 | Fachlogik |
 | AK-402 | Zur Auswahl stehen genau: Betrieb, Berufsschule, Urlaub, Krank, Feiertag. | M04-R02, M04-R11 | AK-402-01 bis AK-402-04 | Fachlogik |
-| AK-403 | Felder für Stunden, Abteilung oder Lernfeld gibt es nicht. | M04-R03 | folgt in G3 | Ablauf, G3 |
+| AK-403 | Felder für Stunden, Abteilung oder Lernfeld gibt es nicht. | M04-R03 | AK-403-01, AK-403-02 | Ablauf |
 | AK-405 | Der Azubi kann eine vorbelegte Tagesart ändern, z. B. von „Feiertag“ auf „Berufsschule“. | M04-R04, M04-R05 | AK-405-01, AK-405-02 | Fachlogik |
 | AK-406 | Ein Entwurf lässt sich ausdrücklich speichern, auch unvollständig, und später unverändert weiterbearbeiten, auch nach Ab- und erneuter Anmeldung. | M04-R06, M04-R07 | AK-406-01 bis AK-406-03 | Fachlogik |
 | AK-407 | Umlaute, Zeilenumbrüche und lange Texte (mindestens 2.000 Zeichen) unverändert; höchstens 5.000 Zeichen je Tag mit Meldung am Feld; Zeilenumbrüche einheitlich. | M04-R09 bis M04-R11 | AK-407-01 bis AK-407-08 | Fachlogik |
-| AK-408 | Wer die Seite mit ungespeicherten Änderungen verlässt, wird gewarnt (Links, Formulare, Schließen, Neuladen, Zurück und Vor). | M04-R13 | folgt in G3 | Ablauf, G3 |
+| AK-408 | Wer die Seite mit ungespeicherten Änderungen verlässt, wird gewarnt (Links, Formulare, Schließen, Neuladen, Zurück und Vor). | M04-R13 | AK-408-01 bis AK-408-07 | Ablauf |
 
-Begründung der Markierung `Ablauf, G3`:
+Begründung der Ebene `Ablauf` (Ablauf-Fälle seit G3, `specs/pruefung/format.md`, „Aufbau eines Ablauf-Falls“):
 
 - **AK-403:** Es geht darum, welche Felder die Oberfläche anbietet; eine Schnittstelle kann das Fehlen eines Feldes
   nicht zeigen, weil der Adapter nur die Felder abbildet, die er kennt.
@@ -171,4 +171,5 @@ Statuswechsel in M05.
 
 - [ ] **Bitte bestätigen:** Der Hinweis „Feiertag (vorbelegt)“ bleibt, auch nachdem der Azubi die Tagesart geändert hat
       (M04-R05), damit erkennbar bleibt, dass der Tag ein Feiertag war. So verhielt sich die App schon vor G2.
-- [ ] Ablauf-Fälle für AK-401 (Anzeige), AK-403 und AK-408 folgen in G3.
+- [ ] Ein Ablauf-Fall für AK-401 (Anzeige) folgt in G3; AK-403 und AK-408 haben seit G3 Ablauf-Fälle (AK-403-01, AK-403-02,
+      AK-408-01 bis AK-408-07).

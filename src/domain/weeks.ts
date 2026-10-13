@@ -73,6 +73,11 @@ export function weekLabel(isoYear: number, isoWeek: number): string {
   return `KW ${isoWeek}/${isoYear} (${formatDate(days[0])} – ${formatDate(days[4])})`;
 }
 
+/** Woche im Format `JJJJ-Www`, z. B. „2026-W40“ (fester Merker für die Prüffälle). */
+export function isoWeekCode(isoYear: number, isoWeek: number): string {
+  return `${isoYear}-W${String(isoWeek).padStart(2, "0")}`;
+}
+
 const WEEKDAYS = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] as const;
 
 /** Kurzer Wochentag, z. B. „Mo“. */

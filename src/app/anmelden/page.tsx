@@ -51,7 +51,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/anmelden">
 
       {oidc ? (
         <form action={loginWithCompanyAccount}>
-          <Button type="submit" variant="primary" className="w-full">
+          <Button type="submit" variant="primary" className="w-full" data-anmeldeweg="firmenkonto">
             Mit {oidc.name} anmelden
           </Button>
         </form>

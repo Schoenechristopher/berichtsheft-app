@@ -2609,5 +2609,222 @@
     "erwartet": {
       "fehler": "bundesland_unbekannt"
     }
+  },
+  {
+    "id": "AK-101-01",
+    "modul": "M02",
+    "ebene": "ablauf",
+    "beschreibung": "Ohne Anmeldung führt die Startseite zur Anmeldung; angeboten wird nur das Firmenkonto, ein Passwortfeld gibt es nicht.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "start"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "anmelden",
+          "angemeldet": null
+        },
+        {
+          "seite": "anmelden",
+          "angemeldet": null,
+          "passwortfeld": false,
+          "anmeldewege": ["firmenkonto"]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-101-02",
+    "modul": "M02",
+    "ebene": "ablauf",
+    "beschreibung": "Nach der Anmeldung zeigt die Startseite Anna angemeldet, ohne Passwortfeld; die aktuelle Woche folgt der gestellten Uhr.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "seite": "start",
+          "angemeldet": "anna",
+          "passwortfeld": false,
+          "aktuelle_woche": "2026-W38"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-101-03",
+    "modul": "M02",
+    "ebene": "ablauf",
+    "beschreibung": "Auch ein Ausbilder meldet sich über das Firmenkonto an und sieht kein Passwortfeld.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "seite": "start",
+          "angemeldet": "bernd",
+          "passwortfeld": false
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-106-01",
+    "modul": "M02",
+    "ebene": "ablauf",
+    "beschreibung": "Nach dem Abmelden führen Startseite und Prüfliste zur Anmeldung.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "abmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "start"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "pruefliste"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "warnung": null,
+          "seite": "anmelden",
+          "angemeldet": null
+        },
+        {
+          "warnung": null,
+          "seite": "anmelden",
+          "angemeldet": null
+        },
+        {
+          "warnung": null,
+          "seite": "anmelden",
+          "angemeldet": null
+        },
+        {
+          "seite": "anmelden",
+          "angemeldet": null,
+          "passwortfeld": false,
+          "anmeldewege": ["firmenkonto"]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-106-02",
+    "modul": "M02",
+    "ebene": "ablauf",
+    "beschreibung": "Nach erneuter Anmeldung ist der Zugriff wieder möglich.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "abmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "wochen"
+      },
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "wochen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "anmelden",
+          "angemeldet": null
+        },
+        {
+          "warnung": null,
+          "seite": "anmelden",
+          "angemeldet": null
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "wochen",
+          "angemeldet": "anna"
+        }
+      ]
+    }
   }
 ]

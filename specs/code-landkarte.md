@@ -20,13 +20,13 @@ Fach-Spec: `specs/M01-kalender-und-zeit.md` · Prüffälle: `specs/pruefung/M01.
 
 | Datei / Funktion | Rolle | Regeln / AK | Plattformgebunden | Übertragung |
 | --- | --- | --- | --- | --- |
-| `src/domain/clock.ts` → `now()`, `setFixedNow()`, `resetClock()`, `setClock()`, `fixedClock()` | einzige Quelle für „jetzt“, für Tests stellbar | M01-R01, M01-R02; AK-1201 | nein | 1:1 übersetzen (auf Liferay als eigener Uhr-Service, siehe unten) |
+| `src/domain/clock.ts` → `now()`, `setFixedNow()`, `resetClock()`, `setClock()`, `fixedClock()` | einzige Quelle für „jetzt“, für Tests stellbar; die eingestellte Uhr liegt auf `globalThis` und gilt so in Route-Handlern, Seiten und Serveraktionen gleich | M01-R01, M01-R02; AK-1201 | nein | 1:1 übersetzen (auf Liferay als eigener Uhr-Service, siehe unten) |
 | `src/domain/clock.ts` → `clockFromEnvironment()` | `APP_FIXED_NOW` nur außerhalb von `NODE_ENV=production` | M01-R03; AK-1201 | ja (Umgebungsvariable, `NODE_ENV`) | nach Profil neu bauen (Konfiguration und Erkennung des Produktivbetriebs je Plattform) |
 | `src/domain/clock.ts` → `InvalidInstantError` | unlesbarer Zeitpunkt | M01-R04; AK-1201 | nein | 1:1 übersetzen |
 | `src/domain/weeks.ts` → `APP_TIME_ZONE`, `calendarDateIn()`, `today()` | Kalendertag in Europe/Berlin | M01-R05, M01-R06; AK-1202 | ja (`Intl.DateTimeFormat` mit Zeitzonen-Datenbank) | nach Profil neu bauen (Zeitzonen-API der Plattform) |
 | `src/domain/weeks.ts` → `isoWeekOf()`, `isoWeekMonday()`, `isoWeeksInYear()`, `isValidIsoWeek()`, `isoWeekWorkdays()`, `nextIsoWeek()`, `compareWeeks()`, `currentIsoWeek()` | ISO-Wochen, Arbeitstage, Folgewoche, Vergleich, aktuelle Woche | M01-R07 bis M01-R12; AK-1202 bis AK-1204 | nein | 1:1 übersetzen |
 | `src/domain/weeks.ts` → `InvalidIsoWeekError` | Woche, die es nicht gibt | M01-R12; AK-1204 | nein | 1:1 übersetzen |
-| `src/domain/weeks.ts` → `formatDate()`, `toDateInput()`, `weekLabel()`, `weekRangeLabel()`, `weekRangeShort()`, `weekdayShort()`, `weekdayLong()` | Texte für Oberfläche und PDF | – (Anzeige, M07/M09) | nein | 1:1 übersetzen oder durch Formatierung der Plattform ersetzen |
+| `src/domain/weeks.ts` → `formatDate()`, `toDateInput()`, `weekLabel()`, `weekRangeLabel()`, `weekRangeShort()`, `weekdayShort()`, `weekdayLong()`, `isoWeekCode()` | Texte für Oberfläche und PDF; `isoWeekCode()` für den festen Merker `data-woche` | – (Anzeige, M07/M09) | nein | 1:1 übersetzen oder durch Formatierung der Plattform ersetzen |
 | `src/domain/federal-states.ts` → `FEDERAL_STATES`, `isFederalState()`, `federalStateName()`, `UnknownFederalStateError` | die 16 Kürzel und Namen | M01-R13, M01-R14; AK-1205 | nein | 1:1 übersetzen |
 | `src/domain/holidays.ts` → `publicHolidays()`, `isPublicHoliday()` | gesetzliche Feiertage je Bundesland und Jahr | M01-R15, M01-R17 bis M01-R19; AK-404, AK-1206 | ja (Bibliothek feiertagejs) | nach Profil neu bauen (Feiertagsbibliothek der Plattform oder eigene Berechnung), Prüffälle AK-404 und AK-1206 als Maßstab |
 | `src/domain/holidays.ts` → `ONE_TIME_HOLIDAYS` und Korrektur Reformationstag vor 2018 | einmalige landesweite Feiertage, Ergänzung zu feiertagejs | M01-R15, M01-R16; AK-1206 | nein | 1:1 übersetzen (Referenzdaten aus der Fach-Spec, Abschnitt 5) |
@@ -43,6 +43,8 @@ und Zeitzone), dann `federal-states.ts` und `holidays.ts`. Aufgerufen werden die
 - Prüf-Runner: `tests/pruefung/fachlogik.test.ts` mit `tests/pruefung/adapter.ts` führt `specs/pruefung/M01.json` aus.
 - Playwright: `e2e/ak-301-408-berichte-erfassen.spec.ts` und `e2e/ui-ak.spec.ts` nutzen `currentIsoWeek()` und die
   feste Uhr (`APP_FIXED_NOW`) im Browser-Test.
+- Ablauf-Runner: `e2e/pruefung-ablauf.spec.ts` stellt die Uhr der laufenden App über die Testschnittstelle (Querschnitt);
+  AK-101-02 (Seite) und AK-408-07 (Serveraktion) hängen von dieser Uhr ab.
 
 **Fallen:**
 
@@ -541,6 +543,11 @@ Bausteine unter `src/components/ui/`.
   Eingaben verloren; Browser-Tests warten darauf.
 - Jede Serveraktion prüft Rolle und Besitz selbst (M02-R13); die Rollenschranke in `ausbilder/layout.tsx` ist nur die
   erste Prüfung.
+- Feste Merker für die Ablauf-Fälle (`specs/pruefung/format.md`, „Aufbau eines Ablauf-Falls“): `data-warnung-verlassen`,
+  `data-ungespeichert`, `data-ausstehend`, `data-datum`, `data-fehler` in `ReportEditor.tsx`, `data-feld` in
+  `ReportEditor.tsx` und `day-type.tsx`, `data-woche` in `week-tile.tsx` und `ReportView.tsx`, `data-anmeldeweg` in
+  `anmelden/page.tsx`, `data-von`/`-nach`/`-person`/`-zeitpunkt` in `ReportHistory.tsx`. Der Ablauf-Adapter
+  (`e2e/pruefung/ablauf-adapter.ts`) liest nur sie, nie Meldungstexte; wer sie umbenennt, bricht die Ablauf-Fälle.
 - Farben nie fest in Komponenten, nur über die Tokens in `src/app/globals.css` (Hell und Dunkel).
 
 **Ersetzt durch Bordmittel / Liferay:** offen für das Profil (G4). Liferay 6.2.5 bringt AlloyUI mit; der Dunkelmodus ist
@@ -558,4 +565,5 @@ Dateien, die keinem Fachmodul gehören.
 | `src/lib/request-path.ts` → `PATH_HEADER` | aufgerufener Pfad vom Proxy (`src/proxy.ts`) an die Seiten; Grundlage für das Rücksprungziel | M08-R10; AK-1003 (M08) | ja (Next.js-Proxy, Request-Header) | ersetzt durch Bordmittel (Rücksprung der Anmeldung der Plattform) |
 | `src/lib/seed-data.ts` → `seedPersons`, `accountWithoutEntry`, `accountToCreate`, `testAccounts`, `seedFederalState`, `seedReport` | Testdaten für Seed und Keycloak-Realm (Anna, Bernd, Clara, Dora, Emil) | – (Gegenstück zu `specs/pruefung/testdaten.json`) | ja (Seed, Keycloak) | nach Profil neu bauen aus `testdaten.json` |
 | `src/app/api/health/route.ts` → `GET` | Gesundheitsprüfung für Docker Compose (Datenbankabfrage) | – (Betrieb; Q ab G3) | ja (Next.js, Prisma) | nach Profil neu bauen |
+| `src/app/api/test/zustand/route.ts` → `POST` | Testschnittstelle des Ablauf-Runners: stellt die Uhr (`setFixedNow`, `resetClock`) und lädt die Testdaten; nur außerhalb von Produktion mit Test-Login, sonst 404 | – (Werkzeug der Prüffälle, `format.md`, „Aufbau eines Ablauf-Falls“); AK-1201 | ja (Next.js-Route-Handler, Prisma) | nach Profil neu bauen (Testzugang der Plattform, im Produktivbetrieb nicht vorhanden) |
 
