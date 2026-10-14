@@ -181,9 +181,9 @@ und liest das Ergebnis über feste Merker der Oberfläche (Codes, Status, Woche)
 1. Die Uhr der laufenden App steht auf `uhr` (Pflicht), in Seiten und Aktionen gleichermaßen.
 2. Die Datenhaltung ist leer. Geladen werden die Testdaten aus `testdaten.json` (alle Personen mit
    `"angelegt": true` und das Bundesland); für jeden Azubi entstehen die Berichte wie in M03 bis „jetzt“.
-3. `ausgangsbestand` (optional) wie bei Daten-Fällen (`personen`, `berichte`), siehe „Aufbau eines Daten-Falls“. Der
-   TypeScript-Ablauf-Runner unterstützt ihn noch nicht und scheitert daran; die Fälle von M09 stellen eingereichte
-   Berichte mit den Aktionen selbst her.
+3. `ausgangsbestand` (optional) wie bei Daten-Fällen, siehe „Aufbau eines Daten-Falls“; im Ablauf nur `berichte`
+   (mit `tage` und `verlauf`, Statuswechsel wie dort, auch mit `uhr`). Danach steht die Uhr wieder auf `uhr` des Falls.
+   `personen` kennt der Ablauf nicht; ein Fall damit ist fehlerhaft.
 4. Niemand ist angemeldet. Jede Person (`als`) hat einen eigenen Browser mit eigener Sitzung, der sich bei ihrem
    ersten Schritt öffnet.
 
@@ -236,6 +236,8 @@ machen den Fall fehlerhaft.
 | `einreichen` | `als` | `{ "status": <Status> }`; Fehler `pflichtangaben_fehlen` mit `"tage"` wie bei `einreichenPruefen` (M05) | „Einreichen“ auf der geöffneten Berichtsseite, Rückfrage bestätigt; ungespeicherte Eingaben werden mitgespeichert |
 | `freigeben` | `als` | `{ "entschieden": true }` | „Freigeben“ auf der geöffneten Berichtsseite oder beim ausgewählten Bericht der Prüfliste, Rückfrage bestätigt; fertig, wenn die App es meldet und den nächsten Bericht bzw. den neuen Status zeigt |
 | `ablehnen` | `als`, `begruendung` | `{ "entschieden": true }` | wie `freigeben`, mit dem Gesamtkommentar `begruendung` |
+| `freigabe_zuruecknehmen` | `als`, `begruendung` | `{ "entschieden": true }` | „Freigabe zurücknehmen“ auf der geöffneten Berichtsseite mit dieser Begründung, Rückfrage bestätigt; fertig, wenn die Seite den neuen Status zeigt (Beispielszenarien, Q) |
+| `erinnerung_ausloesen` | – (ohne `als`; der Lauf gehört keiner Person) | wie bei M08: `{ "lauf": "ausgefuehrt", "angelegt": <Zahl> }`, `{ "lauf": "nicht_faellig" }` oder `{ "lauf": "schon_erledigt" }` | der Erinnerungslauf der App zu „jetzt“, wie ihn ihr Zeitplan startet (Beispielszenarien) |
 | `darstellung_waehlen` | `als`, `darstellung` (`System` \| `Hell` \| `Dunkel`) | `{ "gespeichert": true }` | Wahl auf der geöffneten Seite `einstellungen`, bis sie gespeichert ist |
 
 **Seiten-Ergebnis:** `{ "warnung": <Code> | null, "seite": <Seite> | null, "angemeldet": <Schlüssel> | null }`.
@@ -257,6 +259,12 @@ machen den Fall fehlerhaft.
 
 Felder heißen `tagesart` und `taetigkeiten`; ein Eingabefeld, das keines davon ist, liefert der Adapter als
 `ohne_merker` (so scheitert ein Fall, wenn ein weiteres Feld dazukommt, AK-403).
+
+**Seiteninhalt der Benachrichtigungen** (`seite_lesen` auf `benachrichtigungen`): dazu `nachrichten`, die eigenen
+App-Benachrichtigungen in der Reihenfolge der Seite (neueste zuerst), je `{ "art", "woche", "neu" }` wie bei
+`benachrichtigungen_oeffnen` (M08): `art` `statuswechsel`, `erinnerung` oder `ueberfaellig`; `woche` die Woche des
+Berichts, `null` bei mehreren Wochen; `neu`, ob sie beim Öffnen noch ungelesen war. Das Aufrufen der Seite markiert sie
+als gelesen (AK-1015).
 
 **Seiteninhalt der Prüfliste** (`seite_lesen` auf `pruefliste`): dazu `eintraege` (Wochen der Einträge in der
 Reihenfolge der Liste) und `ausgewaehlt` (Woche des Berichts, den die Prüfansicht zeigt, sonst `null`). Die Fälle

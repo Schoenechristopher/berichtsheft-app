@@ -206,18 +206,41 @@ export async function previewNotifications(prisma: PrismaClient, personId: strin
  * Eigene App-Benachrichtigungen, neueste zuerst (AK-1015). Das Öffnen der Liste markiert alle
  * ungelesenen als gelesen; `unread` sagt, welche der angezeigten bis eben ungelesen waren.
  */
+/** Art einer Benachrichtigung aus ihrem fachlichen Schlüssel (M08-R03): Statuswechsel, Erinnerung, Info an den Ausbilder. */
+export function notificationKind(eventKey: string): "statuswechsel" | "erinnerung" | "ueberfaellig" {
+  if (eventKey.startsWith("reminder:")) {
+    return "erinnerung";
+  }
+  return eventKey.startsWith("trainer-info:") ? "ueberfaellig" : "statuswechsel";
+}
+
 export async function openNotifications(prisma: PrismaClient, personId: string, now: Date, take = 50) {
   const notifications = await prisma.notification.findMany({
     where: { recipientId: personId, channel: "APP" },
     orderBy: [{ createdAt: "desc" }, { id: "asc" }],
     take,
-    select: { id: true, subject: true, body: true, link: true, createdAt: true, readAt: true },
+    select: {
+      id: true,
+      subject: true,
+      body: true,
+      link: true,
+      createdAt: true,
+      readAt: true,
+      eventKey: true,
+      report: { select: { isoYear: true, isoWeek: true } },
+    },
   });
   await prisma.notification.updateMany({
     where: { recipientId: personId, channel: "APP", readAt: null },
     data: { readAt: now },
   });
-  return notifications.map(({ readAt, ...item }) => ({ ...item, unread: readAt === null }));
+  return notifications.map(({ readAt, eventKey, report, ...item }) => ({
+    ...item,
+    unread: readAt === null,
+    // Feste Merker für Prüfungen (Art des Anlasses, Woche des Berichts), unabhängig vom Betreff.
+    kind: notificationKind(eventKey),
+    week: report ? `${report.isoYear}-W${String(report.isoWeek).padStart(2, "0")}` : null,
+  }));
 }
 
 /**

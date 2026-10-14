@@ -1,6 +1,6 @@
 # Übersicht der Fach-Specs
 
-Stand: 12.10.2026 (Etappe G1) · Status: **Entwurf zur Freigabe** · @Chris
+Stand: 14.10.2026 (Etappe G3) · Status: **Entwurf zur Freigabe** · @Chris
 
 ## Ziel
 
@@ -9,13 +9,15 @@ Steuerungsinstanz sie auf TypeScript/Next.js, Liferay 6.2.5 und Liferay 7.2 baue
 (was gilt), einen Abschnitt in der Code-Landkarte (wo es heute im Quellcode steht) und neutrale Prüffälle (woran man es
 erkennt). Eine Plattform ist fertig, wenn alle Prüffälle auf ihr grün sind.
 
-`docs/01`, `docs/02` und `docs/05` bleiben Referenz; maßgeblich werden die Fach-Specs ab Etappe G3. Bis dahin gilt bei
-einem Widerspruch `docs/01`.
+`docs/01`, `docs/02` und `docs/05` bleiben Referenz; maßgeblich sind die Fach-Specs ab Etappe G3 (`CLAUDE.md`,
+„Verbindliche Grundlagen“). Bei einem Widerspruch gilt die Fach-Spec; der Widerspruch wird Chris gemeldet.
 
 ## Module
 
-Stand nach G2: beschrieben sind M01 bis M08; ihre AK-Zuordnung ist endgültig (`docs/06`, „Modulschnitt“). M09 und Q
-folgen in G3, ihre Zuordnung ist bis dahin vorläufig.
+Stand nach G3: beschrieben sind alle Module M01 bis M09 und Q; ihre AK-Zuordnung ist endgültig (`docs/06`,
+„Modulschnitt“). Jede AK-ID hat mindestens einen Prüffall (`npm run ak:abdeckung -- --pruefen`). Die drei
+Beispielszenarien aus `docs/01` stehen als Ablauf-Fälle in `pruefung/szenarien.json`; sie tragen die ID und das Modul
+der AK, die sie im Kern belegen.
 
 | Modul | Fach-Spec | AK-IDs | Stand |
 | --- | --- | --- | --- |
@@ -28,7 +30,7 @@ folgen in G3, ihre Zuordnung ist bis dahin vorläufig.
 | M07 PDF-Export | `M07-pdf-export.md` | AK-901 bis AK-907 | beschrieben (G2) |
 | M08 Benachrichtigungen und Erinnerung | `M08-benachrichtigungen-und-erinnerung.md` | AK-1001 bis AK-1004, AK-1011 bis AK-1015, AK-1021 bis AK-1025 | beschrieben (G2) |
 | M09 Oberfläche | `M09-oberflaeche.md` | UI-AK-01 bis UI-AK-20 | beschrieben (G3) |
-| Q Plattform und Qualität | – | AK-1101, AK-1102 | G3 |
+| Q Plattform und Qualität | `Q-plattform-und-qualitaet.md` | AK-1101, AK-1102 | beschrieben (G3) |
 
 ## Abhängigkeiten
 
@@ -99,7 +101,7 @@ Weitere Begriffe stehen in `docs/01-spezifikation.md`, „Begriffe und bestätig
 1. Diese Übersicht.
 2. `pruefung/format.md`: Aufbau der Prüffälle, Datenformate, Fehlercodes, Regeln für Adapter.
 3. Je Modul in Bau-Reihenfolge: Fach-Spec `Mxx-*.md`, dann `pruefung/Mxx.json`, für Weg A zusätzlich der Abschnitt in
-   `code-landkarte.md`.
+   `code-landkarte.md`; zum Schluss `Q-plattform-und-qualitaet.md` mit `pruefung/Q.json` und `pruefung/szenarien.json`.
 4. Für eine Plattform: ihr Profil unter `profile/` und die Playbooks unter `playbooks/` (ab G4).
 
 Neue Fach-Specs entstehen aus `vorlage-fach-spec.md`. Testdaten für alle Plattformen stehen in

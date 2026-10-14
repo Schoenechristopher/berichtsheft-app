@@ -40,7 +40,13 @@ export default async function NotificationsPage() {
           aria-label="Benachrichtigungen"
         >
           {notifications.map((item) => (
-            <li key={item.id} data-testid="notification" className="flex gap-3 p-4">
+            <li
+              key={item.id}
+              data-testid="notification"
+              data-art={item.kind}
+              data-woche={item.week ?? undefined}
+              className="flex gap-3 p-4"
+            >
               <span
                 aria-hidden="true"
                 className={`mt-2 h-2.5 w-2.5 shrink-0 rounded-full ${item.unread ? "bg-accent" : "bg-transparent"}`}

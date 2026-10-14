@@ -103,8 +103,8 @@ jobs:
     needs: [umfang, checks]
     if: needs.umfang.outputs.e2e == 'true'
     runs-on: ubuntu-latest
-    # Volle Prüfung normal ca. 20 Minuten (CI-17).
-    timeout-minutes: 40
+    # Volle Prüfung normal ca. 40 Minuten seit G3 (Ablauf-Fälle in allen Browsern); Grenze nach CI-17.
+    timeout-minutes: 60
     env:
       # Prüft, dass der Produktions-Build den Test-Login trotzdem nicht anbietet (e2e/produktionsmodus.spec.ts).
       AUTH_TEST_LOGIN: "true"

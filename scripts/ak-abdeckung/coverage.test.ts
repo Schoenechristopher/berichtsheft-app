@@ -341,11 +341,19 @@ ${rows}
     ]);
   });
 
-  it("markierte AK („Ablauf, G3“) ohne Prüffall ist in G2 kein Fehler und wird als „Prüffall folgt (G3)“ gekennzeichnet", () => {
+  it("markierte AK („Ablauf, G3“) ohne Prüffall ist seit G3 ein Fehler (Schalter an)", () => {
     const modules = new Map([["M02", ["AK-101", "AK-1102"]]]);
     const deferred = new Set(["AK-101"]);
-    expect(DEFERRED_CASES_REQUIRED).toBe(false);
-    expect(checkCases(cases("AK-1102-01"), criteria, modules, deferred)).toEqual([]);
+    expect(DEFERRED_CASES_REQUIRED).toBe(true);
+    expect(checkCases(cases("AK-1102-01"), criteria, modules, deferred)).toEqual([
+      "Modul M02: AK-101 hat keinen Prüffall.",
+    ]);
+  });
+
+  it("markierte AK („Ablauf, G3“) ohne Prüffall ist mit ausgeschaltetem Schalter (G2) kein Fehler und wird als „Prüffall folgt (G3)“ gekennzeichnet", () => {
+    const modules = new Map([["M02", ["AK-101", "AK-1102"]]]);
+    const deferred = new Set(["AK-101"]);
+    expect(checkCases(cases("AK-1102-01"), criteria, modules, deferred, false)).toEqual([]);
     expect(pendingCriteria(deferred, cases("AK-1102-01"))).toEqual(["AK-101"]);
     const markdown = renderMarkdown(buildCoverage(criteria, []), [], new Set(["AK-101"]));
     expect(markdown).toContain("| AK-ID | Kurztext | Tests | Ebene | Prüffall folgt (G3) |");

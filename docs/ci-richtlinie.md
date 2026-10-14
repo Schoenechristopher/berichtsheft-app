@@ -1,6 +1,6 @@
 # CI-Richtlinie für berichtsheft-app
 
-Stand: 12.10.2026 · Status: **Entwurf zur Freigabe** · Gilt für `Schoenechristopher/berichtsheft-app`
+Stand: 14.10.2026 · Status: **freigegeben (12.10.2026)** · Gilt für `Schoenechristopher/berichtsheft-app`
 
 Diese Datei ist aus der gemeinsamen CI-Richtlinie vom 11.10.2026 abgeleitet. Seit das Repository in der Organisation
 `Schoenechristopher` liegt und öffentlich ist, gelten hier eigene Bedingungen: kostenlose Standard-Runner von GitHub,
@@ -98,10 +98,11 @@ Angaben zu anderen Repositories stehen bewusst nicht in dieser öffentlichen Dat
 - **CI-36 Abschluss-Job:** Ein letzter Job „Prüfung abgeschlossen“ prüft, dass jeder für die Klasse nötige Job grün
   ist. Nur dieser Job ist im Regelsatz für `main` Pflicht. Grund: Ein übersprungener Job zählt bei GitHub als
   bestanden, ein Pflicht-Check je Job würde also nichts absichern.
-- **CI-37 Auswahl nach Modul (geplant):** Sobald die Code-Landkarte jede Datei unter `src/` einem Modul zuordnet (ab G2),
-  laufen bei Logik- und Serveränderungen nur die Prüffälle der betroffenen Module und der Module, die nach dem
-  Abhängigkeitsgraph davon abhängen. Der genaue Ablauf wird in G3 festgelegt; bis dahin gilt CI-32 mit den Klassen
-  aus Abschnitt 7.
+- **CI-37 Auswahl nach Modul (geplant, Etappe A):** Bei Logik- und Serveränderungen laufen nur die Ablauf-Fälle
+  (Browser) der betroffenen Module und der Module, die nach dem Abhängigkeitsgraph davon abhängen; die Zuordnung Datei →
+  Modul kommt aus der Code-Landkarte. Fachlogik- und Daten-Fälle laufen immer vollständig, im Zweifel laufen alle Fälle
+  (CI-34). Umgesetzt wird das in Etappe A (Paket A2; Entscheidungen E5 und E6 aus Etappe A bzw. G3); bis dahin gilt
+  CI-32 mit den Klassen aus Abschnitt 7.
 
 ### Sparsam und schnell bauen
 

@@ -282,9 +282,9 @@ export const SPEC_LEVELS = ["Fachlogik", "Daten", "Ablauf", "Ablauf, G3"] as con
 export const DEFERRED_LEVEL = "Ablauf, G3";
 /**
  * Schalter „ab G3 Pflicht“ (Entscheidung E1): In G2 ist eine AK mit Ebene `Ablauf, G3` ohne Prüffall kein Fehler.
- * Ab G3 auf `true` stellen; dann braucht auch sie einen Prüffall.
+ * Seit G3 (Paket J) `true`: Auch sie braucht einen Prüffall.
  */
-export const DEFERRED_CASES_REQUIRED = false;
+export const DEFERRED_CASES_REQUIRED = true;
 
 /** AK einer Fach-Spec mit ihrer Ebene (fehlt bei einer Tabelle mit vier Spalten). */
 export interface ModuleCriterion {

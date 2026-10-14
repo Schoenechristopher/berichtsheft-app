@@ -4,10 +4,10 @@ Digitales Berichtsheft: Azubis erfassen Wochenberichte (Mo–Fr), Ausbilder prü
 
 ## Verbindliche Grundlagen
 
-- `docs/01-spezifikation.md`: freigegebene Anforderungen und Akzeptanzkriterien (AK-101 … AK-1102). Das ist die Quelle der Wahrheit für Verhalten.
-- `docs/02-plan.md`: freigegebener Technik-Plan, Datenmodell, Etappen.
-- `docs/05-ui-spezifikation.md`: freigegebene UI-Spezifikation (Tokens, Komponenten, Seiten, UI-AK-01 … UI-AK-20).
-- Weicht etwas davon ab oder ist unklar: nachfragen, nicht raten. Spezifikation und Plan nur nach Freigabe ändern.
+- `specs/`: maßgebliche Fach-Specs seit Etappe G3. `specs/00-uebersicht.md` (Module, Begriffe, Lesereihenfolge), je Modul `specs/M01-…` bis `specs/M09-…` und `specs/Q-plattform-und-qualitaet.md` mit Regeln und Akzeptanzkriterien (AK-101 … AK-1206, UI-AK-01 … UI-AK-20), neutrale Prüffälle unter `specs/pruefung/` (Format in `format.md`), Code-Landkarte `specs/code-landkarte.md`. Das ist die Quelle der Wahrheit für Verhalten; eine fachliche Änderung beginnt in Fach-Spec und Prüffällen.
+- Referenz (bleibt erhalten, maßgeblich ist bei einem Widerspruch die Fach-Spec): `docs/01-spezifikation.md` (Anforderungen, Beispielszenarien), `docs/05-ui-spezifikation.md` (Tokens, Komponenten, Seiten).
+- `docs/02-plan.md`: freigegebener Technik-Plan, Datenmodell, Etappen; `docs/06-spec-architektur.md`: Aufbau der Specs, Profile und Playbooks.
+- Weicht etwas davon ab oder ist unklar: nachfragen, nicht raten. Fach-Specs, Prüffälle, Spezifikation und Plan nur nach Freigabe ändern.
 
 ## Stack
 

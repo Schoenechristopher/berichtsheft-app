@@ -77,6 +77,9 @@ const ACTIONS: Record<string, { required: string[]; optional: string[] }> = {
   einreichen: { required: [], optional: [] },
   freigeben: { required: [], optional: [] },
   ablehnen: { required: ["begruendung"], optional: [] },
+  freigabe_zuruecknehmen: { required: ["begruendung"], optional: [] },
+  // Der Erinnerungslauf der App zu „jetzt“ (wie ihn der Zeitplan startet); ohne `als`, er gehört keiner Person.
+  erinnerung_ausloesen: { required: [], optional: [] },
   darstellung_waehlen: { required: ["darstellung"], optional: [] },
   // Prüfaktionen (`format.md`, „Prüfaktionen“): generisch, keine Aktion je AK.
   ansicht_lesen: { required: [], optional: [] },
@@ -101,6 +104,8 @@ const MAX_TABS = 80;
 
 /** Wie lange auf eine Warnung oder einen Seitenwechsel gewartet wird, wenn nichts geschieht (z. B. „Vor“ ohne Ziel). */
 const QUIET_MS = 3_000;
+/** Höchstdauer eines axe-Aufrufs (`barrierefreiheit_pruefen`); normal wenige Sekunden. */
+const AXE_MS = 60_000;
 /** Wartezeit auf das Laden einer Seite (der Entwicklungsserver übersetzt Seiten beim ersten Aufruf). */
 const LOAD_MS = 30_000;
 
@@ -165,13 +170,14 @@ function checkFields(step: Input, where: string) {
     throw new FlowCaseError(`${where}: unbekannte Aktion „${String(action)}“.`);
   }
   const { required, optional } = ACTIONS[action];
-  const allowed = new Set(["als", "aktion", "uhr", ...required, ...optional]);
+  const withoutPerson = action === "erinnerung_ausloesen";
+  const allowed = new Set([...(withoutPerson ? [] : ["als"]), "aktion", "uhr", ...required, ...optional]);
   for (const name of Object.keys(step)) {
     if (!allowed.has(name)) {
       throw new FlowCaseError(`${where}: Feld „${name}“ gibt es bei „${action}“ nicht.`);
     }
   }
-  for (const name of ["als", ...required]) {
+  for (const name of [...(withoutPerson ? [] : ["als"]), ...required]) {
     if (!(name in step)) {
       throw new FlowCaseError(`${where}: Pflichtfeld „${name}“ fehlt.`);
     }
@@ -214,7 +220,10 @@ async function documentOrigin(page: Page): Promise<number | null> {
 }
 
 /** Stellt Uhr und Bestand der laufenden App über die Testschnittstelle. */
-export async function setAppState(baseURL: string, body: { uhr: string | null; bestand?: "testdaten" }) {
+export async function setAppState(
+  baseURL: string,
+  body: { uhr?: string | null; bestand?: "testdaten"; ausgangsbestand?: unknown; erinnerung?: true },
+): Promise<unknown> {
   const response = await fetch(new URL("/api/test/zustand", baseURL), {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -223,6 +232,7 @@ export async function setAppState(baseURL: string, body: { uhr: string | null; b
   if (!response.ok) {
     throw new Error(`Testschnittstelle antwortet ${response.status}: ${await response.text()}`);
   }
+  return response.json();
 }
 
 interface Person {
@@ -236,6 +246,8 @@ interface Person {
 
 /** Führt die Schritte eines Ablauf-Falls aus; je Person ein eigener Browser-Kontext. */
 export class FlowAdapter {
+  /** ID des laufenden Falls, für Meldungen. */
+  private caseId = "";
   private persons = new Map<string, Person>();
   /** Geräteeinstellungen des Falls (`geraet`) über denen des Projekts. */
   private device: BrowserContextOptions = {};
@@ -256,12 +268,9 @@ export class FlowAdapter {
 
   /** Führt den Fall aus und liefert `{ ergebnisse }` (`format.md`, „Erwartet“). */
   async run(entry: CheckCase): Promise<Result> {
+    this.caseId = entry.id;
     if (typeof entry.uhr !== "string") {
       throw new FlowCaseError("Ein Ablauf-Fall braucht „uhr“.");
-    }
-    if (entry.ausgangsbestand !== undefined) {
-      // Personen und Berichte im Ausgangsbestand kommen mit den Ablauf-Fällen der Module (Welle 2).
-      throw new FlowCaseError("„ausgangsbestand“ unterstützt der TypeScript-Ablauf-Runner noch nicht.");
     }
     if (!Array.isArray(entry.schritte) || entry.schritte.length === 0) {
       throw new FlowCaseError("„schritte“ muss eine nicht leere Liste sein.");
@@ -270,7 +279,8 @@ export class FlowAdapter {
     steps.forEach((step, index) => checkFields(step, `Schritt ${index + 1}`));
     this.setDevice((entry as { geraet?: unknown }).geraet);
 
-    await setAppState(this.baseURL, { uhr: entry.uhr, bestand: "testdaten" });
+    // Den Ausgangsbestand (nur `berichte`) stellt die Testschnittstelle her; ein Fehler dort lässt den Fall scheitern.
+    await setAppState(this.baseURL, { uhr: entry.uhr, bestand: "testdaten", ausgangsbestand: entry.ausgangsbestand });
     const ergebnisse: Result[] = [];
     for (const [index, step] of steps.entries()) {
       const where = `Schritt ${index + 1} (${String(step.aktion)})`;
@@ -370,6 +380,10 @@ export class FlowAdapter {
   }
 
   private async step(step: Input, where: string): Promise<Result> {
+    if (step.aktion === "erinnerung_ausloesen") {
+      const { erinnerung } = (await setAppState(this.baseURL, { erinnerung: true })) as { erinnerung: Result };
+      return erinnerung;
+    }
     const person = await this.person(step.als, where);
     switch (step.aktion) {
       case "anmelden":
@@ -399,6 +413,12 @@ export class FlowAdapter {
         return this.decide(this.openPage(person, where), "freigeben", null);
       case "ablehnen":
         return this.decide(this.openPage(person, where), "ablehnen", textField(step, "begruendung", where));
+      case "freigabe_zuruecknehmen":
+        return this.decide(
+          this.openPage(person, where),
+          "freigabe_zuruecknehmen",
+          textField(step, "begruendung", where),
+        );
       case "darstellung_waehlen":
         return this.chooseTheme(this.openPage(person, where), step, where);
       case "ansicht_lesen": {
@@ -438,11 +458,8 @@ export class FlowAdapter {
         return this.waitFor(this.openPage(person, where), step, where);
       case "erstes_bild_lesen":
         return this.firstPaint(person, where);
-      case "barrierefreiheit_pruefen": {
-        const page = this.openPage(person, where);
-        await this.settled(page);
-        return { verstoesse: await axeViolations(page) };
-      }
+      case "barrierefreiheit_pruefen":
+        return this.checkAccessibility(this.openPage(person, where), where);
       default:
         throw new FlowCaseError(`${where}: unbekannte Aktion.`);
     }
@@ -565,6 +582,54 @@ export class FlowAdapter {
     return this.pageResult(person, dialogs.length === 1 ? armed : null);
   }
 
+  /**
+   * `barrierefreiheit_pruefen`: erst wenn die Seite fertig und ruhig ist (geladen, keine Platzhalter, seit 500 ms
+   * dieselbe Adresse und dasselbe Dokument, also kein laufender Seitenwechsel oder Neuladen), dann axe, höchstens
+   * 60 s. Hängt axe länger (beobachtet einmal in Firefox in der CI, UI-AK-16-02), scheitert der Fall sofort mit Fall,
+   * Schritt, Adresse und offenem Dialog, statt erst am Test-Timeout; wiederholt wird nicht (CI-18).
+   */
+  private async checkAccessibility(page: Page, where: string): Promise<Result> {
+    await page.waitForLoadState("load", { timeout: LOAD_MS });
+    await this.settled(page);
+    const end = Date.now() + LOAD_MS;
+    for (;;) {
+      const before = { url: page.url(), origin: await documentOrigin(page) };
+      await sleep(500);
+      if (before.origin !== null && page.url() === before.url && (await documentOrigin(page)) === before.origin) {
+        break;
+      }
+      if (Date.now() > end) {
+        throw new Error(`${this.caseId}, ${where}: Die Seite kommt nicht zur Ruhe (Adresse ${page.url()}).`);
+      }
+      await page.waitForLoadState("load", { timeout: LOAD_MS });
+    }
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const hung = new Promise<"haengt">((resolve) => {
+      timer = setTimeout(() => resolve("haengt"), AXE_MS);
+    });
+    try {
+      const result = await Promise.race([axeViolations(page), hung]);
+      if (result !== "haengt") {
+        return { verstoesse: result };
+      }
+    } finally {
+      clearTimeout(timer);
+    }
+    // Der Dialog wird nur kurz gelesen: Hängt die Seite selbst, steht dort „unbekannt“.
+    const dialog = await Promise.race([
+      page
+        .evaluate(() => {
+          const open = document.querySelector("dialog[open]");
+          return open ? (open.getAttribute("aria-labelledby") ?? open.id ?? "ohne Kennung") : "keiner";
+        })
+        .catch(() => "unbekannt"),
+      sleep(2_000).then(() => "unbekannt"),
+    ]);
+    throw new Error(
+      `${this.caseId}, ${where}: axe ohne Ergebnis nach ${AXE_MS / 1000} s (Adresse ${page.url()}, offener Dialog: ${dialog}).`,
+    );
+  }
+
   /** Wartet, bis die Seite fertig geladen und hydriert ist (keine Platzhalter, Eingaben freigegeben). */
   private async settled(page: Page) {
     await page.waitForFunction(
@@ -635,6 +700,19 @@ export class FlowAdapter {
           ausgewaehlt:
             document.querySelector("[data-bereich=bericht_ansicht] [data-woche]")?.getAttribute("data-woche") ?? null,
         }))),
+      };
+    }
+    if (seite === "benachrichtigungen") {
+      // Eigene App-Benachrichtigungen, neueste zuerst: Art und Woche über feste Merker, „neu“ über die Markierung.
+      return {
+        ...base,
+        nachrichten: await page.locator("[data-testid=notification]").evaluateAll((items) =>
+          items.map((item) => ({
+            art: item.getAttribute("data-art"),
+            woche: item.getAttribute("data-woche"),
+            neu: item.querySelector("[data-testid=notification-new]") !== null,
+          })),
+        ),
       };
     }
     return base;
@@ -953,8 +1031,15 @@ export class FlowAdapter {
     }
   }
 
-  /** „Freigeben“ bzw. „Ablehnen“ auf der geöffneten Berichtsseite oder in der Prüfliste, Rückfrage bestätigt. */
-  private async decide(page: Page, action: "freigeben" | "ablehnen", reason: string | null): Promise<Result> {
+  /**
+   * „Freigeben“ bzw. „Ablehnen“ auf der geöffneten Berichtsseite oder in der Prüfliste, „Freigabe zurücknehmen“ auf der
+   * geöffneten Berichtsseite (Beispielszenarien, Q); Rückfrage bestätigt.
+   */
+  private async decide(
+    page: Page,
+    action: "freigeben" | "ablehnen" | "freigabe_zuruecknehmen",
+    reason: string | null,
+  ): Promise<Result> {
     const statusOf = () =>
       page.evaluate(
         () =>
@@ -968,7 +1053,11 @@ export class FlowAdapter {
       status: await statusOf(),
       toasts: await page.locator("[data-testid=toast]").count(),
     };
-    await (await this.visibleOne(page, { element: action }, action)).click();
+    if (action === "freigabe_zuruecknehmen") {
+      await page.locator("[data-oeffnet-dialog=REVOKE_APPROVAL]:visible").first().click();
+    } else {
+      await (await this.visibleOne(page, { element: action }, action)).click();
+    }
     const dialog = page.locator("dialog[open]");
     await dialog.waitFor({ timeout: LOAD_MS });
     if (reason !== null) {
