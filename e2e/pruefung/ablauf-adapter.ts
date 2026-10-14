@@ -859,9 +859,14 @@ export class FlowAdapter {
   /** Klick auf ein Element (Tippen am Handy); führt es als Link zu einer anderen Adresse, wird darauf gewartet. */
   private async operate(page: Page, step: Input, where: string): Promise<Result> {
     const element = await this.visibleOne(page, step, where);
-    const target = await element.evaluate((node) =>
-      node instanceof HTMLAnchorElement && !node.getAttribute("href")?.startsWith("#") ? node.href : null,
-    );
+    await element.scrollIntoViewIfNeeded();
+    // Link, den der Klick trifft: das Element am Klickpunkt (Mitte), z. B. ein Link, der eine Zeile überdeckt.
+    const target = await element.evaluate((node) => {
+      const box = node.getBoundingClientRect();
+      const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+      const link = (node.contains(hit) ? hit : node)?.closest("a");
+      return link && !link.getAttribute("href")?.startsWith("#") ? link.href : null;
+    });
     await this.input(page, target, () => element.click());
     return { seite: pageName(page.url()) };
   }
