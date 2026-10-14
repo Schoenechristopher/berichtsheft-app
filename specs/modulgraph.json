@@ -1,0 +1,15 @@
+{
+  "beschreibung": "Modulgraph maschinenlesbar: je Modul die direkten Abhängigkeiten wie im Mermaid-Diagramm in specs/00-uebersicht.md, „Abhängigkeiten“ (Kante A --> B heißt: B hängt von A ab). Nutzt die Auswahl der Ablauf-Fälle nach Modul (docs/ci-richtlinie.md, CI-37); scripts/pruefumfang/modulauswahl.test.ts prüft die Übereinstimmung mit beiden Diagrammen und der Tabelle in docs/06-spec-architektur.md.",
+  "module": {
+    "M01": { "name": "Kalender und Zeit", "abhaengigVon": [] },
+    "M02": { "name": "Personen und Zugang", "abhaengigVon": [] },
+    "M03": { "name": "Wochenberichte entstehen", "abhaengigVon": ["M01", "M02"] },
+    "M04": { "name": "Bericht erfassen", "abhaengigVon": ["M03"] },
+    "M05": { "name": "Status und Prüfung", "abhaengigVon": ["M02", "M04"] },
+    "M06": { "name": "Historie", "abhaengigVon": ["M05"] },
+    "M07": { "name": "PDF-Export", "abhaengigVon": ["M05", "M06"] },
+    "M08": { "name": "Benachrichtigungen und Erinnerung", "abhaengigVon": ["M02", "M03", "M05"] },
+    "M09": { "name": "Oberfläche", "abhaengigVon": ["M07", "M08"] },
+    "Q": { "name": "Plattform und Qualität", "abhaengigVon": ["M09"] }
+  }
+}

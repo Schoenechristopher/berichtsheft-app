@@ -14,6 +14,8 @@
  * @property {boolean} browserVoll Zusätzlich `firefox`, `msedge`, `a11y` und `screenshots`.
  * @property {boolean} liferay625 Liferay-6.2.5-Job.
  * @property {boolean} liferay72 Liferay-7.2-Job.
+ * @property {boolean} modulauswahl Umfang nach Klassen: Die Ablauf-Fälle dürfen nach Modul ausgewählt werden (CI-37,
+ *   `modulauswahl.mjs`); `false` bei erzwungener voller Prüfung (CI-35).
  * @property {string} grund Begründung für die Zusammenfassung des Laufs.
  */
 
@@ -35,6 +37,7 @@ const ZUORDNUNG = /** @type {const} */ ([
       "prisma/",
       "scripts/",
       "tests/",
+      "specs/modulgraph.json",
     ],
   ],
   [
@@ -100,6 +103,7 @@ function umfang(teil, grund) {
     browserVoll: false,
     liferay625: false,
     liferay72: false,
+    modulauswahl: false,
     ...teil,
     grund,
   };
@@ -118,7 +122,14 @@ export function umfangNachKlassen(dateien) {
   const browserVoll = ["O", "I", "unbekannt"].some((k) => klassen.has(k));
   const e2e = browserVoll || klassen.has("L") || klassen.has("P");
   return umfang(
-    { schnell: true, e2e, browserVoll, liferay625: klassen.has("L62"), liferay72: klassen.has("L72") },
+    {
+      schnell: true,
+      e2e,
+      browserVoll,
+      liferay625: klassen.has("L62"),
+      liferay72: klassen.has("L72"),
+      modulauswahl: true,
+    },
     `Änderungsklassen: ${liste}`,
   );
 }

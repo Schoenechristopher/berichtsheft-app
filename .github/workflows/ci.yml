@@ -39,11 +39,13 @@ jobs:
       browser_voll: ${{ steps.umfang.outputs.browser_voll }}
       liferay625: ${{ steps.umfang.outputs.liferay625 }}
       liferay72: ${{ steps.umfang.outputs.liferay72 }}
+      # CI-37: Auswahl der Ablauf-Fälle nach Modul; leer = alle Fälle.
+      ablauf_grep_invert: ${{ steps.umfang.outputs.ablauf_grep_invert }}
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - name: Änderungsklassen und Umfang bestimmen (CI-32 bis CI-35)
+      - name: Änderungsklassen, Umfang und Auswahl nach Modul bestimmen (CI-32 bis CI-35, CI-37)
         id: umfang
         run: node scripts/pruefumfang/index.mjs
 
@@ -113,6 +115,8 @@ jobs:
       E2E_DATABASE_URL: postgresql://berichtsheft:berichtsheft@localhost:5432/berichtsheft
       # E-Mails über die Mailpit-API prüfen (Etappe 6); der Worker im Compose-Stack versendet sie.
       E2E_MAILPIT_URL: http://localhost:8025
+      # CI-37: wählt die Ablauf-Fälle nicht betroffener Module ab (scripts/pruefumfang/modulauswahl.mjs); leer = alle.
+      ABLAUF_GREP_INVERT: ${{ needs.umfang.outputs.ablauf_grep_invert }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -147,14 +151,20 @@ jobs:
           # Edge ist auf den GitHub-Runnern meist vorinstalliert; sonst installiert Playwright es.
           command -v microsoft-edge-stable || npx playwright install --with-deps msedge
           microsoft-edge-stable --version
-      # Klasse L und P: Chromium und 375 px (docs/ci-richtlinie.md, Abschnitt 7).
+      # Klasse L und P: Chromium und 375 px (docs/ci-richtlinie.md, Abschnitt 7), Fälle nach Modul (CI-37).
       - name: Playwright gegen die laufende Demo (Chromium, 375 px)
         if: needs.umfang.outputs.browser_voll != 'true'
-        run: npx playwright test --project=chromium --project=smartphone-375
+        run: |
+          auswahl=()
+          [ -n "$ABLAUF_GREP_INVERT" ] && auswahl=(--grep-invert "$ABLAUF_GREP_INVERT")
+          npx playwright test --project=chromium --project=smartphone-375 "${auswahl[@]}"
       # Klasse O, I und unbekannte Pfade: alle Browser (AK-1101).
       - name: Playwright gegen die laufende Demo (Chromium, Firefox, Edge, 375 px)
         if: needs.umfang.outputs.browser_voll == 'true'
-        run: npx playwright test --project=chromium --project=firefox --project=msedge --project=smartphone-375
+        run: |
+          auswahl=()
+          [ -n "$ABLAUF_GREP_INVERT" ] && auswahl=(--grep-invert "$ABLAUF_GREP_INVERT")
+          npx playwright test --project=chromium --project=firefox --project=msedge --project=smartphone-375 "${auswahl[@]}"
       # UI-AK-16: axe auf allen Seiten, hell und dunkel, 1280 und 375 px (Chromium). Normal ca. 4 Minuten (CI-17).
       - name: Barrierefreiheit (axe)
         if: ${{ !cancelled() && needs.umfang.outputs.browser_voll == 'true' }}
