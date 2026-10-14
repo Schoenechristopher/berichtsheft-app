@@ -216,6 +216,8 @@ machen den Fall fehlerhaft.
 | `tag_erfassen` | `als`, `woche`, `tag`, `tagesart?` (eine der fünf oder `""` = leeren), `text?` | `{ "erfasst": true }` | Eingabe auf der geöffneten Berichtsseite dieser Woche, ohne zu speichern. Ist sie nicht geöffnet, ist der Fall fehlerhaft. |
 | `speichern` | `als` | `{ "gespeichert": true }` | „Speichern“ auf der geöffneten Berichtsseite |
 | `einreichen` | `als` | `{ "status": <Status> }`; Fehler `pflichtangaben_fehlen` mit `"tage"` wie bei `einreichenPruefen` (M05) | „Einreichen“ auf der geöffneten Berichtsseite, Rückfrage bestätigt; ungespeicherte Eingaben werden mitgespeichert |
+| `freigeben` | `als` | `{ "status": <Status> }` | „Freigeben“ auf der geöffneten Berichtsseite, Rückfrage bestätigt (Beispielszenarien, Q) |
+| `freigabe_zuruecknehmen` | `als`, `begruendung` | `{ "status": <Status> }` | „Freigabe zurücknehmen“ auf der geöffneten Berichtsseite mit dieser Begründung, Rückfrage bestätigt (Beispielszenarien, Q) |
 
 **Seiten-Ergebnis:** `{ "warnung": <Code> | null, "seite": <Seite> | null, "angemeldet": <Schlüssel> | null }`.
 

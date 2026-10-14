@@ -1,6 +1,6 @@
 # Spec-Architektur Berichtsheft-App
 
-Stand: 12.10.2026 · Status: **freigegeben (13.10.2026)** · @Chris
+Stand: 14.10.2026 (Etappe G3) · Status: **freigegeben (13.10.2026)** · @Chris
 
 Änderungen gegenüber der ersten Fassung vom 12.10.2026: Es gibt keinen VPS. Das Repository liegt in der Organisation
 `Schoenechristopher` und wird öffentlich; schwere Jobs laufen auf den Standard-Runnern von GitHub (siehe
@@ -109,10 +109,10 @@ dem vorhandenen Code. Gebaut wird in der Reihenfolge M01 bis M09, weil jedes Mod
 | M07 PDF-Export | Einzel- und Sammel-PDF, Freigabevermerk, Kennzeichnung, Umlaute | AK-901 bis 907 (endgültig, G2; Prüffälle über Inhaltsmerkmale, nicht das Layout; keine AK nur im Ablauf) | `src/domain/report-pdf`, `src/lib/report-export`, `src/pdf/` | M05, M06 | A für Inhalt, Profil für Rendering |
 | M08 Benachrichtigungen und Erinnerung | Kanäle je Person, Outbox, genau einmal senden, Montags-Erinnerung, Info an Ausbilder, Rücksprung nach der Anmeldung | AK-1001 bis 1004, 1011 bis 1015, 1021 bis 1025 (endgültig, G2; Prüffälle der Ebenen Fachlogik und Daten, keine AK nur im Ablauf); nutzt „offen“ (M03) | `src/domain/notifications`; `src/lib/notifications`; `src/worker/` | M02, M03, M05 | A für Regeln, B für Versand und Zeitplan |
 | M09 Oberfläche | Tokens, Komponenten, Seiten, Dunkelmodus, Barrierefreiheit | UI-AK-01 bis 20 (endgültig, G3; Prüffälle der Ebene Fachlogik für UI-AK-03, 04, 13, 14; die übrigen 16 sind Ablauf, Prüffall folgt in Welle 2) | `src/domain/week-progress`, `theme`, `relative-time`; `src/lib/theme`, `src/lib/people` (`updateOwnTheme`, `labels`); `src/app/`, `src/components/` | alle | B Spec |
-| Q Plattform und Qualität | Browser, 375 px, Testdaten, Beispielszenarien | AK-1101, 1102 | `e2e/` | alle | B Spec |
+| Q Plattform und Qualität | Browser, 375 px, Testdaten, Beispielszenarien, Testgrenzen | AK-1101, 1102 (endgültig, G3; Ebene Ablauf); die drei Beispielszenarien als Ablauf-Fälle in `szenarien.json` mit ID und Modul der AK, die sie im Kern belegen (AK-502, AK-703 in M05, AK-1022 in M08) | `e2e/`, `e2e/pruefung/` (Ablauf-Runner, Testgrenzen) | alle | B Spec |
 
-Die genaue Zuordnung jeder einzelnen AK-ID entsteht in Etappe G1 und G2. Eine ID, die zwei Module berührt, gehört dem
-Modul, das die Regel besitzt; das andere verweist darauf.
+Die genaue Zuordnung jeder einzelnen AK-ID ist in Etappe G1 bis G3 entstanden und steht in Abschnitt 4 der Fach-Specs.
+Eine ID, die zwei Module berührt, gehört dem Modul, das die Regel besitzt; das andere verweist darauf.
 
 ```mermaid
 flowchart LR
@@ -208,7 +208,8 @@ führt sie über einen eigenen Adapter aus. Jede Prüffall-ID beginnt mit der AK
 }
 ```
 
-**Ablauf, Beispiel:**
+**Ablauf, Beispiel** (Ergebnis je Schritt nach `specs/pruefung/format.md`, „Aufbau eines Ablauf-Falls“; zur
+Veranschaulichung, der Fall `AK-503-01` in `M05.json` ist ein Fachlogik-Fall):
 
 ```json
 {
@@ -217,12 +218,23 @@ führt sie über einen eigenen Adapter aus. Jede Prüffall-ID beginnt mit der AK
   "ebene": "ablauf",
   "uhr": "2026-10-06T09:00:00+02:00",
   "schritte": [
+    { "als": "anna", "aktion": "anmelden" },
+    { "als": "anna", "aktion": "seite_aufrufen", "seite": "bericht", "azubi": "anna", "woche": "2026-W40" },
     { "als": "anna", "aktion": "tag_erfassen", "woche": "2026-W40", "tag": "Mo", "tagesart": "Betrieb", "text": "" },
-    { "als": "anna", "aktion": "einreichen", "woche": "2026-W40" }
+    { "als": "anna", "aktion": "einreichen" }
   ],
-  "erwartet": { "fehler": "taetigkeiten_fehlen", "tage": ["Mo"], "status": "Entwurf" }
+  "erwartet": {
+    "ergebnisse": [
+      { "warnung": null, "seite": "start", "angemeldet": "anna" },
+      { "warnung": null, "seite": "bericht", "angemeldet": "anna" },
+      { "erfasst": true },
+      { "fehler": "pflichtangaben_fehlen", "tage": [{ "tag": "Mo", "fehler": "taetigkeiten_fehlen" }, "…"] }
+    ]
+  }
 }
 ```
+
+(`"…"` steht abgekürzt für die übrigen Tage ohne Angaben.)
 
 **Regeln:**
 

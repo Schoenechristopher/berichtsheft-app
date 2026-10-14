@@ -97,10 +97,18 @@ async function pagePath(target: Exclude<PageName, "start">, step: Input, where: 
 
 function checkFields(step: Input, where: string) {
   const action = step.aktion;
-  if (typeof action !== "string" || !Object.hasOwn(ACTIONS, action)) {
+  const spec =
+    typeof action !== "string"
+      ? undefined
+      : Object.hasOwn(ACTIONS, action)
+        ? ACTIONS[action]
+        : Object.hasOwn(BUSINESS_ACTIONS, action)
+          ? BUSINESS_ACTIONS[action]
+          : undefined;
+  if (!spec) {
     throw new FlowCaseError(`${where}: unbekannte Aktion „${String(action)}“.`);
   }
-  const { required, optional } = ACTIONS[action];
+  const { required, optional } = spec;
   const allowed = new Set(["als", "aktion", "uhr", ...required, ...optional]);
   for (const name of Object.keys(step)) {
     if (!allowed.has(name)) {
@@ -274,6 +282,9 @@ export class FlowAdapter {
       case "einreichen":
         return this.submit(this.openPage(person, where));
       default:
+        if (typeof step.aktion === "string" && Object.hasOwn(BUSINESS_ACTIONS, step.aktion)) {
+          return businessAction(this.openPage(person, where), step, where);
+        }
         throw new FlowCaseError(`${where}: unbekannte Aktion.`);
     }
   }
@@ -605,4 +616,55 @@ export class FlowAdapter {
     const after = await statusOf();
     return { status: after === null ? null : (statusName(after as ReportStatus) ?? after) };
   }
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Fachliche Aktionen der Beispielszenarien und von Q (Paket J, G3 Welle 2): Statuswechsel der Ausbilder auf der
+// geöffneten Berichtsseite. Sie lösen nur aus und liefern den Status, den die Seite danach zeigt (`data-status`).
+// ---------------------------------------------------------------------------------------------------------------
+
+/** Feste Felder der fachlichen Aktionen (`format.md`, „Aktionen der Ablauf-Fälle“). */
+const BUSINESS_ACTIONS: Record<string, { required: string[]; optional: string[] }> = {
+  freigeben: { required: [], optional: [] },
+  freigabe_zuruecknehmen: { required: ["begruendung"], optional: [] },
+};
+
+/** Status, den die geöffnete Berichtsseite zeigt (fester Merker `data-status`). */
+function shownStatus(page: Page): Promise<string | null> {
+  return page.evaluate(
+    () =>
+      document.querySelector("[data-testid=report-status]")?.closest("[data-status]")?.getAttribute("data-status") ??
+      null,
+  );
+}
+
+/** „Freigeben“ bzw. „Freigabe zurücknehmen“ auf der geöffneten Berichtsseite, Rückfrage bestätigt. */
+async function businessAction(page: Page, step: Input, where: string): Promise<Result> {
+  if (pageName(page.url()) !== "bericht") {
+    throw new FlowCaseError(`${where}: Es ist keine Berichtsseite geöffnet.`);
+  }
+  await page.waitForFunction(() => document.querySelector("[data-skeleton]") === null, undefined, {
+    timeout: LOAD_MS,
+  });
+  const before = await shownStatus(page);
+  const value = step.aktion === "freigeben" ? "APPROVE" : "REVOKE_APPROVAL";
+  const opener = step.aktion === "freigeben" ? /^Freigeben/ : /^Freigabe zurücknehmen/;
+  await page.getByRole("button", { name: opener }).first().click();
+  const dialog = page.locator("dialog[open]");
+  await dialog.waitFor({ timeout: LOAD_MS });
+  if (step.aktion === "freigabe_zuruecknehmen") {
+    const reason = dialog.locator("textarea[name=reason]");
+    await reason.click();
+    await reason.fill(textField(step, "begruendung", where));
+  }
+  await dialog.locator(`button[type=submit][value=${value}]`).click();
+  await page.waitForFunction(
+    (previous) =>
+      document.querySelector("[data-testid=report-status]")?.closest("[data-status]")?.getAttribute("data-status") !==
+      previous,
+    before,
+    { timeout: LOAD_MS },
+  );
+  const after = await shownStatus(page);
+  return { status: after === null ? null : (statusName(after as ReportStatus) ?? after) };
 }

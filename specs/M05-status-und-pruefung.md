@@ -163,7 +163,7 @@ Text aus `docs/01-spezifikation.md`, Kapitel 5 bis 7; Prüffälle in `specs/prue
 | AK-ID | Kriterium (Kurzfassung) | Regeln | Prüffälle | Ebene |
 | --- | --- | --- | --- | --- |
 | AK-501 | Ein offener Bericht lässt sich nur mit vollständigen Pflichtangaben einreichen (nur Leerzeichen gelten als leer); nicht bei Wochen ganz außerhalb; die laufende Woche schon vor ihrem Ende. | M05-R02, M05-R03, M05-R05, M05-R07 | AK-501-01 bis AK-501-11 | Fachlogik |
-| AK-502 | Fehlt eine Pflichtangabe, wird nicht eingereicht; die Tage werden mit „Tagesart fehlt“ bzw. „Tätigkeiten fehlen“ benannt und markiert. | M05-R06 | AK-502-01 bis AK-502-03 | Fachlogik |
+| AK-502 | Fehlt eine Pflichtangabe, wird nicht eingereicht; die Tage werden mit „Tagesart fehlt“ bzw. „Tätigkeiten fehlen“ benannt und markiert. | M05-R06 | AK-502-01 bis AK-502-03; Beispielszenario AK-502-04 (`szenarien.json`, Ablauf) | Fachlogik |
 | AK-503 | Bei Urlaub, Krank und Feiertag ist kein Text nötig; ein eingetragener Text bleibt. | M05-R05 | AK-503-01, AK-503-02 | Fachlogik |
 | AK-504 | Auch eine Woche nur aus Urlaub und Feiertagen muss eingereicht werden und zählt bis dahin als offen. | M05-R05, M05-R07 | AK-504-01, AK-504-02 | Fachlogik |
 | AK-505 | Nach dem Einreichen „Eingereicht“ und schreibgeschützt; Einreichen speichert Eingaben mit, beim Scheitern bleiben sie als Entwurf; zusätzlich Schutz in der Datenhaltung. | M05-R08, M05-R09 | AK-505-01 bis AK-505-07 | Daten |
@@ -179,7 +179,7 @@ Text aus `docs/01-spezifikation.md`, Kapitel 5 bis 7; Prüffälle in `specs/prue
 | AK-607 | Berichte im Status „Entwurf“ kann der Ausbilder weder freigeben noch ablehnen. | M05-R02, M05-R04 | AK-607-01 bis AK-607-05 | Fachlogik |
 | AK-701 | Ein abgelehnter Bericht ist bearbeitbar und erneut einreichbar; danach „Eingereicht“ und wieder in der Prüfliste. | M05-R09, M05-R17 | AK-701-01 bis AK-701-03 | Daten |
 | AK-702 | Der Zyklus aus Ablehnen und erneutem Einreichen funktioniert beliebig oft (dreimal ablehnen, dann freigeben). | M05-R17, M05-R18 | AK-702-01 bis AK-702-06 | Daten |
-| AK-703 | Eine Freigabe lässt sich nur mit nicht leerer Begründung zurücknehmen; danach „Abgelehnt“ und bearbeitbar. | M05-R19 | AK-703-01 bis AK-703-05 | Fachlogik |
+| AK-703 | Eine Freigabe lässt sich nur mit nicht leerer Begründung zurücknehmen; danach „Abgelehnt“ und bearbeitbar. | M05-R19 | AK-703-01 bis AK-703-05; Beispielszenario AK-703-06 (`szenarien.json`, Ablauf) | Fachlogik |
 | AK-704 | Außer durch die Rücknahme kann niemand einen freigegebenen Bericht ändern, auch kein Ausbilder. | M05-R02, M05-R09, M05-R19 | AK-704-01 bis AK-704-06 | Fachlogik |
 
 Keine AK von M05 ist nur im Browser prüfbar; es gibt deshalb keine Markierung `Ablauf, G3`. Einzelne Teile betreffen

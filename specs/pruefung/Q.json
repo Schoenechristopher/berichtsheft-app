@@ -1,0 +1,162 @@
+[
+  {
+    "id": "AK-1101-01",
+    "modul": "Q",
+    "ebene": "ablauf",
+    "beschreibung": "Kernablauf in jedem Browser des Runners: Anna erfasst und reicht ein, Bernd gibt frei.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Fr",
+        "tagesart": "Berufsschule",
+        "text": "Subnetting"
+      },
+      {
+        "als": "anna",
+        "aktion": "speichern"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "anmelden",
+        "uhr": "2026-09-16T09:30:00+02:00"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "freigeben"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "gespeichert": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "bernd"
+        },
+        {
+          "status": "Freigegeben"
+        },
+        {
+          "seite": "bericht",
+          "angemeldet": "bernd",
+          "passwortfeld": false,
+          "woche": "2026-W37",
+          "status": "Freigegeben",
+          "ungespeichert": false,
+          "tage": null,
+          "weitere_felder": [],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-09-16T09:00:00+02:00"
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-09-16T09:30:00+02:00"
+            }
+          ]
+        }
+      ]
+    }
+  }
+]
