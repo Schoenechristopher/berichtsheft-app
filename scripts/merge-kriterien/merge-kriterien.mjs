@@ -41,10 +41,30 @@
  */
 
 /**
+ * @typedef {object} Grund Ein Verstoß als fester Code mit Detail; der Text entsteht in {@link grundText}.
+ * @property {string} code Fester Code, z. B. `geschuetzter-pfad`, `offene-frage`, `abnahme-ohne-sha`.
+ * @property {string} [detail] Pfad, Punkt, AK-ID, Paket, Stand oder Zeilenzahl.
+ * @property {string} [zeile] Bei `test-uebersprungen` die Zeile.
+ * @property {number} [vorher] Bei `weniger-tests`.
+ * @property {number} [nachher] Bei `weniger-tests`.
+ * @property {string} [von] Bei Dependabot die bisherige Version.
+ * @property {string} [nach] Bei Dependabot die neue Version.
+ */
+
+/**
+ * @typedef {object} Kriterium Ein ausgewertetes Kriterium (Entscheidung 2a).
+ * @property {keyof typeof KRITERIEN} id AM-R-ID oder `Herkunft`.
+ * @property {boolean} erfuellt
+ * @property {Grund[]} gruende Verstöße; leer, wenn erfüllt.
+ * @property {"revert" | "dependabot" | "kein-dependabot"} [entfaellt] Das Kriterium gilt für diesen PR nicht.
+ */
+
+/**
  * @typedef {object} Entscheidung
  * @property {boolean} antrag Label `automerge` ist gesetzt.
  * @property {boolean} zulaessig Der Check ist grün.
- * @property {string[]} gruende Verstöße; leer, wenn zulässig.
+ * @property {string[]} gruende Verstöße als Text; leer, wenn zulässig.
+ * @property {Kriterium[]} kriterien Jedes ausgewertete Kriterium einzeln; ohne Antrag nur AM-R01.
  * @property {boolean} zulaessigOhneSchalter Ergebnis ohne AM-R12, für den Schattenbetrieb (AM-R14).
  * @property {string} hinweis Kurzfassung für die Zusammenfassung des Laufs.
  */
@@ -135,25 +155,44 @@ function ohneZeichenketten(/** @type {string} */ zeile) {
   return zeile.replace(/(["'`])(?:\\.|(?!\1).)*\1/g, '""');
 }
 
+/** Höchstlänge eines Punkts in einem Grund (AM-R05). */
+const MAX_PUNKT = 120;
+
+/** Überschrift „Bitte bestätigen“: jede Ebene, mit oder ohne Doppelpunkt, oder eine Zeile nur aus Fettschrift. */
+const BITTE_BESTAETIGEN =
+  /^(?:#{1,6}\s*(?:\*\*|__)?\s*Bitte bestätigen(?![\p{L}\p{N}])|(?:\*\*|__)\s*Bitte bestätigen\s*:?\s*(?:\*\*|__)\s*:?$)/iu;
+
 /**
- * Nicht abgehakte Punkte im Abschnitt „Bitte bestätigen“ der PR-Beschreibung (AM-R05).
+ * Offene Punkte im Abschnitt „Bitte bestätigen“ der PR-Beschreibung (AM-R05), fail-closed: Jeder Listenpunkt (`-`,
+ * `*`, `+` oder nummeriert, auch eingerückt) zählt als offen, außer er ist mit `[x]` abgehakt. Der Abschnitt endet an der
+ * nächsten Überschrift (`#`); Zeilen in Codeblöcken beenden ihn nicht.
  * @param {string} beschreibung
- * @returns {string[]}
+ * @returns {string[]} Die offenen Punkte, auf {@link MAX_PUNKT} Zeichen gekürzt.
  */
 export function offenePunkte(beschreibung) {
-  const zeilen = beschreibung.split(/\r?\n/);
-  const start = zeilen.findIndex((zeile) => /^#{1,6}\s*Bitte bestätigen\b/i.test(zeile.trim()));
-  if (start < 0) {
-    return [];
-  }
   const punkte = [];
-  for (const zeile of zeilen.slice(start + 1)) {
-    if (/^#{1,6}\s/.test(zeile.trim())) {
-      break;
+  let imAbschnitt = false;
+  let imCode = false;
+  for (const zeile of beschreibung.split(/\r?\n/)) {
+    const text = zeile.trim();
+    if (/^(```|~~~)/.test(text)) {
+      imCode = !imCode;
     }
-    const treffer = /^\s*(?:[-*+]|\d+[.)])\s+\[ \]\s+(.*)$/.exec(zeile);
-    if (treffer) {
-      punkte.push(treffer[1].trim());
+    if (!imCode && /^#{1,6}(\s|$)/.test(text)) {
+      imAbschnitt = BITTE_BESTAETIGEN.test(text);
+      continue;
+    }
+    if (!imCode && BITTE_BESTAETIGEN.test(text)) {
+      imAbschnitt = true;
+      continue;
+    }
+    if (!imAbschnitt || /^([-*_])(\s*\1){2,}$/.test(text)) {
+      continue;
+    }
+    const treffer = /^(?:[-*+]|\d+[.)])\s+(\S.*)$/.exec(text);
+    if (treffer && !/^\[[xX]\]/.test(treffer[1])) {
+      const punkt = treffer[1].replace(/^\[\s?\]\s*/, "").trim();
+      punkte.push(punkt.length > MAX_PUNKT ? `${punkt.slice(0, MAX_PUNKT - 1)}…` : punkt);
     }
   }
   return punkte;
@@ -199,52 +238,146 @@ function teile(version) {
  * Prüft einen Dependabot-PR nach AM-R09.
  * @param {string} titel
  * @param {string[]} laufzeit
- * @returns {string[]} Verstöße
+ * @returns {Grund[]} Verstöße
  */
 export function pruefeDependabot(titel, laufzeit) {
   const treffer = /^(?:chore(?:\(deps(?:-dev)?\))?: )?Bump (\S+) from (\S+) to (\S+)/i.exec(titel);
   if (!treffer) {
-    return [`Dependabot: Update nicht auswertbar (z. B. Gruppen-Update), Chris gibt frei: „${titel}“`];
+    return [{ code: "dependabot-nicht-auswertbar", detail: titel }];
   }
   const [, paket, von, nach] = treffer;
   const alt = teile(von);
   const neu = teile(nach);
   if (!alt || !neu) {
-    return [`Dependabot: Version nicht auswertbar: ${paket} ${von} → ${nach}`];
+    return [{ code: "dependabot-version-unklar", detail: paket, von, nach }];
   }
   if (neu[0] !== alt[0]) {
-    return [`Major-Version: ${paket} ${von} → ${nach}`];
+    return [{ code: "major-version", detail: paket, von, nach }];
   }
   // Unbekannte Pakete gelten vorsichtshalber als Laufzeitabhängigkeit.
   if (neu[1] !== alt[1] && laufzeit.includes(paket)) {
-    return [`Minor-Version einer Laufzeitabhängigkeit: ${paket} ${von} → ${nach}`];
+    return [{ code: "minor-laufzeit", detail: paket, von, nach }];
   }
   return [];
 }
 
 /**
  * Prüft die Abnahme der Steuerung nach AM-R07: Kommentar mit `<!-- abnahme-steuerung sha=<Stand> -->` von einem Konto mit
- * Schreibrecht, für den aktuellen Stand des PRs.
+ * Schreibrecht, für den aktuellen Stand des PRs. Ohne gültiges `sha=` (7 bis 40 Hexadezimalzeichen) gilt die Abnahme als
+ * fehlend (`abnahme-ohne-sha`); `abnahme-veraltet` nur, wenn ein gültiges `sha=` nicht zum Stand passt.
  * @param {Kommentar[]} kommentare
  * @param {string} headSha
- * @returns {string[]} Verstöße
+ * @returns {Grund[]} Verstöße
  */
 export function pruefeAbnahme(kommentare, headSha) {
   const abnahmen = kommentare
     .map((kommentar) => ({
       kommentar,
-      sha: new RegExp(`<!--\\s*${MARKIERUNG_ABNAHME}(?:\\s+sha=([0-9a-f]{7,40}))?\\s*-->`, "i").exec(kommentar.text),
+      markierung: new RegExp(`<!--\\s*${MARKIERUNG_ABNAHME}(?![\\w-])([^>]*?)-->`, "i").exec(kommentar.text),
     }))
-    .filter(({ sha }) => sha !== null);
+    .filter(({ markierung }) => markierung !== null);
   if (abnahmen.length === 0) {
-    return ["Abnahme der Steuerung fehlt"];
+    return [{ code: "abnahme-fehlt" }];
   }
   const mitRecht = abnahmen.filter(({ kommentar }) => kommentar.schreibrecht);
   if (mitRecht.length === 0) {
-    return ["Abnahme der Steuerung stammt von einem Konto ohne Schreibrecht"];
+    return [{ code: "abnahme-ohne-schreibrecht" }];
   }
-  const aktuell = mitRecht.some(({ sha }) => sha?.[1] && headSha.startsWith(sha[1].toLowerCase()));
-  return aktuell ? [] : ["Abnahme der Steuerung ist älter als der letzte Push (gilt nicht für den aktuellen Stand)"];
+  const stande = mitRecht
+    .map(({ markierung }) => /(?:^|\s)sha=([0-9a-f]{7,40})(?=\s|$)/i.exec(markierung?.[1] ?? "")?.[1]?.toLowerCase())
+    .filter((sha) => sha !== undefined);
+  if (stande.length === 0) {
+    return [{ code: "abnahme-ohne-sha" }];
+  }
+  const kopf = headSha.toLowerCase();
+  return stande.some((sha) => kopf.startsWith(sha)) ? [] : [{ code: "abnahme-veraltet", detail: stande.at(-1) }];
+}
+
+/**
+ * Lesbarer Text zu einem Grund. Tests prüfen Code und Detail, nicht diesen Wortlaut.
+ * @param {Grund} grund
+ */
+export function grundText(grund) {
+  const { detail = "", von, nach } = grund;
+  switch (grund.code) {
+    case "kein-antrag":
+      return "kein Antrag (Label `automerge` fehlt)";
+    case "pr-von-aussen":
+      return "PR von außen";
+    case "geschuetzter-pfad":
+      return `geschützter Pfad: ${detail}`;
+    case "offene-frage":
+      return `offener Punkt unter „Bitte bestätigen“: ${detail}`;
+    case "testdatei-geloescht":
+      return `Testdatei gelöscht: ${detail}`;
+    case "testdatei-umbenannt":
+      return `Testdatei umbenannt: ${detail}`;
+    case "test-uebersprungen":
+      return `Test übersprungen oder eingeschränkt in ${detail}: ${grund.zeile ?? ""}`;
+    case "weniger-tests":
+      return `weniger Tests zu ${detail}: vorher ${grund.vorher}, nachher ${grund.nachher}`;
+    case "prueffall-entfernt":
+      return `Prüffall entfernt: ${detail}`;
+    case "abnahme-fehlt":
+      return "Abnahme der Steuerung fehlt";
+    case "abnahme-ohne-schreibrecht":
+      return "Abnahme der Steuerung stammt von einem Konto ohne Schreibrecht";
+    case "abnahme-ohne-sha":
+      return "Abnahme-Kommentar ohne gültiges sha=<Commit>";
+    case "abnahme-veraltet":
+      return `Abnahme der Steuerung gilt für ${detail}, nicht für den aktuellen Stand (älter als der letzte Push)`;
+    case "dependabot-nicht-auswertbar":
+      return `Dependabot: Update nicht auswertbar (z. B. Gruppen-Update), Chris gibt frei: „${detail}“`;
+    case "dependabot-version-unklar":
+      return `Dependabot: Version nicht auswertbar: ${detail} ${von} → ${nach}`;
+    case "major-version":
+      return `Major-Version: ${detail} ${von} → ${nach}`;
+    case "minor-laufzeit":
+      return `Minor-Version einer Laufzeitabhängigkeit: ${detail} ${von} → ${nach}`;
+    case "zu-gross":
+      return `zu groß: ${detail} geänderte Zeilen (höchstens ${MAX_ZEILEN})`;
+    case "main-rot":
+      return "main ist rot";
+    case "schalter-aus":
+      return "Schalter aus (.github/automerge.yml: aktiv: false)";
+    default:
+      return detail ? `${grund.code}: ${detail}` : grund.code;
+  }
+}
+
+/** Ausgewertete Kriterien in der Reihenfolge der Spec, mit Bezeichnung für die Zusammenfassung (AM-S02). */
+export const KRITERIEN = /** @type {const} */ ({
+  "AM-R01": "Antrag (Label `automerge`)",
+  Herkunft: "PR aus diesem Repository (Geltungsbereich)",
+  "AM-R04": "Keine geschützten Pfade",
+  "AM-R05": "Keine offenen Fragen",
+  "AM-R06": "Keine schwächeren Tests",
+  "AM-R07": "Abnahme der Steuerung",
+  "AM-R09": "Dependabot",
+  "AM-R10": "Größe",
+  "AM-R11": "main ist grün",
+  "AM-R12": "Schalter an",
+});
+
+/** Nicht in diesem Check ausgewertet; steht als Hinweis unter der Tabelle. */
+export const NICHT_MASCHINELL =
+  "AM-R02 und AM-R03 (Ablauf der Steuerung), AM-R08 (Pflicht-Check „Prüfung abgeschlossen“), AM-R13 bis AM-R15 (nach dem Merge)";
+
+/** Entfallende Kriterien: Grund des Entfallens als fester Code. */
+const ENTFAELLT_TEXT = {
+  revert: "entfällt beim Revert (AM-R13)",
+  dependabot: "entfällt bei Dependabot (AM-R09)",
+  "kein-dependabot": "nur für Dependabot-PRs",
+};
+
+/**
+ * @param {keyof typeof KRITERIEN} id
+ * @param {Grund[]} gruende
+ * @param {Kriterium["entfaellt"]} [entfaellt]
+ * @returns {Kriterium}
+ */
+function kriterium(id, gruende, entfaellt) {
+  return entfaellt ? { id, erfuellt: true, gruende: [], entfaellt } : { id, erfuellt: gruende.length === 0, gruende };
 }
 
 /**
@@ -259,48 +392,62 @@ export function entscheideAutomerge(pr) {
       antrag: true,
       zulaessig: true,
       gruende: [],
+      kriterien: [],
       zulaessigOhneSchalter: true,
       hinweis: "Merge-Warteschlange",
     };
   }
   if (!pr.labels.includes(LABEL_ANTRAG)) {
-    return { antrag: false, zulaessig: true, gruende: [], zulaessigOhneSchalter: true, hinweis: "kein Antrag" };
+    return {
+      antrag: false,
+      zulaessig: true,
+      gruende: [],
+      kriterien: [{ id: "AM-R01", erfuellt: false, gruende: [{ code: "kein-antrag" }] }],
+      zulaessigOhneSchalter: true,
+      hinweis: "kein Antrag",
+    };
   }
 
   const revert = pr.labels.includes(LABEL_REVERT);
   const dependabot = pr.autor === DEPENDABOT;
-  /** @type {string[]} */
-  const gruende = [];
+  /** @type {Kriterium[]} */
+  const kriterien = [kriterium("AM-R01", [])];
 
-  if (pr.vonAussen) {
-    gruende.push("PR von außen");
-  }
+  kriterien.push(kriterium("Herkunft", pr.vonAussen ? [{ code: "pr-von-aussen" }] : []));
 
   // AM-R04 geschützte Pfade; nicht für den Revert (AM-R13), für Dependabot ohne package.json/package-lock.json (AM-R09).
-  if (!revert) {
-    const pfade = new Set(pr.dateien.flatMap((datei) => [datei.pfad, ...(datei.alterPfad ? [datei.alterPfad] : [])]));
-    for (const pfad of [...pfade].sort()) {
-      if (istGeschuetzt(pfad) && !(dependabot && ABHAENGIGKEITEN.has(pfad))) {
-        gruende.push(`geschützter Pfad: ${pfad}`);
-      }
-    }
-  }
+  const pfade = new Set(pr.dateien.flatMap((datei) => [datei.pfad, ...(datei.alterPfad ? [datei.alterPfad] : [])]));
+  kriterien.push(
+    kriterium(
+      "AM-R04",
+      [...pfade]
+        .sort()
+        .filter((pfad) => istGeschuetzt(pfad) && !(dependabot && ABHAENGIGKEITEN.has(pfad)))
+        .map((pfad) => ({ code: "geschuetzter-pfad", detail: pfad })),
+      revert ? "revert" : undefined,
+    ),
+  );
 
   // AM-R05 offene Fragen
-  for (const punkt of offenePunkte(pr.beschreibung)) {
-    gruende.push(`offener Punkt unter „Bitte bestätigen“: ${punkt}`);
-  }
+  kriterien.push(
+    kriterium(
+      "AM-R05",
+      offenePunkte(pr.beschreibung).map((punkt) => ({ code: "offene-frage", detail: punkt })),
+    ),
+  );
 
   // AM-R06 keine schwächeren Tests
+  /** @type {Grund[]} */
+  const tests = [];
   for (const datei of pr.dateien) {
     const alt = datei.alterPfad ?? datei.pfad;
     if ((datei.status === "D" || datei.status === "R") && istTestdatei(alt)) {
-      gruende.push(`Testdatei ${datei.status === "D" ? "gelöscht" : "umbenannt"}: ${alt}`);
+      tests.push({ code: datei.status === "D" ? "testdatei-geloescht" : "testdatei-umbenannt", detail: alt });
     }
     if (istTestdatei(datei.pfad)) {
       for (const zeile of datei.neueZeilen ?? []) {
         if (SKIP_MUSTER.test(ohneZeichenketten(zeile))) {
-          gruende.push(`Test übersprungen oder eingeschränkt in ${datei.pfad}: ${zeile.trim()}`);
+          tests.push({ code: "test-uebersprungen", detail: datei.pfad, zeile: zeile.trim() });
         }
       }
     }
@@ -308,48 +455,88 @@ export function entscheideAutomerge(pr) {
   for (const [id, vorher] of Object.entries(pr.testsVorher).sort(([a], [b]) => a.localeCompare(b))) {
     const nachher = pr.testsNachher[id] ?? 0;
     if (nachher < vorher) {
-      gruende.push(`weniger Tests zu ${id}: vorher ${vorher}, nachher ${nachher}`);
+      tests.push({ code: "weniger-tests", detail: id, vorher, nachher });
     }
   }
   const nachher = new Set(pr.prueffaelleNachher);
   for (const id of pr.prueffaelleVorher.filter((fall) => !nachher.has(fall)).sort()) {
-    gruende.push(`Prüffall entfernt: ${id}`);
+    tests.push({ code: "prueffall-entfernt", detail: id });
   }
+  kriterien.push(kriterium("AM-R06", tests));
 
   // AM-R07 Abnahme der Steuerung; nicht für Dependabot (AM-R09) und den Revert (AM-R13).
-  if (!dependabot && !revert) {
-    gruende.push(...pruefeAbnahme(pr.kommentare, pr.headSha));
-  }
+  kriterien.push(
+    kriterium(
+      "AM-R07",
+      dependabot || revert ? [] : pruefeAbnahme(pr.kommentare, pr.headSha),
+      revert ? "revert" : dependabot ? "dependabot" : undefined,
+    ),
+  );
 
   // AM-R09 Dependabot
-  if (dependabot) {
-    gruende.push(...pruefeDependabot(pr.titel, pr.laufzeitAbhaengigkeiten));
-  }
+  kriterien.push(
+    kriterium(
+      "AM-R09",
+      dependabot ? pruefeDependabot(pr.titel, pr.laufzeitAbhaengigkeiten) : [],
+      dependabot ? undefined : "kein-dependabot",
+    ),
+  );
 
   // AM-R10 Größe
   const zeilen = pr.dateien
     .filter((datei) => !NICHT_GEZAEHLT.has(datei.pfad))
     .reduce((summe, datei) => summe + datei.zeilen, 0);
-  if (zeilen > MAX_ZEILEN) {
-    gruende.push(`zu groß: ${zeilen} geänderte Zeilen (höchstens ${MAX_ZEILEN})`);
-  }
+  kriterien.push(kriterium("AM-R10", zeilen > MAX_ZEILEN ? [{ code: "zu-gross", detail: String(zeilen) }] : []));
 
   // AM-R11 main grün; der Revert darf trotzdem (AM-R13).
-  if (!pr.mainGruen && !revert) {
-    gruende.push("main ist rot");
-  }
+  kriterien.push(kriterium("AM-R11", pr.mainGruen ? [] : [{ code: "main-rot" }], revert ? "revert" : undefined));
 
-  const zulaessigOhneSchalter = gruende.length === 0;
   // AM-R12 Schalter
-  if (!pr.schalterAn) {
-    gruende.push("Schalter aus (.github/automerge.yml: aktiv: false)");
-  }
+  kriterien.push(kriterium("AM-R12", pr.schalterAn ? [] : [{ code: "schalter-aus" }]));
 
+  const gruende = kriterien.flatMap((eintrag) => eintrag.gruende.map(grundText));
+  const zulaessigOhneSchalter = kriterien.every((eintrag) => eintrag.erfuellt || eintrag.id === "AM-R12");
   return {
     antrag: true,
     zulaessig: gruende.length === 0,
     gruende,
+    kriterien,
     zulaessigOhneSchalter,
     hinweis: gruende.length === 0 ? "zulässig" : `nicht zulässig (${gruende.length} Gründe)`,
   };
+}
+
+/** Zelle einer Markdown-Tabelle: `|` maskieren, Zeilenumbrüche entfernen. */
+function zelle(/** @type {string} */ text) {
+  return text.replace(/\r?\n/g, " ").replace(/\|/g, "\\|");
+}
+
+/**
+ * Zusammenfassung des Laufs als Markdown (AM-S02): Ergebnis und eine Tabelle mit jedem ausgewerteten Kriterium. Die
+ * Steuerung übernimmt die Tabelle in den Kommentar nach dem Merge (AM-AK-13).
+ * @param {Entscheidung} entscheidung
+ * @returns {string}
+ */
+export function erstelleBericht(entscheidung) {
+  const ja = (/** @type {boolean} */ wert) => (wert ? "ja" : "nein");
+  const zeilen = ["### Merge-Kriterien", "", `Ergebnis: **${entscheidung.hinweis}**`, ""];
+  if (entscheidung.antrag && entscheidung.kriterien.length > 0) {
+    zeilen.push(
+      `- Zulässig: ${ja(entscheidung.zulaessig)}`,
+      `- Zulässig ohne Schalter (Schattenbetrieb, AM-R14): ${ja(entscheidung.zulaessigOhneSchalter)}`,
+      "",
+    );
+  }
+  if (entscheidung.kriterien.length > 0) {
+    zeilen.push("| Kriterium | Ergebnis | Grund |", "| --- | --- | --- |");
+    for (const eintrag of entscheidung.kriterien) {
+      const ergebnis = eintrag.entfaellt ? "entfällt" : eintrag.erfuellt ? "erfüllt" : "nicht erfüllt";
+      const grund = eintrag.entfaellt
+        ? ENTFAELLT_TEXT[eintrag.entfaellt]
+        : eintrag.gruende.map((g) => zelle(grundText(g))).join("<br>");
+      zeilen.push(`| ${eintrag.id} ${KRITERIEN[eintrag.id]} | ${ergebnis} | ${grund} |`);
+    }
+    zeilen.push("", `Nicht in diesem Check ausgewertet: ${NICHT_MASCHINELL}.`, "");
+  }
+  return zeilen.join("\n");
 }

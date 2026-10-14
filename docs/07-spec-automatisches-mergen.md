@@ -68,8 +68,9 @@ bei einem Fehler passiert.**
     lassen sich nicht einfach zurücknehmen. `service.xml` in `liferay-625/` und `liferay-72/` ist nicht geschützt, weil
     dort noch keine Daten bestehen; dass die Tabellen dem Profil entsprechen, prüft die Abnahme der Steuerung (AM-R07).
   - Die Umsetzung dieser Spec selbst: `scripts/merge-kriterien/**`.
-- **AM-R05 Offene Fragen:** Steht in der PR-Beschreibung unter „Bitte bestätigen“ ein Punkt, der nicht abgehakt ist
-  (`- [ ]`), ist automatisches Mergen ausgeschlossen. Fragen an Chris werden also nie übergangen.
+- **AM-R05 Offene Fragen:** Steht in der PR-Beschreibung unter „Bitte bestätigen“ ein Listenpunkt, der nicht mit `[x]`
+  abgehakt ist, ist automatisches Mergen ausgeschlossen. Das gilt für jeden Listenpunkt, auch nummeriert oder ohne
+  Checkbox. Fragen an Chris werden also nie übergangen.
 - **AM-R06 Keine schwächeren Tests:** Ausgeschlossen ist ein PR, der
   - eine Testdatei löscht oder umbenennt (`*.test.ts`, `e2e/**`, `tests/**`, Liferay-Testordner),
   - einen Test überspringt oder einschränkt (`.skip`, `.only`, `.fixme`, `test.fail`, `@Ignore`, `@Disabled`),
@@ -79,7 +80,8 @@ bei einem Fehler passiert.**
 ### Was erfüllt sein muss
 
 - **AM-R07 Abnahme der Steuerung:** Am PR steht ein Abnahme-Kommentar mit `<!-- abnahme-steuerung sha=<Commit> -->` von
-  einem Konto mit Schreibrecht, und `<Commit>` ist der aktuelle Stand des PRs (mindestens 7 Zeichen). Nach jedem Push
+  einem Konto mit Schreibrecht, und `<Commit>` ist der aktuelle Stand des PRs (mindestens 7 Zeichen); ohne gültiges
+  `sha=` gilt die Abnahme als fehlend, Grund `abnahme-ohne-sha`. Nach jedem Push
   ist eine neue Abnahme nötig. Schreibrecht heißt: Eigentümer, Mitglied der Organisation oder Mitarbeitender des
   Repositorys. Die Prüfliste darin umfasst:
   - Arbeitspaket nach Playbook erledigt.
@@ -150,7 +152,7 @@ Ablauf-Kriterien werden einmal an echten Test-PRs geprüft und im PR der Umsetzu
   - Nicht bei `issue_comment`: Solche Läufe gehören zum Stand von `main` und melden kein Ergebnis am PR. Deshalb
     schreibt die Steuerung die Abnahme vor dem Label. Kommt danach ein Push, ist die Abnahme veraltet (AM-R07); die
     Steuerung nimmt dann neu ab und setzt das Label erneut.
-  - Er sammelt die Eingaben und ruft AM-S01 auf. Dateien, Zeilen, Tests je AK-ID (`docs/03-testabdeckung.md`) und
+  - Er sammelt die Eingaben und ruft AM-S01 auf. Die Zusammenfassung listet jedes ausgewertete Kriterium einzeln. Dateien, Zeilen, Tests je AK-ID (`docs/03-testabdeckung.md`) und
     Prüffälle liest er aus dem Test-Merge des PRs, Kommentare und den Status von `main` aus der GitHub-API, mit
     `permissions: contents: read, pull-requests: read, issues: read, actions: read`.
   - Er setzt nie selbst Labels und mergt nie selbst. Ein Merge mit dem `GITHUB_TOKEN` würde die Prüfung auf `main` nicht

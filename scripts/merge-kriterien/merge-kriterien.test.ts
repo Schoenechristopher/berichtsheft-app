@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   entscheideAutomerge,
+  erstelleBericht,
   istGeschuetzt,
+  KRITERIEN,
   offenePunkte,
   pruefeDependabot,
   prueffallIds,
   testsJeAk,
+  type Entscheidung,
   type PrDaten,
 } from "./merge-kriterien.mjs";
 
@@ -35,9 +38,22 @@ function pr(teil: Partial<PrDaten> = {}): PrDaten {
   };
 }
 
+/** Verstöße als Kriterium, Code und Detail; Tests prüfen diese, nicht den Wortlaut. */
+function verstoesse(entscheidung: Entscheidung) {
+  return entscheidung.kriterien.flatMap(({ id, gruende }) =>
+    gruende.map(({ code, detail }) => (detail === undefined ? { id, code } : { id, code, detail })),
+  );
+}
+
 describe("entscheideAutomerge (docs/07-spec-automatisches-mergen.md)", () => {
   it("zulässig, wenn alle Regeln erfüllt sind", () => {
     expect(entscheideAutomerge(pr())).toMatchObject({ antrag: true, zulaessig: true, gruende: [] });
+  });
+
+  it("ein vollständig zulässiger PR hat nur erfüllte Kriterien", () => {
+    const { kriterien } = entscheideAutomerge(pr());
+    expect(kriterien.map(({ id }) => id)).toEqual(Object.keys(KRITERIEN));
+    expect(kriterien.every(({ erfuellt, gruende }) => erfuellt && gruende.length === 0)).toBe(true);
   });
 
   it("AM-AK-01 ohne Label automerge: grün mit „kein Antrag“, auch bei geschützten Pfaden", () => {
@@ -45,6 +61,7 @@ describe("entscheideAutomerge (docs/07-spec-automatisches-mergen.md)", () => {
       pr({ labels: [], dateien: [{ pfad: "docs/01-spezifikation.md", status: "M", zeilen: 3 }], schalterAn: false }),
     );
     expect(entscheidung).toMatchObject({ antrag: false, zulaessig: true, hinweis: "kein Antrag" });
+    expect(verstoesse(entscheidung)).toEqual([{ id: "AM-R01", code: "kein-antrag" }]);
   });
 
   it("AM-AK-02 Antrag und Änderung an der Spezifikation: rot mit geschütztem Pfad", () => {
@@ -52,19 +69,73 @@ describe("entscheideAutomerge (docs/07-spec-automatisches-mergen.md)", () => {
       pr({ dateien: [{ pfad: "docs/01-spezifikation.md", status: "M", zeilen: 3 }] }),
     );
     expect(entscheidung.zulaessig).toBe(false);
-    expect(entscheidung.gruende).toContain("geschützter Pfad: docs/01-spezifikation.md");
+    expect(verstoesse(entscheidung)).toEqual([
+      { id: "AM-R04", code: "geschuetzter-pfad", detail: "docs/01-spezifikation.md" },
+    ]);
   });
 
   it("AM-AK-03 PR aus einem Fork: rot mit „PR von außen“", () => {
-    expect(entscheideAutomerge(pr({ vonAussen: true })).gruende).toContain("PR von außen");
+    expect(verstoesse(entscheideAutomerge(pr({ vonAussen: true })))).toEqual([
+      { id: "Herkunft", code: "pr-von-aussen" },
+    ]);
   });
 
   it("AM-AK-04 nicht abgehakter Punkt unter „Bitte bestätigen“: rot und nennt den Punkt", () => {
     const beschreibung =
       "## Bitte bestätigen\n\n- [x] Schon erledigt\n- [ ] Tabellenname report_day\n\n## Prüfung\n- [ ] egal";
-    expect(entscheideAutomerge(pr({ beschreibung })).gruende).toEqual([
-      "offener Punkt unter „Bitte bestätigen“: Tabellenname report_day",
+    expect(verstoesse(entscheideAutomerge(pr({ beschreibung })))).toEqual([
+      { id: "AM-R05", code: "offene-frage", detail: "Tabellenname report_day" },
     ]);
+  });
+
+  it("AM-AK-04 nummerierte Frage ohne Checkbox: rot mit offene-frage", () => {
+    const beschreibung = "## Bitte bestätigen:\n\n1. Soll die Spalte report_day heißen?\n2. [x] Erledigt\n";
+    const entscheidung = entscheideAutomerge(pr({ beschreibung }));
+    expect(entscheidung.zulaessig).toBe(false);
+    expect(verstoesse(entscheidung)).toEqual([
+      { id: "AM-R05", code: "offene-frage", detail: "Soll die Spalte report_day heißen?" },
+    ]);
+  });
+
+  it("AM-AK-04 jeder Listenpunkt zählt, auch eingerückt und ohne Checkbox; nur [x] oder [X] ist erledigt", () => {
+    const beschreibung = [
+      "#### Bitte bestätigen",
+      "- Frage ohne Checkbox",
+      "  * Unterpunkt",
+      "+ [ ] Plus mit Checkbox",
+      "- [X] Groß abgehakt",
+      "- [x] klein abgehakt",
+      "3) Klammer-Nummer",
+      "Freitext ist kein Listenpunkt",
+      "## Prüfung",
+      "- danach nicht mehr",
+    ].join("\n");
+    expect(offenePunkte(beschreibung)).toEqual([
+      "Frage ohne Checkbox",
+      "Unterpunkt",
+      "Plus mit Checkbox",
+      "Klammer-Nummer",
+    ]);
+  });
+
+  it("AM-AK-04 abgehakter Punkt - [x]: kein Grund", () => {
+    const entscheidung = entscheideAutomerge(pr({ beschreibung: "## Bitte bestätigen\n\n- [x] Erledigt\n" }));
+    expect(entscheidung.zulaessig).toBe(true);
+    expect(entscheidung.kriterien.find(({ id }) => id === "AM-R05")).toMatchObject({ erfuellt: true, gruende: [] });
+  });
+
+  it("AM-AK-04 fette Zeile **Bitte bestätigen** wird als Überschrift erkannt", () => {
+    const beschreibung = "Text\n\n**Bitte bestätigen**\n\n- Darf die Migration so bleiben?\n";
+    expect(verstoesse(entscheideAutomerge(pr({ beschreibung })))).toEqual([
+      { id: "AM-R05", code: "offene-frage", detail: "Darf die Migration so bleiben?" },
+    ]);
+    expect(offenePunkte("**Bitte bestätigen:**\n1. Frage")).toEqual(["Frage"]);
+  });
+
+  it("AM-AK-04 lange Punkte werden gekürzt genannt", () => {
+    const [punkt] = offenePunkte(`## Bitte bestätigen\n- ${"x".repeat(300)}`);
+    expect(punkt).toHaveLength(120);
+    expect(punkt.endsWith("…")).toBe(true);
   });
 
   it("AM-AK-05 gelöschter Test, neues .skip oder weniger Tests zu einer ID: rot und nennt Datei bzw. ID", () => {
@@ -79,11 +150,15 @@ describe("entscheideAutomerge (docs/07-spec-automatisches-mergen.md)", () => {
         testsNachher: { "AK-401": 2, "UI-AK-02": 1 },
       }),
     );
-    expect(entscheidung.gruende).toEqual([
-      "Testdatei gelöscht: src/domain/weeks.test.ts",
-      "Test übersprungen oder eingeschränkt in e2e/helpers.ts: test.skip(true, 'später');",
-      "weniger Tests zu AK-401: vorher 3, nachher 2",
+    expect(verstoesse(entscheidung)).toEqual([
+      { id: "AM-R06", code: "testdatei-geloescht", detail: "src/domain/weeks.test.ts" },
+      { id: "AM-R06", code: "test-uebersprungen", detail: "e2e/helpers.ts" },
+      { id: "AM-R06", code: "weniger-tests", detail: "AK-401" },
     ]);
+    expect(entscheidung.kriterien.find(({ id }) => id === "AM-R06")?.gruende[2]).toMatchObject({
+      vorher: 3,
+      nachher: 2,
+    });
   });
 
   it("AM-AK-05 umbenannte Testdatei und entfernter Prüffall sind ebenfalls rot", () => {
@@ -94,18 +169,47 @@ describe("entscheideAutomerge (docs/07-spec-automatisches-mergen.md)", () => {
         prueffaelleNachher: ["AK-503-01"],
       }),
     );
-    expect(entscheidung.gruende).toEqual(["Testdatei umbenannt: tests/db/alt.test.ts", "Prüffall entfernt: AK-503-02"]);
+    expect(verstoesse(entscheidung)).toEqual([
+      { id: "AM-R06", code: "testdatei-umbenannt", detail: "tests/db/alt.test.ts" },
+      { id: "AM-R06", code: "prueffall-entfernt", detail: "AK-503-02" },
+    ]);
   });
 
   it("AM-AK-06 Abnahme fehlt, ist veraltet oder ohne Schreibrecht: rot", () => {
-    expect(entscheideAutomerge(pr({ kommentare: [] })).gruende).toEqual(["Abnahme der Steuerung fehlt"]);
+    expect(verstoesse(entscheideAutomerge(pr({ kommentare: [] })))).toEqual([{ id: "AM-R07", code: "abnahme-fehlt" }]);
     expect(
-      entscheideAutomerge(pr({ kommentare: [{ text: "<!-- abnahme-steuerung sha=fedcba9 -->", schreibrecht: true }] }))
-        .gruende,
-    ).toEqual(["Abnahme der Steuerung ist älter als der letzte Push (gilt nicht für den aktuellen Stand)"]);
-    expect(entscheideAutomerge(pr({ kommentare: [{ ...ABNAHME, schreibrecht: false }] })).gruende).toEqual([
-      "Abnahme der Steuerung stammt von einem Konto ohne Schreibrecht",
+      verstoesse(
+        entscheideAutomerge(
+          pr({ kommentare: [{ text: "<!-- abnahme-steuerung sha=fedcba9 -->", schreibrecht: true }] }),
+        ),
+      ),
+    ).toEqual([{ id: "AM-R07", code: "abnahme-veraltet", detail: "fedcba9" }]);
+    expect(verstoesse(entscheideAutomerge(pr({ kommentare: [{ ...ABNAHME, schreibrecht: false }] })))).toEqual([
+      { id: "AM-R07", code: "abnahme-ohne-schreibrecht" },
     ]);
+  });
+
+  it("AM-AK-06 Markierung ohne sha= oder mit ungültigem sha=: abnahme-ohne-sha", () => {
+    for (const text of [
+      "Abnahme bestanden.\n<!-- abnahme-steuerung -->",
+      "<!-- abnahme-steuerung sha= -->",
+      "<!-- abnahme-steuerung sha=xyz1234 -->",
+      "<!-- abnahme-steuerung sha=abc12 -->",
+    ]) {
+      expect(verstoesse(entscheideAutomerge(pr({ kommentare: [{ text, schreibrecht: true }] })))).toEqual([
+        { id: "AM-R07", code: "abnahme-ohne-sha" },
+      ]);
+    }
+  });
+
+  it("AM-AK-06 gültiges, aber fremdes sha=: abnahme-veraltet; passendes sha=: erfüllt", () => {
+    const fremd = { text: `<!-- abnahme-steuerung sha=${"f".repeat(40)} -->`, schreibrecht: true };
+    expect(verstoesse(entscheideAutomerge(pr({ kommentare: [fremd] })))).toEqual([
+      { id: "AM-R07", code: "abnahme-veraltet", detail: "f".repeat(40) },
+    ]);
+    const passend = entscheideAutomerge(pr({ kommentare: [fremd, ABNAHME] }));
+    expect(passend.zulaessig).toBe(true);
+    expect(passend.kriterien.find(({ id }) => id === "AM-R07")).toMatchObject({ erfuellt: true, gruende: [] });
   });
 
   it("AM-AK-06 eine Abnahme mit gekürztem Stand (7 Zeichen) gilt", () => {
@@ -123,22 +227,24 @@ describe("entscheideAutomerge (docs/07-spec-automatisches-mergen.md)", () => {
       ],
     };
     expect(entscheideAutomerge(pr({ ...dependabot, titel: "Bump next from 16.3.8 to 16.3.9" })).zulaessig).toBe(true);
-    expect(entscheideAutomerge(pr({ ...dependabot, titel: "Bump next from 16.3.8 to 17.0.0" })).gruende).toEqual([
-      "Major-Version: next 16.3.8 → 17.0.0",
+    expect(verstoesse(entscheideAutomerge(pr({ ...dependabot, titel: "Bump next from 16.3.8 to 17.0.0" })))).toEqual([
+      { id: "AM-R09", code: "major-version", detail: "next" },
     ]);
   });
 
   it("AM-AK-07 Dependabot: Minor nur für Entwicklungsabhängigkeiten, Gruppen-Updates gibt Chris frei", () => {
     expect(pruefeDependabot("Bump vitest from 3.1.0 to 3.2.0", ["next"])).toEqual([]);
     expect(pruefeDependabot("Bump next from 16.3.8 to 16.4.0", ["next"])).toEqual([
-      "Minor-Version einer Laufzeitabhängigkeit: next 16.3.8 → 16.4.0",
+      { code: "minor-laufzeit", detail: "next", von: "16.3.8", nach: "16.4.0" },
     ]);
-    expect(pruefeDependabot("Bump the npm group with 3 updates", ["next"])[0]).toMatch(/^Dependabot: Update nicht/);
+    expect(pruefeDependabot("Bump the npm group with 3 updates", ["next"])).toMatchObject([
+      { code: "dependabot-nicht-auswertbar" },
+    ]);
   });
 
   it("AM-AK-08 mehr als 1.500 geänderte Zeilen: rot; Lockfile und erzeugte Datei zählen nicht", () => {
     const gross = entscheideAutomerge(pr({ dateien: [{ pfad: "src/lib/a.ts", status: "A", zeilen: 1501 }] }));
-    expect(gross.gruende).toEqual(["zu groß: 1501 geänderte Zeilen (höchstens 1500)"]);
+    expect(verstoesse(gross)).toEqual([{ id: "AM-R10", code: "zu-gross", detail: "1501" }]);
     const ohneErzeugte = entscheideAutomerge(
       pr({
         dateien: [
@@ -151,10 +257,10 @@ describe("entscheideAutomerge (docs/07-spec-automatisches-mergen.md)", () => {
   });
 
   it("AM-AK-09 main rot oder Schalter aus: rot mit Grund; der Revert ist trotz rotem main zulässig", () => {
-    expect(entscheideAutomerge(pr({ mainGruen: false })).gruende).toEqual(["main ist rot"]);
+    expect(verstoesse(entscheideAutomerge(pr({ mainGruen: false })))).toEqual([{ id: "AM-R11", code: "main-rot" }]);
     const aus = entscheideAutomerge(pr({ schalterAn: false }));
     expect(aus).toMatchObject({ zulaessig: false, zulaessigOhneSchalter: true });
-    expect(aus.gruende).toEqual(["Schalter aus (.github/automerge.yml: aktiv: false)"]);
+    expect(verstoesse(aus)).toEqual([{ id: "AM-R12", code: "schalter-aus" }]);
     const revert = entscheideAutomerge(
       pr({
         labels: ["automerge", "revert"],
@@ -176,15 +282,51 @@ describe("entscheideAutomerge (docs/07-spec-automatisches-mergen.md)", () => {
         dateien: [{ pfad: ".github/workflows/ci.yml", status: "M", zeilen: 1600 }],
       }),
     );
-    expect(entscheidung.gruende).toEqual([
-      "PR von außen",
-      "geschützter Pfad: .github/workflows/ci.yml",
-      "Abnahme der Steuerung fehlt",
-      "zu groß: 1600 geänderte Zeilen (höchstens 1500)",
-      "main ist rot",
-      "Schalter aus (.github/automerge.yml: aktiv: false)",
+    expect(verstoesse(entscheidung)).toEqual([
+      { id: "Herkunft", code: "pr-von-aussen" },
+      { id: "AM-R04", code: "geschuetzter-pfad", detail: ".github/workflows/ci.yml" },
+      { id: "AM-R07", code: "abnahme-fehlt" },
+      { id: "AM-R10", code: "zu-gross", detail: "1600" },
+      { id: "AM-R11", code: "main-rot" },
+      { id: "AM-R12", code: "schalter-aus" },
     ]);
+    expect(entscheidung.gruende).toHaveLength(6);
     expect(entscheidung.zulaessigOhneSchalter).toBe(false);
+  });
+
+  it("AM-AK-10 mehrere Verstöße erscheinen alle in kriterien, je Kriterium ein Eintrag", () => {
+    const entscheidung = entscheideAutomerge(
+      pr({
+        beschreibung: "## Bitte bestätigen\n1. Erste Frage\n2. Zweite Frage",
+        kommentare: [{ text: "<!-- abnahme-steuerung -->", schreibrecht: true }],
+        schalterAn: false,
+        dateien: [
+          { pfad: "docs/01-spezifikation.md", status: "M", zeilen: 3 },
+          { pfad: "specs/M05-status-und-pruefung.md", status: "M", zeilen: 3 },
+        ],
+      }),
+    );
+    const offen = entscheidung.kriterien.filter(({ erfuellt }) => !erfuellt);
+    expect(offen.map(({ id }) => id)).toEqual(["AM-R04", "AM-R05", "AM-R07", "AM-R12"]);
+    expect(verstoesse(entscheidung)).toEqual([
+      { id: "AM-R04", code: "geschuetzter-pfad", detail: "docs/01-spezifikation.md" },
+      { id: "AM-R04", code: "geschuetzter-pfad", detail: "specs/M05-status-und-pruefung.md" },
+      { id: "AM-R05", code: "offene-frage", detail: "Erste Frage" },
+      { id: "AM-R05", code: "offene-frage", detail: "Zweite Frage" },
+      { id: "AM-R07", code: "abnahme-ohne-sha" },
+      { id: "AM-R12", code: "schalter-aus" },
+    ]);
+    expect(new Set(entscheidung.kriterien.map(({ id }) => id)).size).toBe(entscheidung.kriterien.length);
+  });
+
+  it("Revert und Dependabot: entfallende Kriterien sind gekennzeichnet", () => {
+    const revert = entscheideAutomerge(pr({ labels: ["automerge", "revert"], kommentare: [] }));
+    expect(revert.kriterien.filter(({ entfaellt }) => entfaellt).map(({ id, entfaellt }) => [id, entfaellt])).toEqual([
+      ["AM-R04", "revert"],
+      ["AM-R07", "revert"],
+      ["AM-R09", "kein-dependabot"],
+      ["AM-R11", "revert"],
+    ]);
   });
 
   it("Merge-Warteschlange: immer grün (AM-S02)", () => {
@@ -244,6 +386,10 @@ describe("Hilfsfunktionen", () => {
     expect(
       offenePunkte("### Bitte bestätigen\n1. [ ] Erster\n* [ ] Zweiter\n- [x] fertig\n## Weiter\n- [ ] nein"),
     ).toEqual(["Erster", "Zweiter"]);
+    expect(offenePunkte("## Bitte bestätigen\n```sh\n# Kommentar\n```\n- noch im Abschnitt")).toEqual([
+      "noch im Abschnitt",
+    ]);
+    expect(offenePunkte("## Bitte bestätigen\n\n---\n* * *\n")).toEqual([]);
     expect(offenePunkte("## Inhalt\n- [ ] kein Abschnitt")).toEqual([]);
   });
 
@@ -274,7 +420,7 @@ describe("Hilfsfunktionen", () => {
     const entscheidung = entscheideAutomerge(
       pr({ testsVorher: testsJeAk(zeile(2)), testsNachher: testsJeAk(zeile(1)) }),
     );
-    expect(entscheidung.gruende).toEqual(["weniger Tests zu AM-AK-03: vorher 2, nachher 1"]);
+    expect(verstoesse(entscheidung)).toEqual([{ id: "AM-R06", code: "weniger-tests", detail: "AM-AK-03" }]);
   });
 
   it("prueffallIds: liest die IDs aus dem JSON", () => {
@@ -282,5 +428,39 @@ describe("Hilfsfunktionen", () => {
       "AK-404-02",
       "AK-404-03",
     ]);
+  });
+});
+
+describe("Zusammenfassung (AM-S02)", () => {
+  const ausgewertet = (bericht: string) =>
+    bericht
+      .split("\n")
+      .filter((zeile) => /^\| (AM-R\d+|Herkunft) /.test(zeile))
+      .map((zeile) => zeile.split(" ")[1]);
+
+  it("die Tabelle enthält jede ausgewertete AM-R-ID genau einmal", () => {
+    const bericht = erstelleBericht(
+      entscheideAutomerge(
+        pr({ schalterAn: false, dateien: [{ pfad: "scripts/merge-kriterien/index.mjs", status: "M", zeilen: 5 }] }),
+      ),
+    );
+    expect(bericht).toContain("| Kriterium | Ergebnis | Grund |");
+    expect(ausgewertet(bericht)).toEqual(Object.keys(KRITERIEN));
+    expect(bericht).toMatch(
+      /^\| AM-R04 .* \| nicht erfüllt \| geschützter Pfad: scripts\/merge-kriterien\/index\.mjs \|$/m,
+    );
+    expect(bericht).toMatch(/^\| AM-R12 .* \| nicht erfüllt \| .+ \|$/m);
+    expect(bericht).toMatch(/^\| AM-R09 .* \| entfällt \| .+ \|$/m);
+  });
+
+  it("ohne Antrag nennt die Tabelle nur AM-R01", () => {
+    const bericht = erstelleBericht(entscheideAutomerge(pr({ labels: [] })));
+    expect(bericht).toContain("Ergebnis: **kein Antrag**");
+    expect(ausgewertet(bericht)).toEqual(["AM-R01"]);
+  });
+
+  it("maskiert | in Gründen, damit die Tabelle hält", () => {
+    const bericht = erstelleBericht(entscheideAutomerge(pr({ beschreibung: "## Bitte bestätigen\n- a | b" })));
+    expect(bericht).toContain("a \\| b");
   });
 });
