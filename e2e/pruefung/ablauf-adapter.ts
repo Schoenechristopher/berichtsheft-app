@@ -104,6 +104,8 @@ const MAX_TABS = 80;
 
 /** Wie lange auf eine Warnung oder einen Seitenwechsel gewartet wird, wenn nichts geschieht (z. B. „Vor“ ohne Ziel). */
 const QUIET_MS = 3_000;
+/** Höchstdauer eines axe-Aufrufs (`barrierefreiheit_pruefen`); normal wenige Sekunden. */
+const AXE_MS = 60_000;
 /** Wartezeit auf das Laden einer Seite (der Entwicklungsserver übersetzt Seiten beim ersten Aufruf). */
 const LOAD_MS = 30_000;
 
@@ -244,6 +246,8 @@ interface Person {
 
 /** Führt die Schritte eines Ablauf-Falls aus; je Person ein eigener Browser-Kontext. */
 export class FlowAdapter {
+  /** ID des laufenden Falls, für Meldungen. */
+  private caseId = "";
   private persons = new Map<string, Person>();
   /** Geräteeinstellungen des Falls (`geraet`) über denen des Projekts. */
   private device: BrowserContextOptions = {};
@@ -264,6 +268,7 @@ export class FlowAdapter {
 
   /** Führt den Fall aus und liefert `{ ergebnisse }` (`format.md`, „Erwartet“). */
   async run(entry: CheckCase): Promise<Result> {
+    this.caseId = entry.id;
     if (typeof entry.uhr !== "string") {
       throw new FlowCaseError("Ein Ablauf-Fall braucht „uhr“.");
     }
@@ -453,11 +458,8 @@ export class FlowAdapter {
         return this.waitFor(this.openPage(person, where), step, where);
       case "erstes_bild_lesen":
         return this.firstPaint(person, where);
-      case "barrierefreiheit_pruefen": {
-        const page = this.openPage(person, where);
-        await this.settled(page);
-        return { verstoesse: await axeViolations(page) };
-      }
+      case "barrierefreiheit_pruefen":
+        return this.checkAccessibility(this.openPage(person, where), where);
       default:
         throw new FlowCaseError(`${where}: unbekannte Aktion.`);
     }
@@ -578,6 +580,54 @@ export class FlowAdapter {
       throw new Error(`${where}: Dialog „${dialogs[0]}“, obwohl die Seite keine Warnung trug.`);
     }
     return this.pageResult(person, dialogs.length === 1 ? armed : null);
+  }
+
+  /**
+   * `barrierefreiheit_pruefen`: erst wenn die Seite fertig und ruhig ist (geladen, keine Platzhalter, seit 500 ms
+   * dieselbe Adresse und dasselbe Dokument, also kein laufender Seitenwechsel oder Neuladen), dann axe, höchstens
+   * 60 s. Hängt axe länger (beobachtet einmal in Firefox in der CI, UI-AK-16-02), scheitert der Fall sofort mit Fall,
+   * Schritt, Adresse und offenem Dialog, statt erst am Test-Timeout; wiederholt wird nicht (CI-18).
+   */
+  private async checkAccessibility(page: Page, where: string): Promise<Result> {
+    await page.waitForLoadState("load", { timeout: LOAD_MS });
+    await this.settled(page);
+    const end = Date.now() + LOAD_MS;
+    for (;;) {
+      const before = { url: page.url(), origin: await documentOrigin(page) };
+      await sleep(500);
+      if (before.origin !== null && page.url() === before.url && (await documentOrigin(page)) === before.origin) {
+        break;
+      }
+      if (Date.now() > end) {
+        throw new Error(`${this.caseId}, ${where}: Die Seite kommt nicht zur Ruhe (Adresse ${page.url()}).`);
+      }
+      await page.waitForLoadState("load", { timeout: LOAD_MS });
+    }
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const hung = new Promise<"haengt">((resolve) => {
+      timer = setTimeout(() => resolve("haengt"), AXE_MS);
+    });
+    try {
+      const result = await Promise.race([axeViolations(page), hung]);
+      if (result !== "haengt") {
+        return { verstoesse: result };
+      }
+    } finally {
+      clearTimeout(timer);
+    }
+    // Der Dialog wird nur kurz gelesen: Hängt die Seite selbst, steht dort „unbekannt“.
+    const dialog = await Promise.race([
+      page
+        .evaluate(() => {
+          const open = document.querySelector("dialog[open]");
+          return open ? (open.getAttribute("aria-labelledby") ?? open.id ?? "ohne Kennung") : "keiner";
+        })
+        .catch(() => "unbekannt"),
+      sleep(2_000).then(() => "unbekannt"),
+    ]);
+    throw new Error(
+      `${this.caseId}, ${where}: axe ohne Ergebnis nach ${AXE_MS / 1000} s (Adresse ${page.url()}, offener Dialog: ${dialog}).`,
+    );
   }
 
   /** Wartet, bis die Seite fertig geladen und hydriert ist (keine Platzhalter, Eingaben freigegeben). */
