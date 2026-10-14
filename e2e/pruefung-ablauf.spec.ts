@@ -37,6 +37,8 @@ test.describe("Neutrale Prüffälle der Ebene „ablauf“ (specs/pruefung)", ()
   for (const { file, entry } of cases) {
     test(`${entry.id} (${file}, ablauf)`, async ({ browser }, testInfo) => {
       assertNoDeviation(entry);
+      // Lange Abläufe (z. B. axe auf vielen Seiten) brauchen mehr als die Vorgabe von 60 s.
+      test.setTimeout(60_000 + 8_000 * (Array.isArray(entry.schritte) ? entry.schritte.length : 0));
       const limit = testLimit(entry.id, testInfo.project.name);
       if (limit) {
         // Freigegebene Testgrenze: sichtbar übersprungen, mit Begründung im Bericht.

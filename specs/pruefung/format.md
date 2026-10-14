@@ -181,9 +181,22 @@ und liest das Ergebnis über feste Merker der Oberfläche (Codes, Status, Woche)
 1. Die Uhr der laufenden App steht auf `uhr` (Pflicht), in Seiten und Aktionen gleichermaßen.
 2. Die Datenhaltung ist leer. Geladen werden die Testdaten aus `testdaten.json` (alle Personen mit
    `"angelegt": true` und das Bundesland); für jeden Azubi entstehen die Berichte wie in M03 bis „jetzt“.
-3. `ausgangsbestand` (optional) wie bei Daten-Fällen (`personen`, `berichte`), siehe „Aufbau eines Daten-Falls“.
+3. `ausgangsbestand` (optional) wie bei Daten-Fällen (`personen`, `berichte`), siehe „Aufbau eines Daten-Falls“. Der
+   TypeScript-Ablauf-Runner unterstützt ihn noch nicht und scheitert daran; die Fälle von M09 stellen eingereichte
+   Berichte mit den Aktionen selbst her.
 4. Niemand ist angemeldet. Jede Person (`als`) hat einen eigenen Browser mit eigener Sitzung, der sich bei ihrem
    ersten Schritt öffnet.
+
+**Gerät** (`geraet`, optional): wie das Gerät aller Personen des Falls aussieht, über den Einstellungen des
+Browser-Projekts (Desktop, 375 px …). Ohne `geraet` gilt das Projekt.
+
+| Feld | Inhalt |
+| --- | --- |
+| `breite`, `hoehe` | Größe des Fensters in Pixeln (ganze Zahl ab 200); fehlt eines, gilt das des Projekts |
+| `farbschema` | `hell` \| `dunkel`: Einstellung des Geräts (`prefers-color-scheme`) |
+| `netz` | `langsam`: Datenabrufe der Seite (nicht Seitenaufrufe, Formulare und Anmeldung) antworten erst nach 2 s |
+
+Ein unbekanntes Feld macht den Fall fehlerhaft.
 
 Nach dem Fall stellt der Runner die Uhr zurück. Werkzeuge, mit denen der Runner Uhr und Bestand stellt (bei TypeScript
 die Testschnittstelle und der Test-Login), gibt es im Produktionsbetrieb nicht.
@@ -197,7 +210,12 @@ die Testschnittstelle und der Test-Login), gibt es im Produktionsbetrieb nicht.
 | `start` | Startseite der eigenen Rolle |
 | `wochen` | „Meine Wochen“ eines Azubis |
 | `bericht` | ein Wochenbericht; benannt mit `azubi` und `woche` |
-| `pruefliste` | Prüfliste der Ausbilder |
+| `pruefliste` | Prüfliste der Ausbilder; mit `azubi` und `woche` ist dieser Bericht ausgewählt (wie ein Link darauf) |
+| `azubis` | „Azubis“ der Ausbilder |
+| `personen` | „Personen“ der Ausbilder |
+| `nicht_zustellbar` | „Nicht zustellbar“ der Ausbilder |
+| `benachrichtigungen` | Benachrichtigungen der eigenen Person |
+| `einstellungen` | Einstellungen der eigenen Person |
 
 **Schritte:** `schritte` ist eine nicht leere Liste `{ "als": <Schlüssel>, "aktion": <Aktion>, … }`, ausgeführt in
 dieser Reihenfolge. `uhr` (optional) stellt die Uhr vor dem Schritt; sie bleibt danach auf diesem Zeitpunkt. Ein Feld,
@@ -216,6 +234,9 @@ machen den Fall fehlerhaft.
 | `tag_erfassen` | `als`, `woche`, `tag`, `tagesart?` (eine der fünf oder `""` = leeren), `text?` | `{ "erfasst": true }` | Eingabe auf der geöffneten Berichtsseite dieser Woche, ohne zu speichern. Ist sie nicht geöffnet, ist der Fall fehlerhaft. |
 | `speichern` | `als` | `{ "gespeichert": true }` | „Speichern“ auf der geöffneten Berichtsseite |
 | `einreichen` | `als` | `{ "status": <Status> }`; Fehler `pflichtangaben_fehlen` mit `"tage"` wie bei `einreichenPruefen` (M05) | „Einreichen“ auf der geöffneten Berichtsseite, Rückfrage bestätigt; ungespeicherte Eingaben werden mitgespeichert |
+| `freigeben` | `als` | `{ "entschieden": true }` | „Freigeben“ auf der geöffneten Berichtsseite oder beim ausgewählten Bericht der Prüfliste, Rückfrage bestätigt; fertig, wenn die App es meldet und den nächsten Bericht bzw. den neuen Status zeigt |
+| `ablehnen` | `als`, `begruendung` | `{ "entschieden": true }` | wie `freigeben`, mit dem Gesamtkommentar `begruendung` |
+| `darstellung_waehlen` | `als`, `darstellung` (`System` \| `Hell` \| `Dunkel`) | `{ "gespeichert": true }` | Wahl auf der geöffneten Seite `einstellungen`, bis sie gespeichert ist |
 
 **Seiten-Ergebnis:** `{ "warnung": <Code> | null, "seite": <Seite> | null, "angemeldet": <Schlüssel> | null }`.
 
@@ -237,6 +258,59 @@ machen den Fall fehlerhaft.
 Felder heißen `tagesart` und `taetigkeiten`; ein Eingabefeld, das keines davon ist, liefert der Adapter als
 `ohne_merker` (so scheitert ein Fall, wenn ein weiteres Feld dazukommt, AK-403).
 
+**Seiteninhalt der Prüfliste** (`seite_lesen` auf `pruefliste`): dazu `eintraege` (Wochen der Einträge in der
+Reihenfolge der Liste) und `ausgewaehlt` (Woche des Berichts, den die Prüfansicht zeigt, sonst `null`). Die Fälle
+nennen nur Berichte von Anna; weitere Azubis brauchen hier den Schlüssel.
+
+**Prüfaktionen** (Entscheidung E3, Variante A): wenige generische Prüfungen der Oberfläche, keine Aktion je AK. Sie
+benennen Elemente neutral (Tabelle „Elemente“); welcher feste Merker der Seite dahintersteht, weiß nur der Adapter.
+Sichtbare Texte liest keine Prüfaktion, außer dem Seitentitel (fester Text, M09-R22).
+
+| Aktion | Felder | Ergebnis | Bedeutung |
+| --- | --- | --- | --- |
+| `ansicht_lesen` | `als` | `{ "titel", "hauptueberschriften", "waagerechtes_scrollen", "farbschema", "menue" }` | Titel der Seite im Browser, Zahl der Hauptüberschriften, ob die Seite waagerecht scrollt, wirksames Farbschema (`hell` \| `dunkel`), Menü: `{ "punkte": [<Seite>, …], "aktiv": [<Seite>, …] }` oder `null` ohne Menü. Werkzeuge der Entwicklung (Teams-Postfach der Demo) zählen nicht. |
+| `elemente_lesen` | `als`, `elemente` (Liste) | `{ <Element>: "sichtbar" \| "verborgen" \| "fehlt" }` | `sichtbar`: mindestens ein Treffer ist sichtbar; `verborgen`: es gibt ihn nur unsichtbar; `fehlt`: es gibt ihn nicht |
+| `anordnung_lesen` | `als`, `elemente` (Liste) | `{ "anordnung": "nebeneinander" \| "untereinander" \| "gemischt" \| "einzeln", "anzahl": <Zahl> }` | Lage der sichtbaren Treffer in dieser Reihenfolge: in einer Zeile von links nach rechts, in einer Spalte von oben nach unten, keines davon, oder weniger als zwei |
+| `fokus_lesen` | `als` | Fokus (unten) | wo der Fokus gerade liegt |
+| `bedienen` | `als`, `element`, `tag?` \| `woche?` | `{ "seite": <Seite> }` | Klick (am Handy Tippen) auf den ersten sichtbaren Treffer; führt er zu einer anderen Seite oder schickt er ein Formular ab, wartet der Adapter, bis das fertig ist. Ohne sichtbaren Treffer scheitert der Fall. |
+| `taste_druecken` | `als`, `taste` | Fokus (unten) | eine Taste: `Tab`, `Umschalt+Tab`, `Enter`, `Escape`, `Leertaste`, `Pfeil_unten`, `Pfeil_oben`; gewartet wird wie bei `bedienen` |
+| `tastatur_bis` | `als`, `element`, `tag?` \| `woche?` | Fokus (unten) mit `"unsichtbar"` und `"verdeckt"` | Tab, bis der Fokus im Element liegt (höchstens 80-mal). Jeder Halt unterwegs wird geprüft: nicht sichtbar umrandet oder außerhalb des Bildes → `unsichtbar`, von einer festen Leiste verdeckt → `verdeckt` (Listen der Elemente, `[]` = in Ordnung) |
+| `tippen` | `als`, `text` | `{ "getippt": true }` | tippt den Text über die Tastatur ins fokussierte Feld |
+| `warten` | `als`, `element`, `tag?` \| `woche?`, `zustand` | `{ "erreicht": <Wahrheitswert> }` | wartet höchstens 30 s, bis das Element den Zustand hat (`sichtbar`, `verborgen`, `fehlt`) |
+| `erstes_bild_lesen` | `als` | `{ "farbschema": "hell" \| "dunkel" }` | Farbschema der gerade angezeigten Seite, wie der Server sie ausliefert, bevor ein Skript läuft (gleiche Sitzung und gleiches Gerät, ohne JavaScript): So zeigt der Browser das erste Bild, ein falsches Schema blitzte hier auf (UI-AK-15). |
+| `barrierefreiheit_pruefen` | `als` | `{ "verstoesse": [<Regel und Ziel>, …] }` | automatische Prüfung der angezeigten Seite auf WCAG 2.0 bis 2.2, Stufen A und AA (bei TypeScript axe, ohne das Entwicklungs-Overlay); `[]` = keine Verstöße |
+
+**Fokus:** `{ "fokus": <Element> | "ohne_merker" | null }`: das innerste Element der Tabelle, in dem der Fokus liegt
+(auch das fokussierte selbst), `ohne_merker`, wenn er in keinem liegt, `null`, wenn nichts fokussiert ist. Liegt der
+Fokus in einem Tag des Berichts, kommt `"tag": <Wochentag>` dazu.
+
+**Elemente** (mit `tag` auf einen Tag des geöffneten Berichts, mit `woche` auf einen Eintrag der Prüfliste
+eingegrenzt; ohne Angabe zählen alle Treffer):
+
+| Element | Bedeutung | eingrenzbar |
+| --- | --- | --- |
+| `menue` | Navigation (Seitenleiste bzw. Schublade) | |
+| `menue_knopf` | Menüknopf der Kopfzeile (unter 1024 px) | |
+| `menue_schliessen` | „Schließen“ der Schublade | |
+| `zum_inhalt` | „Zum Inhalt springen“ | |
+| `hauptbereich` | Hauptbereich der Seite | |
+| `glocke`, `glocke_vorschau` | Glocke der Kopfzeile; Vorschau der neuesten Benachrichtigungen | |
+| `platzhalter` | Platzhalter eines Ladezustands | |
+| `meldung` | kurze Meldung (Toast) | |
+| `offene_woche`, `leer_zu_erledigen` | Woche unter „Zu erledigen“; Leerzustand dort | |
+| `leer_pruefliste`, `leer_benachrichtigungen` | Leerzustand der Prüfliste; der Benachrichtigungen (Seite und Vorschau) | |
+| `tag`, `tagesart`, `taetigkeiten` | ein Tag des Berichts; seine Tagesart; seine Tätigkeiten | `tag` |
+| `speichern`, `einreichen` | „Speichern“; „Einreichen“ (öffnet die Rückfrage) | |
+| `fussleiste_gespeichert`, `fussleiste_ungespeichert` | Fußleiste zeigt „Gespeichert“ bzw. „Ungespeicherte Änderungen“ | |
+| `fehlerleiste`, `sprunglink` | Fehlerleiste beim Einreichen; ihr Link zum Feld eines Tages | `tag` (bei `sprunglink`) |
+| `dialog`, `dialog_feld`, `dialog_abbrechen`, `dialog_bestaetigen` | offener Dialog; sein Textfeld; „Abbrechen“; der bestätigende Knopf | |
+| `pruefliste`, `pruefeintrag`, `bericht_ansicht` | Liste der Prüfansicht; ein Eintrag; Bericht rechts daneben | `woche` (bei `pruefeintrag`) |
+| `entscheidungsleiste`, `freigeben`, `ablehnen` | Leiste mit den Entscheidungen; „Freigeben“; „Ablehnen“ (öffnen die Rückfrage) | |
+| `zurueck_zur_pruefliste` | Link „← Prüfliste“ der Berichtsseite | |
+
+Ein unbekanntes Element, eine unbekannte Taste, ein unbekannter Zustand und `tag` bzw. `woche` an einem Element, das
+sie nicht kennt, machen den Fall fehlerhaft.
+
 **Codes der Ablauf-Fälle:**
 
 | Code | Bedeutung | AK |
@@ -244,7 +318,8 @@ Felder heißen `tagesart` und `taetigkeiten`; ein Eingabefeld, das keines davon 
 | `ungespeicherte_aenderungen` | Warnung beim Verlassen einer Seite mit ungespeicherten Änderungen | AK-408 |
 
 **Erwartet:** `{ "ergebnisse": [ … ] }`, je Schritt das Ergebnis in derselben Reihenfolge. Weitere Aktionen und
-Seiteninhalte kommen mit den Ablauf-Fällen der Module dazu (Welle 2 von G3); jede neue Aktion steht in dieser Tabelle.
+Seiteninhalte kommen mit den Ablauf-Fällen der Module dazu (Welle 2 von G3); jede neue Aktion steht in den Tabellen
+oben (fachliche Aktionen bzw. Prüfaktionen).
 
 **Beispiel** (AK-408: Neuladen mit ungespeicherten Änderungen):
 

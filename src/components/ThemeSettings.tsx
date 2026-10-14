@@ -59,7 +59,12 @@ export function ThemeSettings({
       <p id="theme-hint" className="text-fg-muted text-sm">
         „System“ folgt der Einstellung Ihres Geräts. Die Wahl gilt sofort und auf allen Geräten.
       </p>
-      <p aria-live="polite" className="text-fg-muted text-sm" data-testid="theme-saved">
+      <p
+        aria-live="polite"
+        className="text-fg-muted text-sm"
+        data-testid="theme-saved"
+        data-speicherstand={saved === "saved" ? "gespeichert" : saved === "saving" ? "ausstehend" : undefined}
+      >
         {saved === "saving" ? "Wird gespeichert …" : saved === "saved" ? "Darstellung gespeichert." : ""}
       </p>
     </div>

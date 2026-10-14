@@ -7,13 +7,27 @@
  * Uhr und Bestand stellt der Runner über die Testschnittstelle der App (`src/app/api/test/zustand`), die es nur
  * außerhalb von Produktion mit Test-Login gibt; angemeldet wird deshalb über den Test-Login.
  */
-import type { Browser, BrowserContext, BrowserContextOptions, Page } from "@playwright/test";
+import type { Browser, BrowserContext, BrowserContextOptions, Page, Request } from "@playwright/test";
 import { DAY_TYPES, DAY_TYPE_LABELS } from "../../src/domain/report-days";
 import type { ReportStatus } from "../../src/domain/report-access";
+import { THEMES, THEME_LABELS, themeAttribute } from "../../src/domain/theme";
 import { isoWeekWorkdays, toDateInput, weekdayShort } from "../../src/domain/weeks";
 import { formatInstant, formatWeek, parseWeek, statusName } from "../../tests/pruefung/adapter";
 import type { CheckCase } from "../../tests/pruefung/cases";
 import { accounts, reportIdOf } from "../helpers";
+import {
+  KEYS,
+  arrangementOf,
+  axeViolations,
+  elementName,
+  elementState,
+  focusOf,
+  focusVisibility,
+  locate,
+  schemeOf,
+  stateOf,
+  viewOf,
+} from "./ablauf-pruefungen";
 
 type Input = Record<string, unknown>;
 type Result = Record<string, unknown>;
@@ -32,7 +46,19 @@ const PERSONS: Record<string, { name: string; email: string }> = Object.fromEntr
 );
 const KEY_BY_NAME = new Map(Object.entries(PERSONS).map(([key, person]) => [person.name, key]));
 
-const PAGES = ["anmelden", "kein_zugang", "start", "wochen", "bericht", "pruefliste"] as const;
+const PAGES = [
+  "anmelden",
+  "kein_zugang",
+  "start",
+  "wochen",
+  "bericht",
+  "pruefliste",
+  "azubis",
+  "personen",
+  "nicht_zustellbar",
+  "benachrichtigungen",
+  "einstellungen",
+] as const;
 type PageName = (typeof PAGES)[number];
 
 const LEAVE_WAYS = ["link", "neu_laden", "zurueck", "vor", "schliessen"] as const;
@@ -49,7 +75,29 @@ const ACTIONS: Record<string, { required: string[]; optional: string[] }> = {
   tag_erfassen: { required: ["woche", "tag"], optional: ["tagesart", "text"] },
   speichern: { required: [], optional: [] },
   einreichen: { required: [], optional: [] },
+  freigeben: { required: [], optional: [] },
+  ablehnen: { required: ["begruendung"], optional: [] },
+  darstellung_waehlen: { required: ["darstellung"], optional: [] },
+  // Prüfaktionen (`format.md`, „Prüfaktionen“): generisch, keine Aktion je AK.
+  ansicht_lesen: { required: [], optional: [] },
+  elemente_lesen: { required: ["elemente"], optional: [] },
+  anordnung_lesen: { required: ["elemente"], optional: [] },
+  fokus_lesen: { required: [], optional: [] },
+  bedienen: { required: ["element"], optional: ["tag", "woche"] },
+  taste_druecken: { required: ["taste"], optional: [] },
+  tastatur_bis: { required: ["element"], optional: ["tag", "woche"] },
+  tippen: { required: ["text"], optional: [] },
+  warten: { required: ["element", "zustand"], optional: ["tag", "woche"] },
+  erstes_bild_lesen: { required: [], optional: [] },
+  barrierefreiheit_pruefen: { required: [], optional: [] },
 };
+
+/** Gerät eines Falls (`format.md`, „Gerät“): Breite, Höhe, Farbschema des Geräts, langsames Netz. */
+const DEVICE_FIELDS = ["breite", "hoehe", "farbschema", "netz"];
+/** Verzögerung der Datenabrufe der Seite bei `netz: "langsam"`. */
+const SLOW_MS = 2_000;
+/** Höchstzahl der Tabulator-Schritte bei `tastatur_bis`. */
+const MAX_TABS = 80;
 
 /** Wie lange auf eine Warnung oder einen Seitenwechsel gewartet wird, wenn nichts geschieht (z. B. „Vor“ ohne Ziel). */
 const QUIET_MS = 3_000;
@@ -62,6 +110,11 @@ const PAGE_PATHS: Record<Exclude<PageName, "bericht" | "start">, string> = {
   kein_zugang: "/kein-zugang",
   wochen: "/azubi/wochen",
   pruefliste: "/ausbilder/pruefliste",
+  azubis: "/ausbilder/azubis",
+  personen: "/ausbilder/personen",
+  nicht_zustellbar: "/ausbilder/nicht-zustellbar",
+  benachrichtigungen: "/benachrichtigungen",
+  einstellungen: "/einstellungen",
 };
 
 /** Seite der App → neutraler Name; eine unbekannte Adresse lässt den Fall scheitern. */
@@ -72,15 +125,26 @@ function pageName(url: string): PageName {
   if (pathname === "/azubi" || pathname === "/ausbilder") return "start";
   if (pathname === "/azubi/wochen") return "wochen";
   if (pathname === "/ausbilder/pruefliste") return "pruefliste";
+  if (pathname === "/ausbilder/azubis") return "azubis";
+  if (pathname === "/ausbilder/personen") return "personen";
+  if (pathname === "/ausbilder/nicht-zustellbar") return "nicht_zustellbar";
+  if (pathname === "/benachrichtigungen") return "benachrichtigungen";
+  if (pathname === "/einstellungen") return "einstellungen";
   if (/^\/berichte\/[^/]+$/.test(pathname)) return "bericht";
   throw new Error(`Die Seite ${pathname} hat keinen neutralen Namen (format.md, „Seiten“).`);
 }
 
-/** Adresse einer Seite außer `start`; `bericht` braucht `azubi` und `woche`, die es nur dort gibt. */
+/**
+ * Adresse einer Seite außer `start`; `bericht` braucht `azubi` und `woche`, `pruefliste` kann sie nennen (der
+ * Bericht ist dann ausgewählt); bei anderen Seiten gibt es sie nicht.
+ */
 async function pagePath(target: Exclude<PageName, "start">, step: Input, where: string): Promise<string> {
+  if (target === "pruefliste" && ("azubi" in step || "woche" in step)) {
+    return `${PAGE_PATHS.pruefliste}?bericht=${(await pagePath("bericht", step, where)).split("/").pop()}`;
+  }
   if (target !== "bericht") {
     if ("azubi" in step || "woche" in step) {
-      throw new FlowCaseError(`${where}: „azubi“ und „woche“ gibt es nur bei der Seite „bericht“.`);
+      throw new FlowCaseError(`${where}: „azubi“ und „woche“ gibt es nur bei den Seiten „bericht“ und „pruefliste“.`);
     }
     return PAGE_PATHS[target];
   }
@@ -173,6 +237,9 @@ interface Person {
 /** Führt die Schritte eines Ablauf-Falls aus; je Person ein eigener Browser-Kontext. */
 export class FlowAdapter {
   private persons = new Map<string, Person>();
+  /** Geräteeinstellungen des Falls (`geraet`) über denen des Projekts. */
+  private device: BrowserContextOptions = {};
+  private slowNetwork = false;
 
   constructor(
     private readonly browser: Browser,
@@ -201,6 +268,7 @@ export class FlowAdapter {
     }
     const steps = entry.schritte as Input[];
     steps.forEach((step, index) => checkFields(step, `Schritt ${index + 1}`));
+    this.setDevice((entry as { geraet?: unknown }).geraet);
 
     await setAppState(this.baseURL, { uhr: entry.uhr, bestand: "testdaten" });
     const ergebnisse: Result[] = [];
@@ -214,13 +282,67 @@ export class FlowAdapter {
     return { ergebnisse };
   }
 
+  /** `geraet` des Falls: Breite und Höhe des Fensters, Farbschema des Geräts, langsames Netz. */
+  private setDevice(device: unknown) {
+    if (device === undefined) {
+      return;
+    }
+    if (typeof device !== "object" || device === null || Array.isArray(device)) {
+      throw new FlowCaseError("„geraet“ muss ein Objekt sein.");
+    }
+    const fields = device as Input;
+    for (const name of Object.keys(fields)) {
+      if (!DEVICE_FIELDS.includes(name)) {
+        throw new FlowCaseError(`„geraet“ kennt kein Feld „${name}“.`);
+      }
+    }
+    const size = (name: string, fallback: number) => {
+      const value = fields[name] ?? fallback;
+      if (typeof value !== "number" || !Number.isInteger(value) || value < 200) {
+        throw new FlowCaseError(`„geraet.${name}“ muss eine ganze Zahl ab 200 (Pixel) sein.`);
+      }
+      return value;
+    };
+    const base = this.contextOptions.viewport ?? { width: 1280, height: 720 };
+    if ("breite" in fields || "hoehe" in fields) {
+      this.device.viewport = { width: size("breite", base.width), height: size("hoehe", base.height) };
+    }
+    if ("farbschema" in fields) {
+      const scheme = oneOf(fields.farbschema, ["hell", "dunkel"] as const, "Farbschema", "„geraet“");
+      this.device.colorScheme = scheme === "hell" ? "light" : "dark";
+    }
+    if ("netz" in fields) {
+      oneOf(fields.netz, ["langsam"] as const, "Netz", "„geraet“");
+      this.slowNetwork = true;
+    }
+  }
+
+  private async newContext(options: BrowserContextOptions = {}): Promise<BrowserContext> {
+    const context = await this.browser.newContext({
+      ...this.contextOptions,
+      ...this.device,
+      ...options,
+      baseURL: this.baseURL,
+    });
+    if (this.slowNetwork) {
+      // Langsames Netz: Datenabrufe der Seite (nicht Seitenaufrufe und Formulare) antworten erst nach SLOW_MS.
+      await context.route("**/api/**", async (route) => {
+        if (route.request().resourceType() === "fetch" && !route.request().url().includes("/api/auth/")) {
+          await sleep(SLOW_MS);
+        }
+        await route.fallback();
+      });
+    }
+    return context;
+  }
+
   private async person(key: unknown, where: string): Promise<Person> {
     if (typeof key !== "string" || !Object.hasOwn(PERSONS, key)) {
       throw new FlowCaseError(`${where}: unbekannte Person „${String(key)}“.`);
     }
     let person = this.persons.get(key);
     if (!person) {
-      const context = await this.browser.newContext({ ...this.contextOptions, baseURL: this.baseURL });
+      const context = await this.newContext();
       person = { key, context, page: null, answer: "abbrechen", dialogs: [] };
       this.persons.set(key, person);
     }
@@ -273,6 +395,54 @@ export class FlowAdapter {
         return this.save(this.openPage(person, where));
       case "einreichen":
         return this.submit(this.openPage(person, where));
+      case "freigeben":
+        return this.decide(this.openPage(person, where), "freigeben", null);
+      case "ablehnen":
+        return this.decide(this.openPage(person, where), "ablehnen", textField(step, "begruendung", where));
+      case "darstellung_waehlen":
+        return this.chooseTheme(this.openPage(person, where), step, where);
+      case "ansicht_lesen": {
+        const page = this.openPage(person, where);
+        await this.settled(page);
+        return viewOf(page, pageName);
+      }
+      case "elemente_lesen": {
+        const page = this.openPage(person, where);
+        const result: Result = {};
+        for (const name of this.names(step, where)) {
+          result[name] = await stateOf(await locate(page, { element: name }, where));
+        }
+        return result;
+      }
+      case "anordnung_lesen": {
+        const page = this.openPage(person, where);
+        await this.settled(page);
+        const locators = [];
+        for (const name of this.names(step, where)) {
+          locators.push(await locate(page, { element: name }, where));
+        }
+        return arrangementOf(locators);
+      }
+      case "fokus_lesen":
+        return focusOf(this.openPage(person, where));
+      case "bedienen":
+        return this.operate(this.openPage(person, where), step, where);
+      case "taste_druecken":
+        return this.press(this.openPage(person, where), step, where);
+      case "tastatur_bis":
+        return this.tabTo(this.openPage(person, where), step, where);
+      case "tippen":
+        await this.openPage(person, where).keyboard.type(textField(step, "text", where));
+        return { getippt: true };
+      case "warten":
+        return this.waitFor(this.openPage(person, where), step, where);
+      case "erstes_bild_lesen":
+        return this.firstPaint(person, where);
+      case "barrierefreiheit_pruefen": {
+        const page = this.openPage(person, where);
+        await this.settled(page);
+        return { verstoesse: await axeViolations(page) };
+      }
       default:
         throw new FlowCaseError(`${where}: unbekannte Aktion.`);
     }
@@ -454,6 +624,19 @@ export class FlowAdapter {
     if (seite === "bericht") {
       return { ...base, ...(await this.readReport(page)) };
     }
+    if (seite === "pruefliste") {
+      // Einträge der Liste und der Bericht, den der rechte Bereich zeigt (ab 1024 px sichtbar).
+      return {
+        ...base,
+        ...(await page.evaluate(() => ({
+          eintraege: [...document.querySelectorAll("[data-testid=review-row]")].map((row) =>
+            row.getAttribute("data-woche"),
+          ),
+          ausgewaehlt:
+            document.querySelector("[data-bereich=bericht_ansicht] [data-woche]")?.getAttribute("data-woche") ?? null,
+        }))),
+      };
+    }
     return base;
   }
 
@@ -604,5 +787,226 @@ export class FlowAdapter {
     );
     const after = await statusOf();
     return { status: after === null ? null : (statusName(after as ReportStatus) ?? after) };
+  }
+  private names(step: Input, where: string): string[] {
+    const names = step.elemente;
+    if (!Array.isArray(names) || names.length === 0) {
+      throw new FlowCaseError(`${where}: „elemente“ muss eine nicht leere Liste sein.`);
+    }
+    return names.map((name) => elementName(name, where));
+  }
+
+  /** Erster sichtbarer Treffer eines Elements; ohne sichtbaren Treffer scheitert der Fall. */
+  private async visibleOne(page: Page, step: Input, where: string) {
+    const locator = await locate(page, step, where);
+    const end = Date.now() + LOAD_MS;
+    while (Date.now() < end) {
+      for (const candidate of await locator.all()) {
+        if (await candidate.isVisible()) {
+          return candidate;
+        }
+      }
+      await sleep(100);
+    }
+    throw new Error(`${where}: Das Element „${String(step.element)}“ ist nicht sichtbar.`);
+  }
+
+  /**
+   * Führt eine Eingabe aus und wartet, bis sie fertig ist: ein ausgelöster Seitenwechsel (`target`) und abgeschickte
+   * Formulare (Anfragen außer GET, z. B. Serveraktionen). Datenabrufe (GET) wartet sie nicht ab, damit Ladezustände
+   * danach noch zu sehen sind (`warten`).
+   */
+  private async input(page: Page, target: string | null, action: () => Promise<unknown>) {
+    const before = page.url();
+    let pending = 0;
+    let last = Date.now();
+    const started = (request: Request) => {
+      if (request.method() !== "GET") {
+        pending++;
+        last = Date.now();
+      }
+    };
+    const ended = (request: Request) => {
+      if (request.method() !== "GET") {
+        pending = Math.max(0, pending - 1);
+        last = Date.now();
+      }
+    };
+    page.on("request", started);
+    page.on("requestfinished", ended);
+    page.on("requestfailed", ended);
+    try {
+      await action();
+      if (target !== null && target !== before) {
+        await page.waitForURL((url) => url.href === target, { timeout: LOAD_MS });
+      }
+      const end = Date.now() + LOAD_MS;
+      await sleep(200);
+      while ((pending > 0 || Date.now() - last < 300) && Date.now() < end) {
+        await sleep(50);
+      }
+    } finally {
+      page.off("request", started);
+      page.off("requestfinished", ended);
+      page.off("requestfailed", ended);
+    }
+    if (page.url() !== before) {
+      await page.waitForLoadState("load", { timeout: LOAD_MS });
+      await this.settled(page);
+    }
+  }
+
+  /** Klick auf ein Element (Tippen am Handy); führt es als Link zu einer anderen Adresse, wird darauf gewartet. */
+  private async operate(page: Page, step: Input, where: string): Promise<Result> {
+    const element = await this.visibleOne(page, step, where);
+    await element.scrollIntoViewIfNeeded();
+    // Link, den der Klick trifft: das Element am Klickpunkt (Mitte), z. B. ein Link, der eine Zeile überdeckt.
+    const target = await element.evaluate((node) => {
+      const box = node.getBoundingClientRect();
+      const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+      const link = (node.contains(hit) ? hit : node)?.closest("a");
+      return link && !link.getAttribute("href")?.startsWith("#") ? link.href : null;
+    });
+    await this.input(page, target, () => element.click());
+    return { seite: pageName(page.url()) };
+  }
+
+  private async press(page: Page, step: Input, where: string): Promise<Result> {
+    const key = textField(step, "taste", where);
+    if (!Object.hasOwn(KEYS, key)) {
+      throw new FlowCaseError(`${where}: unbekannte Taste „${key}“ (bekannt: ${Object.keys(KEYS).join(", ")}).`);
+    }
+    const target =
+      key === "Enter"
+        ? await page.evaluate(() => {
+            const node = document.activeElement;
+            return node instanceof HTMLAnchorElement && !node.getAttribute("href")?.startsWith("#") ? node.href : null;
+          })
+        : null;
+    await this.input(page, target, () => page.keyboard.press(KEYS[key]));
+    return focusOf(page);
+  }
+
+  /**
+   * Tabulator, bis der Fokus im Element liegt (höchstens MAX_TABS-mal). Jeder Halt unterwegs wird geprüft: Ist der
+   * Fokus nicht sichtbar umrandet bzw. außerhalb des Bildes oder verdeckt, steht er in `unsichtbar` bzw. `verdeckt`.
+   */
+  private async tabTo(page: Page, step: Input, where: string): Promise<Result> {
+    const target = await locate(page, step, where);
+    const invisible: unknown[] = [];
+    const covered: unknown[] = [];
+    let focus: Result = { fokus: null };
+    for (let index = 0; index < MAX_TABS; index++) {
+      await page.keyboard.press("Tab");
+      const lage = await focusVisibility(page);
+      if (!lage) {
+        continue;
+      }
+      focus = await focusOf(page);
+      const label = focus.tag ? `${String(focus.fokus)} ${String(focus.tag)}` : focus.fokus;
+      if (!lage.sichtbar || !lage.imBild) {
+        invisible.push(label);
+      }
+      if (lage.verdeckt) {
+        covered.push(label);
+      }
+      const reached = await target.evaluateAll((nodes) =>
+        nodes.some((node) => node === document.activeElement || node.contains(document.activeElement)),
+      );
+      if (reached) {
+        break;
+      }
+    }
+    return { ...focus, unsichtbar: invisible, verdeckt: covered };
+  }
+
+  /** Wartet, bis das Element den Zustand hat (höchstens LOAD_MS); `erreicht` sagt, ob es so kam. */
+  private async waitFor(page: Page, step: Input, where: string): Promise<Result> {
+    const state = elementState(step.zustand, where);
+    const locator = await locate(page, step, where);
+    const end = Date.now() + LOAD_MS;
+    while (Date.now() < end) {
+      if ((await stateOf(locator)) === state) {
+        return { erreicht: true };
+      }
+      await sleep(50);
+    }
+    return { erreicht: false };
+  }
+
+  /**
+   * Farbschema beim ersten Darstellen: dieselbe Seite mit denselben Cookies und demselben Gerät, aber ohne
+   * JavaScript – so, wie der Server sie ausliefert, bevor ein Skript läuft (kein Aufblitzen, UI-AK-15).
+   */
+  private async firstPaint(person: Person, where: string): Promise<Result> {
+    const page = this.openPage(person, where);
+    const context = await this.newContext({
+      javaScriptEnabled: false,
+      storageState: await person.context.storageState(),
+    });
+    try {
+      const plain = await context.newPage();
+      await plain.goto(page.url(), { timeout: LOAD_MS });
+      return { farbschema: await schemeOf(plain) };
+    } finally {
+      await context.close();
+    }
+  }
+
+  /** „Freigeben“ bzw. „Ablehnen“ auf der geöffneten Berichtsseite oder in der Prüfliste, Rückfrage bestätigt. */
+  private async decide(page: Page, action: "freigeben" | "ablehnen", reason: string | null): Promise<Result> {
+    const statusOf = () =>
+      page.evaluate(
+        () =>
+          document
+            .querySelector("[data-testid=report-status]")
+            ?.closest("[data-status]")
+            ?.getAttribute("data-status") ?? null,
+      );
+    const before = {
+      url: page.url(),
+      status: await statusOf(),
+      toasts: await page.locator("[data-testid=toast]").count(),
+    };
+    await (await this.visibleOne(page, { element: action }, action)).click();
+    const dialog = page.locator("dialog[open]");
+    await dialog.waitFor({ timeout: LOAD_MS });
+    if (reason !== null) {
+      await dialog.locator("textarea").fill(reason);
+    }
+    await dialog.locator("button[type=submit]").click();
+    // Entschieden: Die App meldet es und zeigt danach den nächsten Bericht (andere Adresse) oder den neuen Status.
+    const end = Date.now() + LOAD_MS;
+    while (Date.now() < end) {
+      const toasts = await page.locator("[data-testid=toast]").count();
+      if (toasts > before.toasts && (page.url() !== before.url || (await statusOf()) !== before.status)) {
+        await page.waitForLoadState("load", { timeout: LOAD_MS });
+        await this.settled(page);
+        return { entschieden: true };
+      }
+      await sleep(100);
+    }
+    throw new Error(`${action}: ohne Ergebnis (Adresse ${page.url()}).`);
+  }
+
+  /** Darstellung auf der geöffneten Seite „Einstellungen“ wählen, bis sie gespeichert ist. */
+  private async chooseTheme(page: Page, step: Input, where: string): Promise<Result> {
+    const label = textField(step, "darstellung", where);
+    const theme = THEMES.find((value) => THEME_LABELS[value] === label);
+    if (!theme) {
+      throw new FlowCaseError(`${where}: unbekannte Darstellung „${label}“.`);
+    }
+    if (pageName(page.url()) !== "einstellungen") {
+      throw new FlowCaseError(`${where}: Die Darstellung wählt man auf der Seite „einstellungen“.`);
+    }
+    await page.locator(`input[name=theme][value=${theme}]`).check();
+    await page.waitForFunction(
+      (attribute) =>
+        document.documentElement.getAttribute("data-theme") === attribute &&
+        document.querySelector("[data-speicherstand=gespeichert]") !== null,
+      themeAttribute(theme),
+      { timeout: LOAD_MS },
+    );
+    return { gespeichert: true };
   }
 }

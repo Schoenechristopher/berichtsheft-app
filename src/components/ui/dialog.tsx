@@ -116,6 +116,7 @@ export function ConfirmSubmit({
     <>
       <Button
         ref={buttonRef}
+        data-oeffnet-dialog={value}
         variant={variant}
         disabled={disabled}
         pending={pending}
@@ -209,6 +210,7 @@ export function ConfirmWithReason({
     <>
       <Button
         ref={buttonRef}
+        data-oeffnet-dialog={value}
         variant={variant}
         disabled={disabled}
         pending={pending}
