@@ -13,7 +13,9 @@ Diese Datei schreibt nur die Steuerungsinstanz, jeweils nach dem Merge eines Pak
 | G2 Zerlegung Fachlogik | C: M05 Status und Prüfung, Daten-Runner | abgenommen, gemergt | 13.10.2026 | #21, Merge `8eb4bc7` |
 | G2 Zerlegung Fachlogik | D: M06 Historie, M07 PDF-Export | abgenommen, gemergt | 13.10.2026 | #23, Merge `13c22fe` |
 | G2 Zerlegung Fachlogik | E: M08 Benachrichtigungen und Erinnerung, Abschluss G2 | abgenommen, gemergt | 13.10.2026 | #22, Merge `1b1f4e7` |
-| G3 Oberfläche und Abläufe | Welle 1: H Nachträge G2, G M09 beschreiben, F Ablauf-Runner | in Arbeit | 13.10.2026 | – |
+| G3 Oberfläche und Abläufe | H: Nachträge G2 (Migration Wochennummer, `hasContent`, Kaskade M06-R10) | abgenommen, gemergt | 13.10.2026 | #27, Merge `aaf40fc` |
+| G3 Oberfläche und Abläufe | G: M09 Oberfläche beschreiben, Landkarte `src/app` und `src/components` | abgenommen, gemergt | 13.10.2026 | #26, Merge `6486873` |
+| G3 Oberfläche und Abläufe | F: Ablauf-Runner, Testschnittstelle, AK-101, 106, 403, 408 | abgenommen, gemergt | 13.10.2026 | #28, Merge `9a9ff89` |
 | G3 Oberfläche und Abläufe | Welle 2: I Ablauf-Fälle M09, J Q, Szenarien, Abschluss | geplant | – | – |
 | A Automatisches Mergen | Welle 1: A1 AM-AK in `ak:abdeckung` | abgenommen, gemergt | 13.10.2026 | #30, Merge `e5e0adc` |
 | A Automatisches Mergen | A3 Ablauf-Kriterien AM-AK-11 bis -14 an Test-PRs | nachgewiesen | 13.10.2026 | #32 (gemergt in `am-test/main`), #33, #34 (geschlossen) |
@@ -271,7 +273,76 @@ grün, Ablauf-Fälle in allen Browsern grün, `CLAUDE.md` angepasst, Rückblick 
 
 ### Welle 1 – Pakete H, G und F (parallel)
 
-Gestartet am 13.10.2026 um 07:43 UTC. Einträge nach MW-R10 folgen nach der Abnahme.
+Gestartet am 13.10.2026 um 07:43 UTC, letzter Merge 21:24 UTC.
+
+| Feld | H: Nachträge G2 (#27) | G: M09 Oberfläche (#26) | F: Ablauf-Runner (#28) |
+| --- | --- | --- | --- |
+| Stufe und Denkaufwand | S2, mittel (Versuch nach MW-R11) | S2, mittel (Versuch nach MW-R11) | S3, hoch |
+| Größe und Budget | klein, Richtwert 3–5 US-Dollar | mittel, Richtwert 5–7 US-Dollar | groß, Richtwert 10–15 US-Dollar; nach Freigabe harte Grenze 22,50 |
+| Anläufe | 1 | 1 (dazu Abgleich mit `main`) | 1 Sitzung, 5 Lösungswege für Firefox (3 nach KE-R12, Weg 4 und Option A nach Freigabe) |
+| Beim ersten Anlauf abgenommen | ja | ja | lokal ja; volle CI erst nach Firefox-Nacharbeit grün |
+| Ausweichen auf ein anderes Modell | keins | keins | keins |
+| Verbrauch | 19.704 Ausgabe-, 4,24 Mio. Zwischenspeicher-Token; 0,99 US-Dollar | 66.130 Ausgabe-, 9,38 Mio. Zwischenspeicher-Token; 2,96 US-Dollar | 166.265 Ausgabe-, 48,78 Mio. Zwischenspeicher-Token; 21,74 US-Dollar |
+| Dauer | Draft-PR nach rund 14 Minuten | Draft-PR nach rund 14 Minuten | Draft-PR nach rund 41 Minuten; Firefox-Nacharbeit 10:21 bis 14:35 UTC |
+| CI-Läufe (volle Prüfung) | 1 (grün) | 2 (1 × quay.io 502 vor Testbeginn, 1 × Neustart grün) | 6 (5 × Firefox rot, 1 × grün) |
+| Rückfragen | keine blockierenden; 3 „Bitte bestätigen“, bestätigt | keine blockierenden; 4 „Bitte bestätigen“, bestätigt | 1 blockierende (CI-Weg, Port 3100, bestätigt); 2 Blocker an Chris (Weg 4, Option A); „Bitte bestätigen“ von Chris bestätigt |
+| Erreichte Abbruchkriterien | keine | keine | KE-R12 (drei Lösungswege) erreicht, danach Freigaben durch Chris |
+
+**Abnahme durch die Steuerung:** Diffs gelesen (Migration, Testschnittstelle, Adapter); lokale Abnahmeläufe je PR über einen
+S1-Hilfsagenten: Lint, Format, Typecheck, `npm test` (H 951, G 968, F 946 Tests), `ak:abdeckung`, `pruefumfang`,
+`landkarte` je `--pruefen`, Browser Chromium und 375 px (H, G 89; F 119 bestanden). Gegenproben: falscher Erwartungswert
+und unbekannte Aktion bzw. nicht erfasste Datei scheitern einzeln; Woche 54 verletzt die neue Prüfung; Testschnittstelle im
+Produktions-Build 404.
+
+**Ergebnis Welle 1:** Runner für die Ebene `ablauf` (Playwright, alle Browser) mit Testschnittstelle (Uhr, Testdaten; nur
+außerhalb Produktion) und festen Merkern; 15 Ablauf-Fälle für AK-101, 106, 403, 408 (Ebene „Ablauf“). M09 beschrieben
+(R01–R23, 24 Fachlogik-Fälle; 16 UI-AK als „Ablauf, G3“). Code-Landkarte Pflicht auch für `src/app` und `src/components`
+(109 Dateien). Daten-Format um `fehlt` und `person_loeschen` erweitert (AK-803-05). 444 Prüffälle.
+
+**Testgrenze (Option A, Chris 13.10.2026):** AK-408-03 (Neuladen mit bestätigter Warnung) läuft in Chromium, Edge und
+375 px; in Firefox als benannte Testgrenze in `e2e/pruefung/testgrenzen.ts`, weil Playwright den Ablauf dort nicht treu
+nachstellen kann (`page.reload()` ohne Dialog, `location.reload()` ohne fortgesetzte Navigation). Dieselbe Warnung ist in
+Firefox über AK-408-05 belegt. Offener Punkt G5: erneut prüfen.
+
+**Kosten Welle 1:** Pakete 25,69 US-Dollar (Richtwert 18–27), Steuerung 23,91 US-Dollar (Plan 7). Treiber der Steuerung:
+sechs volle CI-Läufe auf #28 mit Log-Auswertung, viele PR-Ereignisse, Kontext über 0,5 Mio. Token in einer Sitzung über
+rund 14 Stunden, Warten auf Entscheidungen.
+
+**Offene Punkte aus Welle 1:**
+
+- [x] #28 „Bitte bestätigen“ (Ergebnis je Schritt, `ausgangsbestand` erst ab Welle 2, Ebene „Ablauf“, Warnung über
+      Merker, AK-408-05 nur Abbrechen): von Chris bestätigt (13.10.2026).
+- [ ] Beispiel `AK-503-01` in `docs/06` auf das Format „Ergebnis je Schritt“ bringen (Paket J).
+- [ ] Testgrenze Firefox AK-408-03 in der Spec Q dokumentieren (Paket J) und in G5 erneut prüfen.
+- [ ] `ausgangsbestand` im Ablauf-Runner unterstützen, sobald Welle 2 ihn braucht (Paket I oder J).
+
+**Fallen für spätere Aufträge:**
+
+- Firefox gibt es in der Sandbox nicht; jeder Firefox-Befund kostet einen vollen CI-Lauf (rund 17 Minuten). Browser-Abläufe
+  mit nativen Dialogen (beforeunload) vorab als Risiko im Auftrag nennen; die Diagnosezeile im Adapter früh einsetzen.
+- Firefox zeigt beforeunload nur nach echter Nutzerinteraktion (Klick ins Feld), `fill()` reicht nicht.
+- Next.js hält Modulzustand je Bundle getrennt; die Uhr liegt deshalb auf `globalThis`.
+- Playwright lädt `tests/pruefung` als CommonJS (`__dirname` statt `import.meta`).
+- Der Wechsel auf „bereit“ bricht den laufenden Entwurfs-Lauf ab; „Prüfung abgeschlossen“ meldet ihn rot (kein echter Fehler).
+- Merge-Warteschlange und Pflicht-Check „Prüfung abgeschlossen“ sind seit 13.10.2026 aktiv; neue Prüfungen müssen in diesen
+  Job eingehen.
+
+## Übergabe an die Steuerung von G3, Welle 2
+
+- **Stand:** Welle 1 ist gemergt (#25 bis #28). Ablauf-Runner `e2e/pruefung-ablauf.spec.ts` mit Adapter
+  `e2e/pruefung/ablauf-adapter.ts`, Testgrenzen in `e2e/pruefung/testgrenzen.ts`, Testschnittstelle `POST /api/test/zustand`.
+  Format des Ablauf-Falls in `specs/pruefung/format.md`. `DEFERRED_CASES_REQUIRED` ist noch `false`; offen mit Markierung
+  „Ablauf, G3“ sind die 16 UI-AK von M09 (UI-AK-01, 02, 05–12, 15–20).
+- **Nächstes (Plan G3, Welle 2):** I – Ablauf-Fälle aller UI-AK mit festem Prüfvokabular (E3) im Adapter; J – Spec Q
+  (AK-1101, AK-1102, Testgrenze), Beispielszenarien als Ablauf-Fälle, `DEFERRED_CASES_REQUIRED = true`, `CLAUDE.md`
+  „Fach-Specs maßgeblich“, `specs/00-uebersicht.md` und `docs/06` auf Stand G3, CI-37-Satz (E6). Merge-Reihenfolge I → J.
+- **Stufe:** I und J auf S3 (Browser-Infrastruktur). H und G haben gezeigt, dass Beschreibungs-Pakete auf S2 tragen
+  (0,99 und 2,96 US-Dollar); für reine Beschreibungsteile in J einen S2-Anteil erwägen.
+- **Budget:** Firefox-Risiko einplanen: Richtwert I und J je 10–15 US-Dollar, harte Grenze je Paket vorab mit Chris
+  vereinbaren. Steuerung: Abnahmeläufe und CI-Log-Auswertung nur über S1-Hilfsagenten; nach jedem Paket mit Blocker
+  prüfen, ob eine frische Steuerung günstiger ist.
+- **Offen bei Chris:** keine Punkte aus Welle 1.
+
 
 ## A – Automatisches Mergen
 
