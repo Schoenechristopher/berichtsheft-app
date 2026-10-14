@@ -223,12 +223,15 @@ export function auswahlNachModul(dateien, { graph, landkarte, akModul }) {
 /**
  * Auswahl eines CI-Laufs: CI-37 gilt nur für Logik- und Serveränderungen (Klassen L und P, dazu Doku). Erzwungene volle
  * Prüfung (CI-35), Oberfläche (O), Infrastruktur (I) und unbekannte Pfade (CI-34) wählen alle Fälle.
- * @param {{ modulauswahl: boolean }} umfang Ergebnis von `bestimmeUmfang()`
+ * @param {{ e2e: boolean, modulauswahl: boolean }} umfang Ergebnis von `bestimmeUmfang()`
  * @param {string[]} dateien
  * @param {Kontext} kontext
  * @returns {Auswahl}
  */
 export function waehleAblauf(umfang, dateien, kontext) {
+  if (!umfang.e2e) {
+    return { alle: false, module: [], gruende: ["keine:ohne-browser-lauf"], grepInvert: "" };
+  }
   if (!umfang.modulauswahl) {
     return alle(["alle:erzwungen"]);
   }

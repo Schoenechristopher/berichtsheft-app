@@ -82,7 +82,7 @@ if (ereignis === "pull_request") {
 
 const umfang = bestimmeUmfang(anlass);
 const ablauf = waehleAblauf(umfang, anlass.dateien ?? [], modulKontext());
-const ablaufModule = ablauf.alle ? "alle" : ablauf.module.join(" ");
+const ablaufModule = ablauf.alle ? "alle" : ablauf.module.join(" ") || "keine";
 const ausgabe = [
   `schnell=${umfang.schnell}`,
   `e2e=${umfang.e2e}`,

@@ -380,6 +380,15 @@ describe("CI-37 Auswahl der Ablauf-Fälle nach Modul (modulauswahl.mjs)", () => 
     ).toEqual(amPr);
   });
 
+  it("CI-37 ohne Browser-Lauf (Entwurf, Doku) keine Auswahl", () => {
+    const dateien = ["src/domain/notifications.ts"];
+    const entwurf = bestimmeUmfang({ ereignis: "pull_request", entwurf: true, dateien });
+    expect(waehleAblauf(entwurf, dateien, kontext)).toMatchObject({
+      gruende: ["keine:ohne-browser-lauf"],
+      grepInvert: "",
+    });
+  });
+
   it("CI-37 specs/modulgraph.json gehört zur Klasse L", () => {
     expect(klassifiziere("specs/modulgraph.json")).toBe("L");
   });
