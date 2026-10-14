@@ -389,8 +389,8 @@ nennt die Fach-Specs als maßgeblich. Etappe G3 ist abgeschlossen (14.10.2026).
 | Kennzahl | G3 |
 | --- | --- |
 | KZ-1 Abnahme beim ersten Anlauf | 5 von 5 (100 %); Nacharbeit in F (vier Lösungswege, Testgrenze AK-408-03 Firefox) und J (Zeitlimit, Warteschlangen-Hänger) |
-| KZ-2 Rückfragen wegen unvollständigem Auftrag | Welle 1: 1 blockierende (CI-Weg F); Welle 2: I 3 und J 5 Punkte „Bitte bestätigen“, alle von Chris bestätigt |
-| KZ-3 Läufe der vollen Prüfung je PR | F 6, J 3 plus 2 Warteschlangen-Versuche; H 1, G 2 (1 × quay.io 502); I nicht erfasst |
+| KZ-2 Rückfragen wegen unvollständigem Auftrag | Welle 1: 1 blockierende (CI-Weg F); Welle 2: 0 (keine blockierenden Rückfragen von I oder J); dazu I 3 und J 5 Punkte „Bitte bestätigen“, alle von Chris bestätigt |
+| KZ-3 Läufe der vollen Prüfung je PR | F 6, J 3 plus 2 Warteschlangen-Versuche; H 1, G 2 (1 × quay.io 502), I 1 (beim ersten Lauf in allen Browsern grün) |
 | KZ-4 Pakete über Budget | über Richtwert: F (21,74 statt 10–15; harte Grenze 22,50 eingehalten) und J (19,19 statt 8–12); über harter Grenze: 0 |
 | KZ-5 Verbrauch je abgenommenem Paket | H 0,99 · G 2,96 (S2 mittel) · F 21,74 (S3 hoch) · I 7,81 · J 19,19 US-Dollar (S3 mittel) |
 | Steuerung | Welle 1 31,02 · Welle 2 6,77 · Abschluss-Steuerung 2,94 · Wächter #37 2,12 US-Dollar |
