@@ -339,7 +339,10 @@ export function ReportEditor({
             aria-hidden="true"
             className={`h-2.5 w-2.5 rounded-full ${dirty && !pending ? "bg-overdue" : "bg-approved"}`}
           />
-          <span data-testid="save-status">
+          <span
+            data-testid="save-status"
+            data-speicherstand={pending ? "ausstehend" : dirty ? "ungespeichert" : "gespeichert"}
+          >
             {pending
               ? intent === "submit"
                 ? "Wird eingereicht …"

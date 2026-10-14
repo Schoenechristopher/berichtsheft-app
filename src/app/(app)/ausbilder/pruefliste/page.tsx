@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { canViewReport } from "@/domain/report-access";
 import { formatDateTime } from "@/domain/report-history";
-import { weekRangeLabel } from "@/domain/weeks";
+import { isoWeekCode, weekRangeLabel } from "@/domain/weeks";
 import { EmptyState, SegmentLinks } from "@/components/ui";
 import { db } from "@/lib/db";
 import { isUuid } from "@/lib/ids";
@@ -37,6 +37,7 @@ export default async function ReviewQueuePage({ searchParams }: PageProps<"/ausb
     <div className="space-y-4 lg:-mx-8 lg:-my-8 lg:grid lg:h-[calc(100dvh-var(--header-height))] lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-0 lg:space-y-0">
       <section
         aria-label="Prüfliste"
+        data-bereich="pruefliste"
         className="lg:border-border lg:bg-surface min-h-0 space-y-4 lg:overflow-y-auto lg:border-r lg:py-6"
       >
         <div className="space-y-4 lg:px-4">
@@ -65,6 +66,7 @@ export default async function ReviewQueuePage({ searchParams }: PageProps<"/ausb
               id: report.id,
               traineeName: report.trainee.name,
               week: `KW ${report.isoWeek}/${report.isoYear}`,
+              isoWeek: isoWeekCode(report.isoYear, report.isoWeek),
               range: weekRangeLabel(report.isoYear, report.isoWeek),
               submittedAt: formatDateTime(report.submittedAt),
               resubmitted: report.resubmitted,
@@ -74,7 +76,11 @@ export default async function ReviewQueuePage({ searchParams }: PageProps<"/ausb
           />
         )}
       </section>
-      <section aria-label="Ausgewählter Bericht" className="hidden min-h-0 lg:block lg:overflow-y-auto lg:px-8 lg:pt-6">
+      <section
+        aria-label="Ausgewählter Bericht"
+        data-bereich="bericht_ansicht"
+        className="hidden min-h-0 lg:block lg:overflow-y-auto lg:px-8 lg:pt-6"
+      >
         {selected && canViewReport(viewer, selected) ? (
           <ReportView key={selected.id} report={selected} viewer={viewer} headingLevel={2} nextHref={nextHref} />
         ) : requested ? (

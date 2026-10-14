@@ -546,8 +546,12 @@ Bausteine unter `src/components/ui/`.
 - Feste Merker für die Ablauf-Fälle (`specs/pruefung/format.md`, „Aufbau eines Ablauf-Falls“): `data-warnung-verlassen`,
   `data-ungespeichert`, `data-ausstehend`, `data-datum`, `data-fehler` in `ReportEditor.tsx`, `data-feld` in
   `ReportEditor.tsx` und `day-type.tsx`, `data-woche` in `week-tile.tsx` und `ReportView.tsx`, `data-anmeldeweg` in
-  `anmelden/page.tsx`, `data-von`/`-nach`/`-person`/`-zeitpunkt` in `ReportHistory.tsx`. Der Ablauf-Adapter
-  (`e2e/pruefung/ablauf-adapter.ts`) liest nur sie, nie Meldungstexte; wer sie umbenennt, bricht die Ablauf-Fälle.
+  `anmelden/page.tsx`, `data-von`/`-nach`/`-person`/`-zeitpunkt` in `ReportHistory.tsx`; seit G3 (Paket I) dazu
+  `data-speicherstand` in `ReportEditor.tsx` und `ThemeSettings.tsx`, `data-oeffnet-dialog` in `dialog.tsx`,
+  `data-menue`, `data-menue-knopf` und `data-drawer-close` in `AppShell.tsx`, `data-glocke`, `data-glocke-vorschau` in `bell.tsx`,
+  `data-bereich` in `pruefliste/page.tsx`, `data-woche` in `ReviewQueueList.tsx` und die `data-testid` der Leerzustände.
+  Der Ablauf-Adapter (`e2e/pruefung/ablauf-adapter.ts`, Elemente in `e2e/pruefung/ablauf-pruefungen.ts`) liest nur
+  sie, nie Meldungstexte (Ausnahme: der Seitentitel, M09-R22); wer sie umbenennt, bricht die Ablauf-Fälle.
 - Farben nie fest in Komponenten, nur über die Tokens in `src/app/globals.css` (Hell und Dunkel).
 
 **Ersetzt durch Bordmittel / Liferay:** offen für das Profil (G4). Liferay 6.2.5 bringt AlloyUI mit; der Dunkelmodus ist

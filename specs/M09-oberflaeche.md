@@ -133,31 +133,33 @@ Text aus `docs/05-ui-spezifikation.md`, „UI-Akzeptanzkriterien“; Prüffälle
 
 | AK-ID | Kriterium (Kurzfassung) | Regeln | Prüffälle | Ebene |
 | --- | --- | --- | --- | --- |
-| UI-AK-01 | Seitenleiste ab 1024 px, darunter Menüknopf und Schublade mit Escape und Fokusrückgabe. | M09-R01 | folgt in G3 | Ablauf, G3 |
-| UI-AK-02 | Aktiver Menüpunkt gekennzeichnet; jede Rolle sieht genau ihre Menüpunkte. | M09-R02 | folgt in G3 | Ablauf, G3 |
+| UI-AK-01 | Seitenleiste ab 1024 px, darunter Menüknopf und Schublade mit Escape und Fokusrückgabe. | M09-R01 | UI-AK-01-01 bis UI-AK-01-04 | Ablauf |
+| UI-AK-02 | Aktiver Menüpunkt gekennzeichnet; jede Rolle sieht genau ihre Menüpunkte. | M09-R02 | UI-AK-02-01 bis UI-AK-02-02 | Ablauf |
 | UI-AK-03 | Glocke mit Zähler, ab 100 „99+“, genaue Zahl im Namen. | M09-R03 | UI-AK-03-01 bis UI-AK-03-04 | Fachlogik |
 | UI-AK-04 | Start Azubi: aktuelle Woche mit Fortschritt; „Zu erledigen“ älteste zuerst, abgelehnte oben. | M09-R05, M09-R06 | UI-AK-04-01 bis UI-AK-04-04 | Fachlogik |
-| UI-AK-05 | Leerzustand „Alles erledigt – keine offenen Wochen.“ | M09-R07 | folgt in G3 | Ablauf, G3 |
-| UI-AK-06 | Fünf Tage nebeneinander ab 1280 px, kein waagerechtes Scrollen bei 1280 und 375 px. | M09-R08 | folgt in G3 | Ablauf, G3 |
-| UI-AK-07 | Fußleiste „Ungespeicherte Änderungen“ / „Gespeichert“ und Meldung. | M09-R09 | folgt in G3 | Ablauf, G3 |
-| UI-AK-08 | Fehlerleiste mit betroffenen Tagen und Sprunglinks, erhält den Fokus. | M09-R10 | folgt in G3 | Ablauf, G3 |
-| UI-AK-09 | Einreichen speichert zuerst, dann wird eingereicht. | M09-R11 | folgt in G3 | Ablauf, G3 |
-| UI-AK-10 | Prüfliste links, Bericht rechts ab 1024 px; Bericht in der Adresse. | M09-R12 | folgt in G3 | Ablauf, G3 |
-| UI-AK-11 | Nach Entscheidung nächster Bericht; danach „Keine Berichte zur Prüfung.“ | M09-R13 | folgt in G3 | Ablauf, G3 |
-| UI-AK-12 | Unter 1024 px Berichtsseite mit Entscheidungsleiste und „← Prüfliste“. | M09-R14 | folgt in G3 | Ablauf, G3 |
+| UI-AK-05 | Leerzustand „Alles erledigt – keine offenen Wochen.“ | M09-R07 | UI-AK-05-01 bis UI-AK-05-02 | Ablauf |
+| UI-AK-06 | Fünf Tage nebeneinander ab 1280 px, kein waagerechtes Scrollen bei 1280 und 375 px. | M09-R08 | UI-AK-06-01 bis UI-AK-06-03 | Ablauf |
+| UI-AK-07 | Fußleiste „Ungespeicherte Änderungen“ / „Gespeichert“ und Meldung. | M09-R09 | UI-AK-07-01 | Ablauf |
+| UI-AK-08 | Fehlerleiste mit betroffenen Tagen und Sprunglinks, erhält den Fokus. | M09-R10 | UI-AK-08-01 | Ablauf |
+| UI-AK-09 | Einreichen speichert zuerst, dann wird eingereicht. | M09-R11 | UI-AK-09-01 | Ablauf |
+| UI-AK-10 | Prüfliste links, Bericht rechts ab 1024 px; Bericht in der Adresse. | M09-R12 | UI-AK-10-01 | Ablauf |
+| UI-AK-11 | Nach Entscheidung nächster Bericht; danach „Keine Berichte zur Prüfung.“ | M09-R13 | UI-AK-11-01 | Ablauf |
+| UI-AK-12 | Unter 1024 px Berichtsseite mit Entscheidungsleiste und „← Prüfliste“. | M09-R14 | UI-AK-12-01 bis UI-AK-12-02 | Ablauf |
 | UI-AK-13 | Jeder Status-Chip zeigt Symbol und Text. | M09-R15 | UI-AK-13-01 bis UI-AK-13-04 | Fachlogik |
 | UI-AK-14 | Darstellung System, Hell, Dunkel; gilt sofort, bleibt erhalten, gilt auf zweitem Gerät. | M09-R16, M09-R17 | UI-AK-14-01 bis UI-AK-14-10 | Fachlogik |
-| UI-AK-15 | Bei System folgt die App dem Gerät; kein Aufblitzen des falschen Schemas. | M09-R18 | folgt in G3 | Ablauf, G3 |
-| UI-AK-16 | Keine Verstöße WCAG A und AA, hell und dunkel, 1280 und 375 px. | M09-R19 | folgt in G3 | Ablauf, G3 |
-| UI-AK-17 | Alle Abläufe nur mit der Tastatur; Fokus sichtbar und nie verdeckt. | M09-R20 | folgt in G3 | Ablauf, G3 |
-| UI-AK-18 | Dialog fängt Fokus, Escape schließt, Fokus kehrt zurück. | M09-R21 | folgt in G3 | Ablauf, G3 |
-| UI-AK-19 | Eigener Seitentitel „<Seite> – Berichtsheft“ und genau eine Hauptüberschrift. | M09-R22 | folgt in G3 | Ablauf, G3 |
-| UI-AK-20 | Platzhalter als Ladezustand; erklärender Leerzustand. | M09-R23 | folgt in G3 | Ablauf, G3 |
+| UI-AK-15 | Bei System folgt die App dem Gerät; kein Aufblitzen des falschen Schemas. | M09-R18 | UI-AK-15-01 bis UI-AK-15-03 | Ablauf |
+| UI-AK-16 | Keine Verstöße WCAG A und AA, hell und dunkel, 1280 und 375 px. | M09-R19 | UI-AK-16-01 bis UI-AK-16-04 | Ablauf |
+| UI-AK-17 | Alle Abläufe nur mit der Tastatur; Fokus sichtbar und nie verdeckt. | M09-R20 | UI-AK-17-01 bis UI-AK-17-02 | Ablauf |
+| UI-AK-18 | Dialog fängt Fokus, Escape schließt, Fokus kehrt zurück. | M09-R21 | UI-AK-18-01 bis UI-AK-18-02 | Ablauf |
+| UI-AK-19 | Eigener Seitentitel „<Seite> – Berichtsheft“ und genau eine Hauptüberschrift. | M09-R22 | UI-AK-19-01 bis UI-AK-19-02 | Ablauf |
+| UI-AK-20 | Platzhalter als Ladezustand; erklärender Leerzustand. | M09-R23 | UI-AK-20-01 bis UI-AK-20-02 | Ablauf |
 
-Begründung der Markierung `Ablauf, G3`: Alle diese Kriterien beschreiben Verhalten im Browser (Breiten, Fokus, Tastatur,
-Schublade, Seitentitel, Zustände, Farbschema beim Laden, automatische Prüfung auf Barrierefreiheit). Eine Schnittstelle
-dahinter gibt es nicht; ihr Prüffall ist ein Ablauf-Fall, den Paket I in Welle 2 schreibt. Davon haben UI-AK-02,
-UI-AK-05, UI-AK-11 und UI-AK-19 feste Texte oder feste Listen (Abschnitt 5), die ein Ablauf-Fall wörtlich prüft.
+Ebene „Ablauf“: Alle diese Kriterien beschreiben Verhalten im Browser (Breiten, Fokus, Tastatur, Schublade,
+Seitentitel, Zustände, Farbschema beim Laden, automatische Prüfung auf Barrierefreiheit). Eine Schnittstelle dahinter
+gibt es nicht; ihre Prüffälle sind Ablauf-Fälle (G3, Paket I) mit den generischen Prüfaktionen aus
+`specs/pruefung/format.md` („Prüfaktionen“, Entscheidung E3, Variante A), Breite und Farbschema des Geräts über das
+Fall-Feld `geraet`. Feste Texte (Abschnitt 5) prüfen sie nur beim Seitentitel wörtlich (UI-AK-19); Leerzustände
+(UI-AK-05, UI-AK-11, UI-AK-20) und Menüpunkte (UI-AK-02) erkennen sie über feste Merker bzw. die Zielseite.
 
 Fachlogik, soweit es einen fachlichen Kern gibt (wie AK-401 in M04):
 
@@ -239,7 +241,7 @@ unverändert. Zusätzlich:
 
 ## 10. Offene Punkte
 
-- [ ] **Bitte bestätigen:** UI-AK-15 ist `Ablauf, G3`, obwohl `resolveTheme` (Konto vor Gerät) als Fachlogik unter
+- [ ] **Bitte bestätigen:** UI-AK-15 ist `Ablauf`, obwohl `resolveTheme` (Konto vor Gerät) als Fachlogik unter
       UI-AK-14 geprüft wird. Der Kern von UI-AK-15 („folgt dem Gerät“, „kein Aufblitzen“) ist reines Browser-Verhalten.
 - [ ] **Bitte bestätigen:** `darstellungPruefen` prüft die Wertemenge (`isTheme`), nicht `updateOwnTheme()` selbst (das
       braucht die Datenbank und die Rechteprüfung; dafür in Welle 2 ein Daten-Fall). Die App liefert dort nur einen
@@ -248,7 +250,7 @@ unverändert. Zusätzlich:
       `azubi/page.tsx` und nicht in der Fachlogik. Eine reine Funktion in `src/domain/` würde sie als Fachlogik
       prüfbar machen (Änderung außerhalb von G3-G).
 - [ ] `relativeTime()` („vor 2 Std.“) gehört zu M09, hat aber kein UI-AK und keinen Prüffall.
-- [ ] Ablauf-Fälle für UI-AK-01, 02, 05 bis 12, 15 bis 20 folgen in Welle 2 (Paket I).
+- [x] Ablauf-Fälle für UI-AK-01, 02, 05 bis 12, 15 bis 20 (G3, Welle 2, Paket I).
 - [ ] **Liferay (Profil, G4):** Liferay 6.2.5 bringt AlloyUI als Oberflächen-Bibliothek mit; ob die Komponenten dort
       nachgebaut oder ersetzt werden, ist offen. Dunkelmodus ist dort nur begrenzt möglich (Themes der Plattform);
       UI-AK-14 und UI-AK-15 brauchen eine Abweichung, falls er entfällt. Ob 375 px und WCAG 2.2 AA mit der Plattform
