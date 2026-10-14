@@ -1,5 +1,389 @@
 [
   {
+    "id": "UI-AK-01-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Ab 1024 px ist die Seitenleiste sichtbar und der Menüknopf nicht (1280 px).",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 1280
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["menue", "menue_knopf"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "menue": "sichtbar",
+          "menue_knopf": "verborgen"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-01-02",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Ab 1024 px ist die Seitenleiste sichtbar und der Menüknopf nicht (1024 px).",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 1024
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["menue", "menue_knopf"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "menue": "sichtbar",
+          "menue_knopf": "verborgen"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-01-03",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Unter 1024 px öffnet der Menüknopf die Schublade; Escape bzw. „Schließen“ schließt sie, der Fokus kehrt zum Menüknopf zurück (1023 px).",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 1023
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["menue", "menue_knopf"]
+      },
+      {
+        "als": "anna",
+        "aktion": "bedienen",
+        "element": "menue_knopf"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["menue"]
+      },
+      {
+        "als": "anna",
+        "aktion": "fokus_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "taste_druecken",
+        "taste": "Escape"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["menue"]
+      },
+      {
+        "als": "anna",
+        "aktion": "bedienen",
+        "element": "menue_knopf"
+      },
+      {
+        "als": "anna",
+        "aktion": "bedienen",
+        "element": "menue_schliessen"
+      },
+      {
+        "als": "anna",
+        "aktion": "fokus_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["menue"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "menue": "verborgen",
+          "menue_knopf": "sichtbar"
+        },
+        {
+          "seite": "start"
+        },
+        {
+          "menue": "sichtbar"
+        },
+        {
+          "fokus": "menue_schliessen"
+        },
+        {
+          "fokus": "menue_knopf"
+        },
+        {
+          "menue": "verborgen"
+        },
+        {
+          "seite": "start"
+        },
+        {
+          "seite": "start"
+        },
+        {
+          "fokus": "menue_knopf"
+        },
+        {
+          "menue": "verborgen"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-01-04",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Unter 1024 px öffnet der Menüknopf die Schublade; Escape bzw. „Schließen“ schließt sie, der Fokus kehrt zum Menüknopf zurück (375 px).",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 375
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["menue", "menue_knopf"]
+      },
+      {
+        "als": "anna",
+        "aktion": "bedienen",
+        "element": "menue_knopf"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["menue"]
+      },
+      {
+        "als": "anna",
+        "aktion": "fokus_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "taste_druecken",
+        "taste": "Escape"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["menue"]
+      },
+      {
+        "als": "anna",
+        "aktion": "bedienen",
+        "element": "menue_knopf"
+      },
+      {
+        "als": "anna",
+        "aktion": "bedienen",
+        "element": "menue_schliessen"
+      },
+      {
+        "als": "anna",
+        "aktion": "fokus_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["menue"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "menue": "verborgen",
+          "menue_knopf": "sichtbar"
+        },
+        {
+          "seite": "start"
+        },
+        {
+          "menue": "sichtbar"
+        },
+        {
+          "fokus": "menue_schliessen"
+        },
+        {
+          "fokus": "menue_knopf"
+        },
+        {
+          "menue": "verborgen"
+        },
+        {
+          "seite": "start"
+        },
+        {
+          "seite": "start"
+        },
+        {
+          "fokus": "menue_knopf"
+        },
+        {
+          "menue": "verborgen"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-02-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Ein Azubi sieht genau die Menüpunkte seiner Rolle; auf einem Wochenbericht ist „Meine Wochen“ als einziger Punkt aktiv.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "titel": "Start – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "wochen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["start"]
+          }
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "titel": "KW 38/2026 – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "wochen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["wochen"]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-02-02",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Ein Ausbilder sieht genau die Menüpunkte seiner Rolle; der Punkt der aufgerufenen Seite ist als einziger aktiv.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "personen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ansicht_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "warnung": null,
+          "seite": "personen",
+          "angemeldet": "bernd"
+        },
+        {
+          "titel": "Personen – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "pruefliste", "azubis", "personen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["personen"]
+          }
+        }
+      ]
+    }
+  },
+  {
     "id": "UI-AK-03-01",
     "modul": "M09",
     "ebene": "fachlogik",
@@ -219,6 +603,1306 @@
     }
   },
   {
+    "id": "UI-AK-05-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Ohne offene Wochen vor der aktuellen zeigt „Zu erledigen“ den Leerzustand und keine offene Woche.",
+    "uhr": "2026-09-02T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["leer_zu_erledigen", "offene_woche"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "leer_zu_erledigen": "sichtbar",
+          "offene_woche": "fehlt"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-05-02",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Gegenprobe: Mit offenen Wochen vor der aktuellen gibt es keinen Leerzustand.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["leer_zu_erledigen", "offene_woche"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "leer_zu_erledigen": "fehlt",
+          "offene_woche": "sichtbar"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-06-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Bei 1280 px stehen die fünf Tage nebeneinander; die Seite scrollt nicht waagerecht.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 1280
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "anordnung_lesen",
+        "elemente": ["tag"]
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "anordnung": "nebeneinander",
+          "anzahl": 5
+        },
+        {
+          "titel": "KW 38/2026 – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "wochen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["wochen"]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-06-02",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Bei 1279 px stehen die fünf Tage untereinander; die Seite scrollt nicht waagerecht.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 1279
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "anordnung_lesen",
+        "elemente": ["tag"]
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "anordnung": "untereinander",
+          "anzahl": 5
+        },
+        {
+          "titel": "KW 38/2026 – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "wochen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["wochen"]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-06-03",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Bei 375 px stehen die fünf Tage untereinander; die Seite scrollt nicht waagerecht.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 375
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "anordnung_lesen",
+        "elemente": ["tag"]
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "anordnung": "untereinander",
+          "anzahl": 5
+        },
+        {
+          "titel": "KW 38/2026 – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "wochen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["wochen"]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-07-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Nach einer Eingabe zeigt die Fußleiste ungespeicherte Änderungen, nach dem Speichern „Gespeichert“ und eine Meldung.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["fussleiste_gespeichert", "fussleiste_ungespeichert", "meldung"]
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mo",
+        "text": "Netzwerk geplant"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["fussleiste_gespeichert", "fussleiste_ungespeichert"]
+      },
+      {
+        "als": "anna",
+        "aktion": "speichern"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["fussleiste_gespeichert", "fussleiste_ungespeichert", "meldung"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "fussleiste_gespeichert": "sichtbar",
+          "fussleiste_ungespeichert": "fehlt",
+          "meldung": "fehlt"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "fussleiste_gespeichert": "fehlt",
+          "fussleiste_ungespeichert": "sichtbar"
+        },
+        {
+          "gespeichert": true
+        },
+        {
+          "fussleiste_gespeichert": "sichtbar",
+          "fussleiste_ungespeichert": "fehlt",
+          "meldung": "sichtbar"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-08-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Einreichen scheitert an Pflichtangaben: Die Fehlerleiste mit Sprunglinks erscheint und erhält den Fokus; ein Sprunglink führt zum Feld des Tages.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "fokus_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["fehlerleiste", "sprunglink", "dialog"]
+      },
+      {
+        "als": "anna",
+        "aktion": "bedienen",
+        "element": "sprunglink",
+        "tag": "Fr"
+      },
+      {
+        "als": "anna",
+        "aktion": "fokus_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "fehler": "pflichtangaben_fehlen",
+          "tage": [
+            {
+              "tag": "Do",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Fr",
+              "fehler": "tagesart_fehlt"
+            }
+          ]
+        },
+        {
+          "fokus": "fehlerleiste"
+        },
+        {
+          "fehlerleiste": "sichtbar",
+          "sprunglink": "sichtbar",
+          "dialog": "fehlt"
+        },
+        {
+          "seite": "bericht"
+        },
+        {
+          "fokus": "tagesart",
+          "tag": "Fr"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-09-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Einreichen mit ungespeicherten Änderungen speichert zuerst und reicht dann ein; nach dem Neuladen ist der Bericht eingereicht und nichts ungespeichert.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Fr)"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "neu_laden"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["fussleiste_ungespeichert", "einreichen"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "fussleiste_ungespeichert": "fehlt",
+          "einreichen": "fehlt"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-10-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Ab 1024 px stehen Prüfliste und Bericht nebeneinander; der gewählte Bericht steht in der Adresse (bleibt nach dem Neuladen) und ist direkt aufrufbar.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 1280
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Fr)"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "pruefliste"
+      },
+      {
+        "als": "bernd",
+        "aktion": "anordnung_lesen",
+        "elemente": ["pruefliste", "bericht_ansicht"]
+      },
+      {
+        "als": "bernd",
+        "aktion": "bedienen",
+        "element": "pruefeintrag",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_lesen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_verlassen",
+        "weg": "neu_laden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_lesen"
+      },
+      {
+        "als": "clara",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "clara",
+        "aktion": "seite_aufrufen",
+        "seite": "pruefliste",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "clara",
+        "aktion": "elemente_lesen",
+        "elemente": ["bericht_ansicht", "entscheidungsleiste"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "warnung": null,
+          "seite": "pruefliste",
+          "angemeldet": "bernd"
+        },
+        {
+          "anordnung": "nebeneinander",
+          "anzahl": 2
+        },
+        {
+          "seite": "pruefliste"
+        },
+        {
+          "seite": "pruefliste",
+          "angemeldet": "bernd",
+          "passwortfeld": false,
+          "eintraege": ["2026-W37"],
+          "ausgewaehlt": "2026-W37"
+        },
+        {
+          "warnung": null,
+          "seite": "pruefliste",
+          "angemeldet": "bernd"
+        },
+        {
+          "seite": "pruefliste",
+          "angemeldet": "bernd",
+          "passwortfeld": false,
+          "eintraege": ["2026-W37"],
+          "ausgewaehlt": "2026-W37"
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "clara"
+        },
+        {
+          "warnung": null,
+          "seite": "pruefliste",
+          "angemeldet": "clara"
+        },
+        {
+          "bericht_ansicht": "sichtbar",
+          "entscheidungsleiste": "sichtbar"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-11-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Nach Freigeben öffnet sich der nächste Bericht der Liste, nach dem Ablehnen des letzten der Leerzustand.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 1280
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Fr)"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Fr)"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "pruefliste",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "freigeben"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_lesen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ablehnen",
+        "begruendung": "Bitte die Tätigkeiten genauer beschreiben."
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_lesen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "elemente_lesen",
+        "elemente": ["leer_pruefliste"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "warnung": null,
+          "seite": "pruefliste",
+          "angemeldet": "bernd"
+        },
+        {
+          "entschieden": true
+        },
+        {
+          "seite": "pruefliste",
+          "angemeldet": "bernd",
+          "passwortfeld": false,
+          "eintraege": ["2026-W38"],
+          "ausgewaehlt": "2026-W38"
+        },
+        {
+          "entschieden": true
+        },
+        {
+          "seite": "pruefliste",
+          "angemeldet": "bernd",
+          "passwortfeld": false,
+          "eintraege": [],
+          "ausgewaehlt": null
+        },
+        {
+          "leer_pruefliste": "sichtbar"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-12-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Unter 1024 px (1023 px) öffnet ein Eintrag der Prüfliste die Berichtsseite mit Entscheidungsleiste und „← Prüfliste“.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 1023
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Fr)"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "pruefliste"
+      },
+      {
+        "als": "bernd",
+        "aktion": "elemente_lesen",
+        "elemente": ["bericht_ansicht"]
+      },
+      {
+        "als": "bernd",
+        "aktion": "bedienen",
+        "element": "pruefeintrag",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "elemente_lesen",
+        "elemente": ["entscheidungsleiste", "freigeben", "ablehnen", "zurueck_zur_pruefliste"]
+      },
+      {
+        "als": "bernd",
+        "aktion": "bedienen",
+        "element": "zurueck_zur_pruefliste"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "warnung": null,
+          "seite": "pruefliste",
+          "angemeldet": "bernd"
+        },
+        {
+          "bericht_ansicht": "verborgen"
+        },
+        {
+          "seite": "bericht"
+        },
+        {
+          "entscheidungsleiste": "sichtbar",
+          "freigeben": "sichtbar",
+          "ablehnen": "sichtbar",
+          "zurueck_zur_pruefliste": "sichtbar"
+        },
+        {
+          "seite": "pruefliste"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-12-02",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Unter 1024 px (375 px) öffnet ein Eintrag der Prüfliste die Berichtsseite mit Entscheidungsleiste und „← Prüfliste“.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 375
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Fr)"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "pruefliste"
+      },
+      {
+        "als": "bernd",
+        "aktion": "elemente_lesen",
+        "elemente": ["bericht_ansicht"]
+      },
+      {
+        "als": "bernd",
+        "aktion": "bedienen",
+        "element": "pruefeintrag",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "elemente_lesen",
+        "elemente": ["entscheidungsleiste", "freigeben", "ablehnen", "zurueck_zur_pruefliste"]
+      },
+      {
+        "als": "bernd",
+        "aktion": "bedienen",
+        "element": "zurueck_zur_pruefliste"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "warnung": null,
+          "seite": "pruefliste",
+          "angemeldet": "bernd"
+        },
+        {
+          "bericht_ansicht": "verborgen"
+        },
+        {
+          "seite": "bericht"
+        },
+        {
+          "entscheidungsleiste": "sichtbar",
+          "freigeben": "sichtbar",
+          "ablehnen": "sichtbar",
+          "zurueck_zur_pruefliste": "sichtbar"
+        },
+        {
+          "seite": "pruefliste"
+        }
+      ]
+    }
+  },
+  {
     "id": "UI-AK-13-01",
     "modul": "M09",
     "ebene": "fachlogik",
@@ -407,6 +2091,2892 @@
     },
     "erwartet": {
       "darstellung": "System"
+    }
+  },
+  {
+    "id": "UI-AK-15-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Bei „System“ folgt die App dem Gerät (dunkel), schon beim ersten Darstellen ohne Skript.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "farbschema": "dunkel"
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "erstes_bild_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "titel": "Start – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "dunkel",
+          "menue": {
+            "punkte": ["start", "wochen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["start"]
+          }
+        },
+        {
+          "farbschema": "dunkel"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-15-02",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Bei „System“ folgt die App dem Gerät (hell), schon beim ersten Darstellen ohne Skript.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "farbschema": "hell"
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "erstes_bild_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "titel": "Start – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "wochen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["start"]
+          }
+        },
+        {
+          "farbschema": "hell"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-15-03",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Gewählt „Dunkel“ auf einem hellen Gerät: Schon das erste Darstellen ohne Skript ist dunkel (kein Aufblitzen des hellen Schemas).",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "farbschema": "hell"
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "einstellungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "darstellung_waehlen",
+        "darstellung": "Dunkel"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "wochen"
+      },
+      {
+        "als": "anna",
+        "aktion": "erstes_bild_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "einstellungen",
+          "angemeldet": "anna"
+        },
+        {
+          "gespeichert": true
+        },
+        {
+          "warnung": null,
+          "seite": "wochen",
+          "angemeldet": "anna"
+        },
+        {
+          "farbschema": "dunkel"
+        },
+        {
+          "titel": "Meine Wochen – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "dunkel",
+          "menue": {
+            "punkte": ["start", "wochen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["wochen"]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-16-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "axe meldet keine Verstöße der Stufen A und AA (hell, 1280 px) auf den Seiten der Abläufe und in offenen Zuständen (Fehlerleiste, Vorschau der Glocke, Dialog).",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 1280,
+      "farbschema": "hell"
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Fr)"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "start"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "wochen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "benachrichtigungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "einstellungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "bedienen",
+        "element": "glocke"
+      },
+      {
+        "als": "anna",
+        "aktion": "warten",
+        "element": "glocke_vorschau",
+        "zustand": "sichtbar"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "dora",
+        "aktion": "seite_aufrufen",
+        "seite": "anmelden"
+      },
+      {
+        "als": "dora",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "dora",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "dora",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "pruefliste",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "bedienen",
+        "element": "ablehnen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "azubis"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "personen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "wochen",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "fehler": "pflichtangaben_fehlen",
+          "tage": [
+            {
+              "tag": "Mo",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Di",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Mi",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Do",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Fr",
+              "fehler": "tagesart_fehlt"
+            }
+          ]
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "benachrichtigungen",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "einstellungen",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "seite": "einstellungen"
+        },
+        {
+          "erreicht": true
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "anmelden",
+          "angemeldet": null
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "kein_zugang",
+          "angemeldet": null
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "pruefliste",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "seite": "bericht"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "azubis",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "personen",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-16-02",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "axe meldet keine Verstöße der Stufen A und AA (dunkel, 1280 px) auf den Seiten der Abläufe und in offenen Zuständen (Fehlerleiste, Vorschau der Glocke, Dialog).",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 1280,
+      "farbschema": "dunkel"
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Fr)"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "start"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "wochen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "benachrichtigungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "einstellungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "bedienen",
+        "element": "glocke"
+      },
+      {
+        "als": "anna",
+        "aktion": "warten",
+        "element": "glocke_vorschau",
+        "zustand": "sichtbar"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "dora",
+        "aktion": "seite_aufrufen",
+        "seite": "anmelden"
+      },
+      {
+        "als": "dora",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "dora",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "dora",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "pruefliste",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "bedienen",
+        "element": "ablehnen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "azubis"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "personen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "wochen",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "fehler": "pflichtangaben_fehlen",
+          "tage": [
+            {
+              "tag": "Mo",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Di",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Mi",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Do",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Fr",
+              "fehler": "tagesart_fehlt"
+            }
+          ]
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "benachrichtigungen",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "einstellungen",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "seite": "einstellungen"
+        },
+        {
+          "erreicht": true
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "anmelden",
+          "angemeldet": null
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "kein_zugang",
+          "angemeldet": null
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "pruefliste",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "seite": "bericht"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "azubis",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "personen",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-16-03",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "axe meldet keine Verstöße der Stufen A und AA (hell, 375 px) auf den Seiten der Abläufe und in offenen Zuständen (Fehlerleiste, Schublade, Dialog).",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 375,
+      "farbschema": "hell"
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Fr)"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "start"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "wochen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "benachrichtigungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "einstellungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "bedienen",
+        "element": "menue_knopf"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "dora",
+        "aktion": "seite_aufrufen",
+        "seite": "anmelden"
+      },
+      {
+        "als": "dora",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "dora",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "dora",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "pruefliste",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "bedienen",
+        "element": "ablehnen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "azubis"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "personen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "wochen",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "fehler": "pflichtangaben_fehlen",
+          "tage": [
+            {
+              "tag": "Mo",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Di",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Mi",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Do",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Fr",
+              "fehler": "tagesart_fehlt"
+            }
+          ]
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "benachrichtigungen",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "einstellungen",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "seite": "einstellungen"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "anmelden",
+          "angemeldet": null
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "kein_zugang",
+          "angemeldet": null
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "pruefliste",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "seite": "bericht"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "azubis",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "personen",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-16-04",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "axe meldet keine Verstöße der Stufen A und AA (dunkel, 375 px) auf den Seiten der Abläufe und in offenen Zuständen (Fehlerleiste, Schublade, Dialog).",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 375,
+      "farbschema": "dunkel"
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Fr)"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "start"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "wochen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "benachrichtigungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "einstellungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "anna",
+        "aktion": "bedienen",
+        "element": "menue_knopf"
+      },
+      {
+        "als": "anna",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "dora",
+        "aktion": "seite_aufrufen",
+        "seite": "anmelden"
+      },
+      {
+        "als": "dora",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "dora",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "dora",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "pruefliste",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "bedienen",
+        "element": "ablehnen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "azubis"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "personen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "barrierefreiheit_pruefen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "wochen",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "fehler": "pflichtangaben_fehlen",
+          "tage": [
+            {
+              "tag": "Mo",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Di",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Mi",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Do",
+              "fehler": "tagesart_fehlt"
+            },
+            {
+              "tag": "Fr",
+              "fehler": "tagesart_fehlt"
+            }
+          ]
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "benachrichtigungen",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "einstellungen",
+          "angemeldet": "anna"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "seite": "einstellungen"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "anmelden",
+          "angemeldet": null
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "kein_zugang",
+          "angemeldet": null
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "pruefliste",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "seite": "bericht"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "azubis",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        },
+        {
+          "warnung": null,
+          "seite": "personen",
+          "angemeldet": "bernd"
+        },
+        {
+          "verstoesse": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-17-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Ein Azubi ergänzt und reicht einen Bericht nur mit der Tastatur ein; der Fokus ist bei jedem Halt sichtbar und nie verdeckt.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 1280
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "speichern"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "neu_laden"
+      },
+      {
+        "als": "anna",
+        "aktion": "taste_druecken",
+        "taste": "Tab"
+      },
+      {
+        "als": "anna",
+        "aktion": "taste_druecken",
+        "taste": "Enter"
+      },
+      {
+        "als": "anna",
+        "aktion": "tastatur_bis",
+        "element": "tagesart",
+        "tag": "Fr"
+      },
+      {
+        "als": "anna",
+        "aktion": "taste_druecken",
+        "taste": "Pfeil_unten"
+      },
+      {
+        "als": "anna",
+        "aktion": "taste_druecken",
+        "taste": "Tab"
+      },
+      {
+        "als": "anna",
+        "aktion": "tippen",
+        "text": "Netzwerkschrank aufgeräumt"
+      },
+      {
+        "als": "anna",
+        "aktion": "tastatur_bis",
+        "element": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "taste_druecken",
+        "taste": "Enter"
+      },
+      {
+        "als": "anna",
+        "aktion": "taste_druecken",
+        "taste": "Tab"
+      },
+      {
+        "als": "anna",
+        "aktion": "taste_druecken",
+        "taste": "Enter"
+      },
+      {
+        "als": "anna",
+        "aktion": "warten",
+        "element": "meldung",
+        "zustand": "sichtbar"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_verlassen",
+        "weg": "neu_laden"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["einreichen", "fussleiste_ungespeichert"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "gespeichert": true
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "fokus": "zum_inhalt"
+        },
+        {
+          "fokus": "hauptbereich"
+        },
+        {
+          "fokus": "tagesart",
+          "tag": "Fr",
+          "unsichtbar": [],
+          "verdeckt": []
+        },
+        {
+          "fokus": "tagesart",
+          "tag": "Fr"
+        },
+        {
+          "fokus": "taetigkeiten",
+          "tag": "Fr"
+        },
+        {
+          "getippt": true
+        },
+        {
+          "fokus": "einreichen",
+          "unsichtbar": [],
+          "verdeckt": []
+        },
+        {
+          "fokus": "dialog_abbrechen"
+        },
+        {
+          "fokus": "dialog_bestaetigen"
+        },
+        {
+          "fokus": null
+        },
+        {
+          "erreicht": true
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "einreichen": "fehlt",
+          "fussleiste_ungespeichert": "fehlt"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-17-02",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Ein Ausbilder gibt einen Bericht nur mit der Tastatur frei; der Fokus ist bei jedem Halt sichtbar und nie verdeckt.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 1280
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Fr)"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "tastatur_bis",
+        "element": "freigeben"
+      },
+      {
+        "als": "bernd",
+        "aktion": "taste_druecken",
+        "taste": "Enter"
+      },
+      {
+        "als": "bernd",
+        "aktion": "taste_druecken",
+        "taste": "Tab"
+      },
+      {
+        "als": "bernd",
+        "aktion": "taste_druecken",
+        "taste": "Enter"
+      },
+      {
+        "als": "bernd",
+        "aktion": "warten",
+        "element": "meldung",
+        "zustand": "sichtbar"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_verlassen",
+        "weg": "neu_laden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "elemente_lesen",
+        "elemente": ["entscheidungsleiste"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "bernd"
+        },
+        {
+          "fokus": "freigeben",
+          "unsichtbar": [],
+          "verdeckt": []
+        },
+        {
+          "fokus": "dialog_abbrechen"
+        },
+        {
+          "fokus": "dialog_bestaetigen"
+        },
+        {
+          "fokus": null
+        },
+        {
+          "erreicht": true
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "bernd"
+        },
+        {
+          "entscheidungsleiste": "fehlt"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-18-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Der Dialog „Ablehnen“ setzt den Fokus ins Pflichtfeld, hält ihn bei Tab und Umschalt+Tab im Dialog, schließt mit Escape und gibt den Fokus an „Ablehnen“ zurück.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W37",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Fr)"
+      },
+      {
+        "als": "anna",
+        "aktion": "einreichen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "bernd",
+        "aktion": "bedienen",
+        "element": "ablehnen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "fokus_lesen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "taste_druecken",
+        "taste": "Tab"
+      },
+      {
+        "als": "bernd",
+        "aktion": "taste_druecken",
+        "taste": "Tab"
+      },
+      {
+        "als": "bernd",
+        "aktion": "taste_druecken",
+        "taste": "Tab"
+      },
+      {
+        "als": "bernd",
+        "aktion": "taste_druecken",
+        "taste": "Umschalt+Tab"
+      },
+      {
+        "als": "bernd",
+        "aktion": "taste_druecken",
+        "taste": "Umschalt+Tab"
+      },
+      {
+        "als": "bernd",
+        "aktion": "taste_druecken",
+        "taste": "Escape"
+      },
+      {
+        "als": "bernd",
+        "aktion": "elemente_lesen",
+        "elemente": ["dialog"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "bernd"
+        },
+        {
+          "seite": "bericht"
+        },
+        {
+          "fokus": "dialog_feld"
+        },
+        {
+          "fokus": "dialog_abbrechen"
+        },
+        {
+          "fokus": "dialog_bestaetigen"
+        },
+        {
+          "fokus": "dialog_feld"
+        },
+        {
+          "fokus": "dialog_bestaetigen"
+        },
+        {
+          "fokus": "dialog_abbrechen"
+        },
+        {
+          "fokus": "ablehnen"
+        },
+        {
+          "dialog": "fehlt"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-18-02",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Der Dialog „Einreichen“ setzt den Fokus auf „Abbrechen“, schließt mit Escape und gibt den Fokus an „Einreichen“ zurück.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W38"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mo",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mo)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Di",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Di)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Mi",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Mi)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Do",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Do)"
+      },
+      {
+        "als": "anna",
+        "aktion": "tag_erfassen",
+        "woche": "2026-W38",
+        "tag": "Fr",
+        "tagesart": "Betrieb",
+        "text": "Netzwerk geplant (Fr)"
+      },
+      {
+        "als": "anna",
+        "aktion": "speichern"
+      },
+      {
+        "als": "anna",
+        "aktion": "bedienen",
+        "element": "einreichen"
+      },
+      {
+        "als": "anna",
+        "aktion": "fokus_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "taste_druecken",
+        "taste": "Escape"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["dialog"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "erfasst": true
+        },
+        {
+          "gespeichert": true
+        },
+        {
+          "seite": "bericht"
+        },
+        {
+          "fokus": "dialog_abbrechen"
+        },
+        {
+          "fokus": "einreichen"
+        },
+        {
+          "dialog": "fehlt"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-19-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Jede Seite eines Azubis und die Anmeldeseite haben einen eigenen Titel „<Seite> – Berichtsheft“ und genau eine Hauptüberschrift.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "wochen"
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "bericht",
+        "azubi": "anna",
+        "woche": "2026-W37"
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "benachrichtigungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "einstellungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "dora",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "dora",
+        "aktion": "ansicht_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "anmelden",
+          "angemeldet": null
+        },
+        {
+          "titel": "Anmelden – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": null
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "titel": "Start – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "wochen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["start"]
+          }
+        },
+        {
+          "warnung": null,
+          "seite": "wochen",
+          "angemeldet": "anna"
+        },
+        {
+          "titel": "Meine Wochen – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "wochen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["wochen"]
+          }
+        },
+        {
+          "warnung": null,
+          "seite": "bericht",
+          "angemeldet": "anna"
+        },
+        {
+          "titel": "KW 37/2026 – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "wochen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["wochen"]
+          }
+        },
+        {
+          "warnung": null,
+          "seite": "benachrichtigungen",
+          "angemeldet": "anna"
+        },
+        {
+          "titel": "Benachrichtigungen – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "wochen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["benachrichtigungen"]
+          }
+        },
+        {
+          "warnung": null,
+          "seite": "einstellungen",
+          "angemeldet": "anna"
+        },
+        {
+          "titel": "Einstellungen – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "wochen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["einstellungen"]
+          }
+        },
+        {
+          "warnung": null,
+          "seite": "kein_zugang",
+          "angemeldet": null
+        },
+        {
+          "titel": "Kein Zugang – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-19-02",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Jede Seite eines Ausbilders hat einen eigenen Titel „<Seite> – Berichtsheft“ und genau eine Hauptüberschrift.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "pruefliste"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "azubis"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "personen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "benachrichtigungen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ansicht_lesen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "einstellungen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "ansicht_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "titel": "Start – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "pruefliste", "azubis", "personen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["start"]
+          }
+        },
+        {
+          "warnung": null,
+          "seite": "pruefliste",
+          "angemeldet": "bernd"
+        },
+        {
+          "titel": "Prüfliste – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "pruefliste", "azubis", "personen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["pruefliste"]
+          }
+        },
+        {
+          "warnung": null,
+          "seite": "azubis",
+          "angemeldet": "bernd"
+        },
+        {
+          "titel": "Azubis – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "pruefliste", "azubis", "personen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["azubis"]
+          }
+        },
+        {
+          "warnung": null,
+          "seite": "personen",
+          "angemeldet": "bernd"
+        },
+        {
+          "titel": "Personen – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "pruefliste", "azubis", "personen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["personen"]
+          }
+        },
+        {
+          "warnung": null,
+          "seite": "benachrichtigungen",
+          "angemeldet": "bernd"
+        },
+        {
+          "titel": "Benachrichtigungen – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "pruefliste", "azubis", "personen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["benachrichtigungen"]
+          }
+        },
+        {
+          "warnung": null,
+          "seite": "einstellungen",
+          "angemeldet": "bernd"
+        },
+        {
+          "titel": "Einstellungen – Berichtsheft",
+          "hauptueberschriften": 1,
+          "waagerechtes_scrollen": false,
+          "farbschema": "hell",
+          "menue": {
+            "punkte": ["start", "pruefliste", "azubis", "personen", "benachrichtigungen", "einstellungen"],
+            "aktiv": ["einstellungen"]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-20-01",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Bei langsamem Netz zeigt die Vorschau der Glocke Platzhalter, bis die Daten da sind; danach erklärt der Leerzustand die leere Liste.",
+    "uhr": "2026-09-16T09:00:00+02:00",
+    "geraet": {
+      "breite": 1280,
+      "netz": "langsam"
+    },
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "bedienen",
+        "element": "glocke"
+      },
+      {
+        "als": "anna",
+        "aktion": "warten",
+        "element": "platzhalter",
+        "zustand": "sichtbar"
+      },
+      {
+        "als": "anna",
+        "aktion": "warten",
+        "element": "platzhalter",
+        "zustand": "fehlt"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["leer_benachrichtigungen", "platzhalter"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "seite": "start"
+        },
+        {
+          "erreicht": true
+        },
+        {
+          "erreicht": true
+        },
+        {
+          "leer_benachrichtigungen": "sichtbar",
+          "platzhalter": "fehlt"
+        }
+      ]
+    }
+  },
+  {
+    "id": "UI-AK-20-02",
+    "modul": "M09",
+    "ebene": "ablauf",
+    "beschreibung": "Listen ohne Einträge zeigen einen erklärenden Leerzustand: „Zu erledigen“, Benachrichtigungen, Prüfliste.",
+    "uhr": "2026-09-02T09:00:00+02:00",
+    "schritte": [
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["leer_zu_erledigen"]
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "benachrichtigungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "elemente_lesen",
+        "elemente": ["leer_benachrichtigungen"]
+      },
+      {
+        "als": "clara",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "clara",
+        "aktion": "seite_aufrufen",
+        "seite": "pruefliste"
+      },
+      {
+        "als": "clara",
+        "aktion": "elemente_lesen",
+        "elemente": ["leer_pruefliste", "pruefeintrag"]
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "leer_zu_erledigen": "sichtbar"
+        },
+        {
+          "warnung": null,
+          "seite": "benachrichtigungen",
+          "angemeldet": "anna"
+        },
+        {
+          "leer_benachrichtigungen": "sichtbar"
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "clara"
+        },
+        {
+          "warnung": null,
+          "seite": "pruefliste",
+          "angemeldet": "clara"
+        },
+        {
+          "leer_pruefliste": "sichtbar",
+          "pruefeintrag": "fehlt"
+        }
+      ]
     }
   }
 ]

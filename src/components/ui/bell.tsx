@@ -108,7 +108,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
 
   const label = bellLabel(unread);
   return (
-    <div ref={wrapperRef} className="relative">
+    <div ref={wrapperRef} data-glocke="" className="relative">
       {/* Unter 1024 px: Link direkt zur Seite. */}
       <Link
         href="/benachrichtigungen"
@@ -147,6 +147,7 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
       {open ? (
         <div
           id={panelId}
+          data-glocke-vorschau=""
           role="region"
           aria-label="Neueste Benachrichtigungen"
           className="rounded-card border-border bg-surface text-fg absolute top-full right-0 z-40 mt-2 w-96 max-w-[calc(100vw-2rem)] border p-2 shadow-xl"
@@ -165,7 +166,9 @@ export function NotificationBell({ initialUnread }: { initialUnread: number }) {
               </SkeletonGroup>
             </div>
           ) : items.length === 0 ? (
-            <p className="text-fg-muted p-3 text-sm">Keine Benachrichtigungen.</p>
+            <p className="text-fg-muted p-3 text-sm" data-testid="notifications-preview-empty">
+              Keine Benachrichtigungen.
+            </p>
           ) : (
             <ul className="divide-border divide-y" aria-label="Letzte Benachrichtigungen">
               {items.map((item) => (

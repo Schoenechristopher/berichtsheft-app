@@ -10,6 +10,8 @@ export interface QueueItem {
   id: string;
   traineeName: string;
   week: string;
+  /** Woche als `JJJJ-Www`, Merker für den Ablauf-Adapter. */
+  isoWeek: string;
   range: string;
   submittedAt: string;
   resubmitted: boolean;
@@ -71,6 +73,7 @@ export function ReviewQueueList({
           <li
             key={item.id}
             data-testid="review-row"
+            data-woche={item.isoWeek}
             data-selected={selected ? "true" : undefined}
             className={`rounded-card border-border relative border p-4 lg:rounded-none lg:border-0 lg:px-4 lg:py-3 ${
               selected ? "lg:bg-accent-soft" : "bg-surface hover:bg-surface-muted"

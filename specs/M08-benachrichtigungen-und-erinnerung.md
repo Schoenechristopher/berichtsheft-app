@@ -153,7 +153,7 @@ Text aus `docs/01-spezifikation.md`, Kapitel 10 und „Benachrichtigungen und Er
 | AK-1014 | Geänderte Kanäle gelten ab dem nächsten Ereignis; angelegte, noch nicht versendete Nachrichten über den ursprünglichen Kanal. | M08-R07 | AK-1014-01, AK-1014-02 | Daten |
 | AK-1015 | Der Kanal App zeigt ungelesene Nachrichten mit Zähler; das Öffnen der Liste markiert alle als gelesen, die ungelesenen sind dabei „Neu“. | M08-R16 | AK-1015-01 | Daten |
 | AK-1021 | Ist die Vorwoche am Montag um 9:00 Uhr noch offen, erhält der Azubi eine Erinnerung; einmal nachgeholt bis Dienstag 23:59 Uhr, Stichtag bleibt Montag. | M08-R17 bis M08-R19 | AK-1021-01 bis AK-1021-17 | Daten |
-| AK-1022 | Ist dieselbe Woche am folgenden Montag noch offen, wird zusätzlich der zugeordnete Ausbilder informiert; jede offene Woche vor der Vorwoche, auch abgelehnte; eine Nachricht pro Azubi; Azubi ohne Kanal: Ausbilder trotzdem. | M08-R20 | AK-1022-01 bis AK-1022-06 | Fachlogik |
+| AK-1022 | Ist dieselbe Woche am folgenden Montag noch offen, wird zusätzlich der zugeordnete Ausbilder informiert; jede offene Woche vor der Vorwoche, auch abgelehnte; eine Nachricht pro Azubi; Azubi ohne Kanal: Ausbilder trotzdem. | M08-R20 | AK-1022-01 bis AK-1022-06; Beispielszenario AK-1022-07 (`szenarien.json`, Ablauf) | Fachlogik |
 | AK-1023 | Für eingereichte oder freigegebene Wochen und für die laufende Woche kommt keine Erinnerung. | M08-R19 | AK-1023-01 bis AK-1023-05 | Fachlogik |
 | AK-1024 | Erinnerung und Information gehen jeden Montag erneut raus, bis die Woche eingereicht ist. | M08-R21 | AK-1024-01 bis AK-1024-04 | Daten |
 | AK-1025 | Sind mehrere Wochen offen, nennt die Erinnerung alle in einer Nachricht. | M08-R09, M08-R19 | AK-1025-01, AK-1025-02 | Fachlogik |

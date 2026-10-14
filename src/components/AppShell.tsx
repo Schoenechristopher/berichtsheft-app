@@ -181,6 +181,7 @@ export function AppShell({
         <button
           ref={burgerRef}
           type="button"
+          data-menue-knopf=""
           aria-expanded={drawerOpen}
           aria-controls={navId}
           onClick={() => setDrawerOpen(true)}
@@ -210,6 +211,7 @@ export function AppShell({
       <nav
         ref={drawerRef}
         id={navId}
+        data-menue=""
         aria-label={navLabel}
         className={`border-border bg-surface fixed bottom-0 left-0 flex-col border-r ${
           drawerOpen ? "top-0 z-50 flex w-80 max-w-[85vw] shadow-xl" : "top-14 z-20 hidden w-60 lg:flex"

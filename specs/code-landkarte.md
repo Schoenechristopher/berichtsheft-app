@@ -422,7 +422,7 @@ und `daten`), dazu AK-205-01 und AK-205-02 in `specs/pruefung/M02.json`
 | `src/domain/access.ts` → `RETURN_PARAM`, `safeReturnPath()` | Rücksprungziel nach der Anmeldung (Datei sonst M02) | M08-R10; AK-1003 | nein | 1:1 übersetzen |
 | `src/lib/notifications/service.ts` → `insertNotifications()`, `recordTransitionNotifications()`, `StatusChangeEvent` | Nachrichten in den Ausgangskorb, in der Transaktion des Statuswechsels (Einhängepunkt in `transitionReport()`, M05); Doppelte überspringt die Datenbank | M08-R03, M08-R07, M08-R11, M08-R12; AK-1001 bis AK-1004, AK-1014 | ja (Prisma, Unique-Index) | nach Profil neu bauen |
 | `src/lib/notifications/service.ts` → `loadReminderTrainees()`, `runWeeklyReminders()`, `runDueReminders()`, `DueRemindersResult` | Erinnerungslauf: fällige Wochen anlegen (M03), höchstens einmal pro Woche (Vermerk `reminder_run` in derselben Transaktion), Stichtag Montag; Wochennummer des Vermerks 1 bis 53 per CHECK (Migration `20261013100000_erinnerungslauf_wochennummer`) | M08-R17 bis M08-R22; AK-1021 bis AK-1025, AK-205 | ja (Prisma, PostgreSQL) | nach Profil neu bauen |
-| `src/lib/notifications/service.ts` → `countUnread()`, `previewNotifications()`, `openNotifications()` | Glocke mit Zähler, Vorschau, Liste; Öffnen markiert als gelesen | M08-R16; AK-1015 | ja (Prisma) | nach Profil neu bauen (oder Benachrichtigungen der Plattform) |
+| `src/lib/notifications/service.ts` → `countUnread()`, `previewNotifications()`, `openNotifications()`, `notificationKind()` | Glocke mit Zähler, Vorschau, Liste; Öffnen markiert als gelesen; Art und Woche je Nachricht als feste Merker (`data-art`, `data-woche`) | M08-R16; AK-1015 | ja (Prisma) | nach Profil neu bauen (oder Benachrichtigungen der Plattform) |
 | `src/lib/notifications/service.ts` → `updateOwnChannels()`, `ChannelsResult`, `ChannelsFailureReason` | eigene Kanäle speichern; fester Grund | M08-R04; AK-1011 | ja (Prisma) | nach Profil neu bauen |
 | `src/lib/notifications/service.ts` → `countUndeliverable()`, `listUndeliverable()`, `retryUndeliverable()`, `RetryResult`, `RetryFailureReason` | nicht zustellbare Nachrichten, nur Ausbilder; „Erneut versuchen“ | M08-R15; AK-1004 | ja (Prisma) | nach Profil neu bauen |
 | `src/lib/notifications/service.ts` → `listDevMailbox()` | Teams-Postfach der Demo: Azubis eigene, Ausbilder alle | Abschnitt 8 und 9 der Fach-Spec | ja (Prisma) | ersetzt durch Bordmittel (echter Teams-Kanal), nur Demo |
@@ -546,8 +546,12 @@ Bausteine unter `src/components/ui/`.
 - Feste Merker für die Ablauf-Fälle (`specs/pruefung/format.md`, „Aufbau eines Ablauf-Falls“): `data-warnung-verlassen`,
   `data-ungespeichert`, `data-ausstehend`, `data-datum`, `data-fehler` in `ReportEditor.tsx`, `data-feld` in
   `ReportEditor.tsx` und `day-type.tsx`, `data-woche` in `week-tile.tsx` und `ReportView.tsx`, `data-anmeldeweg` in
-  `anmelden/page.tsx`, `data-von`/`-nach`/`-person`/`-zeitpunkt` in `ReportHistory.tsx`. Der Ablauf-Adapter
-  (`e2e/pruefung/ablauf-adapter.ts`) liest nur sie, nie Meldungstexte; wer sie umbenennt, bricht die Ablauf-Fälle.
+  `anmelden/page.tsx`, `data-von`/`-nach`/`-person`/`-zeitpunkt` in `ReportHistory.tsx`; seit G3 (Paket I) dazu
+  `data-speicherstand` in `ReportEditor.tsx` und `ThemeSettings.tsx`, `data-oeffnet-dialog` in `dialog.tsx`,
+  `data-menue`, `data-menue-knopf` und `data-drawer-close` in `AppShell.tsx`, `data-glocke`, `data-glocke-vorschau` in `bell.tsx`,
+  `data-bereich` in `pruefliste/page.tsx`, `data-woche` in `ReviewQueueList.tsx` und die `data-testid` der Leerzustände.
+  Der Ablauf-Adapter (`e2e/pruefung/ablauf-adapter.ts`, Elemente in `e2e/pruefung/ablauf-pruefungen.ts`) liest nur
+  sie, nie Meldungstexte (Ausnahme: der Seitentitel, M09-R22); wer sie umbenennt, bricht die Ablauf-Fälle.
 - Farben nie fest in Komponenten, nur über die Tokens in `src/app/globals.css` (Hell und Dunkel).
 
 **Ersetzt durch Bordmittel / Liferay:** offen für das Profil (G4). Liferay 6.2.5 bringt AlloyUI mit; der Dunkelmodus ist
@@ -565,5 +569,5 @@ Dateien, die keinem Fachmodul gehören.
 | `src/lib/request-path.ts` → `PATH_HEADER` | aufgerufener Pfad vom Proxy (`src/proxy.ts`) an die Seiten; Grundlage für das Rücksprungziel | M08-R10; AK-1003 (M08) | ja (Next.js-Proxy, Request-Header) | ersetzt durch Bordmittel (Rücksprung der Anmeldung der Plattform) |
 | `src/lib/seed-data.ts` → `seedPersons`, `accountWithoutEntry`, `accountToCreate`, `testAccounts`, `seedFederalState`, `seedReport` | Testdaten für Seed und Keycloak-Realm (Anna, Bernd, Clara, Dora, Emil) | – (Gegenstück zu `specs/pruefung/testdaten.json`) | ja (Seed, Keycloak) | nach Profil neu bauen aus `testdaten.json` |
 | `src/app/api/health/route.ts` → `GET` | Gesundheitsprüfung für Docker Compose (Datenbankabfrage) | – (Betrieb; Q ab G3) | ja (Next.js, Prisma) | nach Profil neu bauen |
-| `src/app/api/test/zustand/route.ts` → `POST` | Testschnittstelle des Ablauf-Runners: stellt die Uhr (`setFixedNow`, `resetClock`) und lädt die Testdaten; nur außerhalb von Produktion mit Test-Login, sonst 404 | – (Werkzeug der Prüffälle, `format.md`, „Aufbau eines Ablauf-Falls“); AK-1201 | ja (Next.js-Route-Handler, Prisma) | nach Profil neu bauen (Testzugang der Plattform, im Produktivbetrieb nicht vorhanden) |
+| `src/app/api/test/zustand/route.ts` → `POST` | Testschnittstelle des Ablauf-Runners: stellt die Uhr (`setFixedNow`, `resetClock`), lädt die Testdaten, stellt den `ausgangsbestand` (Berichte mit Tagen und Verlauf) her und startet den Erinnerungslauf (`erinnerung_ausloesen`); nur außerhalb von Produktion mit Test-Login, sonst 404 | – (Werkzeug der Prüffälle, `format.md`, „Aufbau eines Ablauf-Falls“); AK-1201 | ja (Next.js-Route-Handler, Prisma) | nach Profil neu bauen (Testzugang der Plattform, im Produktivbetrieb nicht vorhanden) |
 

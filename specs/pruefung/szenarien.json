@@ -284,7 +284,7 @@
           "angemeldet": "bernd"
         },
         {
-          "status": "Freigegeben"
+          "entschieden": true
         },
         {
           "warnung": null,
@@ -297,7 +297,7 @@
           "angemeldet": "clara"
         },
         {
-          "status": "Abgelehnt"
+          "entschieden": true
         },
         {
           "warnung": null,
@@ -352,6 +352,370 @@
               "nach": "Abgelehnt",
               "person": "clara",
               "zeitpunkt": "2026-10-06T10:00:00+02:00"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1022-07",
+    "modul": "M08",
+    "ebene": "ablauf",
+    "beschreibung": "Beispielszenario „Erinnerung und Information an den Ausbilder“ (docs/01): KW 36–40 freigegeben, KW 41 Entwurf; am 12.10.2026 erhält Anna eine Erinnerung, Bernd nichts aus dem Lauf; am 19.10.2026 erneut Anna, dazu wird Bernd über KW 41 informiert.",
+    "uhr": "2026-10-12T09:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W36",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen",
+              "uhr": "2026-10-09T10:00:00+02:00"
+            },
+            {
+              "als": "bernd",
+              "aktion": "freigeben",
+              "uhr": "2026-10-09T10:30:00+02:00"
+            }
+          ]
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W37",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen",
+              "uhr": "2026-10-09T11:00:00+02:00"
+            },
+            {
+              "als": "bernd",
+              "aktion": "freigeben",
+              "uhr": "2026-10-09T11:30:00+02:00"
+            }
+          ]
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W38",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen",
+              "uhr": "2026-10-09T12:00:00+02:00"
+            },
+            {
+              "als": "bernd",
+              "aktion": "freigeben",
+              "uhr": "2026-10-09T12:30:00+02:00"
+            }
+          ]
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W39",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen",
+              "uhr": "2026-10-09T13:00:00+02:00"
+            },
+            {
+              "als": "bernd",
+              "aktion": "freigeben",
+              "uhr": "2026-10-09T13:30:00+02:00"
+            }
+          ]
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          },
+          "verlauf": [
+            {
+              "als": "anna",
+              "aktion": "einreichen",
+              "uhr": "2026-10-09T14:00:00+02:00"
+            },
+            {
+              "als": "bernd",
+              "aktion": "freigeben",
+              "uhr": "2026-10-09T14:30:00+02:00"
+            }
+          ]
+        }
+      ]
+    },
+    "schritte": [
+      {
+        "aktion": "erinnerung_ausloesen"
+      },
+      {
+        "als": "anna",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "benachrichtigungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_lesen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "anmelden"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "benachrichtigungen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_lesen"
+      },
+      {
+        "aktion": "erinnerung_ausloesen",
+        "uhr": "2026-10-19T09:00:00+02:00"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_aufrufen",
+        "seite": "benachrichtigungen"
+      },
+      {
+        "als": "anna",
+        "aktion": "seite_lesen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_aufrufen",
+        "seite": "benachrichtigungen"
+      },
+      {
+        "als": "bernd",
+        "aktion": "seite_lesen"
+      }
+    ],
+    "erwartet": {
+      "ergebnisse": [
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 2
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "anna"
+        },
+        {
+          "warnung": null,
+          "seite": "benachrichtigungen",
+          "angemeldet": "anna"
+        },
+        {
+          "seite": "benachrichtigungen",
+          "angemeldet": "anna",
+          "passwortfeld": false,
+          "nachrichten": [
+            {
+              "art": "erinnerung",
+              "woche": "2026-W41",
+              "neu": true
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "neu": true
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W39",
+              "neu": true
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W38",
+              "neu": true
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W37",
+              "neu": true
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W36",
+              "neu": true
+            }
+          ]
+        },
+        {
+          "warnung": null,
+          "seite": "start",
+          "angemeldet": "bernd"
+        },
+        {
+          "warnung": null,
+          "seite": "benachrichtigungen",
+          "angemeldet": "bernd"
+        },
+        {
+          "seite": "benachrichtigungen",
+          "angemeldet": "bernd",
+          "passwortfeld": false,
+          "nachrichten": [
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "neu": true
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W39",
+              "neu": true
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W38",
+              "neu": true
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W37",
+              "neu": true
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W36",
+              "neu": true
+            }
+          ]
+        },
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 4
+        },
+        {
+          "warnung": null,
+          "seite": "benachrichtigungen",
+          "angemeldet": "anna"
+        },
+        {
+          "seite": "benachrichtigungen",
+          "angemeldet": "anna",
+          "passwortfeld": false,
+          "nachrichten": [
+            {
+              "art": "erinnerung",
+              "woche": null,
+              "neu": true
+            },
+            {
+              "art": "erinnerung",
+              "woche": "2026-W41",
+              "neu": false
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "neu": false
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W39",
+              "neu": false
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W38",
+              "neu": false
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W37",
+              "neu": false
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W36",
+              "neu": false
+            }
+          ]
+        },
+        {
+          "warnung": null,
+          "seite": "benachrichtigungen",
+          "angemeldet": "bernd"
+        },
+        {
+          "seite": "benachrichtigungen",
+          "angemeldet": "bernd",
+          "passwortfeld": false,
+          "nachrichten": [
+            {
+              "art": "ueberfaellig",
+              "woche": "2026-W41",
+              "neu": true
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "neu": false
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W39",
+              "neu": false
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W38",
+              "neu": false
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W37",
+              "neu": false
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W36",
+              "neu": false
             }
           ]
         }

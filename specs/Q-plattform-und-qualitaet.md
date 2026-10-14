@@ -62,7 +62,7 @@ Text aus `docs/01-spezifikation.md`, Kapitel 11; Prüffälle in `specs/pruefung/
 | AK-ID | Kriterium (Kurzfassung) | Regeln | Prüffälle | Ebene |
 | --- | --- | --- | --- | --- |
 | AK-1101 | Die Web-App funktioniert in Edge, Chrome und Firefox; nachgewiesen, indem alle Browser-Tests in allen drei Browsern laufen. | Q-R01, Q-R06 | AK-1101-01 | Ablauf |
-| AK-1102 | Bei 375 px sind alle Kernfunktionen und Seiten ohne waagerechtes Scrollen bedienbar. | Q-R02, Q-R03 | folgt in G3 | Ablauf, G3 |
+| AK-1102 | Bei 375 px sind alle Kernfunktionen und Seiten ohne waagerechtes Scrollen bedienbar. | Q-R02, Q-R03 | AK-1102-01 | Ablauf |
 
 Begründung der Ebene: Beide Kriterien sprechen über Browser und Bildschirmbreite; eine Schnittstelle ohne Oberfläche
 gibt es dafür nicht.
@@ -70,9 +70,10 @@ gibt es dafür nicht.
 - **AK-1101:** Belegt durch die gesamte Browser-Matrix: Der Ablauf-Runner führt jeden Ablauf-Fall in Chrome, Firefox und
   Edge aus (Q-R01). AK-1101-01 ist zusätzlich ein eigener Kernablauf (erfassen, speichern, einreichen, freigeben, Historie
   lesen), damit die AK einen Prüffall mit ihrer ID hat.
-- **AK-1102:** Der Ablauf-Runner führt jeden Ablauf-Fall auch bei 375 px aus (Q-R02). Der Prüffall AK-1102-01 braucht
-  eine Prüfung „kein waagerechtes Scrollen“ aus dem festen Prüfvokabular von Paket I (G3, Welle 2; dieselbe Prüfung wie
-  für UI-AK-06) und folgt nach dessen Merge.
+- **AK-1102:** Der Ablauf-Runner führt jeden Ablauf-Fall auch bei 375 px aus (Q-R02). AK-1102-01 stellt das Gerät auf
+  375 px (`geraet`) und liest mit `ansicht_lesen` auf jeder Seite aus Q-R03 (auch mit offener Rückfrage beim Einreichen
+  und Ablehnen), ob sie waagerecht scrollt; dabei werden erfasst, eingereicht und freigegeben. „Kein Zugang“ fehlt im
+  Fall, weil der Ablauf keine Person ohne Eintrag anmelden kann; die Seite prüft `e2e/ak-1102-smartphone.spec.ts`.
 
 **Beispielszenarien** (`specs/pruefung/szenarien.json`, Q-R05):
 
@@ -80,11 +81,11 @@ gibt es dafür nicht.
 | --- | --- | --- | --- |
 | Einreichen scheitert an fehlendem Text | AK-502-04 | M05 | Anna erfasst KW 52/2026 Mo–Do, ändert Freitag (Feiertag) auf Berufsschule ohne Text; Einreichen scheitert mit `pflichtangaben_fehlen`, Freitag `taetigkeiten_fehlen`; Status bleibt Entwurf |
 | Vertretung nimmt Freigabe zurück | AK-703-06 | M05 | Bernd gibt KW 40 frei, Clara (nicht zugeordnet) nimmt die Freigabe mit Begründung zurück; Status Abgelehnt; Annas Historie zeigt Einreichen, Bernds Freigabe und Claras Rücknahme |
-| Erinnerung und Information an den Ausbilder | folgt in G3 (AK-1022-07) | M08 | braucht Ausgangsbestand (KW 36–40 freigegeben), den Erinnerungslauf und das Lesen der Benachrichtigungen (Prüfvokabular Paket I) |
+| Erinnerung und Information an den Ausbilder | AK-1022-07 | M08 | Ausgangsbestand: KW 36–40 eingereicht und freigegeben, KW 41 Entwurf. Erinnerungslauf am 12.10.2026: Anna hat eine Erinnerung für KW 41, Bernd nur die Statuswechsel aus dem Ausgangsbestand. Lauf am 19.10.2026: Anna eine weitere Erinnerung (KW 41 und 42, daher ohne einzelne Woche), Bernd die Information über KW 41 |
 
 Was die Szenarien noch nicht im Ablauf prüfen und wo es belegt ist: Vorbelegung „Feiertag“ am 25.12.2026 (M03,
-Fachlogik und Daten), Begründung in der Historie (M06, Daten), Benachrichtigung an Anna (M08, Daten), PDF ohne
-Freigabevermerk (M07, AK-905). Die Browser-Tests `e2e/beispielszenarien.spec.ts` decken die Szenarien weiterhin
+Fachlogik und Daten), Begründung in der Historie (M06, Daten), Benachrichtigung an Anna nach der Rücknahme (M08, Daten),
+PDF ohne Freigabevermerk (M07, AK-905), die Kanäle E-Mail und Teams (M08, Daten). Die Browser-Tests `e2e/beispielszenarien.spec.ts` decken die Szenarien weiterhin
 vollständig ab.
 
 ## 5. Logisches Datenmodell
@@ -104,8 +105,9 @@ Bundesland der Testdaten: `NW`.
 ## 6. Schnittstellen
 
 Q bietet keine fachliche Schnittstelle. Es nutzt die Aktionen und Seiteninhalte der Ablauf-Fälle
-(`specs/pruefung/format.md`, „Aufbau eines Ablauf-Falls“), darunter die fachlichen Aktionen `freigeben` und
-`freigabe_zuruecknehmen` auf der geöffneten Berichtsseite (für die Szenarien eingeführt).
+(`specs/pruefung/format.md`, „Aufbau eines Ablauf-Falls“), für die Szenarien zusätzlich `freigabe_zuruecknehmen`,
+`erinnerung_ausloesen`, den Ausgangsbestand mit Berichten und den Seiteninhalt der Benachrichtigungen; AK-1102-01 nutzt
+`geraet` und `ansicht_lesen`.
 
 ## 7. Ereignisse
 
@@ -143,10 +145,12 @@ nur, wenn ihr Prüfwerkzeug dieselbe Grenze zeigt; sonst läuft der Fall dort au
 
 ## 10. Offene Punkte
 
-- [ ] AK-1102-01 (kein waagerechtes Scrollen, Ablauf) nach dem Merge von Paket I mit dessen Prüfvokabular.
-- [ ] Szenario „Erinnerung und Information an den Ausbilder“ als AK-1022-07 nach dem Merge von Paket I; braucht
-      `ausgangsbestand` im Ablauf-Runner und eine Aktion für den Erinnerungslauf.
+- [x] AK-1102-01 (kein waagerechtes Scrollen, Ablauf) mit dem Prüfvokabular von Paket I (14.10.2026).
+- [x] Szenario „Erinnerung und Information an den Ausbilder“ als AK-1022-07, mit `ausgangsbestand` im Ablauf-Runner
+      und `erinnerung_ausloesen` (14.10.2026).
 - [ ] Testgrenze AK-408-03 in Firefox in G5 erneut prüfen.
+- [ ] **Bitte bestätigen:** `erinnerung_ausloesen` ist der einzige Ablauf-Schritt ohne `als`, weil der Lauf keiner
+      Person gehört; neue feste Merker `data-art` und `data-woche` an den Benachrichtigungen.
 - [ ] **Bitte bestätigen:** Die Szenarien tragen die ID und das Modul der AK, die sie im Kern belegen (AK-502, AK-703,
       AK-1022), statt einer eigenen Szenario-ID; so bleibt das ID-Schema aus `format.md` unverändert.
 - [ ] **Liferay (Profil, G4):** ob Edge und Firefox mit dem Prüfwerkzeug der Liferay-Umsetzungen laufen und ob
