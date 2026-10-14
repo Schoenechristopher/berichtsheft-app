@@ -580,6 +580,60 @@ Nebenbei: Doku-PR #31 lief als erster PR über die Warteschlange von `main`.
 - **Am Ende von A:** `docs/07` (Einführung Schritt 4, offene Punkte) in einem Doku-PR nachziehen (geschützter Pfad, Chris
   mergt), dazu Rückblick nach MW-R12/KE-R18 und Übergabe.
 
+## Gesamtsteuerung
+
+Die Gesamtsteuerung führt die Etappen, startet je Etappe bzw. Welle eine Etappen-Steuerung, legt deren Pläne und Fragen
+Chris vor und gibt seine Entscheidungen zurück. Sie entwickelt nicht, nimmt nicht ab und hält keine PR-Abos.
+
+### Stand 14.10.2026, 22:00 UTC (Übergabe an die nächste Gesamtsteuerung)
+
+- **G1, G2, G3 abgeschlossen** (G3: #25–#28, #36–#39; Rückblick und Übergabe an G4 oben).
+- **Etappe A läuft:** A1 und A3 erledigt (#30, #32–#35); Welle 2 nach freigegebenem Plan (A2a CI-37, A2b Merge-Kriterien
+  nachbessern, A2c E2E parallelisieren; Merge-Reihenfolge A2b → A2a → A2c). Steuerung „A Welle 2b“ läuft. #40 (A2b)
+  wartet auf die volle Prüfung, #41 (A2a) auf die Wiederherstellung versehentlich gelöschter Abschnitte in
+  `docs/ci-richtlinie.md`. Schattenbetrieb: 3 von 10 Paket-PRs, bisher ohne Widerspruch. A muss vor L62 fertig sein;
+  danach stellt Chris den Schalter auf `aktiv: true`.
+- **Nächstes:** G4 (Profile und Playbooks) nach der Übergabe oben planen lassen: Etappen-Steuerung entwirft den Plan,
+  Gesamtsteuerung legt ihn Chris vor, erst nach Freigabe starten. A läuft parallel weiter.
+
+### Entscheidungen und Verfahren (von Chris freigegeben, 13./14.10.2026)
+
+- `docs/06` bis `docs/09` freigegeben; Vorschläge aus dem Rückblick G2 angenommen.
+- **Regelsatz auf `main`:** Merge-Warteschlange (Merge-Commit), Pflicht-Check „Prüfung abgeschlossen“; Ziel auch
+  `am-test/main` (Test-Basis von A, `aktiv: true` nur dort). Chris mergt über „Merge when ready“.
+- **Schattenbetrieb (E2 aus A):** Nach der Abnahme eines Paket-PRs schreibt die Etappen-Steuerung den Abnahme-Kommentar
+  `<!-- abnahme-steuerung sha=<head-SHA> -->` nach dem letzten Push und setzt **danach** das Label `automerge`
+  (F1, 14.10.2026); Eintrag in der Tabelle „Schattenbetrieb“ (Abschnitt A). Nicht an Doku-PRs.
+- **Grenzen für Steuerungen:** je Welle bzw. Sitzung höchstens 6 bis 8 US-Dollar oder 200 000 bis 250 000 Token Kontext;
+  dann Übergabe und frische Steuerung. Kurze Aufgaben (PR bis zum Merge begleiten, Doku-PR) in eigene kleine Sitzungen
+  mit 3 bis 5 US-Dollar Grenze. Kosten immer aus den Sitzungsdaten (`get_session`, `usage.cost_usd`) melden.
+- **Fehlersuche gehört ins Paket:** Steuerungen lesen keine CI-Logs selbst; das Fehlerbild liefert ein Hilfsagent der
+  Stufe S1 (Denkaufwand niedrig). Entwicklersitzungen bekommen eine harte Kostengrenze auch für Diagnose.
+- **Denkaufwand (MW-R06, Umsetzung in `docs/08`):** Beim Start nicht einstellbar; die Steuerung nennt Chris die
+  Sitzungs-ID jeder S3-Sitzung, Chris stellt in der App auf „Hoch“; Prüfung über `get_session`
+  (`session_context.effort_level`). S2-Sitzungen bleiben „Mittel“.
+- **Archivieren:** Abgeschlossene Sitzungen dieses Projekts darf die Gesamtsteuerung archivieren (Chris, 14.10.2026);
+  Chats anderer Projekte nicht.
+
+### Kosten bis 14.10.2026 (Sitzungsdaten, US-Dollar)
+
+| Posten | Kosten |
+| --- | --- |
+| G3 Pakete (H, G, F, I, J) | 52,69 |
+| G3 Steuerungen (Welle 1, Welle 2, Abschluss, Wächter) | 42,85 |
+| G3 Doku-PR | 0,88 |
+| A Steuerungen (Welle 1, Welle 2) | 16,91 |
+| A Pakete bisher (A1, A2b; A2a läuft) | 2,48 + A2a |
+
+### Lehren der Gesamtsteuerung
+
+- Der größte Kostenblock sind Steuerungen mit langem Verlauf: Jedes PR-Ereignis und jede Nachricht verarbeitet den
+  ganzen Kontext erneut. Kleine, frische Sitzungen je Welle und je Teilaufgabe halbieren die Kosten.
+- Schon die Grundausstattung einer Steuerung (Lesen, Auftrag, PR-Ereignisse) füllt 100 000 bis 180 000 Token; die
+  Kontextgrenze wird daher vor der Kostengrenze erreicht. Aufträge an Steuerungen eng schneiden.
+- Plattformgrenzen klären, bevor man sich darauf verlässt (Regelsatz war nicht gesetzt; Denkaufwand nicht per Start
+  einstellbar). Lesend prüfen lassen und Chris eine konkrete Klick-Anleitung geben.
+
 ## Übergabe an die Steuerung von G2
 
 - **Stand:** G1 ist gemergt (#16). Auf `main` liegen `specs/00-uebersicht.md`, `specs/vorlage-fach-spec.md`,
