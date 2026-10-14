@@ -94,6 +94,12 @@ nachvollziehbar bleibt.
   - **Niedrig** gilt für S1-Hilfsagenten.
   - Bevor die Steuerung ein Paket eine Stufe höher setzt, prüft sie, ob dieselbe Stufe mit höherem Denkaufwand reicht.
     Ein stärkeres Modell mit niedrigerem Denkaufwand ist oft günstiger als ein schwächeres mit hohem.
+  - **Umsetzung auf der Plattform (Stand 14.10.2026):** Der Denkaufwand lässt sich beim Starten einer Sitzung nicht
+    setzen. Eine Umgebungsvariable `CLAUDE_CODE_EFFORT_LEVEL` in der Cloud-Umgebung wirkt nicht, weil die Plattform den
+    Aufwand je Runde mitschickt. Verfahren: Die Steuerung nennt Chris beim Start jeder Sitzung mit Denkaufwand „hoch“
+    deren ID; Chris stellt in der App auf „Hoch“; die Einstellung gilt danach für alle Runden der Sitzung, auch für Runden
+    aus Nachrichten anderer Sitzungen und aus PR-Ereignissen. Geprüft wird über die Sitzungsdaten (`effort_level`).
+    Hilfsagenten bekommen den Aufwand direkt im Aufruf.
 - **MW-R07 S4 nur mit Grund:** S4 wählt die Steuerung nur,
   - wenn ein Paket auf S3 mit hohem Denkaufwand zweimal nicht abgenommen wurde,
   - für die Analyse eines nicht bestandenen Blindtests oder
@@ -167,8 +173,8 @@ nachvollziehbar bleibt.
 
 ## Offene Punkte
 
-- [ ] Ob die Plattform den Denkaufwand je Entwicklersitzung einstellen lässt oder nur je Hilfsagent. Sonst gilt MW-R06
-      nur für Hilfsagenten, und die Steuerung wählt allein über die Stufe.
+- [x] Ob die Plattform den Denkaufwand je Entwicklersitzung einstellen lässt: erledigt am 14.10.2026, nicht beim Start,
+      aber über die App (Verfahren in MW-R06, „Umsetzung auf der Plattform“).
 - [x] Die Plattform meldet den Verbrauch je Sitzung: Die Sitzungsdaten, die die Steuerung für eine
       Entwicklersitzung abrufen kann, enthalten Eingabe-, Ausgabe- und Zwischenspeicher-Token sowie die Kosten in US-Dollar
       (festgestellt am 12.10.2026). Die Steuerung liest sie nach Ende des Pakets und trägt sie ein.

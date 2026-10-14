@@ -16,7 +16,9 @@ Diese Datei schreibt nur die Steuerungsinstanz, jeweils nach dem Merge eines Pak
 | G3 Oberfläche und Abläufe | H: Nachträge G2 (Migration Wochennummer, `hasContent`, Kaskade M06-R10) | abgenommen, gemergt | 13.10.2026 | #27, Merge `aaf40fc` |
 | G3 Oberfläche und Abläufe | G: M09 Oberfläche beschreiben, Landkarte `src/app` und `src/components` | abgenommen, gemergt | 13.10.2026 | #26, Merge `6486873` |
 | G3 Oberfläche und Abläufe | F: Ablauf-Runner, Testschnittstelle, AK-101, 106, 403, 408 | abgenommen, gemergt | 13.10.2026 | #28, Merge `9a9ff89` |
-| G3 Oberfläche und Abläufe | Welle 2: I Ablauf-Fälle M09, J Q, Szenarien, Abschluss | geplant | – | – |
+| G3 Oberfläche und Abläufe | I: Ablauf-Fälle aller UI-AK M09, Prüfvokabular im Adapter | abgenommen, gemergt | 14.10.2026 | #38, Merge `0a9f592` |
+| G3 Oberfläche und Abläufe | J: Q-Spec, Beispielszenarien, `DEFERRED_CASES_REQUIRED = true`, Abschluss G3 | abgenommen, gemergt | 14.10.2026 | #37, Merge `dae33ac` |
+| G3 Oberfläche und Abläufe | Etappe G3 | abgeschlossen | 14.10.2026 | Rückblick und Übergabe unten |
 | A Automatisches Mergen | Welle 1: A1 AM-AK in `ak:abdeckung` | abgenommen, gemergt | 13.10.2026 | #30, Merge `e5e0adc` |
 | A Automatisches Mergen | A3 Ablauf-Kriterien AM-AK-11 bis -14 an Test-PRs | nachgewiesen | 13.10.2026 | #32 (gemergt in `am-test/main`), #33, #34 (geschlossen) |
 | A Automatisches Mergen | Welle 2: A2 CI-37 (nach #28, I, J) | geplant | – | – |
@@ -196,7 +198,8 @@ genau einzeln, ein Fall der Ebene `ablauf` scheitert; bei E zusätzlich eine nic
 
 ### Offene Punkte nach G2
 
-- [ ] Denkaufwand je Entwicklersitzung lässt sich beim Start nicht einstellen (`docs/08`, offen).
+- [x] Denkaufwand je Entwicklersitzung lässt sich beim Start nicht einstellen: erledigt am 14.10.2026 durch das Verfahren
+      über die App (`docs/08`, MW-R06, „Umsetzung auf der Plattform“).
 - [ ] Ablauf-Prüffälle für AK-101, AK-106, AK-403, AK-408 (G3); danach `DEFERRED_CASES_REQUIRED` in
       `scripts/ak-abdeckung/coverage.ts` umlegen.
 - [ ] Erinnerungsläufe: Prüfung der Wochennummer (KW 1 bis 53) als spätere Migration (von Chris bestätigt, nicht in G2).
@@ -344,6 +347,107 @@ rund 14 Stunden, Warten auf Entscheidungen.
 - **Offen bei Chris:** keine Punkte aus Welle 1.
 
 
+### Welle 2 – Pakete I und J
+
+Beide Pakete auf S3 (Browser-Infrastruktur), Denkaufwand mittel. Merge-Reihenfolge I → J.
+
+| Feld | I: Ablauf-Fälle M09 (#38) | J: Q, Szenarien, Abschluss (#37) |
+| --- | --- | --- |
+| Stufe und Denkaufwand | S3, mittel | S3, mittel |
+| Größe und Budget | mittel, Richtwert 8–12 US-Dollar | mittel, Richtwert 8–12 US-Dollar |
+| Anläufe | 1 | 1 Sitzung; Nacharbeit wegen Zeitlimit und Warteschlangen-Hänger |
+| Beim ersten Anlauf abgenommen | ja | ja (Nacharbeit nur CI, siehe unten) |
+| Ausweichen auf ein anderes Modell | keins | keins |
+| Verbrauch | 7,81 US-Dollar | 19,19 US-Dollar |
+| Gemergt | 14.10.2026 11:47 UTC | 14.10.2026 20:01 UTC über die Merge-Warteschlange |
+| Abweichungen | keine | Verbrauch über Richtwert: Log- und Artefaktsuche in der Entwicklersitzung (rund 7 US-Dollar) |
+
+**CI-Läufe J:** `de9422d` Tests grün, aber Abbruch am 40-Minuten-Limit des E2E-Jobs; `6108596` Limit auf 60 Minuten (CI-17,
+von Chris bestätigt als J-5), grün, E2E 32,6 Minuten; `a528d0c` grün, E2E 41,3 Minuten. Der erste Versuch in der
+Merge-Warteschlange (16:03 UTC) scheiterte in Firefox an UI-AK-16-02: Hänger in der axe-Prüfung auf einem langsameren
+Runner. Diagnose-Fix `a528d0c`: ruhige Seite abwarten, axe höchstens 60 Sekunden, Meldung mit Schritt, Adresse und Dialog.
+Zweiter Versuch grün, gemergt.
+
+**Bestätigungen von Chris:**
+
+- **#38:** I-1 Prüfvokabular und Feld `geraet`; I-2 Fokus nach Tastatur-Einreichen = null als Ist-Zustand, Verbesserung
+  als offener Punkt G4/M09-R20; I-3 `data-*`-Merker.
+- **#37:** J-1 `CLAUDE.md` „Fach-Specs maßgeblich“; J-2 Status von `docs/ci-richtlinie.md` „freigegeben (12.10.2026)“;
+  J-3 Szenario-IDs nach Kern-AK/Modul; J-4 Merker `data-art`/`data-woche`, Aktionen `erinnerung_ausloesen` und
+  `freigabe_zuruecknehmen`; J-5 E2E-Zeitlimit 60 Minuten.
+
+**Schattenbetrieb:** Beide PRs stehen in der Tabelle in Abschnitt A (Nr. 1 und 2).
+
+### Ergebnis G3
+
+`specs/M09-oberflaeche.md` und `specs/Q-plattform-und-qualitaet.md` liegen vor; alle AK und UI-AK haben einen Prüffall
+(Ablauf-Fälle in allen Browsern), `DEFERRED_CASES_REQUIRED = true`, Beispielszenarien sind Ablauf-Fälle, `CLAUDE.md`
+nennt die Fach-Specs als maßgeblich. Etappe G3 ist abgeschlossen (14.10.2026).
+
+### Rückblick G3 (MW-R12, KE-R18)
+
+| Kennzahl | G3 |
+| --- | --- |
+| KZ-1 Abnahme beim ersten Anlauf | 5 von 5 (100 %); Nacharbeit in F (vier Lösungswege, Testgrenze AK-408-03 Firefox) und J (Zeitlimit, Warteschlangen-Hänger) |
+| KZ-2 Rückfragen wegen unvollständigem Auftrag | Welle 1: 1 blockierende (CI-Weg F); Welle 2: I 3 und J 5 Punkte „Bitte bestätigen“, alle von Chris bestätigt |
+| KZ-3 Läufe der vollen Prüfung je PR | F 6, J 3 plus 2 Warteschlangen-Versuche; H 1, G 2 (1 × quay.io 502); I nicht erfasst |
+| KZ-4 Pakete über Budget | über Richtwert: F (21,74 statt 10–15; harte Grenze 22,50 eingehalten) und J (19,19 statt 8–12); über harter Grenze: 0 |
+| KZ-5 Verbrauch je abgenommenem Paket | H 0,99 · G 2,96 (S2 mittel) · F 21,74 (S3 hoch) · I 7,81 · J 19,19 US-Dollar (S3 mittel) |
+| Steuerung | Welle 1 31,02 · Welle 2 6,77 · Abschluss-Steuerung 2,94 · Wächter #37 2,12 US-Dollar |
+| Eskalationen je Stufe | keine |
+
+**Summe G3: 95,54 US-Dollar (Pakete 52,69; Steuerung 42,85).** Richtwert im Plan: Pakete 34–51, Steuerung höchstens 14.
+
+**Lehren und Vorschläge (zur Freigabe durch Chris, noch nicht beschlossen):**
+
+1. **Steuerung als größter Kostenblock.** In Welle 1 trieben eine lange Sitzung und sechs CI-Läufe auf #28 mit eigener
+   Log-Auswertung die Kosten. Mit der Grenze von 8 US-Dollar und 250.000 Token Kontext je Sitzung und einer Übergabe kam
+   Welle 2 auf 6,77 US-Dollar: bewährt. Der Steuerungs-Kontext füllt sich schon durch PR-Ereignisse und
+   Hilfsagenten-Berichte. Vorschlag: Doku-PRs wie diesen in einer eigenen Sitzung schreiben lassen.
+2. **Diagnose kostet in der Entwicklersitzung zu viel.** Log- und Artefaktsuche war bei J rund 7 US-Dollar. Vorschlag:
+   Die Steuerung liefert das Fehlerbild über einen S1-Hilfsagenten, und die Diagnose bekommt eine eigene Kostengrenze.
+3. **E2E-Laufzeit wächst mit den Ablauf-Fällen** (rund 25 von 34 bis 41 Minuten). Hebel: `workers` und `fullyParallel`.
+   Vorschlag: in A2/CI-37 aufnehmen.
+4. **Firefox.** Playwright-Grenze bei `beforeunload` (Testgrenze AK-408-03, in G5 prüfen) und Hänger auf langsameren
+   Warteschlangen-Runnern (UI-AK-16-02). Vorschlag: Diagnosemeldungen früh einbauen, nicht erst nach dem ersten Ausfall.
+5. **Denkaufwand** lässt sich über die App setzen (Verfahren in `docs/08`, MW-R06; Kurzfassung in der Übergabe unten).
+6. **Schattenbetrieb.** Die Kriterien lehnten beide Paket-PRs zu Recht ab (geschützte Pfade, Größe). Zwei Fehler in den
+   Merge-Kriterien: falsch-positiv „Abnahme älter als letzter Push“ (ein Abnahme-Kommentar löst keinen neuen Lauf aus) und
+   ein offenes „Bitte bestätigen“ wird nicht erkannt (AM-R05). Beides geht in A2.
+
+## Übergabe an die Steuerung von G4
+
+- **Stand:** G3 ist abgeschlossen (#26 bis #28, #37, #38 und H #27 gemergt). Fach-Specs sind maßgeblich
+  (`specs/`, `CLAUDE.md`), `DEFERRED_CASES_REQUIRED = true`. Etappe A läuft parallel (A1 und A3 erledigt).
+- **Nächstes (`docs/06`, Etappen):** G4 Profile und Playbooks: Profile für TypeScript, 6.2.5 und 7.2, alle Reihen P00 bis
+  P10 und U00 bis U06, Vorlage, Datenübernahme. Voraussetzung G3 erfüllt.
+- **Schnitt und Abhängigkeiten:** Die Playbook-Reihen hängen am Profil ihrer Plattform; zuerst Ordner `playbooks/` und
+  Vorlage `playbooks/vorlage-arbeitspaket.md` mit dem Block „Gemeinsame Regeln für alle Pakete“ (KE-S02), danach die Reihen.
+  L62 und L72 brauchen G4 und A (Schalter `aktiv: true` durch Chris vor L62). Den Schnitt in Pakete legt die Steuerung vor
+  dem Start mit Chris fest.
+- **Stufen:** Schreibende Playbooks und Profile mit Neuheit oder Risiko auf S3; Beschreibungsteile nach bekanntem Muster
+  können S2 tragen (H und G: 0,99 und 2,96 US-Dollar). Hilfsagenten für Suche und Logauswertung S1.
+- **Fallen aus G3:**
+  - Firefox gibt es in der Sandbox nicht; jeder Firefox-Befund kostet einen vollen CI-Lauf. Diagnosemeldungen früh einbauen.
+  - Der E2E-Job läuft bis zu 60 Minuten (CI-17); auf der Merge-Warteschlange können langsamere Runner Hänger zeigen.
+  - Der Wechsel auf „bereit“ bricht den laufenden Entwurfs-Lauf ab; „Prüfung abgeschlossen“ meldet ihn rot.
+  - Ein Abnahme-Kommentar löst keinen neuen Lauf aus (Schattenbetrieb: falsch-positiv „Abnahme älter als letzter Push“).
+  - Log- und Artefaktsuche nicht in der Entwicklersitzung; Fehlerbild über einen S1-Hilfsagenten liefern.
+- **Offene Punkte:**
+  - [ ] M09-R20: Fokus nach Tastatur-Einreichen (heute null als Ist-Zustand, I-2).
+  - [ ] Testgrenze AK-408-03 (Firefox) in G5 erneut prüfen.
+  - [ ] AK-505 und AK-508 je Plattform als eigener Nachweis in den Profilen.
+  - [ ] AM-S04 (`playbooks/00-steuerung.md`) und Liferay-Teile von AM-R04 nach G4/P00.
+  - [ ] Ordner `playbooks/` und Vorlage mit Block „Gemeinsame Regeln für alle Pakete“ (KE-S02) in G4.
+  - [ ] Firefox-Hänger UI-AK-16-02 beobachten.
+  - [ ] Etappe A: A2 CI-37 und Nachbesserung der Merge-Kriterien (zwei Fehler, Lehre 6); danach Schalter `aktiv: true`
+        durch Chris vor L62.
+  - [ ] Vorschläge 1 bis 4 und 6 aus dem Rückblick G3 zur Freigabe.
+- **Werkzeuge:** Kosten je Sitzung aus den Sitzungsdaten (`get_session`). Denkaufwand: Die Steuerung nennt Chris beim Start
+  jeder Sitzung mit Denkaufwand „hoch“ deren ID; Chris stellt in der App auf „Hoch“; die Einstellung gilt für alle Runden der
+  Sitzung. Prüfung über `effort_level` in den Sitzungsdaten. Hilfsagenten bekommen den Aufwand direkt im Aufruf. Eine
+  Umgebungsvariable in der Cloud-Umgebung wirkt nicht.
+
 ## A – Automatisches Mergen
 
 Plan „Etappe A“, freigegeben von Chris am 13.10.2026 mit E2 bis E7 wie vorgeschlagen; E1 offen. Grundlage:
@@ -386,6 +490,8 @@ Kriterien und Entscheidung von Chris weichen voneinander ab.
 
 | Nr. | PR | Etappe, Paket | Abnahme-Commit | Kriterien (ohne Schalter) | Gründe | Entscheidung Chris | Widerspruch |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | #38 | G3 W2, I | 0d9016a | nein | geschützte Pfade specs/M09-oberflaeche.md, specs/pruefung/M09.json, specs/pruefung/format.md; zu groß (5683 > 1500); dazu falsch-positiv „Abnahme älter als letzter Push“ | Chris: gemergt | nein |
+| 2 | #37 | G3 W2, J | a528d0c | nein | 11 geschützte Pfade (ci.yml, CLAUDE.md, docs/06, docs/ci-richtlinie.md, specs/00-uebersicht.md, specs/M05, specs/M08, specs/Q, Q.json, format.md, szenarien.json); zu groß (1949 > 1500); dazu falsch-positiv „Abnahme älter als letzter Push“ (Abnahme-Kommentar löst keinen neuen Lauf aus) | Chris: gemergt | nein |
 
 ### Welle 1 – Paket A1
 
