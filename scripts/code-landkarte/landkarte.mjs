@@ -45,3 +45,32 @@ export function compareMap(files, markdown) {
     unknown: [...mapped].filter((file) => !existing.has(file)).sort(),
   };
 }
+
+/** Abschnitt „Querschnitt“: Dateien, die keinem Fachmodul gehören. */
+export const CROSS_SECTION = "Querschnitt";
+
+/**
+ * Abschnitte der Landkarte je Datei: `## M01 …` bis `## M09 …` ergeben das Modul (`M01` …), `## Querschnitt` ergibt
+ * {@link CROSS_SECTION}. Tabellen unter anderen Überschriften zählen nicht. Eine Datei kann mehreren Modulen gehören
+ * (z. B. `src/lib/reports.ts`).
+ * @param {string} markdown
+ * @returns {Map<string, Set<string>>}
+ */
+export function sectionsByFile(markdown) {
+  /** @type {Map<string, Set<string>>} */
+  const sections = new Map();
+  let section = /** @type {string | null} */ (null);
+  for (const line of markdown.split("\n")) {
+    if (/^##\s/.test(line)) {
+      section = /^##\s+(M\d{2})\s/.exec(line)?.[1] ?? (/^##\s+Querschnitt\b/.test(line) ? CROSS_SECTION : null);
+      continue;
+    }
+    if (!section) {
+      continue;
+    }
+    for (const file of mappedFiles(line)) {
+      sections.set(file, (sections.get(file) ?? new Set()).add(section));
+    }
+  }
+  return sections;
+}

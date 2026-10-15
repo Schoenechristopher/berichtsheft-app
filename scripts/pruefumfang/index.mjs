@@ -4,9 +4,14 @@
  *
  * `npm run pruefumfang -- --pruefen` (schnelle Prüfung): scheitert, wenn eine Datei im Repository keiner
  * Änderungsklasse angehört; sie muss dann in `pruefumfang.mjs` und Abschnitt 7 der Richtlinie eingeordnet werden.
+ *
+ * `npm run pruefumfang -- --auswahl <Datei> …`: zeigt die Auswahl der Ablauf-Fälle nach Modul (CI-37) für diese
+ * Dateien, z. B. um das Muster lokal mit `npx playwright test --grep-invert "<Muster>"` auszuprobieren.
  */
 import { execFileSync } from "node:child_process";
-import { appendFileSync, readFileSync } from "node:fs";
+import { appendFileSync, readFileSync, readdirSync } from "node:fs";
+import { sectionsByFile } from "../code-landkarte/landkarte.mjs";
+import { akModule, auswahlNachModul, waehleAblauf } from "./modulauswahl.mjs";
 import { bestimmeUmfang, klassifiziere } from "./pruefumfang.mjs";
 
 /** @param {string[]} args */
@@ -15,6 +20,27 @@ function git(...args) {
     .split("\n")
     .map((zeile) => zeile.trim())
     .filter(Boolean);
+}
+
+/** Modulgraph, Code-Landkarte und AK-Zuordnung der Fach-Specs für die Auswahl nach Modul (CI-37). */
+function modulKontext() {
+  const specs = readdirSync("specs")
+    .filter((datei) => /^(M\d{2}|Q)-.*\.md$/.test(datei))
+    .map((datei) => ({ datei, markdown: readFileSync(`specs/${datei}`, "utf8") }));
+  return {
+    graph: JSON.parse(readFileSync("specs/modulgraph.json", "utf8")),
+    landkarte: sectionsByFile(readFileSync("specs/code-landkarte.md", "utf8")),
+    akModul: akModule(specs),
+  };
+}
+
+if (process.argv.includes("--auswahl")) {
+  const dateien = process.argv.slice(process.argv.indexOf("--auswahl") + 1);
+  const auswahl = auswahlNachModul(dateien, modulKontext());
+  console.log(`Gründe: ${auswahl.gruende.join(", ")}`);
+  console.log(`Module: ${auswahl.alle ? "alle" : auswahl.module.join(", ")}`);
+  console.log(`--grep-invert: ${auswahl.grepInvert || "(keins, alle Fälle)"}`);
+  process.exit(0);
 }
 
 if (process.argv.includes("--pruefen")) {
@@ -55,14 +81,18 @@ if (ereignis === "pull_request") {
 }
 
 const umfang = bestimmeUmfang(anlass);
+const ablauf = waehleAblauf(umfang, anlass.dateien ?? [], modulKontext());
+const ablaufModule = ablauf.alle ? "alle" : ablauf.module.join(" ") || "keine";
 const ausgabe = [
   `schnell=${umfang.schnell}`,
   `e2e=${umfang.e2e}`,
   `browser_voll=${umfang.browserVoll}`,
   `liferay625=${umfang.liferay625}`,
   `liferay72=${umfang.liferay72}`,
+  `ablauf_module=${ablaufModule}`,
+  `ablauf_grep_invert=${ablauf.grepInvert}`,
 ];
-console.log(`${umfang.grund}\n${ausgabe.join("\n")}`);
+console.log(`${umfang.grund}\nAblauf-Fälle (CI-37): ${ablauf.gruende.join(", ")}\n${ausgabe.join("\n")}`);
 if (anlass.dateien) {
   console.log(`Geänderte Dateien (${anlass.dateien.length}):`);
   for (const datei of anlass.dateien) {
@@ -89,6 +119,13 @@ if (process.env.GITHUB_STEP_SUMMARY) {
       `| Liferay 6.2.5 | ${ja(umfang.liferay625)} |`,
       `| Liferay 7.2 | ${ja(umfang.liferay72)} |`,
       "",
+      "#### Ablauf-Fälle im Browser nach Modul (CI-37)",
+      "",
+      `Module: ${ablaufModule}`,
+      "",
+      `Gründe: ${ablauf.gruende.map((grund) => `\`${grund}\``).join(", ")}`,
+      "",
+      ...(ablauf.grepInvert ? ["Abgewählt mit `--grep-invert`:", "", "```", ablauf.grepInvert, "```", ""] : []),
     ].join("\n"),
   );
 }

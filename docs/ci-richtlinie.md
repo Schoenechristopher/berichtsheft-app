@@ -98,11 +98,25 @@ Angaben zu anderen Repositories stehen bewusst nicht in dieser öffentlichen Dat
 - **CI-36 Abschluss-Job:** Ein letzter Job „Prüfung abgeschlossen“ prüft, dass jeder für die Klasse nötige Job grün
   ist. Nur dieser Job ist im Regelsatz für `main` Pflicht. Grund: Ein übersprungener Job zählt bei GitHub als
   bestanden, ein Pflicht-Check je Job würde also nichts absichern.
-- **CI-37 Auswahl nach Modul (geplant, Etappe A):** Bei Logik- und Serveränderungen laufen nur die Ablauf-Fälle
+- **CI-37 Auswahl nach Modul (umgesetzt, Etappe A):** Bei Logik- und Serveränderungen laufen nur die Ablauf-Fälle
   (Browser) der betroffenen Module und der Module, die nach dem Abhängigkeitsgraph davon abhängen; die Zuordnung Datei →
   Modul kommt aus der Code-Landkarte. Fachlogik- und Daten-Fälle laufen immer vollständig, im Zweifel laufen alle Fälle
-  (CI-34). Umgesetzt wird das in Etappe A (Paket A2; Entscheidungen E5 und E6 aus Etappe A bzw. G3); bis dahin gilt
-  CI-32 mit den Klassen aus Abschnitt 7.
+  (CI-34). Umgesetzt in Etappe A (Paket A2a; Entscheidungen E5 und E6 aus Etappe A bzw. G3):
+  - Modulgraph: `specs/modulgraph.json` (direkte Abhängigkeiten wie im Diagramm in `specs/00-uebersicht.md`; ein Test
+    der schnellen Prüfung gleicht beide Diagramme und die Tabelle „Modulschnitt“ in `docs/06` ab).
+  - Auswahl: `scripts/pruefumfang/modulauswahl.mjs` mit Tests in `scripts/pruefumfang/pruefumfang.test.ts`; Datei →
+    Modul über die Abschnitte der Code-Landkarte (`sectionsByFile()` in `scripts/code-landkarte/landkarte.mjs`), Fall →
+    Modul über die AK-IDs in Testnamen und Tags und Abschnitt 4 der Fach-Specs.
+  - Gilt nur, wenn der PR außer Doku nur Dateien der Klassen L und P ändert. Klasse O, I, unbekannte Pfade und die
+    erzwungene volle Prüfung (CI-35) wählen alle Fälle. Ebenso alle Fälle: eine Datei im „Querschnitt“ oder in keinem
+    Modulabschnitt der Landkarte (z. B. `prisma/**`, `src/worker/**`, `specs/pruefung/**`) und das Testgerüst
+    (`e2e/helpers.ts`, `e2e/pruefung/**`, `tests/pruefung/**`, `playwright.config.ts`).
+  - Ein Fall ohne AK-ID und die Fälle in `ui-ak`, `barrierefreiheit`, `produktionsmodus`, `screenshots`, `ak-1101-…`
+    und `ak-1102-…` laufen immer mit; eine geänderte Spec-Datei unter `e2e/` läuft immer.
+  - Der Job „Umfang“ gibt die Auswahl als Muster für `playwright test --grep-invert` aus (`ablauf_grep_invert`, leer =
+    alle Fälle) und nennt Module und Gründe mit festen Codes in der Zusammenfassung des Laufs (`modul:M01`,
+    `abhaengig:M03`, `datei:e2e/…`, `alle:querschnitt`, `alle:unbekannte-datei`, `alle:testgeruest`,
+    `alle:klasse-O`, `alle:erzwungen` …). Lokal: `npm run pruefumfang -- --auswahl <Datei> …`.
 
 ### Sparsam und schnell bauen
 
@@ -183,7 +197,7 @@ Die volle Prüfung läuft erst, wenn der PR „bereit“ ist (CI-10, CI-11). Die
 |---|---|---|---|
 | D Doku | `docs/**`, `profile/**`, `playbooks/**`, `specs/**/*.md`, `*.md` | keine (CI-12) | ändert kein Verhalten |
 | P Prüffälle | `specs/pruefung/**` | TypeScript: wie Klasse L; Liferay: nur im Wochenlauf oder mit Label `volle-pruefung` | der Prüf-Runner der schnellen Prüfung führt die Fachlogik-Fälle schon aus |
-| L Logik und Server | `src/domain/**`, `src/lib/**`, `src/pdf/**`, `src/worker/**`, `src/auth.ts`, `src/proxy.ts`, `prisma/**`, `scripts/**`, `tests/**` | Docker Compose + Playwright `chromium` und `smartphone-375` | Verhalten ändert sich, die Darstellung im Browser nicht |
+| L Logik und Server | `src/domain/**`, `src/lib/**`, `src/pdf/**`, `src/worker/**`, `src/auth.ts`, `src/proxy.ts`, `prisma/**`, `scripts/**`, `tests/**`, `specs/modulgraph.json` | Docker Compose + Playwright `chromium` und `smartphone-375`, Ablauf-Fälle nach Modul (CI-37) | Verhalten ändert sich, die Darstellung im Browser nicht |
 | O Oberfläche | `src/app/**`, `src/components/**`, `assets/**`, `public/**`, `e2e/**`, `playwright.config.ts`, `next.config.ts`, `postcss.config.mjs` | zusätzlich `firefox`, `msedge`, `a11y`, `screenshots` | Darstellung und Barrierefreiheit können je Browser abweichen |
 | I Infrastruktur und Abhängigkeiten | `package.json`, `package-lock.json`, `Dockerfile`, `docker/**`, `docker-compose.yml`, `keycloak/**`, `.github/**`, `.claude/**`, `.env.example`, `.dockerignore`, `.gitattributes`, `.gitignore`, `.prettierignore`, `.prettierrc.json`, `tsconfig.json`, `eslint.config.mjs`, `vitest.config.ts`, `prisma.config.ts` | alle Konfigurationen der TypeScript-App | wirkt auf alles, z. B. neue Bibliotheksversionen |
 | L62 Liferay 6.2.5 | `liferay-625/**` | Liferay-6.2.5-Job | eigene Umsetzung |
