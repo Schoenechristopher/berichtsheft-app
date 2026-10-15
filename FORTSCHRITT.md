@@ -492,6 +492,8 @@ Kriterien und Entscheidung von Chris weichen voneinander ab.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | #38 | G3 W2, I | 0d9016a | nein | geschützte Pfade specs/M09-oberflaeche.md, specs/pruefung/M09.json, specs/pruefung/format.md; zu groß (5683 > 1500); dazu falsch-positiv „Abnahme älter als letzter Push“ | Chris: gemergt | nein |
 | 2 | #37 | G3 W2, J | a528d0c | nein | 11 geschützte Pfade (ci.yml, CLAUDE.md, docs/06, docs/ci-richtlinie.md, specs/00-uebersicht.md, specs/M05, specs/M08, specs/Q, Q.json, format.md, szenarien.json); zu groß (1949 > 1500); dazu falsch-positiv „Abnahme älter als letzter Push“ (Abnahme-Kommentar löst keinen neuen Lauf aus) | Chris: gemergt | nein |
+| 3 | #40 | A, A2b | de973a6 | nein | geschützte Pfade (scripts/merge-kriterien/**, docs/07) | Chris: gemergt | nein |
+| 4 | #41 | A, A2a | 6ea2275 | nein | geschützte Pfade (.github/workflows/ci.yml, docs/ci-richtlinie.md, specs/modulgraph.json); „Bitte bestätigen“ offen (AM-R05) | Chris: gemergt | nein |
 
 ### Welle 1 – Paket A1
 
@@ -561,6 +563,53 @@ Nebenbei: Doku-PR #31 lief als erster PR über die Warteschlange von `main`.
   Ende von A für weitere Prüfungen (z. B. von A2) stehen.
 - **Verbrauch der Steuerung** (Welle 1 und A3 zusammen, Sitzung bis hier): siehe Rückblick am Ende von A.
 
+### Welle 2 – Pakete A2a, A2b, A2c
+
+Plan von Chris am 14.10.2026 freigegeben. Merge-Reihenfolge A2b → A2a → A2c. Steuerung: bis 14.10. 21:48 UTC
+`session_01D4c6rgZNwGQXKJanaXz5xX`, danach `session_01WjD6yH9wsqdbRwzNN5UbXA`.
+
+| Feld | A2b: Merge-Kriterien nachbessern (#40) | A2a: CI-37 Auswahl nach Modul (#41) | A2c: E2E parallelisieren |
+| --- | --- | --- | --- |
+| Stufe und Denkaufwand je Anlauf | S2, mittel | S3, hoch | S3, hoch |
+| Grund | Nachbesserung an bestehendem Skript, per Unit-Test prüfbar | neue Auswahl-Logik in CI, Klasse I, Risiko „zu wenig geprüft“ | Eingriff in die Testausführung, Risiko unzuverlässiger Tests |
+| Größenklasse und Budget | klein, hart 7,5 US-Dollar | mittel, 7–11, hart 16 US-Dollar | klein, 3–5, hart 7,5 US-Dollar |
+| Anläufe | 1 | 1, mit einer Nachbesserung | 1, nach der Bestandsaufnahme abgebrochen (gewollt) |
+| Beim ersten Anlauf abgenommen | ja | nein: der Diff löschte in `docs/ci-richtlinie.md` versehentlich CI-17 bis CI-31 und die Abschnitte 4–6; wiederhergestellt, dann abgenommen | – (kein PR) |
+| Ausweichen auf ein anderes Modell | keins gemeldet | keins gemeldet | keins gemeldet |
+| Verbrauch der Entwicklersitzung | 1,91 US-Dollar | 4,42 US-Dollar | 1,34 US-Dollar |
+| CI | volle Prüfung grün; Warteschlange grün, gemergt 15.10. 07:43 UTC | volle Prüfung grün; Warteschlange 1 × rot (Firefox, UI-AK-16-04, axe ohne Ergebnis nach 60 s auf `/anmelden`; nicht vom PR, es liefen alle Fälle `alle:klasse-I`), nach einem Neustart grün, gemergt 15.10. 09:01 UTC | – |
+| Rückfragen | keine | 2 × „Bitte bestätigen“ (CI-37 nur für Klassen L/P; Q und „Querschnitt“ als Ausnahme im Abgleich Graph–Landkarte) | – |
+| Erreichte Abbruchkriterien | keine | keine | Auftragsvorgabe „nur ohne gemeinsamen DB-Zustand“ nicht erfüllbar |
+
+**Abnahme:** A2b durch die vorige Steuerung (Diff, lokale Prüfungen, 57 Tests der Merge-Kriterien, Gegenprobe). A2a:
+Code durch die vorige Steuerung; nach der Nachbesserung hat ein S1-Hilfsagent geprüft, dass sich in
+`docs/ci-richtlinie.md` nur der Absatz CI-37 und Zeile L in Abschnitt 7 ändern. Beide mit Abnahme-Kommentar (`sha=`)
+und Label `automerge` (F1).
+
+**Ergebnis A2b:** „Merge-Kriterien“ zeigt jedes Kriterium einzeln mit festem Grund; AM-R05 ist fail-closed; der
+Abnahme-Kommentar trägt `sha=` (AM-R07).
+
+**Ergebnis A2a:** `specs/modulgraph.json`; `scripts/pruefumfang/modulauswahl.mjs` wählt die Ablauf-Fälle nach Modul
+und transitiven Abhängigen, im Zweifel alle. Ersparnis laut PR: M01 rund 1/6, M07/M08 rund 40 %. Folgepunkt G4:
+`src/pdf`, `src/worker`, `prisma`, `specs/pruefung` stehen in keinem Modulabschnitt der Landkarte und wählen deshalb
+immer alle Fälle.
+
+**Befund A2c (kein PR):** Lokal (Chromium + 375 px, `workers: 1`) 23,5 Minuten, davon 15,0 (64 %) in
+`pruefung-ablauf.spec.ts`. Der Ablauf-Runner leert vor jedem Fall die ganze Datenbank und stellt die Server-Uhr global;
+viele Dateien ändern Seed-Personen oder Annas Bericht KW 40. Ohne Schreibzugriff kommen nur vier Dateien aus (rund
+19 s). Gegenprobe `--fully-parallel --workers=4`: 57 Fälle rot. Playwright-Projekte laufen untereinander gleichzeitig;
+eine Reihenfolge über `dependencies` würde die Auswahl je Projekt ändern. Vorschläge (eigenes Paket, Freigabe nötig):
+(a) eigene Datenbank und eigener Server für die Ablauf-Fälle in smartphone-375, parallel zu Chromium (Erwartung
+lokal rund 16 statt 23,5 Minuten); (b) fachlich prüfen, ob in smartphone-375 jeder Ablauf-Fall laufen muss.
+
+**Lehren:**
+
+- Doku-Dateien im Diff einer Entwicklersitzung immer auf ungewollte Löschungen prüfen lassen (A2a). Steht jetzt als
+  „bekannte Falle“ in den Aufträgen.
+- Grüne Läufe kommen nicht zuverlässig als Ereignis an; ein Check-in nach rund 60–90 Minuten hat die Lücke geschlossen.
+- Ein Auftrag mit klarer Abbruchvorgabe hat sich bewährt: A2c hat nach rund 1,3 US-Dollar mit Messung und Gegenprobe
+  aufgehört, statt einen unzuverlässigen Schnitt zu bauen.
+
 ### Übergabe an die nächste Steuerung A (Welle 2)
 
 - **Stand:** A1 gemergt (#30); Plan und Tabelle „Schattenbetrieb“ auf `main` (#29). `.github/automerge.yml` steht auf
@@ -579,6 +628,18 @@ Nebenbei: Doku-PR #31 lief als erster PR über die Warteschlange von `main`.
   am Ende. Bisher 0 Einträge.
 - **Am Ende von A:** `docs/07` (Einführung Schritt 4, offene Punkte) in einem Doku-PR nachziehen (geschützter Pfad, Chris
   mergt), dazu Rückblick nach MW-R12/KE-R18 und Übergabe.
+
+### Übergabe an die nächste Steuerung A (nach Welle 2)
+
+- **Stand 15.10.2026:** A1, A2a (#41), A2b (#40) gemergt, A3 belegt. A2c untersucht und ohne PR abgeschlossen (Befund
+  oben); die Vorschläge (a) und (b) liegen bei Chris, Empfehlung: für G4 vormerken. `.github/automerge.yml` steht auf
+  `aktiv: false`.
+- **Schattenbetrieb:** 4 Einträge, kein Widerspruch. Fertig A braucht 10 Paket-PRs ohne Widerspruch (oder eine
+  Entscheidung von Chris), danach setzt Chris den Schalter.
+- **Offen aus #41:** die zwei Punkte „Bitte bestätigen“ (Klasse O, Q/Querschnitt) – Chris hat gemergt; ob er beide
+  bestätigt, festhalten. Landkarte für `src/pdf`, `src/worker`, `prisma`, `specs/pruefung` in G4 ergänzen.
+- **Am Ende von A:** `docs/07` (Einführung Schritt 4, offene Punkte) nachziehen (geschützter Pfad), Rückblick nach
+  MW-R12/KE-R18. Sitzungen A2a, A2b, A2c erst nach Zustimmung von Chris archivieren.
 
 ## Gesamtsteuerung
 
