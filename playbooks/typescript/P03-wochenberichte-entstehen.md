@@ -82,7 +82,7 @@ AK die Prüffälle:
    Anzeige; gelöscht wird nichts. Prüfschritt: Test „Wochen ganz außerhalb zählen nicht als offen“ (AK-306).
 6. **Aufrufe einhängen.** Das Anlegen läuft beim Aufruf der Seiten von Azubi und Ausbilder, nach jeder Änderung in der
    Nutzerverwaltung (Anlegen, Ausbildungszeitraum, Bundesland, aktiv/deaktiviert, M02) und, sobald sie existieren, vor
-   PDF-Export (P07) und Erinnerung (P08). Prüfschritt: Neue Person anlegen (Browser, Test-Login) erzeugt ihre Wochen sofort
+   PDF-Export (P07) und Erinnerung (P08). Prüfschritt: Neue Person anlegen (Browser, Test-Login) erzeugt ihre Wochen spätestens beim nächsten Aufruf (M03-R02; die Referenz legt sie sofort an)
    (AK-301); eine deaktivierte Person bekommt beim nächsten Lauf keine neuen Wochen (AK-205).
 7. **Seiten (funktional).** `src/app/(app)/azubi/page.tsx` (Start: aktuelle Woche mit dem Merker `data-woche`, „Zu erledigen“),
    `src/app/(app)/azubi/wochen/page.tsx` mit `src/components/WeekOverview.tsx` (Meine Wochen), `src/components/ui/week-tile.tsx`,

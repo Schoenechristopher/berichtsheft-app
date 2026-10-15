@@ -22,6 +22,8 @@ Moduls.
 ## 2. Voraussetzungen
 
 - Keine fertigen Playbooks. P00 ist das erste Paket und blockiert alle anderen (`playbooks/00-steuerung.md`, Abschnitt 2).
+- Im Blindtest: das Werkzeugpaket für `scripts/playbooks/` (Profil, Abschnitt 5, „Prüfung der Playbooks im Blindtest“) ist abgenommen
+  und gemergt. Ohne dieses Paket gilt der Übergang aus Schritt 11.
 - Werkzeuge: Node.js ab 22.12, npm, PostgreSQL 16 mit Rolle `berichtsheft` und den Datenbanken `berichtsheft` und
   `berichtsheft_test`. In der Cloud-Sitzung richtet das Startskript `.claude/hooks/session-start.sh` PostgreSQL, `.env`,
   `npm ci`, Migration und Seed ein (Protokoll `/tmp/session-start.log`); es braucht ein vorhandenes `prisma/schema.prisma`,
@@ -124,8 +126,9 @@ einen Vergleich ausdrücklich beauftragt.
 11. **Profil bestätigen.** Zu jeder Zeile von Profil, Abschnitt 3, den Eintrag „Pfad vorhanden / folgt in Pn“ prüfen und
     Abweichungen in den PR unter „Bitte bestätigen“ schreiben. Prüfschritt: `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` meldet mit
     vorhandenem Quellcode keine Befunde. Im Blindtest-Branch meldet die Prüfung „fehlender-pfad“ für jeden Zielpfad unter `src/`,
-    `prisma/`, `e2e/` und `tests/`, der noch nicht gebaut ist; das ist bis zum Bau erwartet und hängt von einer Werkzeuganpassung ab
-    (Profil, Abschnitt 5, „Prüfung der Playbooks im Blindtest“).
+    `prisma/`, `e2e/` und `tests/`, der noch nicht gebaut ist; mit dem abgenommenen Werkzeugpaket entfällt dieser Befund. Ohne
+    das Paket (Übergang): `npx vitest run --exclude scripts/playbooks/repository.test.ts` statt `npm test`; der Vitest-Job der CI ist dann
+    rot, bis das Paket gemergt ist (Profil, Abschnitt 5).
 12. **Compose und Container.** `docker-compose.yml`, `Dockerfile` und `docker/start-app.sh` sind vorhanden und werden nur gegen
     die Umgebungsvariablen aus `.env.example` abgeglichen. Container laufen in der Cloud-Sitzung nicht; der Stack wird in
     GitHub Actions geprüft. Prüfschritt: `docker compose config` ist nicht nötig; im PR steht, dass der Stack nur in CI läuft.
@@ -137,7 +140,7 @@ einen Vergleich ausdrücklich beauftragt.
 | `npm run lint` | keine Fehler |
 | `npm run format:check` | „All matched files use Prettier code style!“ |
 | `npm run typecheck` | keine Fehler |
-| `npm run test:unit` | Gerüst-Tests grün (z. B. Testdaten), alle Prüffälle als `todo` (noch nicht gebaut) |
+| `npm run test:unit` (ohne Werkzeugpaket: `npx vitest run --project unit --exclude scripts/playbooks/repository.test.ts`) | Gerüst-Tests grün (z. B. Testdaten), alle Prüffälle als `todo` (noch nicht gebaut) |
 | `npm run test:db` | globales Setup migriert, Daten-Fälle als `todo` |
 | `curl localhost:3000/api/health` (bei `npm run dev`) | HTTP 200 |
 | `E2E_LOGIN_MODE=test npx playwright test --list --project=chromium` | Ablauf-Fälle werden gefunden |

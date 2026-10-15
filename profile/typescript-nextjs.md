@@ -212,10 +212,14 @@ Workflows nutzen keine Geheimnisse.
 **Prüfung der Playbooks im Blindtest.** `scripts/playbooks/pruefung.ts` nimmt nur `playbooks/` und `profile/` von der Pfadprüfung aus
 (`FUTURE_DIRS`). Im Blindtest-Branch ohne `src/`, `prisma/`, `e2e/` und `tests/` meldet
 `npx tsx scripts/playbooks/pruefen.ts` deshalb für jeden genannten Zielpfad dieser Ordner den Befund „fehlender-pfad“, und der Test
-`scripts/playbooks/repository.test.ts` (damit `npm test` und die CI) scheitert. Das ist bis zum Bau der jeweiligen Datei erwartet und
-kein Fehler der Playbooks. Ohne Werkzeuganpassung gilt im Blindtest als grün: Lint, Format, Typecheck, die Prüf-Runner des gebauten
-Moduls und die Qualitätsprüfungen nach P10; `pruefen.ts` ist erst nach dem Bau (oder mit der Anpassung unter „Bitte bestätigen“) das
-Kriterium.
+`scripts/playbooks/repository.test.ts` (damit `npm test`, das Vitest-Projekt `unit` und die CI) scheitert.
+
+- **Voraussetzung des Blindtests (Entscheidung der Steuerung):** das Werkzeugpaket für `scripts/playbooks/` ist abgenommen und
+  gemergt (Vorschlag unter „Bitte bestätigen“). Danach gelten `npm test` und `npx tsx scripts/playbooks/pruefen.ts` wie in den
+  Playbooks beschrieben.
+- **Übergang ohne Werkzeugpaket:** statt `npm test` den Befehl `npx vitest run --exclude scripts/playbooks/repository.test.ts`
+  ausführen. Der Vitest-Job der CI bleibt dann rot, bis das Paket gemergt ist. `pruefen.ts` ist in diesem Fall nicht das Kriterium;
+  grün sein müssen Lint, Format, Typecheck, die Prüf-Runner der gebauten Module und die Qualitätsprüfungen nach P10.
 
 ## 6. Bewusste Abweichungen
 
@@ -327,8 +331,8 @@ Update bedingt ist und dass die Sperre vor dem Lesen des Stands liegt.
 - [ ] **Werkzeugpaket vor dem Blindtest (Vorschlag):** Ein eigenes kleines Paket ändert `scripts/playbooks/` so, dass die Prüfung im
       Blindtest nicht an Zielpfaden scheitert, entweder (a) ein Schalter (z. B. Umgebungsvariable `PLAYBOOKS_BLINDTEST=1`), der
       „fehlender-pfad“ für `src/`, `prisma/`, `e2e/` und `tests/` unterdrückt, oder (b) Zielpfade, die ein Playbook ausdrücklich als
-      „anzulegen“ markiert, gelten als zukünftig (wie `playbooks/` und `profile/` in `FUTURE_DIRS`). Es muss vor dem Blindtest laufen;
-      `scripts/**` ist für dieses Paket tabu.
+      „anzulegen“ markiert, gelten als zukünftig (wie `playbooks/` und `profile/` in `FUTURE_DIRS`). Es ist feste Voraussetzung des Blindtests und muss vor ihm
+      abgenommen und gemergt sein; `scripts/**` ist tabu für die Blindtest-Pakete P00 bis P10, nicht für dieses Werkzeugpaket.
 - [ ] **Ausnahme für `docs/03-testabdeckung.md`:** Jedes Playbook erzeugt die Datei mit `npm run ak:abdeckung` neu und committet sie;
       sonst scheitert `npm run ak:abdeckung -- --pruefen` in der CI. Das ist die einzige Ausnahme vom Verbot, `docs/**` zu ändern.
 - [ ] **Reihenfolge M01 und M02:** `specs/00-uebersicht.md` und `docs/06-spec-architektur.md` nennen sie parallel möglich. P01 und P02
