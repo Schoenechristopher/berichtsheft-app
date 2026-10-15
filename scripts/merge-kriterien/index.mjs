@@ -7,7 +7,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { appendFileSync, readFileSync } from "node:fs";
-import { entscheideAutomerge, prueffallIds, testsJeAk } from "./merge-kriterien.mjs";
+import { entscheideAutomerge, erstelleBericht, prueffallIds, testsJeAk } from "./merge-kriterien.mjs";
 
 /** @param {string[]} args */
 function git(...args) {
@@ -145,25 +145,7 @@ if (ereignis === "merge_group") {
 }
 
 const entscheidung = entscheideAutomerge(daten);
-const ja = (/** @type {boolean} */ wert) => (wert ? "ja" : "nein");
-const bericht = [
-  "### Merge-Kriterien",
-  "",
-  `Ergebnis: **${entscheidung.hinweis}**`,
-  "",
-  ...(entscheidung.antrag && ereignis !== "merge_group"
-    ? [
-        `- Antrag (Label \`automerge\`): ja`,
-        `- Zulässig: ${ja(entscheidung.zulaessig)}`,
-        `- Zulässig ohne Schalter (Schattenbetrieb, AM-R14): ${ja(entscheidung.zulaessigOhneSchalter)}`,
-        "",
-        ...(entscheidung.gruende.length > 0
-          ? ["Gründe:", "", ...entscheidung.gruende.map((grund) => `- ${grund}`)]
-          : []),
-      ]
-    : []),
-  "",
-].join("\n");
+const bericht = erstelleBericht(entscheidung);
 console.log(bericht);
 if (process.env.GITHUB_STEP_SUMMARY) {
   appendFileSync(process.env.GITHUB_STEP_SUMMARY, bericht);
