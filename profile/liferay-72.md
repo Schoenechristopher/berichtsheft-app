@@ -222,8 +222,9 @@ unverändert; „abweichend, begründet“ steht zusätzlich unter Abschnitt 6):
 - **Lesen in der App** (eigene Glocke bzw. Seite „Benachrichtigungen“) setzt `readAt` aus der Uhr und markiert den
   zugehörigen `UserNotificationEvent` als gelesen (`archived`), in derselben Transaktion.
 - **Lesen über die Liferay-Glocke:** Ein `ModelListener<UserNotificationEvent>` in `bh-notification` setzt bei
-  `onAfterUpdate`, wenn `archived` von `false` auf `true` wechselt, `readAt` der Nachricht mit dieser
-  `userNotificationEventId` (nur wenn noch leer, Zeitpunkt aus der Uhr). Ob 7.2 das Gelesen-Markieren über die
+  `onAfterUpdate`, wenn `archived` gesetzt und `readAt` der Nachricht mit dieser `userNotificationEventId` noch leer
+  ist, `readAt` aus der Uhr. Den Vorzustand braucht das nicht (`onAfterUpdate` bekommt ihn in 7.2 vermutlich nicht;
+  alternativ den alten Stand in `onBeforeUpdate` lesen; in P00 zu bestätigen). Ob 7.2 das Gelesen-Markieren über die
   Persistenz schreibt (sonst greift der Listener nicht), klärt P00; Ausweg ist ein eigener `UserNotificationHandler`,
   dessen Link über die App führt und dort `readAt` setzt.
 - **Vorschau ohne Gelesen-Markierung** (M09-R03, AK-1015) gilt nur für die eigene Glocke; die Liferay-Liste markiert
@@ -446,7 +447,7 @@ AK-505-06, AK-505-07 (Ebene `fachlogik`, `darfBearbeiten`). Für die Historie zu
    Tageskommentare beim Ablehnen (Tag → Text, M05-R22). Die Sperre liefert `WeeklyReportFinderImpl` (Custom SQL), das
    bedingte Update läuft über `SQLQuery.executeUpdate()`, danach `clearCache` des Berichts.
 3. **Fehlergrund:** `ReportTransitionException extends PortalException` mit einem Feld `reason` (bei `text_zu_lang`
-   zusätzlich `field`), gemeldet in der Reihenfolge von M05-R21: `zugriff_verweigert` (Person, Rolle, Besitz);
+   zusätzlich `field` und die betroffenen Tage `days`, wie der Prüffall `"tage"` erwartet), gemeldet in der Reihenfolge von M05-R21: `zugriff_verweigert` (Person, Rolle, Besitz);
    `uebergang_unzulaessig` (Status, M05-R02) bzw. die Gründe des gesehenen Stands aus M05-R20
    (`bericht_zurueckgezogen`, `bereits_geprueft`, `bereits_eingereicht`, `bereits_zurueckgezogen`,
    `bereits_zurueckgenommen`, `inzwischen_geaendert`); `azubi_deaktiviert`; `kommentar_fehlt`, `begruendung_fehlt`,
@@ -533,7 +534,7 @@ gelingen, der Test zeigt zwei Erfolge bzw. zwei Historieneinträge und wird rot;
 - [ ] `TemplateContextContributor` vom Typ THEME und `data-theme` vor dem ersten Darstellen; Senna für die Site aus (3.4, 7).
 - [ ] Clay-Version in 7.2 und Liste der Komponenten mit Token-Überschreibung (3.4).
 - [ ] Scheduler: `SchedulerEngineHelper`/`TriggerFactory`, Speicherart, Takt (3.3).
-- [ ] Synchroner Mailversand über die Mail-Sitzung des Portals (Abschnitt 3).
+- [ ] Falls freigegeben: synchroner Mailversand über die Mail-Sitzung des Portals (Abschnitt 3).
 - [ ] Gelesen-Markieren über die Liferay-Glocke erreicht den `ModelListener<UserNotificationEvent>` (3.5).
 - [ ] PDFBox per `compileInclude` als OSGi-Modul lauffähig (Abschnitt 3).
 - [ ] Liferay-Arquillian 1.0.20 mit 7.2 (gemeinsam 7) und Aufgabe `testIntegration` im Workspace (Abschnitt 4).
