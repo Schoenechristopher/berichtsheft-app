@@ -19,6 +19,9 @@ Diese Datei schreibt nur die Steuerungsinstanz, jeweils nach dem Merge eines Pak
 | G3 Oberfläche und Abläufe | I: Ablauf-Fälle aller UI-AK M09, Prüfvokabular im Adapter | abgenommen, gemergt | 14.10.2026 | #38, Merge `0a9f592` |
 | G3 Oberfläche und Abläufe | J: Q-Spec, Beispielszenarien, `DEFERRED_CASES_REQUIRED = true`, Abschluss G3 | abgenommen, gemergt | 14.10.2026 | #37, Merge `dae33ac` |
 | G3 Oberfläche und Abläufe | Etappe G3 | abgeschlossen | 14.10.2026 | Rückblick und Übergabe unten |
+| G4 Profile und Playbooks | A: Vorlage Arbeitspaket, Playbook-Prüfung | abgenommen, gemergt | 15.10.2026 | #45, Merge `1d9be30` |
+| G4 Profile und Playbooks | C: `profile/liferay-gemeinsam.md` | abgenommen, gemergt | 15.10.2026 | #46, Merge `42774f8` |
+| G4 Profile und Playbooks | B: Leitfaden der Steuerung | abgenommen, gemergt | 15.10.2026 | #44, Merge `a4e0d8c` |
 | A Automatisches Mergen | Welle 1: A1 AM-AK in `ak:abdeckung` | abgenommen, gemergt | 13.10.2026 | #30, Merge `e5e0adc` |
 | A Automatisches Mergen | A3 Ablauf-Kriterien AM-AK-11 bis -14 an Test-PRs | nachgewiesen | 13.10.2026 | #32 (gemergt in `am-test/main`), #33, #34 (geschlossen) |
 | A Automatisches Mergen | Welle 2: A2 CI-37 (nach #28, I, J) | geplant | – | – |
@@ -448,6 +451,76 @@ nennt die Fach-Specs als maßgeblich. Etappe G3 ist abgeschlossen (14.10.2026).
   Sitzung. Prüfung über `effort_level` in den Sitzungsdaten. Hilfsagenten bekommen den Aufwand direkt im Aufruf. Eine
   Umgebungsvariable in der Cloud-Umgebung wirkt nicht.
 
+## G4 – Profile und Playbooks
+
+Plan „Etappe G4“, freigegeben von Chris am 15.10.2026 mit den Entscheidungsfragen 1 bis 10 wie vorgeschlagen:
+
+- 4 Wellen und 12 Pakete (A bis L) mit harten Grenzen je Paket.
+- Gemeinsame Grundlage der Liferay-Umsetzungen in `profile/liferay-gemeinsam.md`.
+- Die Liferay-Reihen sind in einen S3-Teil und einen S2-Teil geteilt.
+- Bezugsquellen werden nur lesend geprüft.
+- Upgrade-Prüffälle kommen in G4-I.
+- Die Playbook-Prüfung ist ein Vitest-Test, ohne Änderung an `package.json` und CI.
+- AM-R04 für Liferay folgt in G4-L.
+- Kostenrahmen 110–155 US-Dollar.
+- Vorschläge 1, 2 und 4 aus dem Rückblick G3 angenommen; 3 und 6 bei Paket A.
+- Die E2E-Optionen (a) und (b) aus A2c kommen nicht in G4, sondern als eigenes Paket später.
+
+| Welle | Pakete (Stufe, harte Grenze in US-Dollar) |
+| --- | --- |
+| 1 | A, B, C |
+| 2 | D (S2, 13), E (S3, 16), F (S3, 16) |
+| 3 | G, H, I |
+| 4 | J, K, L |
+
+### Welle 1 – Pakete A, B und C (parallel)
+
+Gemergt am 15.10.2026. Steuerung je Welle in einer frischen Sitzung.
+
+**Freigaben aus „Bitte bestätigen“ (Chris, 15.10.2026):**
+
+- **G4-A:** Heuristiken (a) bis (d) der Playbook-Prüfung.
+- **G4-B:** Eine Steuerung je Vorhaben mit frischer Steuerung je Welle; Budgetformel harte Grenze ≈ 1,5 × Richtwert und
+  Diagnose ≈ 15 %; Check-ins enden nach drei Runden; Blindtest-Basis `blindtest/<plattform>/main`.
+- **G4-C:** PostgreSQL-Trigger plus ModelListener (Folge: Liferay nur auf PostgreSQL; die Zeile in `docs/06` folgt im
+  Doku-PR am Ende von G4), Präfix `BH_`, Primärschlüssel `long`, Versionsspalte mit `FOR UPDATE`, Java 8/11, eigene
+  Feiertagslogik, `TIMESTAMP` ohne Zeitzone mit UTC-Konvention, ein Mandant.
+
+**Paket-Einträge (MW-R10, KE-R18; Kosten aus den Sitzungsdaten, US-Dollar):**
+
+| Feld | G4-A (#45) | G4-B (#44) | G4-C (#46) |
+| --- | --- | --- | --- |
+| Inhalt | Vorlage Arbeitspaket, Playbook-Prüfung (`pruefen.ts`) | Leitfaden der Steuerung | `profile/liferay-gemeinsam.md` |
+| Stufe | S2 | S3 | S3 |
+| Kosten | 4,17 | 4,10 | 8,52 |
+| Harte Grenze | 9 | 13 | 13 |
+| Beim ersten Anlauf abgenommen | ja, mit einem Nachbesserungs-Commit | ja, mit einem Nachbesserungs-Commit | ja, mit einem Nachbesserungs-Commit |
+| Eskalation | keine | keine | keine |
+| Merge | `1d9be30` | `a4e0d8c` | `42774f8` |
+
+**Steuerung W1:** Planung und W1a 11,31 (über der Grenze von 7, wegen voller Aufträge und langer Review-Berichte), W1b 3,94.
+**Summe W1: 32,04** (Pakete 16,79, Steuerung 15,25).
+
+**Fallen und Lehren aus Welle 1:**
+
+- Kommen Tests dazu, `docs/03` per `npm run ak:abdeckung` neu erzeugen.
+- S1-Logsuche mit `tail_lines` ≥ 3000 und Suche nach `##[error]`.
+- Reviews per Hilfsagent, Berichte höchstens 20 Zeilen; Aufträge verweisen auf die Vorlage, statt sie zu wiederholen.
+- Freigaben aus „Bitte bestätigen“ hält Chris als `- [x]` in der PR-Beschreibung fest, sonst meldet AM-R05 sie als offen.
+  Steuerungen dürfen Sitzungen nicht um das Abhaken bitten.
+- **Grüne CI-Läufe kommen nicht als PR-Ereignis an** (#40, #44, #46). Deshalb setzt jede Steuerung nach jedem Push bzw.
+  „bereit“ einen `send_later`-Check-in: Klasse D nach rund 10–15 Minuten, L nach rund 30, I bzw. volle Prüfung nach rund 70.
+- Nur `cost_usd` aus den Sitzungsdaten zählt; Selbstschätzungen weichen ab.
+- Profile auf S3 liegen nahe an der Grenze (G4-C 8,5 von 13).
+- Die Steuerungs-Grundausstattung mit drei vollen Aufträgen sprengt 220 000 Token; je Welle eine frische Steuerung.
+
+**Übergabe an Welle 2:**
+
+- Vorlage und `pruefen.ts` liegen auf `main`. G4-D, G4-E und G4-F bauen auf `profile/liferay-gemeinsam.md` auf; die
+  Pfadmuster dort in Abschnitt 5 sind vorläufig.
+- Bekannte Grenze von `pruefen.ts`: Kennungen wie `claude-5` ohne Familiennamen werden nicht erkannt (Vorschlag
+  `claude-\d+(?![\d/])`).
+
 ## A – Automatisches Mergen
 
 Plan „Etappe A“, freigegeben von Chris am 13.10.2026 mit E2 bis E7 wie vorgeschlagen; E1 offen. Grundlage:
@@ -494,6 +567,9 @@ Kriterien und Entscheidung von Chris weichen voneinander ab.
 | 2 | #37 | G3 W2, J | a528d0c | nein | 11 geschützte Pfade (ci.yml, CLAUDE.md, docs/06, docs/ci-richtlinie.md, specs/00-uebersicht.md, specs/M05, specs/M08, specs/Q, Q.json, format.md, szenarien.json); zu groß (1949 > 1500); dazu falsch-positiv „Abnahme älter als letzter Push“ (Abnahme-Kommentar löst keinen neuen Lauf aus) | Chris: gemergt | nein |
 | 3 | #40 | A, A2b | de973a6 | nein | geschützte Pfade (scripts/merge-kriterien/**, docs/07) | Chris: gemergt | nein |
 | 4 | #41 | A, A2a | 6ea2275 | nein | geschützte Pfade (.github/workflows/ci.yml, docs/ci-richtlinie.md, specs/modulgraph.json); „Bitte bestätigen“ offen (AM-R05) | Chris: gemergt | nein |
+| 5 | #45 | G4 W1, A | 4bc7fcc | nein | geschützter Pfad `playbooks/**` (AM-R04); „Bitte bestätigen“ nicht als `[x]` (AM-R05); Schalter aus (AM-R12) | Chris: gemergt | nein |
+| 6 | #46 | G4 W1, C | 8076603 | nein | geschützter Pfad `profile/**` (AM-R04); Schalter aus (AM-R12); Check „Merge-Kriterien“ im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
+| 7 | #44 | G4 W1, B | 0fa1801 | nein | geschützter Pfad `playbooks/**` (AM-R04); Schalter aus (AM-R12); Check „Merge-Kriterien“ im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
 
 ### Welle 1 – Paket A1
 
