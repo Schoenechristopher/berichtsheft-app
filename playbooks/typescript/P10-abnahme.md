@@ -73,7 +73,7 @@ Fehler, meldet die Sitzung ihn der Steuerung, die das Modul-Playbook erneut verg
 6. **Testgrenzen** (Q-R06): `e2e/pruefung/testgrenzen.ts` enthält genau die in Abschnitt 8 der Q-Spec freigegebene Grenze (AK-408-03 in
    Firefox) mit Grund, Freigabe und Ersatzbeleg; sie erscheint im Bericht als übersprungen mit Begründung. Prüfschritt: Der Ersatzfall
    AK-408-05 läuft in Firefox grün; keine weitere Grenze.
-7. **Qualitätsprüfungen.** `npm run ak:abdeckung -- --pruefen` (jede AK-ID hat einen Test mit der ID im Namen, `docs/03-testabdeckung.md`
+7. **Qualitätsprüfungen.** `npm run ak:abdeckung` erzeugt `docs/03-testabdeckung.md` neu (mitcommitten), danach `npm run ak:abdeckung -- --pruefen` (jede AK-ID hat einen Test oder Prüffall, die Datei `docs/03-testabdeckung.md`
    ist aktuell), `npm run landkarte -- --pruefen` (jede Datei unter `src/domain/`, `src/lib/`, `src/app/` und `src/components/` steht in
    `specs/code-landkarte.md`), `npm run pruefumfang -- --pruefen`. Weicht ein Dateiname der Umsetzung von der Landkarte ab, ist das ein
    Befund für die Steuerung („Bitte bestätigen“), kein Anlass, die Landkarte selbst zu ändern. Prüfschritt: alle drei Befehle ohne Befund.
@@ -100,10 +100,11 @@ Fehler, meldet die Sitzung ihn der Steuerung, die das Modul-Playbook erneut verg
 | `E2E_LOGIN_MODE=test npx playwright test --project=a11y` | keine axe-Verstöße |
 | `npm run ak:abdeckung -- --pruefen`, `npm run landkarte -- --pruefen`, `npm run pruefumfang -- --pruefen` | ohne Befund |
 | `npm run lint && npm run format:check && npm run typecheck` | keine Fehler |
-| `npx tsx scripts/playbooks/pruefen.ts` | „Playbook-Prüfung: keine Befunde.“ |
+| `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` | mit vorhandenem Quellcode „Playbook-Prüfung: keine Befunde.“; im Blindtest-Branch nur Befunde „fehlender-pfad“ auf Zielpfade, die noch nicht gebaut sind (Profil, Abschnitt 5) |
 
 ## 9. Abschluss
 
+- `docs/03-testabdeckung.md` neu erzeugen und mitcommitten; die Merge-Reihenfolge der Pakete folgt KE-R05: der spätere PR gleicht per Merge mit dem Hauptzweig ab und erzeugt die Datei erneut.
 - Commit, z. B. „P10: Abnahme (Prüffälle, Browser-Matrix, Demo-Anleitung)“; vor dem Push alles lokal grün.
 - Draft-PR mit der AK-Tabelle der ganzen Umsetzung (Modul, AK-ID, Prüffälle, Test), Q-Nachweis (AK-1101, AK-1102), Testgrenze AK-408-03,
   dem Abnahmebericht und „Bitte bestätigen“.

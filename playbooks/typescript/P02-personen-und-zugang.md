@@ -13,9 +13,8 @@ sind. Zurückgestellt bis P08: AK-205-01 und AK-205-02 (sie brauchen den Erinner
 
 ## 2. Voraussetzungen
 
-- P00 abgenommen. Die Fachregeln von M02 brauchen M01 nicht, M01 und M02 dürfen deshalb parallel laufen (keine gemeinsamen
-  Dateien). Die Testschnittstelle (Schritt 9) stellt aber die Uhr aus `src/domain/clock.ts`: Wird P01 nicht zuerst gemergt, lege
-  `src/domain/clock.ts` in P02 nicht selbst an, sondern warte mit Schritt 9, bis P01 gemergt ist.
+- P00 und P01 abgenommen und gemergt. P01 und P02 laufen **nacheinander**: beide ändern `tests/pruefung/adapter.ts` und
+  `tests/pruefung/cases.ts`, und die Testschnittstelle (Schritt 9) stellt die Uhr aus `src/domain/clock.ts`.
 - Profil: Abschnitte 3 (Anmeldung, Rollen und Besitz, Persistenz, Transaktion), 5 (Umgebungsvariablen, Test-Login) und 7.
 - Keycloak ist für die lokale Prüfung nicht nötig (Test-Login); der echte OIDC-Weg wird in CI mit dem Compose-Stack geprüft.
 
@@ -60,8 +59,9 @@ Serveraktionen, (8) Seed und Testschnittstelle, (9) Adapter und Browser-Tests. Z
 | AK-208 | Ausbilder mit zugeordneten Azubis erst nach Neuzuordnung deaktivierbar; fürs Löschen und Herabstufen zählen auch deaktivierte Azubis. | 5 (5 fachlogik) | `specs/pruefung/M02.json` |
 | AK-209 | Der Admin kann das Bundesland der Firma für die Feiertage einstellen. | 5 (5 fachlogik) | `specs/pruefung/M02.json` |
 
-AK-205 (Berichte entstehen nach Anlegen und Ausbildungsstart) und die Bundesland-Einstellung AK-209 schließen den Kreis zu M03
-und M08: Die Wirkung auf Berichte und Erinnerung wird in P03 und P08 geprüft.
+AK-205 (deaktivierte Azubis erhalten keine Erinnerungen, und für sie entstehen keine neuen Wochenberichte) und die
+Bundesland-Einstellung AK-209 schließen den Kreis zu M03 und M08: Die Wirkung auf Berichte und Erinnerung wird in P03 und P08
+geprüft; die zwei Prüffälle zu AK-205 liegen in `specs/pruefung/M02.json`.
 
 ## 6. Empfehlung
 
@@ -149,12 +149,14 @@ Sitzung, Proxy) folgt ohnehin dem Profil. Weg A nur auf ausdrücklichen Auftrag.
 | `npx vitest run --project db tests/db/people.test.ts` | grün, auch gleichzeitiges Deaktivieren (AK-207) |
 | `E2E_LOGIN_MODE=test npm run test:e2e -- --project=chromium --project=smartphone-375` | alle Tests zu AK-101 bis AK-106 und AK-201 bis AK-209 und die Ablauf-Fälle AK-101-01, AK-101-02, AK-101-03, AK-106-01, AK-106-02 grün |
 | `npm run lint && npm run format:check && npm run typecheck` | keine Fehler |
-| `npx tsx scripts/playbooks/pruefen.ts` | „Playbook-Prüfung: keine Befunde.“ |
+| `npm run ak:abdeckung` | schreibt `docs/03-testabdeckung.md` neu; die Datei wird mitcommittet (Profil, Abschnitt 4). Danach meldet `npm run ak:abdeckung -- --pruefen` keinen Befund |
+| `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` | mit vorhandenem Quellcode „Playbook-Prüfung: keine Befunde.“; im Blindtest-Branch nur Befunde „fehlender-pfad“ auf Zielpfade, die noch nicht gebaut sind (Profil, Abschnitt 5) |
 
 Nur in CI: echter OIDC-Login gegen Keycloak (`E2E_LOGIN_MODE=keycloak`, AK-101 mit Firmenkonto) und Firefox/Edge; im PR vermerken.
 
 ## 9. Abschluss
 
+- `docs/03-testabdeckung.md` neu erzeugen und mitcommitten; die Merge-Reihenfolge der Pakete folgt KE-R05: der spätere PR gleicht per Merge mit dem Hauptzweig ab und erzeugt die Datei erneut.
 - Commit, z. B. „P02: Personen und Zugang (Anmeldung, Nutzerverwaltung)“; vor dem Push Lint, Format, Typecheck und Tests lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-101 bis AK-106, AK-201 bis AK-209 mit Test und Prüffällen), den zurückgestellten Fällen
   (AK-205-01, AK-205-02) und „Bitte bestätigen“. Hinweis: `src/auth.ts`, `src/proxy.ts`, `src/lib/auth/`,

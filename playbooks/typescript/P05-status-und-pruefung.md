@@ -8,9 +8,9 @@ Reihe `playbooks/typescript/` · Plattform TypeScript/Next.js · Profil `profile
 Das Statusmodell (Entwurf, Eingereicht, Freigegeben, Abgelehnt) mit Einreichen und Pflichtprüfung, Zurückziehen, Prüfliste,
 Freigeben, Ablehnen, Rücknahme der Freigabe und der Absicherung gegen gleichzeitige Änderungen ist umgesetzt. Fertig, wenn alle
 Prüffälle in `specs/pruefung/M05.json` grün sind (19 AK-IDs; 59 Fachlogik- und 36 Daten-Fälle), die Datenbanktests
-(`tests/db/transitions.test.ts`) grün sind, der Schreibschutz der Datenhaltung greift (AK-505) und die Beispielszenarien
-„Einreichen scheitert an fehlendem Text“ und „Vertretung nimmt Freigabe zurück“ im Browser laufen (Prüffälle AK-502-04 und
-AK-703-06; sie zählen im Bau-Stand „szenarien“ erst in P10). Nachweis AK-505 und AK-508: Profil, Abschnitt „Nachweis AK-505 und
+(`tests/db/transitions.test.ts`) grün sind, der Schreibschutz der Datenhaltung greift (AK-505) und die Browser-Tests zu AK-501 bis AK-508, AK-601 bis AK-607 und AK-701 bis AK-704 laufen. Die Beispielszenarien „Einreichen
+scheitert an fehlendem Text“ und „Vertretung nimmt Freigabe zurück“ (Prüffälle AK-502-04 und AK-703-06 in `specs/pruefung/szenarien.json`)
+sind in P05 vorbereitet (Schritt 11), werden aber erst in P10 verbindlich verlangt: sie brauchen Historie (P06) und die Seiten von P09. Nachweis AK-505 und AK-508: Profil, Abschnitt „Nachweis AK-505 und
 AK-508“.
 
 ## 2. Voraussetzungen
@@ -151,10 +151,12 @@ die Daten-Fälle zeigen Gleichzeitigkeit deterministisch (`gesehen`). Weg A nur 
 | `npx vitest run --project db tests/db/transitions.test.ts` | grün, auch AK-508 mit `Promise.all` |
 | `E2E_LOGIN_MODE=test npm run test:e2e -- --project=chromium --project=smartphone-375 e2e/ak-501-803-einreichen-pruefen.spec.ts` | Tests zu AK-501 bis AK-508, AK-601 bis AK-607, AK-701 bis AK-704 grün |
 | `npm run lint && npm run format:check && npm run typecheck` | keine Fehler |
-| `npx tsx scripts/playbooks/pruefen.ts` | „Playbook-Prüfung: keine Befunde.“ |
+| `npm run ak:abdeckung` | schreibt `docs/03-testabdeckung.md` neu; die Datei wird mitcommittet (Profil, Abschnitt 4). Danach meldet `npm run ak:abdeckung -- --pruefen` keinen Befund |
+| `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` | mit vorhandenem Quellcode „Playbook-Prüfung: keine Befunde.“; im Blindtest-Branch nur Befunde „fehlender-pfad“ auf Zielpfade, die noch nicht gebaut sind (Profil, Abschnitt 5) |
 
 ## 9. Abschluss
 
+- `docs/03-testabdeckung.md` neu erzeugen und mitcommitten; die Merge-Reihenfolge der Pakete folgt KE-R05: der spätere PR gleicht per Merge mit dem Hauptzweig ab und erzeugt die Datei erneut.
 - Commit, z. B. „P05: Status und Prüfung (Statusmodell, Einreichen, Prüfliste)“; vor dem Push alles lokal grün.
 - Draft-PR mit der AK-Tabelle (alle AK-IDs aus Abschnitt 5 mit Test und Prüffällen), dem Nachweis AK-505 und AK-508 (Verweis
   auf das Profil) und „Bitte bestätigen“.

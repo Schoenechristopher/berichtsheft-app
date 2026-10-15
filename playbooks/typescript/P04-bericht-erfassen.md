@@ -102,12 +102,14 @@ auf ausdrücklichen Auftrag.
 | `npx vitest run --project db tests/db/reports.test.ts` | grün |
 | `E2E_LOGIN_MODE=test npm run test:e2e -- --project=chromium --project=smartphone-375 e2e/pruefung-ablauf.spec.ts e2e/ak-301-408-berichte-erfassen.spec.ts` | Ablauf-Fälle zu M04 (AK-403-01, AK-403-02, AK-408-01 bis AK-408-07) und Tests zu AK-401 bis AK-408 grün |
 | `npm run lint && npm run format:check && npm run typecheck` | keine Fehler |
-| `npx tsx scripts/playbooks/pruefen.ts` | „Playbook-Prüfung: keine Befunde.“ |
+| `npm run ak:abdeckung` | schreibt `docs/03-testabdeckung.md` neu; die Datei wird mitcommittet (Profil, Abschnitt 4). Danach meldet `npm run ak:abdeckung -- --pruefen` keinen Befund |
+| `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` | mit vorhandenem Quellcode „Playbook-Prüfung: keine Befunde.“; im Blindtest-Branch nur Befunde „fehlender-pfad“ auf Zielpfade, die noch nicht gebaut sind (Profil, Abschnitt 5) |
 
 Nur in CI: Firefox und Edge (AK-408-03 in Firefox ist die freigegebene Testgrenze).
 
 ## 9. Abschluss
 
+- `docs/03-testabdeckung.md` neu erzeugen und mitcommitten; die Merge-Reihenfolge der Pakete folgt KE-R05: der spätere PR gleicht per Merge mit dem Hauptzweig ab und erzeugt die Datei erneut.
 - Commit, z. B. „P04: Bericht erfassen (Editor, Speichern, Warnung beim Verlassen)“; vor dem Push alles lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-401, AK-402, AK-403, AK-405, AK-406, AK-407, AK-408 mit Test und Prüffällen) und „Bitte bestätigen“.
 - Bericht an die Steuerung; `FORTSCHRITT.md` schreibt die Steuerung.

@@ -72,7 +72,8 @@ AK die Prüffälle:
    `now()`. Prüfschritt: `src/domain/report-generation.test.ts`.
 4. **Anlegen `src/lib/reports.ts`** (M03-R01 bis M03-R13, AK-301 bis AK-305, AK-203, AK-205): `ensureReportsForTrainee()` und
    `ensureReportsForAllTrainees()` legen fehlende Berichte und Tage in **einer** Transaktion an; Eindeutigkeit gibt die Datenbank
-   (`createMany` mit `skipDuplicates`): zwei gleichzeitige Aufrufe erzeugen keine Doppelten. Idempotent. Vorbelegte Feiertage
+   (`createMany` mit `skipDuplicates`): zwei gleichzeitige Aufrufe erzeugen keine Doppelten. Idempotent. Für **deaktivierte Azubis entstehen keine neuen Berichte**, bestehende bleiben (M03-R06, AK-205); `ensureReportsForAllTrainees()`
+   nimmt deshalb nur aktive Azubis (`listActiveTrainees()` aus P02). Vorbelegte Feiertage
    werden nie neu berechnet. Die Neuberechnung nach einer Zeitraumänderung läuft nur in offenen Berichten, auch für Wochen ganz
    außerhalb. Prüfschritt: `tests/db/reports.test.ts` (Name beginnt mit der AK-ID) für AK-301 bis AK-306, AK-203, AK-205.
 5. **Übersichten.** `listTraineeWeeks()` (Wochen neueste zuerst, eingeordnet, ausgeblendete fehlen; Zugriff Azubi und Ausbilder,
@@ -82,7 +83,7 @@ AK die Prüffälle:
 6. **Aufrufe einhängen.** Das Anlegen läuft beim Aufruf der Seiten von Azubi und Ausbilder, nach jeder Änderung in der
    Nutzerverwaltung (Anlegen, Ausbildungszeitraum, Bundesland, aktiv/deaktiviert, M02) und, sobald sie existieren, vor
    PDF-Export (P07) und Erinnerung (P08). Prüfschritt: Neue Person anlegen (Browser, Test-Login) erzeugt ihre Wochen sofort
-   (AK-205).
+   (AK-301); eine deaktivierte Person bekommt beim nächsten Lauf keine neuen Wochen (AK-205).
 7. **Seiten (funktional).** `src/app/(app)/azubi/page.tsx` (Start: aktuelle Woche mit dem Merker `data-woche`, „Zu erledigen“),
    `src/app/(app)/azubi/wochen/page.tsx` mit `src/components/WeekOverview.tsx` (Meine Wochen), `src/components/ui/week-tile.tsx`,
    Ausbilder-Sicht `src/app/(app)/ausbilder/azubis/page.tsx` und `src/app/(app)/ausbilder/azubis/[id]/page.tsx` mit
@@ -105,10 +106,12 @@ AK die Prüffälle:
 | `npx vitest run --project db tests/db/reports.test.ts` | grün (AK-301 bis AK-306, AK-203, AK-205, KW 53 in der Datenbank) |
 | `E2E_LOGIN_MODE=test npm run test:e2e -- --project=chromium --project=smartphone-375 e2e/ak-103-105-berichte.spec.ts e2e/ak-301-408-berichte-erfassen.spec.ts` | Tests zu AK-103, AK-105 und AK-301 bis AK-306 grün |
 | `npm run lint && npm run format:check && npm run typecheck` | keine Fehler |
-| `npx tsx scripts/playbooks/pruefen.ts` | „Playbook-Prüfung: keine Befunde.“ |
+| `npm run ak:abdeckung` | schreibt `docs/03-testabdeckung.md` neu; die Datei wird mitcommittet (Profil, Abschnitt 4). Danach meldet `npm run ak:abdeckung -- --pruefen` keinen Befund |
+| `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` | mit vorhandenem Quellcode „Playbook-Prüfung: keine Befunde.“; im Blindtest-Branch nur Befunde „fehlender-pfad“ auf Zielpfade, die noch nicht gebaut sind (Profil, Abschnitt 5) |
 
 ## 9. Abschluss
 
+- `docs/03-testabdeckung.md` neu erzeugen und mitcommitten; die Merge-Reihenfolge der Pakete folgt KE-R05: der spätere PR gleicht per Merge mit dem Hauptzweig ab und erzeugt die Datei erneut.
 - Commit, z. B. „P03: Wochenberichte entstehen (Wochenerzeugung, Übersichten)“; vor dem Push Lint, Format, Typecheck und Tests
   lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-301 bis AK-306 mit Test und Prüffällen), dem zurückgestellten Fall AK-305-09 und „Bitte

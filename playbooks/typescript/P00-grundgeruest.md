@@ -7,8 +7,8 @@ Reihe `playbooks/typescript/` · Plattform TypeScript/Next.js · Profil `profile
 
 Eine leere App startet, der Prüf-Adapter läuft, die Testdaten sind eingelesen. Fertig, wenn:
 
-1. `npm ci`, `npm run lint`, `npm run format:check`, `npm run typecheck` und `npm test` laufen grün (noch ohne Fachcode, mit den
-   Platzhaltertests aus Schritt 8).
+1. `npm ci`, `npm run lint` und `npm run format:check` laufen grün; `npm run typecheck` und `npm test` nach Schritt 6 bzw. 8
+   (noch ohne Fachcode, mit den Platzhaltertests aus Schritt 8).
 2. `npm run dev` startet die App; `GET /api/health` antwortet mit Status 200 und fragt die Datenbank ab.
 3. Die Prüf-Runner der drei Ebenen (Fachlogik, Daten, Ablauf) sind angelegt und laden alle Dateien aus `specs/pruefung/`. Sie
    führen die Fälle der Module aus, die gebaut sind (Bau-Stand, Schritt 8); alle anderen Fälle erscheinen sichtbar als „noch
@@ -82,9 +82,10 @@ einen Vergleich ausdrücklich beauftragt.
 3. **Prisma-Schema anlegen, dann installieren.** `prisma/schema.prisma` mit `generator client` (`provider = "prisma-client"`,
    `output = "../src/generated/prisma"`) und `datasource db` (`provider = "postgresql"`), noch ohne Modelle. Erst danach
    `npm ci` (das `postinstall`-Skript ruft `prisma generate` und braucht das Schema; alternativ `npm ci --ignore-scripts` und
-   `npx prisma generate`). Prüfschritt: `src/generated/prisma/` entsteht; `src/generated/` steht in `.gitignore`.
-4. **Konfiguration vervollständigen** nach Profil, Abschnitt 2.2 (nur fehlende Dateien). Prüfschritt: `npm run lint`,
-   `npm run format:check` und `npm run typecheck` laufen durch.
+   `npx prisma generate`). Prüfschritt: `src/generated/prisma/` entsteht; `src/generated/` steht in `.gitignore`. Auch `scripts/playbooks/pruefen.ts` und die
+   Tests unter `scripts/` brauchen den erzeugten Client: vor jedem Prüflauf `npx prisma generate`.
+4. **Konfiguration vervollständigen** nach Profil, Abschnitt 2.2 (nur fehlende Dateien). Prüfschritt: `npm run lint` und
+   `npm run format:check` laufen durch (`npm run typecheck` erst nach Schritt 6: `next typegen` bricht ohne `src/app` ab).
 5. **Datenbankzugang `src/lib/db.ts`.** `createPrismaClient(url)` baut `PrismaClient` mit `@prisma/adapter-pg` (`PrismaPg`) und
    zwingt die Sitzung in UTC (`DB_SESSION_OPTIONS`, Wert `"-c TimeZone=UTC"`, als `options` an `PrismaPg`; der Client wird aus
    `@/generated/prisma/client` importiert); `db()` liefert eine gemeinsame
@@ -92,7 +93,8 @@ einen Vergleich ausdrücklich beauftragt.
    `TZ=Europe/Berlin` einen `timestamptz` schreiben und lesen und erhält denselben Zeitpunkt (der vollständige Test
    `tests/db/timezone.test.ts` entsteht in P06).
 6. **Gesundheitsprüfung.** `GET /api/health` führt `SELECT 1` über `db()` aus und antwortet mit 200 und `{ "status": "ok" }`,
-   bei Datenbankfehler mit 503. Prüfschritt: `curl -s -o /dev/null -w "%{http_code}" localhost:3000/api/health` liefert `200`.
+   bei Datenbankfehler mit 503. Prüfschritt: `curl -s -o /dev/null -w "%{http_code}" localhost:3000/api/health` liefert `200`; jetzt läuft auch
+   `npm run typecheck` ohne Fehler.
 7. **Test-Hilfen der Datenbank.** `tests/db/global-setup.ts` führt `prisma migrate deploy` gegen `TEST_DATABASE_URL` aus und
    scheitert ohne diese Variable mit einer verständlichen Meldung. `tests/db/helpers.ts` bietet `testDb()` (Client über
    `createPrismaClient`) und `resetDatabase()`. Es leert zuerst die Azubis, dann alle Personen (die Kaskade entfernt Berichte und Historie, die per Trigger
@@ -120,8 +122,10 @@ einen Vergleich ausdrücklich beauftragt.
     liest die Datei (Gerüst); das Anlegen der Personen folgt in P02, wenn es `Person` gibt. Prüfschritt: der Testdaten-Test ist
     grün; `npm run db:seed` läuft ohne Fehler durch (legt noch nichts an).
 11. **Profil bestätigen.** Zu jeder Zeile von Profil, Abschnitt 3, den Eintrag „Pfad vorhanden / folgt in Pn“ prüfen und
-    Abweichungen in den PR unter „Bitte bestätigen“ schreiben. Prüfschritt: `npx tsx scripts/playbooks/pruefen.ts` meldet keine
-    Befunde.
+    Abweichungen in den PR unter „Bitte bestätigen“ schreiben. Prüfschritt: `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` meldet mit
+    vorhandenem Quellcode keine Befunde. Im Blindtest-Branch meldet die Prüfung „fehlender-pfad“ für jeden Zielpfad unter `src/`,
+    `prisma/`, `e2e/` und `tests/`, der noch nicht gebaut ist; das ist bis zum Bau erwartet und hängt von einer Werkzeuganpassung ab
+    (Profil, Abschnitt 5, „Prüfung der Playbooks im Blindtest“).
 12. **Compose und Container.** `docker-compose.yml`, `Dockerfile` und `docker/start-app.sh` sind vorhanden und werden nur gegen
     die Umgebungsvariablen aus `.env.example` abgeglichen. Container laufen in der Cloud-Sitzung nicht; der Stack wird in
     GitHub Actions geprüft. Prüfschritt: `docker compose config` ist nicht nötig; im PR steht, dass der Stack nur in CI läuft.
@@ -137,7 +141,8 @@ einen Vergleich ausdrücklich beauftragt.
 | `npm run test:db` | globales Setup migriert, Daten-Fälle als `todo` |
 | `curl localhost:3000/api/health` (bei `npm run dev`) | HTTP 200 |
 | `E2E_LOGIN_MODE=test npx playwright test --list --project=chromium` | Ablauf-Fälle werden gefunden |
-| `npx tsx scripts/playbooks/pruefen.ts` | „Playbook-Prüfung: keine Befunde.“ |
+| `npm run ak:abdeckung` | schreibt `docs/03-testabdeckung.md` neu; die Datei wird mitcommittet (Profil, Abschnitt 4). Danach meldet `npm run ak:abdeckung -- --pruefen` keinen Befund |
+| `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` | mit vorhandenem Quellcode „Playbook-Prüfung: keine Befunde.“; im Blindtest-Branch nur Befunde „fehlender-pfad“ auf Zielpfade, die noch nicht gebaut sind (Profil, Abschnitt 5) |
 
 ## 9. Abschluss
 

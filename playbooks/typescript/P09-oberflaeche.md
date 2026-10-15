@@ -134,12 +134,14 @@ Darstellung) und (b) Schritte 7 und 8 (Fokus, Barrierefreiheit, Prüfaktionen) �
 | `E2E_LOGIN_MODE=test npx playwright test e2e/ui-ak.spec.ts --project=chromium --project=smartphone-375` | alle UI-AK grün |
 | `E2E_LOGIN_MODE=test npx playwright test --project=a11y` | keine axe-Verstöße |
 | `npm run lint && npm run format:check && npm run typecheck` | keine Fehler |
-| `npx tsx scripts/playbooks/pruefen.ts` | „Playbook-Prüfung: keine Befunde.“ |
+| `npm run ak:abdeckung` | schreibt `docs/03-testabdeckung.md` neu; die Datei wird mitcommittet (Profil, Abschnitt 4). Danach meldet `npm run ak:abdeckung -- --pruefen` keinen Befund |
+| `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` | mit vorhandenem Quellcode „Playbook-Prüfung: keine Befunde.“; im Blindtest-Branch nur Befunde „fehlender-pfad“ auf Zielpfade, die noch nicht gebaut sind (Profil, Abschnitt 5) |
 
 Nur in CI: Firefox und Edge für alle Ablauf-Fälle; Screenshots der Hauptseiten (`--project=screenshots`).
 
 ## 9. Abschluss
 
+- `docs/03-testabdeckung.md` neu erzeugen und mitcommitten; die Merge-Reihenfolge der Pakete folgt KE-R05: der spätere PR gleicht per Merge mit dem Hauptzweig ab und erzeugt die Datei erneut.
 - Commit, z. B. „P09: Oberfläche (Rahmen, Seiten, Darstellung, Barrierefreiheit)“; vor dem Push alles lokal grün.
 - Draft-PR mit der UI-AK-Tabelle (UI-AK-01 bis UI-AK-20 mit Test und Prüffällen) und „Bitte bestätigen“; Screenshots nur mit Testdaten.
 - Bericht an die Steuerung; `FORTSCHRITT.md` schreibt die Steuerung.

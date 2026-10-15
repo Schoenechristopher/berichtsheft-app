@@ -14,7 +14,7 @@ zurückgestellten Fälle AK-205-01 und AK-205-02 aus `specs/pruefung/M02.json` l
 
 ## 2. Voraussetzungen
 
-- P00 bis P07 abgenommen (Statuswechsel aus P05 mit dem Einhängepunkt `TransitionEvent`, Wochen aus P03, Rücksprung aus P02).
+- P00 bis P06 abgenommen (M08 hängt von M02, M03 und M05 ab, nicht von M07; Statuswechsel aus P05 mit dem Einhängepunkt `TransitionEvent`, Wochen aus P03, Rücksprung aus P02).
 - Profil: Abschnitte 3 (Hintergrundjobs, E-Mail, Teams, Benachrichtigung in der App), 5 (SMTP, Teams-Modus) und 7 („Genau einmal“,
   UTC, Uhr). Mailpit gibt es nur im Compose-Stack (CI); lokal ein SMTP-Mock (`tests/smtp-mock.ts`).
 
@@ -58,7 +58,7 @@ Transaktion des Statuswechsels, (4) Versandlauf mit Kanälen, (5) Erinnerungslau
 | AK-1024 | Erinnerung und Information gehen jeden Montag erneut raus, bis die Woche eingereicht ist. | 4 (3 fachlogik, 1 daten) | `specs/pruefung/M08.json` |
 | AK-1025 | Sind mehrere Wochen offen, nennt die Erinnerung alle in einer Nachricht. | 2 (2 fachlogik) | `specs/pruefung/M08.json` |
 
-AK-205 (Erinnerung für neu angelegte oder deaktivierte Personen) gehört zu M02; seine zwei Prüffälle in `specs/pruefung/M02.json` laufen
+AK-205 (deaktivierte Azubis erhalten keine Erinnerungen, ihr Ausbilder keine Information zu ihnen, M08-R22) gehört zu M02; seine zwei Prüffälle in `specs/pruefung/M02.json` laufen
 mit diesem Playbook an.
 
 ## 6. Empfehlung
@@ -134,12 +134,14 @@ Abschnitt 3): zuerst Ausgangskorb und Versand (Schritte 3 bis 5, neuartig), dana
 | `npx vitest run --project db tests/db/notifications.test.ts tests/db/reminders.test.ts` | grün, auch zwei parallele Versandläufe |
 | `E2E_LOGIN_MODE=test npm run test:e2e -- --project=chromium --project=smartphone-375 e2e/ak-1001-1025-benachrichtigungen.spec.ts` | Tests zu AK-1001 bis AK-1004, AK-1011 bis AK-1015, AK-1021 bis AK-1025 grün |
 | `npm run lint && npm run format:check && npm run typecheck` | keine Fehler |
-| `npx tsx scripts/playbooks/pruefen.ts` | „Playbook-Prüfung: keine Befunde.“ |
+| `npm run ak:abdeckung` | schreibt `docs/03-testabdeckung.md` neu; die Datei wird mitcommittet (Profil, Abschnitt 4). Danach meldet `npm run ak:abdeckung -- --pruefen` keinen Befund |
+| `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` | mit vorhandenem Quellcode „Playbook-Prüfung: keine Befunde.“; im Blindtest-Branch nur Befunde „fehlender-pfad“ auf Zielpfade, die noch nicht gebaut sind (Profil, Abschnitt 5) |
 
 Nur in CI: E-Mail an Mailpit im Compose-Stack (`http://localhost:8025`), Firefox und Edge.
 
 ## 9. Abschluss
 
+- `docs/03-testabdeckung.md` neu erzeugen und mitcommitten; die Merge-Reihenfolge der Pakete folgt KE-R05: der spätere PR gleicht per Merge mit dem Hauptzweig ab und erzeugt die Datei erneut.
 - Commit, z. B. „P08: Benachrichtigungen und Erinnerung (Ausgangskorb, Glocke, Montags-Lauf)“; vor dem Push alles lokal grün.
 - Draft-PR mit der AK-Tabelle (alle AK-IDs aus Abschnitt 5 mit Test und Prüffällen, dazu AK-205), Hinweis auf nur in CI geprüfte
   Teile (Mailpit) und „Bitte bestätigen“ (insbesondere Teams-Postfach der Demo und Graph).

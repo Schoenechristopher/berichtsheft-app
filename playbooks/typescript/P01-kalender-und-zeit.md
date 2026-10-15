@@ -12,7 +12,8 @@ Ebene `fachlogik`) und die Unit-Tests zu den Regeln M01-R01 bis M01-R19 grün si
 ## 2. Voraussetzungen
 
 - P00 ist abgenommen (Gerüst, Prüf-Runner mit Bau-Stand).
-- M01 hängt von keinem Modul ab; M02 kann parallel laufen (`specs/00-uebersicht.md`, „Abhängigkeiten“), sie teilen keine Dateien.
+- M01 hängt von keinem Modul ab, wird aber **vor** P02 gebaut: P01 und P02 ändern beide `tests/pruefung/adapter.ts` und
+  `tests/pruefung/cases.ts`, und P02 braucht `src/domain/clock.ts` (Profil, Abschnitt „Bitte bestätigen“, zur Parallelität).
 - Profil: Abschnitte 1, 3 (Uhr) und 7 (Uhr, UTC).
 
 ## 3. Eingaben
@@ -93,11 +94,12 @@ Weg A nur auf ausdrücklichen Auftrag.
 | `npx vitest run --project unit tests/pruefung/fachlogik.test.ts -t "M01.json"` | 50 Prüffälle grün |
 | `npx vitest run --project unit src/domain/clock.test.ts src/domain/weeks.test.ts src/domain/federal-states.test.ts src/domain/holidays.test.ts` | grün |
 | `npm run lint && npm run format:check && npm run typecheck` | keine Fehler |
-| `npm run ak:abdeckung -- --pruefen` | AK-404 und AK-1201 bis AK-1206 haben je einen Test mit AK-ID im Namen (noch fehlende Module anderer Playbooks erscheinen als offen; nur M01 zählt hier) |
-| `npx tsx scripts/playbooks/pruefen.ts` | „Playbook-Prüfung: keine Befunde.“ |
+| `npm run ak:abdeckung` | schreibt `docs/03-testabdeckung.md` neu; die Datei wird mitcommittet (Profil, Abschnitt 4). Danach meldet `npm run ak:abdeckung -- --pruefen` keinen Befund |
+| `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` | mit vorhandenem Quellcode „Playbook-Prüfung: keine Befunde.“; im Blindtest-Branch nur Befunde „fehlender-pfad“ auf Zielpfade, die noch nicht gebaut sind (Profil, Abschnitt 5) |
 
 ## 9. Abschluss
 
+- `docs/03-testabdeckung.md` neu erzeugen und mitcommitten; die Merge-Reihenfolge der Pakete folgt KE-R05: der spätere PR gleicht per Merge mit dem Hauptzweig ab und erzeugt die Datei erneut.
 - Commit, z. B. „P01: Kalender und Zeit (Uhr, ISO-Wochen, Feiertage)“; vor dem Push Lint, Format, Typecheck und Tests lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-404, AK-1201, AK-1202, AK-1203, AK-1204, AK-1205, AK-1206: Test und Prüffälle), Abweichungen
   und „Bitte bestätigen“.

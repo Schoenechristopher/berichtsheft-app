@@ -96,10 +96,12 @@ Bau-Reihenfolge: (1) Trigger für Unveränderlichkeit mit festem Fehlercode, (2)
 | `npx vitest run --project db tests/db/status-change.test.ts tests/db/timezone.test.ts tests/db/transitions.test.ts` | grün |
 | `E2E_LOGIN_MODE=test npm run test:e2e -- --project=chromium --project=smartphone-375 e2e/ak-501-803-einreichen-pruefen.spec.ts` | Tests zu AK-801 bis AK-803 grün |
 | `npm run lint && npm run format:check && npm run typecheck` | keine Fehler |
-| `npx tsx scripts/playbooks/pruefen.ts` | „Playbook-Prüfung: keine Befunde.“ |
+| `npm run ak:abdeckung` | schreibt `docs/03-testabdeckung.md` neu; die Datei wird mitcommittet (Profil, Abschnitt 4). Danach meldet `npm run ak:abdeckung -- --pruefen` keinen Befund |
+| `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` | mit vorhandenem Quellcode „Playbook-Prüfung: keine Befunde.“; im Blindtest-Branch nur Befunde „fehlender-pfad“ auf Zielpfade, die noch nicht gebaut sind (Profil, Abschnitt 5) |
 
 ## 9. Abschluss
 
+- `docs/03-testabdeckung.md` neu erzeugen und mitcommitten; die Merge-Reihenfolge der Pakete folgt KE-R05: der spätere PR gleicht per Merge mit dem Hauptzweig ab und erzeugt die Datei erneut.
 - Commit, z. B. „P06: Historie (unveränderlich, nach Prüfrunde)“; vor dem Push alles lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-801, AK-802, AK-803 mit Test und Prüffällen), dem Nachweis AK-803 (Verweis auf das Profil) und
   „Bitte bestätigen“.

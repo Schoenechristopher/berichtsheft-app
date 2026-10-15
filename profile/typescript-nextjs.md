@@ -39,7 +39,7 @@ wählt P00 die jeweils aktuelle Version der oben genannten Hauptversion und häl
 ### 2.1 Zielstruktur
 
 ```text
-specs/ docs/ playbooks/ profile/   Vorgaben (nicht ändern)
+specs/ docs/ playbooks/ profile/   Vorgaben (nicht ändern; einzige Ausnahme: die erzeugte Datei docs/03-testabdeckung.md)
 scripts/                            Werkzeuge der Qualitätssicherung (vorhanden, nicht ändern)
 assets/fonts/                       Noto Sans (vorhanden)
 keycloak/realm-berichtsheft.json    Demo-Realm (vorhanden)
@@ -95,7 +95,7 @@ Vorhandene Dateien prüft P00 nur; fehlende legt P00 an.
 ### 2.4 Build
 
 `npm run build` baut die App für den Produktivbetrieb; `npx prisma generate` muss vorher gelaufen sein (der Client liegt in
-`src/generated/prisma/`). Ein Image (`Dockerfile`) enthält App und Worker; `docker/start-app.sh` wendet die Migrationen an,
+`src/generated/prisma/`; auch `scripts/playbooks/pruefen.ts` und die Tests unter `scripts/` brauchen ihn). Ein Image (`Dockerfile`) enthält App und Worker; `docker/start-app.sh` wendet die Migrationen an,
 lädt auf Wunsch den Seed (`SEED_DEMO_DATA=true`) und startet `next start`.
 
 ## 3. Abbildung der Bausteine
@@ -170,8 +170,10 @@ Profils.
 - **Weitere Tests.** Vitest neben dem Code (`src/domain/*.test.ts` u. a.), Datenbanktests unter `tests/db/`, Playwright je
   Modul unter `e2e/` (Dateinamen mit AK-Bereich, z. B. `e2e/ak-501-803-einreichen-pruefen.spec.ts`), dazu
   `e2e/barrierefreiheit.spec.ts` (axe, UI-AK-16), `e2e/ui-ak.spec.ts`, `e2e/beispielszenarien.spec.ts`.
-- **Abdeckung.** `npm run ak:abdeckung -- --pruefen` verlangt zu jeder AK-ID mindestens einen Test mit der ID im Namen;
-  `docs/03-testabdeckung.md` wird davon erzeugt.
+- **Abdeckung.** Jede AK-ID braucht mindestens einen Test oder Prüffall; Prüffälle zählen als Abdeckung. `npm run ak:abdeckung`
+  erzeugt `docs/03-testabdeckung.md` neu, `npm run ak:abdeckung -- --pruefen` scheitert, wenn die Datei veraltet ist. Jedes Playbook
+  erzeugt die Datei neu und committet sie mit; das ist die einzige Ausnahme vom Verbot, `docs/**` zu ändern. Die Merge-Reihenfolge der
+  Pakete folgt KE-R05: der spätere PR gleicht per Merge mit dem Hauptzweig ab und erzeugt die Datei erneut.
 - **Daten.** Nur Testdaten aus `specs/pruefung/testdaten.json` (Anna, Bernd, Clara; Dora und Emil für die Fälle ohne
   Eintrag). Der Seed `prisma/seed.ts` legt sie idempotent an, mit Annas Beispielbericht KW 40/2026.
 
@@ -206,6 +208,14 @@ CI-Lauf: Diagnosemeldungen früh einbauen. Im PR vermerken, was nur CI prüft.
 auf „bereit“ setzen, wenn lokal alles grün ist. Jobs: Umfang, Lint/Format/Typecheck/Vitest/AK-Abdeckung/Landkarte,
 Docker Compose mit Playwright (Chromium, Firefox, Edge, 375 px, axe, Screenshots). Logs und Artefakte enthalten nur Testdaten,
 Workflows nutzen keine Geheimnisse.
+
+**Prüfung der Playbooks im Blindtest.** `scripts/playbooks/pruefung.ts` nimmt nur `playbooks/` und `profile/` von der Pfadprüfung aus
+(`FUTURE_DIRS`). Im Blindtest-Branch ohne `src/`, `prisma/`, `e2e/` und `tests/` meldet
+`npx tsx scripts/playbooks/pruefen.ts` deshalb für jeden genannten Zielpfad dieser Ordner den Befund „fehlender-pfad“, und der Test
+`scripts/playbooks/repository.test.ts` (damit `npm test` und die CI) scheitert. Das ist bis zum Bau der jeweiligen Datei erwartet und
+kein Fehler der Playbooks. Ohne Werkzeuganpassung gilt im Blindtest als grün: Lint, Format, Typecheck, die Prüf-Runner des gebauten
+Moduls und die Qualitätsprüfungen nach P10; `pruefen.ts` ist erst nach dem Bau (oder mit der Anpassung unter „Bitte bestätigen“) das
+Kriterium.
 
 ## 6. Bewusste Abweichungen
 
@@ -314,5 +324,15 @@ Update bedingt ist und dass die Sperre vor dem Lesen des Stands liegt.
       in fester Reihenfolge verlangt; Abschnitt 3 verweist darauf.
 - [ ] **Fehlergründe AK-508:** Die Prüffall-Codes stehen in M05-R20 und sind maßgeblich; die Namen der Gründe im Code
       (`withdrawn-meanwhile` usw.) sind Beispiele der Referenz und für andere Umsetzungen frei wählbar.
+- [ ] **Werkzeugpaket vor dem Blindtest (Vorschlag):** Ein eigenes kleines Paket ändert `scripts/playbooks/` so, dass die Prüfung im
+      Blindtest nicht an Zielpfaden scheitert, entweder (a) ein Schalter (z. B. Umgebungsvariable `PLAYBOOKS_BLINDTEST=1`), der
+      „fehlender-pfad“ für `src/`, `prisma/`, `e2e/` und `tests/` unterdrückt, oder (b) Zielpfade, die ein Playbook ausdrücklich als
+      „anzulegen“ markiert, gelten als zukünftig (wie `playbooks/` und `profile/` in `FUTURE_DIRS`). Es muss vor dem Blindtest laufen;
+      `scripts/**` ist für dieses Paket tabu.
+- [ ] **Ausnahme für `docs/03-testabdeckung.md`:** Jedes Playbook erzeugt die Datei mit `npm run ak:abdeckung` neu und committet sie;
+      sonst scheitert `npm run ak:abdeckung -- --pruefen` in der CI. Das ist die einzige Ausnahme vom Verbot, `docs/**` zu ändern.
+- [ ] **Reihenfolge M01 und M02:** `specs/00-uebersicht.md` und `docs/06-spec-architektur.md` nennen sie parallel möglich. P01 und P02
+      ändern aber beide `tests/pruefung/adapter.ts` und `tests/pruefung/cases.ts`, und P02 braucht `src/domain/clock.ts`; die Playbooks
+      bauen sie deshalb nacheinander.
 - [ ] **Zielstruktur:** Die Dateinamen unter `src/`, `tests/` und `e2e/` sind eine Konvention der Referenz; ein Aufbau aus der
       Spec darf sie wählen, solange die Landkarte-Zuordnung je Modul gleich lesbar bleibt.

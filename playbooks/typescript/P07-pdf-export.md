@@ -99,10 +99,12 @@ nur auf ausdrücklichen Auftrag.
 | `npx vitest run --project db tests/db/pdf-export.test.ts` | grün |
 | `E2E_LOGIN_MODE=test npm run test:e2e -- --project=chromium --project=smartphone-375 e2e/ak-901-907-pdf-export.spec.ts` | Tests zu AK-901 bis AK-907 grün |
 | `npm run lint && npm run format:check && npm run typecheck` | keine Fehler |
-| `npx tsx scripts/playbooks/pruefen.ts` | „Playbook-Prüfung: keine Befunde.“ |
+| `npm run ak:abdeckung` | schreibt `docs/03-testabdeckung.md` neu; die Datei wird mitcommittet (Profil, Abschnitt 4). Danach meldet `npm run ak:abdeckung -- --pruefen` keinen Befund |
+| `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` | mit vorhandenem Quellcode „Playbook-Prüfung: keine Befunde.“; im Blindtest-Branch nur Befunde „fehlender-pfad“ auf Zielpfade, die noch nicht gebaut sind (Profil, Abschnitt 5) |
 
 ## 9. Abschluss
 
+- `docs/03-testabdeckung.md` neu erzeugen und mitcommitten; die Merge-Reihenfolge der Pakete folgt KE-R05: der spätere PR gleicht per Merge mit dem Hauptzweig ab und erzeugt die Datei erneut.
 - Commit, z. B. „P07: PDF-Export (Einzel- und Sammel-PDF, Freigabevermerk)“; vor dem Push alles lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-901 bis AK-907 mit Test und Prüffällen) und „Bitte bestätigen“. `src/pdf/**` löst in der CI die volle
   Prüfung aus (Änderungsklasse L, `docs/ci-richtlinie.md`).
