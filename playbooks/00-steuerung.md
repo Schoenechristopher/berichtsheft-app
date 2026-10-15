@@ -10,7 +10,7 @@ Er ist **keine neue Regel**: Maßgeblich sind `docs/06-spec-architektur.md`, `do
 15.10.2026“**; widerspricht es einer freigegebenen Datei, gilt die Datei.
 
 Lesereihenfolge beim Start: dieser Leitfaden, dann `CLAUDE.md`, dann die letzte Übergabe in `FORTSCHRITT.md`, dann
-gezielt die Regel-Abschnitte, auf die ein Schritt verweist (KE-R09).
+gezielt die Regel-Abschnitte, auf die ein Schritt verweist (KE-R09 sinngemäß).
 
 ## 1. Rolle und Grenzen
 
@@ -25,16 +25,17 @@ Grenzen der Steuerung:
 
 - **Selbst nicht entwickeln (KE-R07):** Diffs und Prüfergebnisse lesen, nicht den ganzen Code. Keine CI-Logs selbst
   lesen; breite Suchen, Logs und lokale Prüfläufe gehen an einen Hilfsagenten der Stufe S1 (KE-R03, KE-R16).
-- **Frische Steuerung (KE-R03):** je Welle bzw. Sitzung höchstens 6–8 US-Dollar oder 200 000–250 000 Token Kontext;
-  dann Übergabe (Abschnitt 11) und Ende. Schon Lesen, Aufträge und PR-Ereignisse füllen 100 000–180 000 Token; die
-  Kontextgrenze kommt meist vor der Kostengrenze (Entscheidungen 13./14.10.2026).
+- **Frische Steuerung je Welle (KE-R03):** nach jeder Welle Übergabe (Abschnitt 11) und Ende.
+- **Grenzen je Welle bzw. Sitzung** (`FORTSCHRITT.md`, „Entscheidungen und Verfahren“): höchstens 6–8 US-Dollar oder
+  200 000–250 000 Token Kontext, dann Übergabe. Schon Lesen, Aufträge und PR-Ereignisse füllen 100 000–180 000 Token;
+  die Kontextgrenze kommt meist vor der Kostengrenze.
 - **Kurze Aufgaben auslagern:** Doku-PR schreiben oder einen PR bis zum Merge begleiten in eine eigene kleine Sitzung
   (S2) mit 3–5 US-Dollar Grenze.
 - Eigenen Verbrauch regelmäßig prüfen: `get_session` ohne `session_id`, Feld `usage.cost_usd`.
 
 ## 2. Start eines Vorhabens
 
-1. **Plattform lesen:** Profil `profile/<plattform>.md` (Abschnitte 1, 5 und 7 zuerst) und die Reihe
+1. **Plattform lesen:** Profil `profile/<plattform>.md` (Abschnitte 1, 5 und 7 zuerst; _Verfahren, Stand 15.10.2026_) und die Reihe
    `playbooks/<plattform>/` (P00–P10) bzw. `playbooks/upgrade-625-auf-72/` (U00–U06). Nur die Abschnitte „Ziel“,
    „Voraussetzungen“ und „Prüfung“ jedes Playbooks; den Rest liest die Entwicklersitzung.
 2. **Modelle ermitteln (MW-R01 bis MW-R03, MW-R14):** verfügbare Modelle aus der eigenen Umgebung (Systemhinweise,
@@ -45,7 +46,7 @@ Grenzen der Steuerung:
    - Startskript nach KE-S01 (`.claude/hooks/session-start.sh`) richtet eine frische Sitzung ohne eigene Schritte ein
      (KE-AK-04); für Liferay ergänzt P00 der Plattform JDK und Bundle.
    - P00 der Plattform ist abgenommen, bevor P01 ff. starten.
-   - Letzte Prüfung auf `main` grün (AM-R11).
+   - Letzte Prüfung auf `main` grün (AM-R11 sinngemäß als Start-Voraussetzung; _Verfahren, Stand 15.10.2026_).
 4. **Plan an Chris:** Schnitt, Wellen, Stufen, Budgets (Abschnitte 3 und 4) als eine Nachricht mit Vorschlag; erst nach
    Freigabe starten. Den Plan als Doku-PR in `FORTSCHRITT.md` festhalten (KE-R02).
 
@@ -60,17 +61,17 @@ Grenzen der Steuerung:
     `docs/ci-richtlinie.md`) bekommen eine Merge-Reihenfolge; der spätere PR gleicht per Merge mit `main` ab.
 - **Wellen** nach dem Abhängigkeitsgraph in `specs/00-uebersicht.md` (Abschnitt „Abhängigkeiten“): was nicht
   voneinander abhängt, läuft parallel, sonst nacheinander. Nicht mehr Sitzungen als unabhängige Pakete.
-- **Größenklasse und Budget:** Klasse nach KE-R14; Richtwerte in Token aus KE-R14. Erfahrungswerte in US-Dollar
-  (Rückblick G3, _Verfahren, Stand 15.10.2026_):
+- **Größenklasse und Budget:** Klasse und Richtwerte nach KE-R14 (Rückblick G2); dazu Erfahrungswerte aus G3:
 
   | Stufe und Klasse | Richtwert (US-Dollar) |
   | --- | --- |
-  | S2 klein | rund 1–3 |
-  | S3 mittel | 7–11 |
-  | S3 groß, ungeteilt | bis rund 20 |
+  | S2 klein | rund 1–3 (Rückblick G3, _Verfahren, Stand 15.10.2026_) |
+  | S3 mittel | 7–11 (KE-R14) |
+  | S3 groß | rund 10,50 (KE-R14); in G3 ungeteilt bis rund 20 (Paket F), abweichend von KE-R14 |
 
-  - **Harte Grenze inkl. Diagnose:** rund 1,5 × oberer Richtwert (z. B. 16 bei 7–11).
-  - **Diagnose-Grenze:** rund 15 % der harten Grenze (z. B. 2 bei 13).
+  - **Harte Grenze inkl. Diagnose:** rund 1,5 × oberer Richtwert (_Verfahren, Stand 15.10.2026_).
+  - **Diagnose-Grenze:** rund 15 % der harten Grenze (_Verfahren, Stand 15.10.2026_).
+  - Beispiel S3 mittel, 7–11: harte Grenze rund 16, Diagnose rund 2–2,5.
 
   Die harte Grenze folgt aus KE-R12 („Budget um die Hälfte überschritten“). Die Diagnose-Grenze setzt die
   Entscheidung „Fehlersuche gehört ins Paket“ um: Ist sie erreicht, stoppt die Sitzung und meldet das Fehlerbild.
@@ -81,7 +82,8 @@ Grenzen der Steuerung:
 2. **Startstufe (MW-R05):** S3, wenn Neuheit, Schwierigkeit oder Risiko hoch (alles unter AM-R04 ist Risiko hoch); S2,
    wenn alle drei höchstens mittel und die Prüfbarkeit hoch ist; im Zweifel höher. Richtwerte je Reihe in der Tabelle
    von MW-R05; Herunterstufen nach MW-R11, Hochstufen nach MW-R09, S4 nur nach MW-R07.
-3. **Denkaufwand (MW-R06):** S3-Pakete und Reviews „hoch“, sonst „mittel“, S1-Hilfsagenten „niedrig“.
+3. **Denkaufwand (MW-R06):** S3-Pakete und Reviews „hoch“, sonst „mittel“, S1-Hilfsagenten „niedrig“. Vor dem
+   Hochstufen prüfen, ob dieselbe Stufe mit höherem Denkaufwand reicht.
 4. **Auf der Plattform einstellen (MW-R06, „Umsetzung“):** Beim Start nicht setzbar. Die Steuerung nennt Chris (bzw. der
    Gesamtsteuerung) **ID und Titel jeder S3-Sitzung** gleich nach dem Start; Chris stellt in der App auf „Hoch“.
    Prüfen mit `get_session` (`session_context.effort_level`), bevor die Abnahme beginnt. S2 bleibt „Mittel“.
@@ -89,7 +91,11 @@ Grenzen der Steuerung:
    Aufwand); Auftrag: nur das Ergebnis melden.
 6. **Keine Modellkennungen (MW-R03, MW-AK-02):** in Dateien, Commits und PR-Texten nur Stufen. Die Zuordnung Stufe →
    Modell steht nur im Chat.
-7. **Festhalten (MW-R10):** Modellwahl-Eintrag je Paket nach Abschnitt 9.
+7. **Eine Sitzung, ein Modell (MW-R08):** nie mitten in der Sitzung wechseln; Hochstufen heißt neue Sitzung mit
+   Übergabe (MW-R09), und ohne neue Einsicht wird nicht hochgestuft – bleibt die Ursache unklar, Chris fragen.
+8. **Vorgaben und Verfügbarkeit:** Ordnet Chris ein Modell oder eine Stufe an, gilt das vor allem anderen (MW-R13).
+   Fehlt für eine Stufe ein Modell, die nächsthöhere nehmen und vermerken (MW-R14).
+9. **Festhalten (MW-R10):** Modellwahl-Eintrag je Paket nach Abschnitt 9.
 
 ## 5. Auftrag schreiben und Sitzung starten
 
@@ -97,7 +103,8 @@ Grenzen der Steuerung:
    Regeln für alle Pakete“ (KE-S02). Verweise statt Abschrift; bekannte Fallen aus früheren Paketen und mögliche
    Schemaänderungen benennen. Was die Steuerung schon festgestellt hat, steht drin (KE-R17).
 2. **Prüfen:** Auftrag als Datei ablegen und `npx tsx scripts/playbooks/pruefen.ts <auftrag>` ausführen (KE-AK-01);
-   fehlende Felder ergänzen, bis die Prüfung grün ist.
+   fehlende Felder ergänzen, bis die Prüfung grün ist. Das Skript entsteht in G4-A; fehlt es, die Pflichtfelder aus
+   KE-R01 von Hand prüfen.
 3. **Starten** mit `create_session`: `source_url` des Repositorys, `prompt` = Auftrag, Titel „<Etappe> <Paket>:
    <Kurzinhalt>“, Tags `<vorhaben>` und `rolle:entwicklung`; Umgebung erbt die der Steuerung. _Verfahren, Stand
    15.10.2026._
@@ -109,9 +116,9 @@ Grenzen der Steuerung:
 - **Ereignisgesteuert:** Berichte der Entwicklersitzungen kommen per `send_message`; PR-Ereignisse über ein Abo
   (`subscribe_pr_activity`), das die Steuerung **erst zu Beginn der Abnahme** setzt (KE-R03).
 - **Kein Abfragen im Minutentakt,** kein aktives Warten mit Pausenbefehlen.
-- **Sicherheits-Check-in** mit `send_later` frühestens 50–60 Minuten nach dem letzten Ereignis; grüne Läufe kommen nicht
-  immer als Ereignis an (Lehre A2). Findet ein Check-in nichts Neues, still neu ansetzen; nach drei Runden ohne Neues
-  keine weiteren Check-ins, Chris einmal kurz Bescheid geben.
+- **Sicherheits-Check-in** mit `send_later` frühestens 60 Minuten nach dem letzten Ereignis (KE-AK-06 verlangt
+  mindestens 50); grüne Läufe kommen nicht immer als Ereignis an (Lehre A2). Findet ein Check-in nichts Neues, still
+  neu ansetzen; nach drei Runden ohne Neues keine weiteren Check-ins und Chris einmal kurz Bescheid geben (_Verfahren, Stand 15.10.2026_).
 - Während eine Welle wartet, nichts „nebenbei“ lesen: Jede Runde verarbeitet den ganzen Kontext erneut.
 
 ## 7. Abnahme (docs/06, „Abnahme eines Pakets“; AM-R07)
@@ -136,23 +143,26 @@ Die REST-Routen sind _Verfahren, Stand 15.10.2026_ (A3).
    `POST /repos/{owner}/{repo}/pulls/{n}/ccr/ready_for_review`. Der Wechsel bricht den Entwurfs-Lauf ab; „Prüfung
    abgeschlossen“ meldet diesen kurz rot – erwartet.
 2. **Abnahme-Kommentar** nach dem letzten Push, mit der Prüfliste aus AM-R07 und der Markierung
-   `<!-- abnahme-steuerung sha=<head-SHA> -->`. Nach jedem weiteren Push neu.
+   `<!-- abnahme-steuerung sha=<head-SHA> -->`. Nach jedem weiteren Push neu. Gesetzt mit den GitHub-Werkzeugen der
+   Sitzung: Kommentar am Issue bzw. PR; das Label in Schritt 3 über das Issue-Update (_Verfahren, Stand 15.10.2026_).
 3. **Danach** das Label `automerge` setzen (AM-R02). Ein neues Label startet die Prüfung neu (CI-15, AM-R08); erst
    dieser Lauf sieht die Abnahme.
 4. **Automatisches Mergen** nur bei `aktiv: true` (AM-R12) einschalten: `PUT /repos/{owner}/{repo}/pulls/{n}/ccr/auto_merge`
    (ausschalten mit `DELETE`). **Im Schattenbetrieb** stattdessen eine Zeile in der Tabelle „Schattenbetrieb“ von
    `FORTSCHRITT.md` (Ergebnis „Merge-Kriterien“ ohne den Grund „Schalter aus“); nicht an Doku-PRs. Chris mergt über
    „Merge when ready“.
-5. **Nach dem Merge:** Kommentar am PR mit allen ausgewerteten Kriterien AM-R01 bis AM-R12 und Ergebnis (AM-AK-13,
-   AM-R15); Grundlage ist die Zusammenfassung des Checks „Merge-Kriterien“, ergänzt um Merge-Commit und Ablauf. Dann
-   Fortschrittsdatei (Abschnitt 9) und die Wochenzusammenfassung an Chris.
+5. **Nach dem Merge:** Nach einem **automatischen** Merge ist der Kommentar am PR mit allen ausgewerteten Kriterien
+   AM-R01 bis AM-R12 und Ergebnis Pflicht (AM-AK-13, AM-R15); Grundlage ist die Zusammenfassung des Checks
+   „Merge-Kriterien“, ergänzt um Merge-Commit und Ablauf. Im Schattenbetrieb ersetzt ihn der Eintrag in die Tabelle
+   (E2, E4 in `FORTSCHRITT.md`). Dann Fortschrittsdatei (Abschnitt 9) und die Wochenzusammenfassung an Chris.
 
 Bekannte Eigenheiten:
 
 - Ein Abnahme-Kommentar löst keinen neuen Lauf aus; deshalb Reihenfolge Kommentar → Label (AM-S02).
 - Geschützte Pfade (AM-R04, z. B. `playbooks/**`, `specs/**`) und offene Punkte unter „Bitte bestätigen“ (AM-R05)
   schließen automatisches Mergen aus; dann mergt Chris. Kommentar und Label trotzdem setzen (Schattenbetrieb zählt).
-- Wird `main` nach einem automatischen Merge rot: sofort Revert-PR (AM-R13).
+- Wird `main` nach einem automatischen Merge rot und ist der Merge die wahrscheinliche Ursache: sofort Revert-PR, Chris
+  bekommt Bescheid (AM-R13).
 
 ## 9. Fortschrittsdatei (KE-R02, KE-R18, MW-R10)
 
@@ -229,8 +239,10 @@ Steuerung je Welle eintragen.
   **Lückenliste** vermerken (Datei, Stelle, Annahme, Folge).
 - **Bestanden** nur mit grünen Prüffällen und leerer Lückenliste (docs/06, „Offene Punkte“).
 - Gemergt wird **nur in Wegwerf-Branches**; dort mergt die Steuerung selbst (docs/06, „Steuerung und Arbeitspakete“
-  und „Etappen“, Zeile B; AM-R04 gilt dort nicht). Für TypeScript ein Branch ohne `src/`, `prisma/`, `e2e/` und
-  `tests/`.
+  und „Etappen“, Zeile B; AM-R04 gilt dort nicht, _Verfahren, Stand 15.10.2026_). Für TypeScript ein Branch ohne `src/`, `prisma/`, `e2e/`
+  und `tests/`.
+- **Wegwerf-Basis** (_Verfahren, Stand 15.10.2026_): ein Branch `blindtest/<plattform>/main` von `main`; alle Paket-PRs zielen dorthin. Dort
+  kein Schattenbetrieb und kein Label `automerge`.
 - Was im Normalbetrieb Chris erledigt (Denkaufwand „Hoch“ einstellen, Freigaben), wird im Blindtest zur Annahme mit
   Eintrag in der Lückenliste, sofern der Auftrag nichts anderes sagt.
 
@@ -260,4 +272,8 @@ Steuerung je Welle eintragen.
 - [ ] **Fortschrittsdatei der Liferay-Umsetzungen:** docs/06 und AM-R15 sprechen von der Fortschrittsdatei „der
       Umsetzung“; ausgelegt als `FORTSCHRITT.md` im Wurzelordner mit einem Abschnitt je Vorhaben.
 - [ ] **Check-ins:** Abbruch nach drei Runden ohne Neues und einmal Bescheid an Chris (KE-R04 mit der Praxis aus A2).
-- [ ] **Blindtest:** Denkaufwand und Freigaben werden zur Annahme in der Lückenliste (Abschnitt 12).
+- [ ] **Blindtest:** Denkaufwand und Freigaben werden zur Annahme in der Lückenliste; Wegwerf-Basis
+      `blindtest/<plattform>/main`, dort kein Schattenbetrieb und kein Label `automerge`; AM-R04 gilt dort nicht
+      (Abschnitt 12).
+- [ ] **Weitere Verfahren:** Lesereihenfolge des Profils (Abschnitt 2), AM-R11 als Start-Voraussetzung, Check-in ab
+      60 Minuten, Setzen von Kommentar und Label über die GitHub-Werkzeuge.
