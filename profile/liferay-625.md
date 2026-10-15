@@ -23,7 +23,7 @@ was für 6.2.5 eigen ist; Unterschiede zu 7.2 nur aus Sicht von 6.2.5.
 | Portal | Liferay Portal 6.2.5 CE GA6, Tomcat-Bundle (Bezugsquelle `liferay-gemeinsam.md` 4.1) | Bundle bestätigt (SourceForge); Inhalt in P00 |
 | Server | Tomcat 7 aus dem Bundle (erwartet 7.0.62); Servlet 3.0, JSP 2.2, Portlet 2.0 (JSR-286) | in P00 zu bestätigen |
 | Java | OpenJDK 8 (Ubuntu-Paket `openjdk-8-jdk-headless`); Fachlogik auf Sprachstand 8, Ausweichregel Java 7 nach `liferay-gemeinsam.md` 3.2 | in P00 zu bestätigen (Java 8 für 6.2 nur durch Forenbeitrag belegt) |
-| Build | Plugins SDK 6.2 GA6 (Ant, Ivy); Ant aus dem Ubuntu-Paket `ant` | in P00 zu bestätigen (Ant-Version, Ivy ohne Liferay-Nexus) |
+| Build | Plugins SDK 6.2 GA6 (Ant, Ivy); Ant aus dem Ubuntu-Paket `ant` (1.10, läuft nur auf Java 8 und neuer); `javac.source` und `javac.target` auf `1.8` angehoben (Voreinstellung des SDK ist älter) | in P00 zu bestätigen (Ant-Version, Ivy ohne Liferay-Nexus, Sprachstand) |
 | Datenbank | PostgreSQL 16 (Sitzung und CI), JDBC-Treiber 42.7.14 statt des mitgelieferten Treibers in `tomcat-7.0.62/lib/ext/` | in P00 zu bestätigen (Start auf PostgreSQL 16, SCRAM) |
 | ORM und Transaktion | Hibernate 3 und Spring 3 aus dem Portal; Service Builder 6.2 | in P00 zu bestätigen |
 | Suchdienst | eingebettetes Lucene des Portals (`data/lucene/`); die App indiziert nichts; kein Elasticsearch | in P00 zu bestätigen |
@@ -57,13 +57,15 @@ liferay-625/                                  Wurzel des Plugins SDK 6.2 (build.
       portlet.xml, liferay-portlet.xml        Portlets, Scheduler-Einträge, Benachrichtigungs-Handler
       liferay-display.xml, liferay-plugin-package.properties
       liferay-hook.xml                        Login-Aktion, Servlet-Filter, JSP-Hook der Anmeldeseite
-      web.xml                                 Listener, der die Testschnittstelle nur bei bh.betrieb=test anmeldet
+      web.xml                                 Servlet der Testschnittstelle (antwortet 404 außer bei bh.betrieb=test)
       sql/                                    von Service Builder erzeugt (tables.sql, indexes.sql, sequences.sql)
       service/                                von Service Builder erzeugte API (nicht von Hand ändern)
       src/
         portal.properties                     Hook: login.events.post, servlet.service.events.pre
-        portlet.properties                    value.object.listener.*, upgrade.processes, Release-Nummer
-        service.properties                    von Service Builder erzeugt; build.auto.upgrade=false (siehe 7)
+        portlet.properties                    Einstellungen des Portlets; ob upgrade.processes und Release-Nummer hier
+                                              oder in service.properties stehen, klärt P00
+        service.properties                    von Service Builder erzeugt (nicht von Hand ändern)
+        service-ext.properties                value.object.listener.* (ModelListener), build.auto.upgrade=false (siehe 7)
         META-INF/portlet-model-hints.xml      Spaltenlängen nach gemeinsam 2.3
         custom-sql/default.xml                SELECT … FOR UPDATE, bedingtes Update, FOR UPDATE SKIP LOCKED
         resource-actions/default.xml          Rechte der Portlets
@@ -97,7 +99,8 @@ liferay-625/                                  Wurzel des Plugins SDK 6.2 (build.
   docker/                                     Image für CI (falls das Docker-Hub-Image nicht reicht)
 ```
 
-Paketname `de.berichtsheft` ist ein Vorschlag (siehe „Bitte bestätigen“). Die Fachlogik unter `domain/` wird mit dem
+Paketwurzel `de.berichtsheft` ist ein Vorschlag für beide Plattformen, also für `liferay-gemeinsam.md` (siehe „Bitte
+bestätigen“). Die Fachlogik unter `domain/` wird mit dem
 Portlet gebaut, darf aber nichts aus `com.liferay.*` importieren; ein Unit-Test prüft das (Gegenstück zur Regel in
 `CLAUDE.md`). Ob 6.2.5 und 7.2 dieselben Quelldateien der Fachlogik nutzen, legt P00 fest (`liferay-gemeinsam.md` 3.2).
 
@@ -124,19 +127,26 @@ Abgleich der Spalte 6.2.5 mit der Struktur aus 2.1. „Bestätigt“ heißt: Das
 
 | Entsprechung zu | Vorläufiges Muster 6.2.5 | Ergebnis | Stand nach diesem Profil |
 | --- | --- | --- | --- |
-| `src/auth.ts`, `src/lib/auth/**` | `liferay-625/**/hook/**`, `liferay-625/**/liferay-hook.xml`, `liferay-625/**/portal.properties` | bestätigt | trifft `de/berichtsheft/hook/events/**`, `liferay-hook.xml` und `docroot/WEB-INF/src/portal.properties` des Plugins; zusätzlich `liferay-625/**/html/hooks/login/**` (JSP-Hook der Anmeldeseite) |
+| `src/auth.ts`, `src/lib/auth/**` | `liferay-625/**/hook/**`, `liferay-625/**/liferay-hook.xml`, `liferay-625/**/portal.properties` | korrigiert | trifft `de/berichtsheft/hook/events/**`, `liferay-hook.xml` und `docroot/WEB-INF/src/portal.properties` des Plugins; zusätzlich `liferay-625/**/html/hooks/login/**` (JSP-Hook der Anmeldeseite) |
 | `src/proxy.ts`, `src/lib/session.ts` | `liferay-625/**/servlet/filter/**`, `liferay-625/**/*Filter.java` | bestätigt | unverändert |
 | `src/domain/access.ts`, `src/domain/report-access.ts` | `liferay-625/**/domain/access/**` | bestätigt | unverändert |
 | Rollen- und Besitzprüfung in Serveraktionen | `liferay-625/**/service/impl/**`, `liferay-625/**/service/permission/**` | bestätigt | unverändert |
 | Rechte der Portlets | `liferay-625/**/portlet.xml`, `liferay-625/**/liferay-portlet.xml`, `liferay-625/**/resource-actions/**` | bestätigt | unverändert (das Muster `portlet.xml` trifft auch `liferay-portlet.xml`) |
-| Konfiguration, Betriebsart, Testschnittstelle | `liferay-625/**/portal-ext.properties`, `liferay-625/**/pruefung/**` | korrigiert | dazu `liferay-625/**/portal-ext*.properties` (Vorlage heißt `portal-ext.beispiel.properties`) und `liferay-625/**/web.xml` (meldet die Testschnittstelle an) |
-| Schema und Schutz in der Datenhaltung | `liferay-625/**/service.xml`, `liferay-625/**/sql/**`, `liferay-625/**/model/listener/**` | korrigiert | dazu `liferay-625/**/upgrade/**` (dort liegt das Skript aus gemeinsam 2.6), `liferay-625/**/custom-sql/**` (Sperre und bedingtes Update, AK-508), `liferay-625/**/portlet.properties` (Anmeldung der `ModelListener`, Upgrade-Prozesse), `liferay-625/**/service.properties` (`build.auto.upgrade`), `liferay-625/**/portlet-model-hints.xml` (Spaltenlängen) |
+| Konfiguration, Betriebsart, Testschnittstelle | `liferay-625/**/portal-ext.properties`, `liferay-625/**/pruefung/**` | korrigiert | dazu `liferay-625/**/portal-ext*.properties` (Vorlage heißt `portal-ext.beispiel.properties`) und `liferay-625/**/web.xml` (trägt das Servlet der Testschnittstelle ein) |
+| Schema und Schutz in der Datenhaltung | `liferay-625/**/service.xml`, `liferay-625/**/sql/**`, `liferay-625/**/model/listener/**` | korrigiert | dazu `liferay-625/**/upgrade/**` (dort liegt das Skript aus gemeinsam 2.6), `liferay-625/**/custom-sql/**` (Sperre und bedingtes Update, AK-508), `liferay-625/**/portlet.properties` (Upgrade-Prozesse, falls P00 sie dort findet), `liferay-625/**/service*.properties` (`service-ext.properties` meldet die `ModelListener` an und setzt `build.auto.upgrade`), `liferay-625/**/portlet-model-hints.xml` (Spaltenlängen) |
 
-Begründung der Korrekturen: In 6.2.5 meldet nicht eine Annotation, sondern `portlet.properties` den `ModelListener`
-und die Upgrade-Prozesse an; ein Eintrag dort abzuschalten hebelt den Schutz aus. `build.auto.upgrade=true` würde
+Begründung der Korrekturen: In 6.2.5 meldet nicht eine Annotation, sondern eine Properties-Datei den `ModelListener`
+an: Die `*PersistenceImpl` eines Plugins liest `value.object.listener.<Modell>` über `ServiceProps`, also aus
+`service.properties` bzw. `service-ext.properties`; ein Eintrag dort abzuschalten hebelt den Schutz aus. Wo
+`upgrade.processes` steht, klärt P00; beide Dateien sind deshalb erfasst. `build.auto.upgrade=true` würde
 Tabellen bei einer Schemaänderung kopieren und neu anlegen und dabei Trigger und Constraints verlieren (7). Das
 bedingte Update steht in `custom-sql/`, nicht in `service/impl/`. `liferay-gemeinsam.md` Abschnitt 6 nennt
 `**/upgrade/**` als mit erfasst; in der Tabelle von Abschnitt 5 fehlt das Muster.
+
+**Hinweis für G4-L:** `ivy.xml`, `build.xml` und `ivy-settings.xml` des Plugins bzw. des SDK legen die Bibliotheken
+und ihre Bezugsquellen fest. Sie sind von keinem Muster aus `liferay-gemeinsam.md` Abschnitt 5 erfasst; eine neue
+Bibliothek fiele dort nur über die Liste in Abschnitt 7 auf. Vorschlag: `liferay-625/**/ivy*.xml` und
+`liferay-625/**/build*.xml` aufnehmen.
 
 ## 3. Abbildung der Bausteine
 
@@ -149,10 +159,10 @@ Je Baustein nur, was 6.2.5 eigen ist; die gemeinsame Abbildung steht in `liferay
 | Zugang je Anfrage | Servlet-Filter über `liferay-hook.xml` (`servlet-filter`, `servlet-filter-mapping`) auf die Seiten der Site „Berichtsheft“ | prüft `BH_Person` (aktiv, gebunden) und die 8 Stunden ab dem Anmeldezeitpunkt in der Sitzung (M02-R04, M02-R05); sonst Seite `kein_zugang` bzw. Abmelden |
 | Rollen und Besitz | `*LocalServiceImpl` prüft gegen `BH_Person`; Liferay-Rollen „BH Azubi“, „BH Ausbilder“ nur für Seiten-Sichtbarkeit | Rechte der Seiten über die Site-Verwaltung bzw. die Testschnittstelle angelegt |
 | Persistenz | Service Builder 6.2 (`liferay-service-builder_6_2_0.dtd`); `mvcc-enabled` gibt es dort voraussichtlich nicht und entfällt | gemeinsam 2.4 sieht das Entfallen vor |
-| Transaktion | Methoden der `*LocalServiceImpl`; Spring-Transaktion des Portals; fachliche Fehler als Unterklassen von `PortalException` | nur `PortalException` und `SystemException` lösen sicher ein Zurückrollen aus; Methodennamen mit `get`, `is`, `has` laufen nur lesend (siehe 7) |
+| Transaktion | Methoden der `*LocalServiceImpl`; Spring-Transaktion des Portals; fachliche Fehler, die zurückrollen müssen, als Unterklassen von `PortalException`; `pflichtangaben_fehlen` beim Einreichen als Ergebnis, nicht als Ausnahme | nur `PortalException` und `SystemException` lösen sicher ein Zurückrollen aus; Methodennamen mit `get`, `is`, `has` laufen nur lesend (siehe 7) |
 | Sperre und bedingtes Update | `*FinderImpl` mit `CustomSQLUtil` und `SQLQuery.executeUpdate()` in der Hibernate-Sitzung der Service-Transaktion | danach Entity- und Finder-Cache leeren und das Objekt aus der Hibernate-Sitzung lösen (`session.evict`) |
-| Historie unveränderlich | Trigger nach gemeinsam 2.6 plus `ModelListener` (`BaseModelListener`), angemeldet in `portlet.properties` mit `value.object.listener.de.berichtsheft.model.StatusChange` und `…Comment` | Nachweis im Abschnitt „Nachweis AK-505 und AK-508“ |
-| Schema-Schritte | Service Builder legt Tabellen beim ersten Deployment an; `UpgradeProcess` des Plugins (`upgrade.processes` in `portlet.properties`) führt danach das Skript aus | Reihenfolge Tabellen → Skript in P00 nachweisen |
+| Historie unveränderlich | Trigger nach gemeinsam 2.6 plus `ModelListener` (`BaseModelListener`), angemeldet in `service-ext.properties` mit `value.object.listener.de.berichtsheft.model.StatusChange` und `…Comment` | Nachweis im Abschnitt „Nachweis AK-505 und AK-508“ |
+| Schema-Schritte | Service Builder legt Tabellen beim ersten Deployment an; `UpgradeProcess` des Plugins führt danach das Skript aus | Ort der Anmeldung (`upgrade.processes`, Release-Nummer) und Reihenfolge Tabellen → Skript in P00 nachweisen |
 | Uhr | Spring-Bean des Plugins (`ext-spring.xml`) bzw. Einzelstück mit `Clock`-Schnittstelle; Betriebsart aus `PropsUtil.get("bh.betrieb")` | stellbar nur über die Testschnittstelle |
 | Hintergrundjobs | `scheduler-entry` in `liferay-portlet.xml` mit `scheduler-event-listener-class`, Speicherart `MEMORY_CLUSTERED` | Quartz rechnet Cron-Ausdrücke in der JVM-Zeitzone (GMT); deshalb **Takt alle 15 Minuten**, die Fälligkeit (Montag 9:00 Uhr Europe/Berlin, Nachholen bis Dienstag 23:59 Uhr) entscheidet die Fachlogik (AK-1021, AK-1023) |
 | Benachrichtigung in der App | `user-notification-definitions` und `UserNotificationHandler` in `liferay-portlet.xml`; Quelle bleibt `BH_Notification` (gemeinsam 2.5) | Glocke siehe 3.1 |
@@ -170,17 +180,24 @@ Je Baustein nur, was 6.2.5 eigen ist; die gemeinsame Abbildung steht in `liferay
 Die Glocke der Dockbar von 6.2 zeigt Liferay-Benachrichtigungen, aber nicht nach M09-R03 („99+“, genaue Zahl im Namen)
 und nicht mit dem Markieren nach AK-1015. Vorschlag für 6.2.5: **eigene Glocke im Theme** aus `BH_Notification` mit der
 Fachlogik von UI-AK-03 und AK-1015; die Dockbar ist für Azubis und Ausbilder ausgeblendet (sie ist fest oben und würde
-den Fokus verdecken, UI-AK-17). Der Eintrag in `UserNotificationEvent` bleibt als Abbild, wie gemeinsam 2.5 es
-vorsieht, wird aber in der App nicht angezeigt. Das widerspricht der Formulierung „die Glocke der Plattform zeigt die
-Nachricht“ in `liferay-gemeinsam.md` 2.5 (siehe „Bitte bestätigen“).
+den Fokus verdecken, UI-AK-17).
+
+Das ist ein **Vorschlag**, keine Festlegung dieses Profils: Er weicht von `liferay-gemeinsam.md` 2.5 („die Glocke der
+Plattform zeigt die Nachricht“) und von der Zeile „Benachrichtigung in der App“ der Bausteintabelle in
+`docs/06-spec-architektur.md` ab; beides ändert nach `liferay-gemeinsam.md` Abschnitt 1 nur die gemeinsame Freigabe
+(siehe „Bitte bestätigen“). Bis dahin gilt gemeinsam 2.5. **Abbild in `UserNotificationEvent`:** Vorschlag, es auf
+6.2.5 trotzdem zu schreiben, nur damit nach dem Upgrade (U03) die Glocke von 7.2 die früheren Nachrichten zeigt, ohne
+dass U03 sie nachträglich anlegt; angezeigt wird es auf 6.2.5 nicht. Die Alternative (kein Abbild auf 6.2.5,
+`userNotificationEventId` bleibt leer, U03 legt die Einträge an) ist ebenso möglich; die Wahl gehört zu U00.
 
 ### 3.2 Dunkelmodus und UI-AK auf 6.2.5
 
 **Umfang (Vorschlag):** Hell und Dunkel gelten für den Rahmen des Themes (Seitenleiste, Kopf, Schublade, Glocke), alle
-Portlets der App und die Anmeldeseite (JSP-Hook des Login-Portlets mit eigenem Markup). Nicht umgestellt werden
-Seiten, die das Portal selbst ausliefert und die in keinem Ablauf der App vorkommen: Control Panel (eigenes Theme des
-Portals, nur für den Portal-Administrator), „Passwort vergessen“ und „Passwort setzen“ aus dem Link der Einladungsmail,
-Fehlerseiten des Portals. Sie bleiben hell und sind nicht auf WCAG geprüft; das ist „abweichend, begründet“ zu M09-R19
+Portlets der App und den Einstieg jeder Person: Anmeldeseite, „Passwort vergessen“ und „Passwort setzen“ aus dem
+Link der Einladungsmail. Diese drei Seiten bekommen über denselben JSP-Hook eigenes Markup mit Tokens (Login-Portlet
+und die Seite des Portals zum Setzen des Passworts) und werden mit axe geprüft. Nicht umgestellt werden Seiten, die
+das Portal selbst ausliefert und die keine Person der App erreicht: Control Panel (eigenes Theme des Portals, nur für
+den Portal-Administrator, keine Person in `BH_Person`) und Fehlerseiten des Portals. Sie bleiben hell und sind nicht auf WCAG geprüft; das ist „abweichend, begründet“ zu M09-R19
 („alle Seiten … hell und dunkel“). PDF und Druckansicht bleiben hell (wie `docs/05-ui-spezifikation.md`).
 
 **Technik:**
@@ -205,7 +222,7 @@ Fehlerseiten des Portals. Sie bleiben hell und sind nicht auf WCAG geprüft; das
 | --- | --- | --- |
 | UI-AK-01 | Seitenleiste und Schublade im Theme (`portal_normal.vm`, `main.js`), Fokusfalle und Escape von Hand | gleichwertig |
 | UI-AK-02 | Menü im Theme aus den Request-Attributen (Rolle, Zähler), `aria-current`; Sichtbarkeit der Seiten über Liferay-Rollen, Schutz im Service | gleichwertig |
-| UI-AK-03 | eigene Glocke nach 3.1 | gleichwertig, wenn 3.1 bestätigt ist |
+| UI-AK-03 | eigene Glocke nach 3.1 (Vorschlag); mit der Glocke der Dockbar nicht erfüllbar | gleichwertig, wenn der Vorschlag aus 3.1 freigegeben ist |
 | UI-AK-04 | Portlet „Start“ (JSP), Fachlogik in `domain/` | gleichwertig |
 | UI-AK-05 | Leerzustand im Portlet | gleichwertig |
 | UI-AK-06 | eigenes CSS-Raster, Portlet auf einspaltiger Layout-Vorlage ohne Seitenränder des Portals | gleichwertig |
@@ -218,7 +235,7 @@ Fehlerseiten des Portals. Sie bleiben hell und sind nicht auf WCAG geprüft; das
 | UI-AK-13 | Chips mit eingebetteten SVG-Symbolen (dieselben Formen wie die TypeScript-App), nicht Font Awesome 3 aus dem Portal | gleichwertig |
 | UI-AK-14 | Fachlogik `darstellungPruefen`, `darstellungErmitteln` in Java; Speichern in `BH_Person.theme` und Cookie, danach Weiterleitung auf dieselbe Seite (wirkt sofort) | gleichwertig |
 | UI-AK-15 | `data-theme` und Tokens im `<head>` vom Server, kein Skript nötig (UI-AK-15-01, UI-AK-15-02, UI-AK-15-03) | gleichwertig |
-| UI-AK-16 | axe auf allen Seiten der Abläufe, hell und dunkel, 1280 und 375 px (UI-AK-16-01 bis UI-AK-16-04), einschließlich Anmeldeseite (JSP-Hook) | gleichwertig für die Seiten der Abläufe; **abweichend, begründet** für die Seiten des Portals außerhalb der App (siehe Umfang) |
+| UI-AK-16 | axe auf allen Seiten der Abläufe, hell und dunkel, 1280 und 375 px (UI-AK-16-01 bis UI-AK-16-04), einschließlich Anmeldeseite, „Passwort vergessen“ und „Passwort setzen“ (JSP-Hook) | gleichwertig für die Seiten der Abläufe; **abweichend, begründet** für die Seiten des Portals außerhalb der App (siehe Umfang) |
 | UI-AK-17 | Dockbar für Azubis und Ausbilder ausgeblendet; „Abmelden“ im Menü des Themes; keine fest stehende Leiste des Portals | gleichwertig |
 | UI-AK-18 | eigener Dialog (`<dialog>` bzw. eigenes Markup mit Fokusfalle), kein `aui-modal` | gleichwertig |
 | UI-AK-19 | Seitentitel über `PortalUtil.setPageTitle` und eine Titelvorlage im Theme („<Seite> – Berichtsheft“); Portlet-Rahmen ohne Überschrift (`portlet.vm`, `portlet-decorate` aus), Seitenkopf ohne `h1` | gleichwertig |
@@ -241,13 +258,15 @@ Fehlerseiten des Portals. Sie bleiben hell und sind nicht auf WCAG geprüft; das
   (Voreinstellung: drei Ordner über dem Plugin, also die Wurzel des Repositorys). Formate und Fehlercodes nach
   `specs/pruefung/format.md`, „Regeln für Adapter“.
 - **JSON lesen:** Die JUnit-Runner brauchen eine JSON-Bibliothek; das Portal bringt keine mit, die ohne laufendes Portal
-  nutzbar ist. Vorschlag: Jackson Databind 2.x (Apache-2.0, Java 8), nur im Test-Klassenpfad; fehlt in
-  `liferay-gemeinsam.md` Abschnitt 7 (siehe „Bitte bestätigen“).
+  nutzbar ist. Vorschlag für `liferay-gemeinsam.md` Abschnitt 7: Jackson Databind mit fester Version, nur im Test-Klassenpfad
+  (Apache-2.0; ab 2.13 Java 8, Version in P00 auf Maven Central festlegen). Bei der Ausweiche Java 7 bräuchte es
+  Jackson 2.12.x und Ant 1.9.x, weil Ant 1.10 nur auf Java 8 läuft (siehe „Bitte bestätigen“).
 - **Testnamen:** JUnit 4 erlaubt keinen Bindestrich im Methodennamen. Eigene Tests heißen `AK505_…`/`AK508_…` (Klasse
   oder Methode), die Runner benennen jeden Fall mit seiner ID (`@Parameters(name = "{0}")` → `AK-508-01 (M05.json,
   daten)`). Ob `npm run ak:abdeckung` Java-Tests mitzählt, klärt P10.
 - **Fehlercodes:** Fachliche Fehler sind Unterklassen von `PortalException` mit einem festen Code (Aufzählung
-  `Fehlercode`); der Adapter liest den Code, nie den Meldungstext. Die Abweisung der Datenhaltung erkennt er am
+  `Fehlercode`), außer `pflichtangaben_fehlen` beim Einreichen: Das ist ein Ergebnis mit Code, keine Ausnahme, damit
+  die mitgeschickten Tage gespeichert bleiben (M05-R08, AK-505-03). Der Adapter liest den Code, nie den Meldungstext. Die Abweisung der Datenhaltung erkennt er am
   SQLSTATE `BH803` in der Ursachenkette (gemeinsam 2.6).
 - **Abweichende Fälle:** Ein Fall mit `abweichend.liferay-625` wird nicht ausgeführt, sondern mit der Markierung
   „abweichend, begründet“ und dem Verweis als übersprungen ausgewiesen (JUnit: `Assume` mit Meldung; Playwright:
@@ -258,8 +277,15 @@ Fehlerseiten des Portals. Sie bleiben hell und sind nicht auf WCAG geprüft; das
 
 Ein Servlet des Plugins unter `/bh-portlet/pruefung/zustand` (Gegenstück zu `src/app/api/test/zustand/route.ts`):
 Uhr stellen und zurückstellen, Bestand leeren, Testdaten laden (`specs/pruefung/testdaten.json`), Ausgangsbestand
-herstellen, Daten-Aktionen ausführen, Erinnerungslauf auslösen. Ein `ServletContextListener` in `web.xml` meldet es nur
-bei `bh.betrieb=test` an (Servlet 3.0, `ServletContext.addServlet`); sonst gibt es die Adresse nicht. Beim Laden der
+herstellen, Daten-Aktionen ausführen, Erinnerungslauf auslösen. Das Servlet steht fest in `web.xml` und antwortet
+bei jeder Anfrage mit 404, wenn nicht `bh.betrieb=test` gilt (geprüft je Anfrage, nicht nur beim Start). Ein Anmelden
+per `ServletContext.addServlet` aus einem Listener scheitert in 6.2 vermutlich (`IllegalStateException`); in P00 zu bestätigen.
+
+**Aktionen „an der Fachlogik vorbei“** (`historie_aendern`, `historie_loeschen`, `bericht_loeschen`, M06): Die
+Testschnittstelle führt sie mit direktem SQL über eine JDBC-Verbindung des Portals aus (`DataAccess.getConnection()`),
+nicht über die Persistenz von Service Builder. So zeigen AK-803-01 bis AK-803-04 den Trigger (Ergebnis `BH803` →
+`historie_unveraenderlich`); über die Persistenz fiele schon der `ModelListener` ins Gewicht und der Trigger bliebe
+ungeprüft. Den `ModelListener` prüft nur `AK803_ModelListenerTest`. Beim Laden der
 Testdaten legt die Schnittstelle je Person ein Liferay-Konto mit der E-Mail aus den Testdaten und einem Demo-Passwort
 an (Platzhalter aus der Konfiguration, kein Geheimnis); Personen mit `"angelegt": false` bekommen nur das Konto, keinen
 Eintrag in `BH_Person` (Gegenprobe zu AK-102).
@@ -339,7 +365,7 @@ Demo-Konten an, die nur bei `bh.betrieb=test` angelegt werden.
 
 | AK | Betroffen | Bewertung auf 6.2.5 |
 | --- | --- | --- |
-| AK-101 | Anmeldung über das Firmenkonto, kein Passwort in der App | **abweichend, begründet.** Die Anmeldeseite hat ein Passwortfeld, und der Anmeldeweg ist das Liferay-Konto. Betroffen: AK-101-01 (`passwortfeld`, `anmeldewege`), AK-101-02 und AK-101-03 (`passwortfeld`). Was bleibt: kein Passwort in den App-Tabellen; Anmelden führt zur Startseite der Rolle. |
+| AK-101 | Anmeldung über das Firmenkonto, kein Passwort in der App | **teilweise abweichend, begründet.** Die Anmeldeseite hat ein Passwortfeld, und der Anmeldeweg ist das Liferay-Konto. Betroffen ist nur AK-101-01 (Anmeldeseite: `passwortfeld`, `anmeldewege`). AK-101-02 und AK-101-03 prüfen die Startseite nach der Anmeldung und sind erfüllbar (gleichwertig). Was bleibt: kein Passwort in den App-Tabellen; Anmelden führt zur Startseite der Rolle. |
 | AK-102 | Kein Zugang ohne Person oder bei deaktivierter Person | gleichwertig. Fachlogik unverändert (AK-102-01 bis AK-102-09). Die App deaktiviert das Liferay-Konto nicht mit; die Anmeldung beim Portal gelingt, der Filter zeigt `kein_zugang` mit dem Hinweis nach M02-R03. Sonst sähe die Person die Meldung des Portals statt des Hinweises. |
 | AK-106 | Nach dem Abmelden kein Zugriff | **teilweise abweichend, begründet.** AK-106-01 prüft am Ende die Anmeldeseite (`passwortfeld: false`, `anmeldewege: ["firmenkonto"]`) wie AK-101-01 → abweichend. AK-106-02 gleichwertig. M02-R05 („Abmelden beendet auch die Anmeldung beim Anmeldedienst“) ist erfüllt, weil das Portal selbst der Anmeldedienst ist. |
 | AK-201 | Binden beim ersten Login über die bestätigte E-Mail | gleichwertig mit einer Auslegung: „bestätigt“ ist `User.isEmailAddressVerified()` des Liferay-Kontos. Fachlogik unverändert (AK-201-01 bis AK-201-11). Wie ein vom Admin angelegtes Konto bestätigt wird (Bestätigungsmail des Portals oder „bestätigt“ durch das Setzen des Passworts über den Link an diese Adresse), klärt P00 (siehe „Bitte bestätigen“). |
@@ -351,14 +377,14 @@ Anmeldezeitpunkt aus der Uhr in der Sitzung, der Filter meldet nach 8 Stunden ab
 Damit gleichwertig, kein Prüffall (wie in der TypeScript-App).
 
 Die Markierung `"abweichend": { "liferay-625": "profile/liferay-625.md, Abschnitt 6.1" }` gehört in die Prüffälle
-AK-101-01, AK-101-02, AK-101-03 und AK-106-01. Dieses Paket ändert `specs/**` nicht; die Markierung setzt ein eigener
+AK-101-01 und AK-106-01. Dieses Paket ändert `specs/**` nicht; die Markierung setzt ein eigener
 Auftrag nach der Freigabe (siehe „Bitte bestätigen“).
 
 ### 6.2 Oberfläche
 
 - Seiten des Portals außerhalb der App bleiben hell und ungeprüft (3.2, UI-AK-16): **abweichend, begründet.**
-- Glocke im Theme statt der Glocke der Plattform (3.1): Abweichung von `liferay-gemeinsam.md` 2.5, nicht von einer
-  Fach-Spec.
+- Glocke im Theme statt der Glocke der Plattform (3.1): nur Vorschlag; er weicht von `liferay-gemeinsam.md` 2.5 und
+  der Bausteintabelle in `docs/06-spec-architektur.md` ab, nicht von einer Fach-Spec.
 
 ### 6.3 Gemeinsame Abweichungen
 
@@ -374,9 +400,12 @@ Kalendertage als Text, `TIMESTAMP` in UTC, `seq` je Bericht, Trigger plus `Model
   Java-8-Syntax in JSPs (Jasper von Tomcat 7). In P00 zu bestätigen.
 - **Lesende Transaktionen:** Service-Methoden mit `get`, `is`, `has`, `search`, `dynamicQuery` am Anfang laufen nur
   lesend. Statuswechsel und Speichern heißen deshalb z. B. `submitReport`, `saveDays`, nie `get…`.
-- **Zurückrollen:** Nur `PortalException` und `SystemException` rollen die Transaktion sicher zurück; fachliche
-  Fehler (Konflikt, Pflichtangaben) sind daher `PortalException`. Ein Konflikt nach dem bedingten Update muss
-  zurückrollen, damit kein Historieneintrag entsteht.
+- **Zurückrollen:** Nur `PortalException` und `SystemException` rollen die Transaktion sicher zurück. Fehler, die
+  nichts hinterlassen dürfen (Konflikt, ungültige Eingaben nach AK-505-04, fehlende Rechte), sind deshalb
+  `PortalException`; ein Konflikt nach dem bedingten Update muss zurückrollen, damit kein Historieneintrag entsteht.
+  **Umgekehrt** darf `pflichtangaben_fehlen` beim Einreichen nicht werfen: Die mitgeschickten Tage sind dann schon in
+  derselben Transaktion gespeichert und müssen als Entwurf bleiben (M05-R08, AK-505-03). Der Service gibt ein Ergebnis
+  mit dem Code zurück, die Transaktion endet normal.
 - **`build.auto.upgrade`:** steht auf `false`. Ein automatisches Schema-Upgrade kopiert Tabellen und legt sie neu an;
   dabei gingen Trigger, Fremdschlüssel und CHECK-Constraints verloren, und die Trigger der Historie würden das
   Umkopieren abweisen. Schemaänderungen nur als eigener `UpgradeProcess`.
@@ -400,7 +429,8 @@ Kalendertage als Text, `TIMESTAMP` in UTC, `seq` je Bericht, Trigger plus `Model
   zwischen Anmelden und Startseite; in Sitzung und CI aus (5.1), sonst scheitert jeder Ablauf-Fall beim `anmelden`.
 - **Java 8 auf 6.2:** `-XX:MaxPermSize` aus `setenv.sh` ist unter Java 8 wirkungslos (Warnung im Log). Läuft 6.2.5
   nicht stabil mit Java 8, gilt die Ausweichregel Java 7 (gemeinsam 3.2); Java 7 ist in der Sitzung nicht beziehbar,
-  nur in CI über ein Image.
+  nur in CI über ein Image. Dann reicht die Ausweichregel allein nicht: Ant 1.10 läuft erst ab Java 8 (also Ant 1.9.x),
+  Jackson ab 2.13 ebenso (also 2.12.x), und `javac.source`/`javac.target` bleiben auf `1.7`.
 - **PostgreSQL 16:** neuer als jede Version, mit der 6.2 getestet wurde (gemeinsam 4.5); ein alter Treiber kann sich
   nicht anmelden (SCRAM).
 - **Oberfläche nur sinngemäß:** Bootstrap 2 ist nicht für kleine Bildschirme zuerst gebaut; Breiten und Raster kommen
@@ -418,10 +448,10 @@ Schema in dem Playbook, das Service Builder einführt.
 | Schicht | 6.2.5-Mittel | Prüffall | JUnit-Test (Ort, Playbook) |
 | --- | --- | --- | --- |
 | Fachlogik | `darfBearbeiten` in `domain/` | AK-505-05, AK-505-06, AK-505-07 | `PruefungFachlogikTest` (`ant pruefung-fachlogik`, P05) |
-| Service | Speichern sperrt die Zeile (`FOR UPDATE`), prüft dann Status und Person, sonst `nicht_bearbeitbar`; Einreichen speichert mit | AK-505-01, AK-505-02, AK-505-03, AK-505-04 | `PruefungDatenTest` (`ant pruefung-daten`, P05) |
+| Service | Speichern sperrt die Zeile (`FOR UPDATE`), prüft dann Status und Person, sonst `nicht_bearbeitbar`; Einreichen speichert mit | AK-505-01, AK-505-02, AK-505-03, AK-505-04 | `PruefungDatenTest` (`ant pruefung-daten`, P05); AK-505-03 verlangt, dass `pflichtangaben_fehlen` nicht zurückrollt (7, „Zurückrollen“) |
 | Datenhaltung: Tage | Trigger `report_day_locked` (gemeinsam 2.6), meldet `P0001` | kein neutraler Fall | `AK505_DatenhaltungWeistAendernEinesEingereichtenTagsAbTest` in `test/db/` (P05): Bericht per SQL auf `SUBMITTED`, dann `UPDATE BH_ReportDay` per JDBC → Abweisung mit SQLSTATE `P0001`; Gegenprobe: im Entwurf gelingt dasselbe Update |
-| Datenhaltung: Historie | Trigger `status_change_no_update`, `status_change_no_delete`, `comment_no_update`, `comment_no_delete`, `weekly_report_delete_guard` mit SQLSTATE `BH803` | AK-803-01, AK-803-02, AK-803-03, AK-803-04, AK-803-05 | `PruefungDatenTest` (P06) und `AK803_TriggerDerHistorieTest` in `test/db/` (P06): `UPDATE` und `DELETE` auf `BH_StatusChange` und `BH_Comment` per JDBC → `BH803`; Löschen der Person per Kaskade gelingt |
-| App: Historie | `ModelListener` auf `StatusChange` und `Comment` (`onBeforeUpdate`, `onBeforeRemove` → `ModelListenerException` mit Grund `historie_unveraenderlich`), angemeldet in `portlet.properties` | AK-803-01, AK-803-02, AK-803-03 (über die Service-Schicht) | `AK803_ModelListenerTest` in `test/unit/` (P06): Listener weist Ändern und Löschen ab; Gegenprobe: Anlegen geht durch |
+| Datenhaltung: Historie | Trigger `status_change_no_update`, `status_change_no_delete`, `comment_no_update`, `comment_no_delete`, `weekly_report_delete_guard` mit SQLSTATE `BH803` | AK-803-01, AK-803-02, AK-803-03, AK-803-04 (Testschnittstelle mit direktem SQL, 4.2), AK-803-05 | `PruefungDatenTest` (P06) und `AK803_TriggerDerHistorieTest` in `test/db/` (P06): `UPDATE` und `DELETE` auf `BH_StatusChange` und `BH_Comment` per JDBC → `BH803`; Löschen der Person per Kaskade gelingt |
+| App: Historie | `ModelListener` auf `StatusChange` und `Comment` (`onBeforeUpdate`, `onBeforeRemove` → `ModelListenerException` mit Grund `historie_unveraenderlich`), angemeldet in `service-ext.properties` | kein neutraler Fall (die Daten-Fälle gehen an der Persistenz vorbei, 4.2) | `AK803_ModelListenerTest` in `test/unit/` (P06): Listener weist Ändern und Löschen ab; Gegenprobe: Anlegen geht durch |
 
 Fehlergrund: Der Daten-Adapter liefert `historie_unveraenderlich` bei `BH803` in der Ursachenkette oder bei der
 `ModelListenerException` mit diesem Grund; `nicht_bearbeitbar` kommt aus der Fehlerart des Service, nie aus dem
@@ -434,7 +464,7 @@ Meldungstext. Die Kaskade beim endgültigen Löschen (AK-803-05, AK-206) läuft 
 | --- | --- | --- | --- |
 | Fachlogik | Reihenfolge der Prüfungen und Codes nach M05-R20, M05-R21 in `domain/` | AK-508-06, AK-508-07, AK-508-08, AK-508-09, AK-508-10, AK-508-11 | `PruefungFachlogikTest` (P05) |
 | Service | `*LocalServiceImpl` in einer Transaktion: `SELECT … FOR UPDATE` über `*FinderImpl`, Prüfung gegen den gesehenen Stand (Status und `version`), bedingtes `UPDATE BH_WeeklyReport … WHERE status = ? AND version = ?` mit genau einer Zeile, sonst `PortalException` mit Konfliktcode; Historie im selben Lauf; danach Cache leeren | AK-508-01, AK-508-02, AK-508-03, AK-508-04, AK-508-05 | `PruefungDatenTest` (P05) |
-| Datenhaltung | Zeilensperre und bedingtes Update in PostgreSQL | kein neutraler Fall (M05 Abschnitt 10) | `AK508_SperreUndBedingtesUpdateTest` in `test/db/` (P05): zwei JDBC-Verbindungen, A sperrt und aktualisiert, B wartet auf die Sperre und ändert danach 0 Zeilen; ohne Prüfung von `version` ändert B 1 Zeile (Gegenprobe) |
+| Datenhaltung | Zeilensperre und bedingtes Update in PostgreSQL | kein neutraler Fall (M05 Abschnitt 10) | `AK508_SperreUndBedingtesUpdateTest` in `test/db/` (P05): (1) zwei JDBC-Verbindungen: A sperrt und wechselt den Status, B wartet auf die Sperre und ändert danach mit dem alten Status 0 Zeilen; (2) Folge A-B-A: gesehen ist „Eingereicht“ mit `version` n, inzwischen zurückgezogen und erneut eingereicht („Eingereicht“, n+2); das bedingte Update mit `version = n` ändert 0 Zeilen und der Service meldet `inzwischen_geaendert` (M05-R20). Gegenprobe zu (2): ohne die Bedingung auf `version` ändert dasselbe Update 1 Zeile, nur die Version unterscheidet den Fall |
 | Ganze App | zwei gleichzeitige Aufrufe über die Testschnittstelle | kein neutraler Fall | `AK508_ZweiGleichzeitigeAktionenTest` in `test/integration/` (P05): „AK-508 von zwei gleichzeitigen Aktionen gelingt genau eine“ (gemeinsam 2.4); zwei Threads mit Startschranke rufen Freigeben und Zurückziehen auf demselben Stand; genau eine gelingt, die andere liefert `bericht_zurueckgezogen` bzw. `bereits_geprueft`; genau ein neuer Eintrag in `BH_StatusChange`, `version` um 1 erhöht |
 
 Fehlergrund: Der Service wirft je Konflikt eine `PortalException` mit festem `Fehlercode` (`bericht_zurueckgezogen`,
@@ -446,19 +476,22 @@ zurück und meldet `inzwischen_geaendert` (zweite Sicherung nach gemeinsam 2.4).
 ## Bitte bestätigen
 
 - [ ] Plattform-Schlüssel `liferay-625` für `abweichend` in den Prüffällen.
-- [ ] Markierung „abweichend, begründet“ für AK-101 (Fälle AK-101-01, AK-101-02, AK-101-03) und AK-106-01 (6.1); das
+- [ ] Markierung „abweichend, begründet“ für AK-101-01 und AK-106-01 (6.1); AK-101-02 und AK-101-03 bleiben ohne; das
       Eintragen in `specs/pruefung/M02.json` übernimmt ein eigener Auftrag nach Freigabe.
 - [ ] „Bestätigte E-Mail“ auf 6.2.5 = `User.isEmailAddressVerified()`; ob das Setzen des Passworts über den Link an
       die Firmen-E-Mail als Bestätigung zählt, entscheidet Chris nach P00 (AK-201).
 - [ ] Die App deaktiviert das Liferay-Konto beim Deaktivieren der Person nicht mit (AK-102, AK-204).
-- [ ] Dunkelmodus-Umfang nach 3.2: App, Rahmen und Anmeldeseite hell und dunkel; Seiten des Portals außerhalb der App
-      bleiben hell und ungeprüft (**abweichend, begründet** zu M09-R19, UI-AK-16).
-- [ ] Eigene Glocke im Theme statt der Glocke der Dockbar (3.1); betrifft die Formulierung in `liferay-gemeinsam.md`
-      2.5 („die Glocke der Plattform zeigt die Nachricht“). Bei Zustimmung trägt G4-L oder die Freigabe von
-      `liferay-gemeinsam.md` das dort nach.
-- [ ] Ein einziges Plugin `bh-portlet` (Portlets, Hook, Service, Scheduler, Testschnittstelle) plus Theme (2.1);
-      Paketname `de.berichtsheft`.
-- [ ] Testbibliothek Jackson Databind 2.x (nur Test-Klassenpfad) als Ergänzung zu `liferay-gemeinsam.md` Abschnitt 7.
+- [ ] Dunkelmodus-Umfang nach 3.2: App, Rahmen, Anmeldeseite, „Passwort vergessen“ und „Passwort setzen“ hell und
+      dunkel; Control Panel und Fehlerseiten des Portals bleiben hell und ungeprüft (**abweichend, begründet** zu M09-R19,
+      UI-AK-16).
+- [ ] **Vorschlag für `liferay-gemeinsam.md` 2.5 und die Bausteintabelle in `docs/06-spec-architektur.md`** („Benachrichtigung
+      in der App“): eigene Glocke im Theme aus `BH_Notification` statt der Glocke der Dockbar (3.1); das Abbild in
+      `UserNotificationEvent` wird nur für U03 weitergeführt, nicht angezeigt (Alternative in 3.1, Wahl in U00).
+- [ ] **Vorschlag für `liferay-gemeinsam.md` Abschnitt 7:** Testbibliothek Jackson Databind mit fester Version (ab
+      2.13 Java 8; Version in P00), nur Test-Klassenpfad; bei der Ausweiche Java 7 Jackson 2.12.x und Ant 1.9.x.
+- [ ] **Vorschlag für `liferay-gemeinsam.md`:** Paketwurzel `de.berichtsheft` auf beiden Plattformen.
+- [ ] Ein einziges Plugin `bh-portlet` (Portlets, Hook, Service, Scheduler, Testschnittstelle) plus Theme (2.1).
+- [ ] `pflichtangaben_fehlen` beim Einreichen als Ergebnis statt Ausnahme, damit die Tage gespeichert bleiben (7).
 - [ ] Erinnerung und Ausgangskorb mit Takt alle 15 Minuten, Fälligkeit aus der Fachlogik (3).
 - [ ] E-Mail synchron über `MailEngine.send` statt `MailServiceUtil` (3).
 - [ ] **Pfadmuster für AM-R04, Korrekturen zu `liferay-gemeinsam.md` Abschnitt 5 (Spalte 6.2.5)**, zur Übernahme durch
@@ -466,23 +499,27 @@ zurück und meldet `inzwischen_geaendert` (zweite Sicherung nach gemeinsam 2.4).
 
 | Zeile in gemeinsam 5 | Bisher | Ergänzung | Grund |
 | --- | --- | --- | --- |
-| Anmeldung, Binden | `liferay-625/**/hook/**`, `liferay-625/**/liferay-hook.xml`, `liferay-625/**/portal.properties` | `liferay-625/**/html/hooks/login/**` | JSP-Hook der Anmeldeseite (Anmeldewege, Formular) |
-| Konfiguration, Betriebsart, Testschnittstelle | `liferay-625/**/portal-ext.properties`, `liferay-625/**/pruefung/**` | `liferay-625/**/portal-ext*.properties`, `liferay-625/**/web.xml` | Vorlage `portal-ext.beispiel.properties`; `web.xml` meldet die Testschnittstelle an |
-| Schema und Schutz in der Datenhaltung | `liferay-625/**/service.xml`, `liferay-625/**/sql/**`, `liferay-625/**/model/listener/**` | `liferay-625/**/upgrade/**`, `liferay-625/**/custom-sql/**`, `liferay-625/**/portlet.properties`, `liferay-625/**/service.properties`, `liferay-625/**/portlet-model-hints.xml` | Skript als `UpgradeProcess`; Sperre und bedingtes Update; Anmeldung der `ModelListener`; `build.auto.upgrade`; Spaltenlängen |
+| Anmeldung, Binden | `liferay-625/**/hook/**`, `liferay-625/**/liferay-hook.xml`, `liferay-625/**/portal.properties` | `liferay-625/**/html/hooks/login/**` | JSP-Hook der Anmeldeseite, „Passwort vergessen“ und „Passwort setzen“ |
+| Konfiguration, Betriebsart, Testschnittstelle | `liferay-625/**/portal-ext.properties`, `liferay-625/**/pruefung/**` | `liferay-625/**/portal-ext*.properties`, `liferay-625/**/web.xml` | Vorlage `portal-ext.beispiel.properties`; `web.xml` trägt das Servlet der Testschnittstelle ein |
+| Schema und Schutz in der Datenhaltung | `liferay-625/**/service.xml`, `liferay-625/**/sql/**`, `liferay-625/**/model/listener/**` | `liferay-625/**/upgrade/**`, `liferay-625/**/custom-sql/**`, `liferay-625/**/portlet.properties`, `liferay-625/**/service*.properties`, `liferay-625/**/portlet-model-hints.xml` | Skript als `UpgradeProcess`; Sperre und bedingtes Update; Upgrade-Prozesse (Ort in P00); `ModelListener` und `build.auto.upgrade` in `service-ext.properties`; Spaltenlängen |
 
 Bestätigt ohne Änderung: die Zeilen zu Filter und Sitzung, Zugangsregeln (`domain/access`), Rollen- und
-Besitzprüfung (`service/impl`, `service/permission`) und Rechten der Portlets.
+Besitzprüfung (`service/impl`, `service/permission`) und Rechten der Portlets. Nicht erfasst und als Hinweis für G4-L
+(2.3): `ivy.xml`, `build.xml` und `ivy-settings.xml`; Vorschlag `liferay-625/**/ivy*.xml`, `liferay-625/**/build*.xml`.
 
 ## In P00 zu bestätigen
 
 1. Bundle 6.2.5 GA6 startet mit OpenJDK 8; Tomcat-Version im Bundle; Speicher und Startzeit.
 2. Portal auf PostgreSQL 16 mit JDBC 42.7.14; alter Treiber entfernt.
-3. Plugins SDK baut mit Ant aus Ubuntu und Ivy nur aus Maven Central; Ant-Ziele für Tests in `build.xml`.
+3. Plugins SDK baut mit Ant aus Ubuntu und Ivy nur aus Maven Central; Ant-Ziele für Tests in `build.xml`;
+   `javac.source`/`javac.target` auf `1.8` angehoben; feste Jackson-Version auf Maven Central.
 4. Service Builder 6.2: `namespace` `BH`, erzeugte `tables.sql` gegen `liferay-gemeinsam.md` 2.3; `mvcc-enabled` in
    der DTD von 6.2 nicht vorhanden; `build.auto.upgrade=false` wirkt.
 5. Reihenfolge beim ersten Deployment: Tabellen von Service Builder, danach `UpgradeProcess` mit dem Skript aus
-   gemeinsam 2.6 (`upgrade.processes`, Release-Nummer in `portlet.properties`).
-6. `ModelListener` für Entities des Plugins über `value.object.listener.*` in `portlet.properties`.
+   gemeinsam 2.6; wo `upgrade.processes` und die Release-Nummer stehen (`portlet.properties` oder
+   `service.properties`/`service-ext.properties`).
+6. `ModelListener` für Entities des Plugins über `value.object.listener.*` in `service-ext.properties` (gelesen über
+   `ServiceProps` der `*PersistenceImpl`); `build.auto.upgrade=false` dort.
 7. Hook-Teile (`login.events.post`, `servlet.service.events.pre`, Servlet-Filter, JSP-Hook) im selben Portlet-Plugin.
 8. Service Builder verarbeitet `*LocalServiceImpl` nur ohne Java-8-Syntax; Jasper von Tomcat 7 ebenso.
 9. Lesende Transaktionen nach Methodenpräfix; Zurückrollen bei `PortalException`.
@@ -494,10 +531,11 @@ Besitzprüfung (`service/impl`, `service/permission`) und Rechten der Portlets.
 14. `UserNotificationHandler` und Verhalten der Dockbar-Glocke (3.1).
 15. Login: Folgeseiten abschaltbar (Nutzungsbedingungen, Erinnerungsfrage, Passwortwechsel); `auth.login.url`,
     Landeseite, Abmeldeseite, Rücksprungziel; `company.security.auto.login=false`; `session.timeout.warning=0`.
-16. Bestätigte E-Mail: Wert von `emailAddressVerified` bei vom Admin angelegten Konten und wie er wahr wird.
+16. JSP-Hook für Anmeldeseite, „Passwort vergessen“ und „Passwort setzen“. Bestätigte E-Mail: Wert von `emailAddressVerified` bei vom Admin angelegten Konten und wie er wahr wird.
 17. Sass des Themes: CSS-Variablen, `var()`, `@media (prefers-color-scheme)`; sonst Tokens im `<head>`.
 18. Theme mit Eltern-Theme `_styled`; Portlet-Rahmen ohne `h1`; Dockbar ausblendbar je Rolle; Titelvorlage.
-19. Testschnittstelle per `ServletContext.addServlet` nur bei `bh.betrieb=test`; `PropsUtil.get("bh.betrieb")` liest
+19. Testschnittstelle als festes Servlet in `web.xml` mit 404 außer bei `bh.betrieb=test` (`ServletContext.addServlet`
+    aus einem Listener scheitert vermutlich mit `IllegalStateException`); `PropsUtil.get("bh.betrieb")` liest
     eigene Schlüssel aus `portal-ext.properties`.
 20. Seitenadressen der Site „Berichtsheft“ und `friendly-url-routes.xml` für den Bericht.
 21. Docker-Hub-Image `liferay/portal:6.2.5-ga6` für CI: Java-Version, Treiber, Startzeit; sonst eigenes Image.
