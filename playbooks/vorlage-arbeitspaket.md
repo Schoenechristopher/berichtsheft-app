@@ -12,6 +12,16 @@ Prüfung eines fertigen Auftrags vor dem Start (KE-AK-01): Auftrag als Datei abl
 feste Gründe wie `fehlender-abschnitt`, `fehlende-pruef-id`, `fehlende-stufe`, `fehlender-denkaufwand`,
 `fehlende-harte-grenze` oder `fehlende-diagnose-grenze`.
 
+Geprüfte Schreibweisen (so schreiben, dann erkennt die Prüfung sie sicher):
+
+- Stufe als `S1`, `S2` oder `S3`; Denkaufwand als „Denkaufwand mittel“ (auch „Denkaufwand: mittel“ oder „mittlerer
+  Denkaufwand“), Werte niedrig, mittel, hoch.
+- Beträge als „9 US-Dollar“ (auch „9 USD“, „USD 9“); „harte Grenze 9 US-Dollar inkl. Diagnose, davon Diagnose
+  höchstens 2 US-Dollar“, die Zahl jeweils kurz nach „harte Grenze“ bzw. „Diagnose“.
+- AK- und Prüffall-IDs einzeln: Ein Bereich „AK-1201 bis AK-1206“ zählt nur die beiden Endpunkte. Ein Playbook Pnn
+  nennt deshalb jede AK-ID seines Moduls einzeln (P10: die von Q). IDs anderer Specs (KE-AK, AM-AK, MW-AK) gelten nicht
+  als Fach-AK; im Fertig-Kriterium eines Prozesspakets genügen sie.
+
 Modelle erscheinen in Aufträgen nie mit Namen oder Kennung, nur als Stufe S1, S2 oder S3 (MW-R01, MW-R03). Welches
 Modell eine Stufe hat, ermittelt die Steuerung zur Laufzeit.
 
@@ -30,7 +40,7 @@ Ausfüllhinweis:
 
 Ausfüllhinweis: Plattform-Reihe und Playbook (`playbooks/<plattform>/Pnn-<kurzname>.md` oder
 `playbooks/upgrade-625-auf-72/Unn-<kurzname>.md`), bei geteilten Playbooks die Schritte, dazu der empfohlene Weg (A aus
-dem Quellcode, B aus der Spec). Ohne Playbook: die Grundlagen mit Regel-IDs (z. B. KE-R01, MW-R05), nicht deren Text.
+dem Quellcode, B aus der Spec). Ein Playbook Pnn nennt jede AK-ID seines Moduls einzeln, nicht als Bereich. Ohne Playbook: die Grundlagen mit Regel-IDs (z. B. KE-R01, MW-R05), nicht deren Text.
 
 ## Dateien in Lesereihenfolge
 

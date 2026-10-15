@@ -99,8 +99,8 @@ export const PROOF_IDS = ["AK-505", "AK-508"] as const;
 
 export const PROFILE_FILES = ["profile/typescript-nextjs.md", "profile/liferay-625.md", "profile/liferay-72.md"];
 
-/** Pfade, die in G4 neu entstehen und deshalb nicht geprüft werden (gemeinsame Konventionen G4). */
-const FUTURE_PATHS = new Set([...PROFILE_FILES, "profile/liferay-gemeinsam.md"]);
+/** Ordner, die in G4 neu entstehen; Pfade darin werden nicht geprüft (gemeinsame Konventionen G4). */
+const FUTURE_DIRS = ["playbooks/", "profile/"];
 
 /** Anfänge von Repository-Pfaden, deren Existenz geprüft wird. */
 const PATH_PREFIXES = [
@@ -195,8 +195,13 @@ function checkSections(file: string, sections: Section[], titles: readonly strin
   return findings;
 }
 
-/** AK-, UI-AK- oder Prüffall-ID; `KE-AK-01` o. Ä. zählt nicht (anderes Präfix). */
-const SPEC_ID = /(?<![\w-])(UI-AK-\d{2}|AK-\d{3,4})(-\d{2})?(?![\w-]?\d)/g;
+/**
+ * Kandidat für eine AK-, UI-AK- oder Prüffall-ID; `KE-AK-01`, `AM-AK-13` o. Ä. zählen nicht (anderes Präfix). Ein
+ * Kandidat, der keine gültige Form hat (z. B. `AK-12011`), ist eine unbekannte AK-ID.
+ */
+const SPEC_ID_CANDIDATE = /(?<![\w-])(?:UI-)?AK-\d+(?:-\d+)*(?![\w-]*\w)/g;
+/** Gültige Form: AK-ID (`AK-404`, `UI-AK-01`), wahlweise mit laufender Nummer des Prüffalls (`AK-404-01`). */
+const SPEC_ID = /^(UI-AK-\d{2}|AK-\d{3,4})(-\d{2})?$/;
 /** Prüf-ID im Fertig-Kriterium: AK-, UI-AK-, Prüffall- oder Spec-AK-ID wie `KE-AK-01`. */
 const ANY_CHECK_ID = /(?<![\w-])(?:[A-Z]{1,3}-)?AK-\d{2,4}(?:-\d{2})?\b/;
 
@@ -216,13 +221,16 @@ function checkOrderContent(file: string, sections: Section[]): Finding[] {
     if (!/\bS[123]\b/.test(level.body)) {
       findings.push({ file, line: level.line, reason: "fehlende-stufe", detail: level.title });
     }
-    if (!/Denkaufwand\W{0,3}(niedrig|mittel|hoch|sehr hoch|maximal)\b/i.test(level.body)) {
+    const effortAfter = /Denkaufwand\W{0,3}(?:niedrig|mittel|hoch|sehr hoch|maximal)\b/i;
+    // Gebeugt vor dem Wort: „niedriger“, „mittlerer“, „hoher“, „maximaler Denkaufwand“.
+    const effortBefore = /\b(?:niedrig|mittler|hoh|maximal)\w*\s+Denkaufwand/i;
+    if (!effortAfter.test(level.body) && !effortBefore.test(level.body)) {
       findings.push({ file, line: level.line, reason: "fehlender-denkaufwand", detail: level.title });
     }
   }
   const budget = findSection(sections, "Budget und Abbruch");
   if (budget && budget.body.trim() !== "") {
-    if (!/\d\s*(US-Dollar|USD|\$)/.test(budget.body)) {
+    if (!/\d\s*(US-Dollar|USD|\$)|(US-Dollar|USD|\$)\s*\d/.test(budget.body)) {
       findings.push({ file, line: budget.line, reason: "fehlender-betrag", detail: budget.title });
     }
     if (!/harte Grenze[^\d]{0,40}\d/i.test(budget.body)) {
@@ -235,7 +243,10 @@ function checkOrderContent(file: string, sections: Section[]): Finding[] {
   return findings;
 }
 
-/** AK-IDs, die ein Playbook nennen muss: Pnn (n = 1…9) die von Mnn, P10 die von Q, sonst keine. */
+/**
+ * AK-IDs, die ein Playbook nennen muss: Pnn (n = 1…9) die von Mnn, P10 die von Q, sonst keine. Jede AK-ID muss einzeln
+ * dastehen; ein Bereich „AK-1201 bis AK-1206“ zählt nur seine Endpunkte.
+ */
 function requiredCriteria(kind: DocumentKind, context: Context): readonly string[] {
   if (kind.kind !== "playbook" || kind.series !== "P") {
     return [];
@@ -246,8 +257,13 @@ function requiredCriteria(kind: DocumentKind, context: Context): readonly string
   return kind.number === 10 ? (context.moduleCriteria.get("Q") ?? []) : [];
 }
 
-/** Modellkennungen (MW-R03); erlaubt sind „Claude Code“, „Claude-Code-…“, `.claude/` und `claude/…`. */
-const MODEL_PATTERNS = [/\bclaude-(?!code\b)[a-z0-9]/gi, /\b(?:opus|sonnet|haiku|fable)\b/gi];
+/**
+ * Modellkennungen (MW-R03): `claude-<familie>…` oder `claude-<version>-…` (z. B. `claude-3-5-…`) und die
+ * Familiennamen als ganze Wörter. Erlaubt bleiben „Claude Code“, „Claude-Sitzung“, `.claude/`, `claude/…` und
+ * Pfade wie `/tmp/claude-0/`.
+ */
+const MODEL_ID = /\bclaude-(?:opus|sonnet|haiku|fable|\d+[-.]\d)[\w.-]*/gi;
+const MODEL_FAMILY = /\b(?:opus|sonnet|haiku|fable)\b/gi;
 
 /** Prüfungen für jede Datei: IDs, Repository-Pfade und Modellkennungen. */
 function checkReferences(file: string, markdown: string, context: Context): Finding[] {
@@ -255,9 +271,11 @@ function checkReferences(file: string, markdown: string, context: Context): Find
   const knownCriteria = new Set([...context.moduleCriteria.values()].flat());
   linesOf(markdown).forEach(({ text }, index) => {
     const line = index + 1;
-    for (const match of text.matchAll(SPEC_ID)) {
-      const [id, criterion, caseSuffix] = match;
-      if (caseSuffix) {
+    for (const [id] of text.matchAll(SPEC_ID_CANDIDATE)) {
+      const [, criterion, caseSuffix] = SPEC_ID.exec(id) ?? [];
+      if (!criterion) {
+        findings.push({ file, line, reason: "unbekannte-ak-id", detail: id });
+      } else if (caseSuffix) {
         if (!context.caseIds.has(id)) {
           findings.push({ file, line, reason: "unbekannte-prueffall-id", detail: id });
         }
@@ -273,8 +291,14 @@ function checkReferences(file: string, markdown: string, context: Context): Find
         }
       }
     }
-    for (const pattern of MODEL_PATTERNS) {
-      for (const match of text.matchAll(pattern)) {
+    const ids = [...text.matchAll(MODEL_ID)];
+    for (const match of ids) {
+      findings.push({ file, line, reason: "modellkennung", detail: match[0] });
+    }
+    for (const match of text.matchAll(MODEL_FAMILY)) {
+      // Ein Familienname innerhalb einer schon gemeldeten Kennung zählt nicht doppelt.
+      const inId = ids.some((id) => match.index >= id.index && match.index < id.index + id[0].length);
+      if (!inId) {
         findings.push({ file, line, reason: "modellkennung", detail: match[0] });
       }
     }
@@ -284,19 +308,19 @@ function checkReferences(file: string, markdown: string, context: Context): Find
 
 /**
  * Zu prüfender Repository-Pfad aus dem Inhalt eines Backtick-Abschnitts, sonst `null`: nur ein einzelnes Wort mit
- * bekanntem Anfang; ausgenommen sind Muster (`*`, `<…>`, `…`) und Pfade, die in G4 neu entstehen (`playbooks/**`,
- * Profile). Eine Zeilenangabe (`:12`) oder ein Anker (`#…`) am Ende zählt nicht zum Pfad.
+ * bekanntem Anfang; ausgenommen sind Muster (`*`, `{a,b}`, `<…>`, `…`) und die Ordner, die in G4 neu entstehen
+ * (`playbooks/`, `profile/` samt Unterordnern). Eine Zeilenangabe (`:12`, `:12-20`) oder ein Anker (`#…`) am Ende
+ * zählt nicht zum Pfad.
  */
 export function repositoryPath(code: string): string | null {
   const text = code.trim();
   if (/\s/.test(text) || !PATH_PREFIXES.some((prefix) => text.startsWith(prefix))) {
     return null;
   }
-  if (/[*<>…]/.test(text) || text.startsWith("playbooks/")) {
+  if (/[*<>…{}]/.test(text) || FUTURE_DIRS.some((dir) => text.startsWith(dir))) {
     return null;
   }
-  const path = text.replace(/#.*$/, "").replace(/:\d+(?::\d+)?$/, "");
-  return FUTURE_PATHS.has(path) ? null : path;
+  return text.replace(/#.*$/, "").replace(/:\d+(?:[-:]\d+)?$/, "");
 }
 
 /**

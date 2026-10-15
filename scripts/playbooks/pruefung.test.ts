@@ -75,6 +75,19 @@ describe("Auftrag", () => {
     ]);
   });
 
+  it("KE-AK-01 Denkaufwand und Betrag werden in üblichen Schreibweisen erkannt", () => {
+    const base = fixture("auftrag-vollstaendig.md");
+    const variants = [
+      base.replace("Stufe S2, Denkaufwand mittel.", "Stufe S2, mittlerer Denkaufwand."),
+      base.replace("Stufe S2, Denkaufwand mittel.", "Stufe S2. Denkaufwand: mittel."),
+      base.replace("Richtwert 4–6 US-Dollar, harte Grenze 9 US-Dollar", "Richtwert USD 5, harte Grenze USD 9"),
+      base.replace("Richtwert 4–6 US-Dollar, harte Grenze 9 US-Dollar", "Richtwert 5 USD, harte Grenze 9 USD"),
+    ];
+    for (const markdown of variants) {
+      expect(checkDocument(ORDER, markdown, context, true)).toEqual([]);
+    }
+  });
+
   it("Überschriften in Codeblöcken zählen nicht als Abschnitt", () => {
     const markdown = "# Auftrag\n\n```markdown\n## Ziel und Fertig-Kriterium\nAK-501-01\n```\n";
     expect(reasons(checkDocument(ORDER, markdown, context, true))).toContain(
@@ -152,11 +165,20 @@ describe("Playbook", () => {
     ]);
   });
 
-  it("IDs anderer Specs wie KE-AK-01 oder AM-AK-02 werden nicht als AK-ID geprüft", () => {
+  it("Kennung ohne gültige ID-Form wird als unbekannte AK-ID gemeldet", () => {
+    const markdown = `${fixture("playbook-p05.md")}\nAK-508, AK-12011, UI-AK-1, AK-501-1.\n`;
+    expect(reasons(checkDocument(PLAYBOOK, markdown, context))).toEqual([
+      "unbekannte-ak-id AK-12011",
+      "unbekannte-ak-id UI-AK-1",
+      "unbekannte-ak-id AK-501-1",
+    ]);
+  });
+
+  it("IDs anderer Specs werden nicht gegen die Fach-Specs geprüft", () => {
     const markdown = `${fixture("playbook-p05.md")}\nAK-508, KE-AK-01, AM-AK-02, MW-R03.\n`;
     expect(checkDocument(PLAYBOOK, markdown, context)).toEqual([]);
   });
-  it("KE-AK-06 und AM-AK-13 sind keine Fach-AK", () => {
+  it("fremde Spec-IDs (KE-AK, AM-AK, MW-AK) gelten nicht als Fach-AK", () => {
     const markdown = `${fixture("playbook-p05.md")}\nAK-508; KE-AK-01, KE-AK-04, KE-AK-05, KE-AK-06, AM-AK-13, MW-AK-01, MW-AK-02.\n`;
     expect(checkDocument(PLAYBOOK, markdown, context)).toEqual([]);
     expect(checkDocument("playbooks/00-steuerung.md", "KE-AK-06 und AM-AK-13 (AM-AK-13-01)", context)).toEqual([]);
@@ -175,7 +197,7 @@ describe("Profil", () => {
     ]);
   });
 
-  it("Nachweis-Abschnitt ohne AK-508 im Text wird gemeldet", () => {
+  it("Nachweis-Abschnitt, der eine der beiden IDs nicht nennt, wird gemeldet", () => {
     const markdown = fixture("profil.md").replace("AK-508 über einen Browser-Test.", "Rest offen.");
     expect(reasons(checkDocument(PROFILE, markdown, context))).toEqual(["fehlender-nachweis AK-508"]);
   });
@@ -186,11 +208,12 @@ describe("Pfade und Modellkennungen", () => {
     const markdown = [
       "`specs/M05-status.md` `specs/fehlt.md` `src/fehlt.ts:12`",
       "`specs/M0n-*.md` `playbooks/typescript/P01-x.md` `profile/liferay-gemeinsam.md` `liferay-72/modules/x`",
-      "`npm test` `docs/<datei>.md`",
+      "`npm test` `docs/<datei>.md` `profile/` `playbooks/liferay-625/` `specs/{M01,M02}.md` `src/fehlt2.ts:12-20`",
     ].join("\n");
     expect(reasons(checkDocument("playbooks/00-steuerung.md", markdown, context))).toEqual([
       "fehlender-pfad specs/fehlt.md",
       "fehlender-pfad src/fehlt.ts",
+      "fehlender-pfad src/fehlt2.ts",
     ]);
   });
 
@@ -203,11 +226,16 @@ describe("Pfade und Modellkennungen", () => {
 
   it("Modellkennungen werden gemeldet, erlaubte Schreibweisen nicht", () => {
     const family = ["Son", "net"].join("");
-    const id = ["claude", "x-1"].join("-");
-    const allowed = "Claude Code, Claude-Code-Sitzung, `.claude/`, Branch `claude/g4-a`, Stufe S1.";
+    const named = ["claude", family.toLowerCase(), "9"].join("-");
+    const versioned = ["claude", "3", "5", "x"].join("-");
+    const allowed =
+      "Claude Code, Claude-Code-Sitzung, Claude-Sitzung, Claude-Sitzungen, `.claude/`, Branch `claude/g4-a`, " +
+      "`/tmp/claude-0/x`, Stufe S1.";
     expect(checkDocument("playbooks/00-steuerung.md", allowed, context)).toEqual([]);
-    expect(reasons(checkDocument("profile/liferay-gemeinsam.md", `${family} hilft. Kennung ${id}.`, context))).toEqual([
-      `modellkennung ${id.slice(0, 8)}`,
+    const text = `${family} hilft. Kennungen ${named} und ${versioned} sind verboten.`;
+    expect(reasons(checkDocument("profile/liferay-gemeinsam.md", text, context))).toEqual([
+      `modellkennung ${named}`,
+      `modellkennung ${versioned}`,
       `modellkennung ${family}`,
     ]);
   });
