@@ -11,8 +11,10 @@ anders oder zusätzlich zu beachten ist. Verweise in der Form „gemeinsam 2.4�
 
 Wie jedes Profil ändert diese Datei keine Regel; maßgeblich sind die Fach-Specs unter `specs/`. **Alle Angaben zu
 Liferay-Verhalten, Versionen und Werkzeugen gelten als „in P00 zu bestätigen“**, bis P00 sie im laufenden System
-nachgewiesen hat; die Liste steht am Ende („In P00 zu bestätigen“). Abweichungen von `profile/liferay-gemeinsam.md`
-stehen nur unter „Bitte bestätigen“.
+nachgewiesen hat; die Liste steht am Ende („In P00 zu bestätigen“). Dieses Profil setzt nichts fest, was
+`profile/liferay-gemeinsam.md` regelt oder was beide Plattformen betrifft: Solche Punkte gehören nach dessen Abschnitt 1
+in die gemeinsame Datei und stehen hier nur als „Vorschlag für liferay-gemeinsam.md (beide Plattformen)“ unter „Bitte
+bestätigen“. Bis zur Freigabe gilt gemeinsam.
 
 ## 1. Laufzeit und Versionen
 
@@ -40,16 +42,18 @@ stehen nur unter „Bitte bestätigen“.
 - **Konfiguration:** `liferay-72/configs/common/osgi/configs/com.liferay.portal.search.elasticsearch6.configuration.ElasticsearchConfiguration.config`
   mit `operationMode="EMBEDDED"` und festem `clusterName`; kein Neuaufbau des Index beim Start
   (`index.on.startup=false` in `portal-ext.properties`).
-- **Speicher:** Der eingebettete Knoten teilt sich den Heap der Liferay-JVM. Vorschlag: `-Xms2g -Xmx3g` für die JVM
-  (Bundle-Voreinstellung in `setenv.sh` ist höher), Metaspace 768 MB. Auf dem Standard-Runner (16 GB) bleiben damit
+- **Speicher:** Der eingebettete Knoten teilt sich den Heap der Liferay-JVM. Vorschlag: höchstens `-Xmx3g` für die JVM
+  (die Voreinstellung in `setenv.sh` des Bundles 7.2.1 liegt laut Review bei `-Xmx2560m`; in P00 zu bestätigen, ebenso
+  ob der eingebettete Knoten damit auskommt). Auf dem Standard-Runner (16 GB) bleiben damit
   Reserven für PostgreSQL, Node und drei Browser; P00 misst Spitzenwert und Startzeit und legt die Zahlen fest.
 - **Grenze:** Verwaltungsseiten von Liferay (Benutzerliste im Control Panel) lesen aus dem Index. Sie sind nicht Teil der
   App (Abschnitt 6); ein leerer oder veralteter Index berührt keine AK.
 
 ## 2. Projektstruktur und Build
 
-Alles für 7.2 liegt unter `liferay-72/`, einem Liferay Workspace. Paketwurzel der Java-Quellen ist `de.berichtsheft`
-(Vorschlag, gleich mit 6.2.5 wegen U02; siehe „Bitte bestätigen“). Code-Bezeichner englisch, Oberfläche deutsch.
+Alles für 7.2 liegt unter `liferay-72/`, einem Liferay Workspace. Paketwurzel der Java-Quellen ist in diesem Profil
+`de.berichtsheft`; das ist ein Vorschlag für liferay-gemeinsam.md (beide Plattformen, wegen U02), siehe „Bitte
+bestätigen“. Code-Bezeichner englisch, Oberfläche deutsch.
 
 ```text
 liferay-72/
@@ -60,9 +64,9 @@ liferay-72/
     ci/            GitHub Actions: JDBC auf den Dienst-Container, bh.betrieb=test, Mailpit
     prod/          Vorlage ohne Geheimnisse, bh.betrieb=produktion (nur Demo, kein Produktivbetrieb)
   modules/
-    bh-domain/                 reine Fachlogik (Java 8, keine Liferay-Abhängigkeit) und ihre JUnit-Tests
-                               samt Fachlogik-Adapter für specs/pruefung (Abschnitt 4)
-    bh-clock/                  OSGi-Uhr-Service (Abschnitt 3.2)
+    bh-domain/                 reine Fachlogik (Java 8, keine Liferay-Abhängigkeit) mit der Uhr-Schnittstelle,
+                               JUnit-Tests samt Fachlogik-Adapter für specs/pruefung (Abschnitt 4)
+    bh-clock/                  Umsetzung der Uhr als OSGi-Service (Abschnitt 3.2)
     bh/bh-api, bh/bh-service   Service Builder: service.xml, Modelle, *LocalServiceImpl, Finder, ModelListener,
                                Upgrade-Schritte mit dem Skript „Schutz in der Datenhaltung“ (gemeinsam 2.6)
     bh-access/                 Zugang: LifecycleActions (login.events.post, servlet.service.events.pre,
@@ -113,12 +117,12 @@ Grundlage ist gemeinsam 3.1. Die Tabelle nennt nur, wie 7.2 den gemeinsamen Baus
 | Sitzung höchstens 8 Stunden (M02-R05) | Anmeldezeitpunkt aus der Uhr in der HTTP-Sitzung (beim Login gesetzt), die Pre-Action beendet die Sitzung nach 8 Stunden; `session.timeout` bleibt für Untätigkeit | `bh-access` |
 | Rollen und Besitz (M02-R13) | Prüfung in jeder Methode der `*LocalServiceImpl` gegen `BH_Person` des handelnden Benutzers; die MVC-Commands übergeben nur die `userId`. Liferay-Rollen „BH Azubi“ und „BH Ausbilder“ steuern nur die Sichtbarkeit von Seiten (gemeinsam 2.5) | `bh-service`, Paket `…service.impl`; `…security.permission` |
 | Persistenz | Service Builder mit DS; Custom SQL in `META-INF/custom-sql/default.xml`, Finder in `…service.persistence.impl.*FinderImpl` über den OSGi-Dienst `CustomSQL` | `bh-service` |
-| Transaktion und Gleichzeitigkeit | gemeinsam 2.4; die Transaktion ist die der `*LocalServiceImpl`-Methode. Fachliche Abweisungen sind Unterklassen von `PortalException` mit festem Grund, damit `@Transactional` sie zurückrollt (Nachweis unten) | `bh-service` |
+| Transaktion und Gleichzeitigkeit | gemeinsam 2.4; die Transaktion ist die der `*LocalServiceImpl`-Methode. Abweisungen, nach denen nichts gespeichert sein darf, sind Unterklassen von `PortalException` mit festem Grund und rollen zurück. Das Scheitern an fehlenden Pflichtangaben beim Einreichen ist **keine Ausnahme**, sondern ein Ergebnis, damit die gespeicherten Tage bleiben (M05-R08; Nachweis unten) | `bh-service` |
 | Historie und Schreibschutz | gemeinsam 2.6; `ModelListener` als DS-Komponenten (Nachweis unten) | `bh-service`, Paket `…model.listener` |
 | Uhr | eigener OSGi-Service, Abschnitt 3.2 | `bh-clock` |
 | Hintergrundjobs | `MessageListener` plus `SchedulerEngineHelper.register(…)` mit `TriggerFactory`; Abschnitt 3.3 | `bh-notification` |
-| Benachrichtigung in der App | `UserNotificationHandler` (DS-Komponente mit `javax.portlet.name` des Benachrichtigungs-Portlets) und `UserNotificationEventLocalService`; Quelle bleibt `BH_Notification` (gemeinsam 2.5). Die Glocke im Kopf ist eine eigene Komponente des Themes (UI-AK-03), nicht das Liferay-Benutzermenü | `bh-notification`, `bh-theme` |
-| E-Mail | Liferay-Mailkonfiguration (`mail.session.mail.smtp.*` in `portal-ext.properties`); versendet wird synchron über die `javax.mail.Session` des Portals, nicht über den asynchronen `MailService`, damit der Ausgangskorb Erfolg und Fehler je Nachricht erfährt (M08, Abschnitt 7) | `bh-notification` |
+| Benachrichtigung in der App | `UserNotificationHandler` (DS-Komponente mit `javax.portlet.name` des Benachrichtigungs-Portlets) und `UserNotificationEventLocalService`; Quelle bleibt `BH_Notification` (gemeinsam 2.5). Zähler und Vorschau im Kopf: Vorschlag eigene Glocke im Theme, weil UI-AK-03 („99+“, Name mit genauer Zahl, Vorschau ohne Gelesen-Markierung) mit der Liferay-Glocke nicht sicher erfüllbar ist; das weicht von gemeinsam 2.5 und dem Bordmittel-Grundsatz ab und steht unter „Bitte bestätigen“. `readAt` (M08-R16): Abschnitt 3.5 | `bh-notification`, `bh-theme` |
+| E-Mail | gemeinsam 3.2 (Mailservice von Liferay, Konfiguration `mail.session.mail.smtp.*` in `portal-ext.properties`). Offen: Der `MailService` versendet asynchron und meldet keinen Fehler je Nachricht zurück (Abschnitt 7); Vorschlag für liferay-gemeinsam.md (beide Plattformen): synchroner Versand über die `javax.mail.Session` des Portals, unter „Bitte bestätigen“ | `bh-notification` |
 | Teams | gemeinsam 3.2, Eigenschaft `bh.teams.modus` als OSGi-Konfiguration | `bh-notification` |
 | PDF | PDFBox 2.0.37 (gemeinsam 7) per `compileInclude` ins Modul eingebettet; Noto Sans als Ressource des Moduls | `bh-pdf` |
 | Oberfläche | MVC-Portlets mit JSP, Clay-Taglibs nur, wo sie Tokens annehmen; eigene Seiten-Vorlage im Theme; Senna (SPA) für die Site abgeschaltet (Abschnitt 7) | `bh-web`, `bh-theme` |
@@ -141,8 +145,8 @@ Grundlage ist gemeinsam 3.1. Die Tabelle nennt nur, wie 7.2 den gemeinsamen Baus
 
 ### 3.2 Uhr als OSGi-Service (M01-R01 bis M01-R04, AK-1201)
 
-- **Schnittstelle** `de.berichtsheft.clock.Clock` mit `Instant now()` (gemeinsam 3.2) im exportierten Paket von
-  `bh-clock`; die Fachlogik in `bh-domain` kennt nur diese Schnittstelle bzw. bekommt den Zeitpunkt übergeben.
+- **Schnittstelle** `Clock` (gemeinsam 3.2) liegt in `bh-domain` (Paket `de.berichtsheft.domain.clock`), damit die
+  Fachlogik ohne Liferay-Modul übersetzt und getestet wird. `bh-clock` hängt von `bh-domain` ab und setzt sie um.
 - **Eine Komponente** `ClockImpl` (`@Component(service = {Clock.class, ClockControl.class},
   configurationPid = "de.berichtsheft.configuration.BetriebConfiguration")`). Sie liefert die Systemzeit, außer eine
   Vorgabe ist gesetzt. `ClockControl` (`setFixed(Instant)`, `reset()`) nutzt nur die Testschnittstelle in
@@ -150,10 +154,8 @@ Grundlage ist gemeinsam 3.1. Die Tabelle nennt nur, wie 7.2 den gemeinsamen Baus
 - **Stellbar nur bei `bh.betrieb=test`:** `ClockImpl` liest die Betriebsart in `@Activate` und `@Modified`. Bei
   `produktion` (Voreinstellung in `@Meta.AD(deflt = "produktion")`) wirft `setFixed` eine Ausnahme und eine schon gesetzte
   Vorgabe wird verworfen (M01-R03). `bh-pruefung` registriert seine Dienste zusätzlich nur bei `bh.betrieb=test`.
-- **Einziger Lieferant von „jetzt“:** Kein Modul ruft `System.currentTimeMillis()`, `new Date()` oder `Instant.now()`
-  in Fachlogik oder Services; auch `createDate`/`modifiedDate`/`createdAt`/`updatedAt` füllt der Service aus der Uhr
-  (gemeinsam 2.2). P00 richtet dafür eine Prüfung ein (Suche im Build, die solche Aufrufe außerhalb von `ClockImpl`
-  meldet), Gegenprobe mit einem absichtlich eingefügten Aufruf.
+- **Einziger Lieferant von „jetzt“** nach gemeinsam 2.2 und 3.2. Auf 7.2 richtet P00 dafür eine Prüfung im Build ein,
+  die Aufrufe der Systemzeit außerhalb von `ClockImpl` meldet, mit Gegenprobe.
 - **Ein Knoten:** Die gestellte Uhr lebt im Speicher eines Knotens; L72 läuft in Sitzung und CI mit einem Knoten.
 
 ### 3.3 Zeitplan in Europe/Berlin
@@ -194,7 +196,7 @@ unverändert; „abweichend, begründet“ steht zusätzlich unter Abschnitt 6):
 | --- | --- | --- |
 | UI-AK-01 | gleichwertig | Seitenleiste und Schublade im Theme (`portal_normal.ftl`, eigenes Skript), nicht die Navigation von Liferay |
 | UI-AK-02 | gleichwertig | Menü im Theme aus der Rolle in `BH_Person`; Seiten der Site bleiben über Liferay-Rollen gesperrt (gemeinsam 2.5) |
-| UI-AK-03 | gleichwertig | eigene Glocke im Theme (Zähler aus `BH_Notification`, Fachlogik wie TypeScript); die Liferay-Glocke ist nur Abbild |
+| UI-AK-03 | gleichwertig, wenn die eigene Glocke freigegeben wird (sonst in P08 mit der Liferay-Glocke neu zu bewerten) | eigene Glocke im Theme (Zähler aus `BH_Notification`, Fachlogik wie TypeScript); die Liferay-Glocke ist Abbild (3.5) |
 | UI-AK-04 | gleichwertig | Portlet Start Azubi; Fortschritt aus der Fachlogik |
 | UI-AK-05 | gleichwertig | Leerzustand mit festem Merker |
 | UI-AK-06 | gleichwertig | Raster im Theme; Control Menu von Liferay für Azubi und Ausbilder ausgeblendet (keine Verwaltungsrechte) |
@@ -212,6 +214,20 @@ unverändert; „abweichend, begründet“ steht zusätzlich unter Abschnitt 6):
 | UI-AK-18 | gleichwertig | eigener Dialog auf Basis von `<dialog>` statt `Liferay.Util.openModal` (iFrame, Fokus nicht sicher) |
 | UI-AK-19 | gleichwertig | `<title>` im Theme als „<Seite> – Berichtsheft“ (Halbgeviertstrich), Portlet-Dekorator `barebone` ohne eigene Überschrift, genau eine `h1` |
 | UI-AK-20 | gleichwertig | eigene Platzhalter; der Ladekreis von Liferay bei Seitenwechseln entfällt mit abgeschaltetem Senna |
+
+### 3.5 Glocke und Gelesen-Status (M08-R16)
+
+- **Quelle** ist `BH_Notification` (gemeinsam 2.5); zu jeder App-Nachricht legt `bh-notification` einen
+  `UserNotificationEvent` an und merkt dessen ID in `userNotificationEventId`.
+- **Lesen in der App** (eigene Glocke bzw. Seite „Benachrichtigungen“) setzt `readAt` aus der Uhr und markiert den
+  zugehörigen `UserNotificationEvent` als gelesen (`archived`), in derselben Transaktion.
+- **Lesen über die Liferay-Glocke:** Ein `ModelListener<UserNotificationEvent>` in `bh-notification` setzt bei
+  `onAfterUpdate`, wenn `archived` von `false` auf `true` wechselt, `readAt` der Nachricht mit dieser
+  `userNotificationEventId` (nur wenn noch leer, Zeitpunkt aus der Uhr). Ob 7.2 das Gelesen-Markieren über die
+  Persistenz schreibt (sonst greift der Listener nicht), klärt P00; Ausweg ist ein eigener `UserNotificationHandler`,
+  dessen Link über die App führt und dort `readAt` setzt.
+- **Vorschau ohne Gelesen-Markierung** (M09-R03, AK-1015) gilt nur für die eigene Glocke; die Liferay-Liste markiert
+  beim Öffnen womöglich selbst (P00).
 
 ## 4. Tests und Prüf-Adapter
 
@@ -295,11 +311,12 @@ Zeitlimit des Jobs 60 Minuten; Speicher und Laufzeit aus P00.
 
 Bereits entschieden (`docs/06-spec-architektur.md`, „Bewusste Abweichung“). Die Testpersonen melden sich mit E-Mail und
 Passwort ihres Liferay-Kontos an; Liferay speichert das Passwort, die App nicht (gemeinsam 2.5). Betroffen ist M02-R02
-(„ausschließlich über das Firmenkonto“) und die Ablauf-Fälle, die das Fehlen eines Passwortfelds prüfen.
+(„ausschließlich über das Firmenkonto“) und die Ablauf-Fälle, die die Anmeldeseite lesen.
 
 | AK-ID | Prüffälle | Bewertung auf 7.2 | Begründung bzw. Ersatz |
 | --- | --- | --- | --- |
-| AK-101 | AK-101-01, AK-101-02, AK-101-03 | **abweichend, begründet** | Die Anmeldeseite ist das Login-Portlet von Liferay mit Passwortfeld; `passwortfeld` ist `true`, `anmeldewege` nennt das Liferay-Konto statt `firmenkonto`. Die Fälle tragen `"abweichend": { "liferay-72": "profile/liferay-72.md, Abschnitt 6.1" }` (Änderung der Prüffälle nur nach Freigabe). Mit OIDC (6.2) entfällt die Abweichung, wenn die Bedingungen dort erfüllt sind. |
+| AK-101 | AK-101-01 | **abweichend, begründet** | Die Anmeldeseite ist das Login-Portlet von Liferay mit Passwortfeld; `passwortfeld` ist `true`, `anmeldewege` nennt das Liferay-Konto statt `firmenkonto`. Der Fall trägt `"abweichend": { "liferay-72": "profile/liferay-72.md, Abschnitt 6.1" }` (Änderung der Prüffälle nur nach Freigabe). Mit OIDC (6.2) entfällt die Abweichung, wenn die Bedingungen dort erfüllt sind. |
+| AK-101 | AK-101-02, AK-101-03 | gleichwertig | Sie lesen nur die Startseite nach der Anmeldung; dort gibt es kein Passwortfeld. Angemeldet wird über das Login-Portlet (Abschnitt 4). |
 | AK-106 | AK-106-01 | **abweichend, begründet** | Die ersten vier Schritte (Abmelden, Startseite und Prüfliste führen zur Anmeldung) sind gleichwertig; der letzte Schritt liest die Anmeldeseite und scheitert wie AK-101 nur an `passwortfeld` und `anmeldewege`. |
 | AK-106 | AK-106-02 | gleichwertig | Abmelden über `/c/portal/logout` beendet die Liferay-Sitzung; Liferay ist hier zugleich der Anmeldedienst (M02-R05). |
 | AK-102 | AK-102-01 bis AK-102-09 | gleichwertig | Fachlogik unverändert; die Pre-Action prüft bei jedem Zugriff (Abschnitt 3). Konto-ID ist die `userId` des Liferay-Kontos. |
@@ -335,7 +352,8 @@ Abweichung zu AK-101 nur, wenn P00 alle Bedingungen nachweist; sonst bleibt 6.1 
   Liferay folgen nicht den Tokens und werden nicht mit axe geprüft. Sie sind kein Teil der App: Azubis und Ausbilder
   erledigen alles auf Seiten der Site „Berichtsheft“ (auch die Nutzerverwaltung, M02 Abschnitt 8), die Verwaltung nutzt
   nur der Betreiber. Alle Seiten der App einschließlich Anmeldung bleiben im Umfang von UI-AK-16.
-- Alle übrigen UI-AK von M09 sind auf 7.2 gleichwertig (Tabelle in 3.4).
+- Alle übrigen UI-AK von M09 sind auf 7.2 gleichwertig (Tabelle in 3.4); UI-AK-03 nur mit der eigenen Glocke, die
+  unter „Bitte bestätigen“ steht.
 
 ## 7. Fallstricke und Grenzen
 
@@ -352,19 +370,20 @@ Abweichung zu AK-101 nur, wenn P00 alle Bedingungen nachweist; sonst bleibt 6.1 
 - **Senna (SPA-Navigation):** 7.2 wechselt Seiten standardmäßig per JavaScript. Dabei würde `data-theme` am `html` nicht
   neu gesetzt, die Warnung bei ungespeicherten Änderungen (M04-R13) und Seitentitel könnten verloren gehen. Senna wird
   für die Site „Berichtsheft“ abgeschaltet (Theme-Einstellung bzw. Konfiguration `com.liferay.frontend.js.spa`, P00).
-- **Service Builder schreibt am Cache vorbei:** Nach Custom SQL (bedingtes Update, Kaskade beim Löschen) Entity- und
-  Finder-Cache leeren und das Objekt aus der Hibernate-Sitzung entfernen (gemeinsam 2.4).
+- **Service Builder schreibt am Cache vorbei:** gemeinsam 2.4 („Cache“); auf 7.2 zusätzlich das Objekt aus der
+  Hibernate-Sitzung entfernen.
 - **Remote-Services:** `remote-service="true"` (Voreinstellung) erzeugt JSON-Webdienste, die Rollen- und Besitzprüfung
   der Portlets umgehen könnten. Deshalb überall `false` (Abschnitt 2), Gegenprobe in P02: `/api/jsonws` kennt keine
   BH-Dienste.
-- **`ModelListener` greift nur über die Persistenz:** Custom SQL und die Datenbank-Kaskade umgehen ihn; der Schutz
-  hängt deshalb an den Triggern (gemeinsam 2.6). Die Signatur von `onBeforeUpdate` und `onBeforeRemove` in 7.2 ist in
-  P00 zu bestätigen.
-- **`PortalException` und Rollback:** Nur Ausnahmen aus `rollbackFor` rollen zurück. Fachliche Abweisungen ohne
-  `PortalException` als Oberklasse würden einen halben Statuswechsel festschreiben (M05 Abschnitt 8).
+- **`ModelListener`:** Grenzen nach gemeinsam 2.6; die Signatur von `onBeforeUpdate` und `onBeforeRemove` in 7.2 ist
+  in P00 zu bestätigen.
+- **`PortalException` und Rollback:** Jede `PortalException` aus der Methode rollt die ganze Transaktion zurück, auch
+  vorher gespeicherte Tage. Eine Abweisung ohne `PortalException` als Oberklasse würde dagegen einen halben
+  Statuswechsel festschreiben (M05 Abschnitt 8). Deshalb gilt: Wo nach der Abweisung etwas gespeichert bleiben muss
+  (fehlende Pflichtangaben beim Einreichen, M05-R08), liefert der Service ein Ergebnis statt einer Ausnahme; überall
+  sonst wirft er. Kein `noRollbackFor`, weil es auch Fehler nach dem Speichern festschreiben würde.
 - **Mail asynchron:** Der `MailService` von Liferay versendet über den Message Bus und meldet Fehler nicht zurück; der
-  Ausgangskorb braucht das Ergebnis je Nachricht (M08). Deshalb synchroner Versand über die Mail-Sitzung des Portals
-  (Abschnitt 3).
+  Ausgangskorb braucht das Ergebnis je Nachricht (M08). Vorschlag für liferay-gemeinsam.md unter „Bitte bestätigen“.
 - **Scheduler in UTC:** Cron-Zeiten nie als Berliner Zeit schreiben (Abschnitt 3.3).
 - **Clay ist Sass, keine CSS-Variablen:** Jede neu genutzte Clay-Komponente braucht eine Token-Überschreibung im Theme,
   sonst bleibt sie im Dunkelmodus hell (axe meldet das nur bei zu wenig Kontrast).
@@ -380,16 +399,19 @@ Abweichung zu AK-101 nur, wenn P00 alle Bedingungen nachweist; sonst bleibt 6.1 
 **Mittel auf 7.2 (nach gemeinsam 2.6, Trigger plus `ModelListener`):**
 
 1. **Fachlogik und Service:** `darfBearbeiten` (`bh-domain`) entscheidet; jede Methode, die Tage schreibt, sperrt den
-   Bericht zuerst (`FOR UPDATE`, gemeinsam 2.4) und weist mit `ReportNotEditableException extends PortalException`
-   (Grund `nicht_bearbeitbar`) ab. Einreichen speichert die Tage und reicht in derselben Transaktion ein; scheitert nur
-   die Pflichtprüfung, bleiben die Tage gespeichert (M05-R08).
-2. **`ModelListener` als frühe Abweisung:** `ReportDayModelListener extends BaseModelListener<ReportDay>`
+   Bericht nach gemeinsam 2.4 und weist mit `ReportNotEditableException extends PortalException` (Grund
+   `nicht_bearbeitbar`) ab; ungültige Eingaben ebenso (`tage_ungueltig`), dann rollt alles zurück (AK-505-04).
+2. **Einreichen mit Speichern (M05-R08):** `WeeklyReportLocalServiceImpl.submit(…)` speichert die Tage, prüft dann die
+   Pflichtangaben und gibt ein `SubmitResult` zurück: entweder eingereicht oder `pflichtangaben_fehlen` mit den Tagen.
+   Das Scheitern an den Pflichtangaben **wirft nicht**; die Transaktion endet normal, die Tage bleiben als Entwurf
+   gespeichert, Status, Version und Historie bleiben unverändert (AK-505-03). Alle anderen Abweisungen werfen vor dem
+   Speichern bzw. rollen zurück.
+3. **`ModelListener` als frühe Abweisung:** `ReportDayModelListener extends BaseModelListener<ReportDay>`
    (`@Component(service = ModelListener.class)`) weist in `onBeforeUpdate` und `onBeforeRemove` ab, wenn der Bericht
    eingereicht oder freigegeben ist. Ebenso `StatusChangeModelListener` und `CommentModelListener` für jedes Ändern und
    Löschen (M06-R08); Ausnahme `ModelListenerException` mit Ursache `HistoryImmutableException` (Grund
    `historie_unveraenderlich`).
-3. **Trigger als Schutz an der Fachlogik vorbei:** `report_day_locked` (Code `P0001`) und die Historien-Trigger
-   (Code `BH803`) aus dem Skript in gemeinsam 2.6, angelegt durch den Upgrade-Schritt aus 3.1.
+4. **Trigger als Schutz an der Fachlogik vorbei:** nach gemeinsam 2.6, angelegt durch den Upgrade-Schritt aus 3.1.
 
 **Prüffälle:** AK-505-01, AK-505-02, AK-505-03, AK-505-04 (Ebene `daten`, über die Testschnittstelle) und AK-505-05,
 AK-505-06, AK-505-07 (Ebene `fachlogik`, `darfBearbeiten`). Für die Historie zusätzlich AK-803-01 bis AK-803-05.
@@ -402,27 +424,35 @@ AK-505-06, AK-505-07 (Ebene `fachlogik`, `darfBearbeiten`). Für die Historie zu
 | `ReportDayProtectionTest.AK505_modelListenerWeistAendernUeberDiePersistenzAb` | P05 | `reportDayLocalService.updateReportDay(…)` auf einen eingereichten Bericht scheitert mit `ModelListenerException`, Daten unverändert |
 | `HistoryProtectionTest.AK803_datenhaltungWeistAendernUndLoeschenAb` | P06 | direktes `UPDATE` und `DELETE` auf `BH_StatusChange` und `BH_Comment` scheitern mit SQLState `BH803`; Prüf-Adapter meldet `historie_unveraenderlich` |
 
-**Gegenprobe (P05/P06):** Trigger `report_day_locked` bzw. `status_change_no_update` in der Testdatenbank entfernen →
-der jeweilige Test wird rot; Trigger wieder anlegen.
+**Gegenproben (P05/P06):**
+
+- Trigger `report_day_locked` bzw. `status_change_no_update` in der Testdatenbank entfernen → der Test zur Datenhaltung
+  wird rot; Trigger wieder anlegen.
+- Komponente `ReportDayModelListener` abschalten (Gogo-Shell `scr:disable` bzw. Komponente vorübergehend ohne
+  `@Component`) → `AK505_modelListenerWeistAendernUeberDiePersistenzAb` wird rot (die Abweisung kommt dann erst als
+  `P0001` aus dem Trigger, nicht als `ModelListenerException`); danach wieder einschalten.
+- `submit` vorübergehend bei fehlenden Pflichtangaben werfen lassen → AK-505-03 wird rot (Tage sind zurückgerollt);
+  danach zurücknehmen.
 
 ### AK-508: Versionsstand, bedingtes Update, fester Fehlergrund
 
 **Mittel auf 7.2 (nach gemeinsam 2.4):**
 
-1. **Versionsspalte** `BH_WeeklyReport.version`, `mvcc-enabled="false"` in `service.xml`.
-2. **Service-Transaktion:** `WeeklyReportLocalServiceImpl.transition(long actorUserId, long weeklyReportId,
-   String action, String seenStatus, int seenVersion, String text)` mit der Transaktion der Methode
-   (`@Transactional(rollbackFor = {PortalException.class, SystemException.class})`, Voreinstellung der
-   `*LocalServiceImpl`). Darin: Sperre `SELECT … FOR UPDATE` über `WeeklyReportFinderImpl` (Custom SQL), Prüfung mit
-   `uebergangPruefen` aus `bh-domain` (Reihenfolge M05-R21), bedingtes Update
-   `UPDATE BH_WeeklyReport SET status = ?, version = version + 1, updatedAt = ? WHERE weeklyReportId = ? AND status = ? AND version = ?`
-   über `SQLQuery.executeUpdate()`, genau eine Zeile verlangt, danach Historie (`seq` je Bericht), Kommentare und
-   Benachrichtigungen; zuletzt `clearCache` des Berichts.
-3. **Fehlergrund:** `ReportTransitionException extends PortalException` mit einem Feld `reason` aus der festen Liste
-   von M05-R20 (`bericht_zurueckgezogen`, `bereits_geprueft`, `bereits_eingereicht`, `bereits_zurueckgezogen`,
-   `bereits_zurueckgenommen`, `inzwischen_geaendert`, `uebergang_unzulaessig`). Die Oberfläche wählt den Meldungstext
-   über den Grund, der Prüf-Adapter liefert den Grund unverändert als `fehler`. Ergibt das bedingte Update keine Zeile,
-   meldet der Service `inzwischen_geaendert` (zweite Sicherung).
+1. **Versionsspalte, Sperre und bedingtes Update** nach gemeinsam 2.4 (Schritte 1 bis 4).
+2. **Service-Transaktion auf 7.2:** `WeeklyReportLocalServiceImpl.transition(long actorUserId, long weeklyReportId,
+   String action, String seenStatus, int seenVersion, String text, Map<String, String> dayComments)` mit der
+   Transaktion der Methode (`@Transactional(rollbackFor = {PortalException.class, SystemException.class})`,
+   Voreinstellung der `*LocalServiceImpl`). `text` ist Gesamtkommentar bzw. Begründung, `dayComments` die
+   Tageskommentare beim Ablehnen (Tag → Text, M05-R22). Die Sperre liefert `WeeklyReportFinderImpl` (Custom SQL), das
+   bedingte Update läuft über `SQLQuery.executeUpdate()`, danach `clearCache` des Berichts.
+3. **Fehlergrund:** `ReportTransitionException extends PortalException` mit einem Feld `reason` (bei `text_zu_lang`
+   zusätzlich `field`), gemeldet in der Reihenfolge von M05-R21: `zugriff_verweigert` (Person, Rolle, Besitz);
+   `uebergang_unzulaessig` (Status, M05-R02) bzw. die Gründe des gesehenen Stands aus M05-R20
+   (`bericht_zurueckgezogen`, `bereits_geprueft`, `bereits_eingereicht`, `bereits_zurueckgezogen`,
+   `bereits_zurueckgenommen`, `inzwischen_geaendert`); `azubi_deaktiviert`; `kommentar_fehlt`, `begruendung_fehlt`,
+   `text_zu_lang`. Die Gründe liefert `uebergangPruefen` aus `bh-domain`; der Service erfindet keine eigenen. Ergibt das
+   bedingte Update trotzdem keine Zeile, meldet er `inzwischen_geaendert` (zweite Sicherung). Die Oberfläche wählt den
+   Meldungstext über den Grund, der Prüf-Adapter liefert ihn unverändert als `fehler`.
 
 **Prüffälle:** AK-508-01, AK-508-02, AK-508-03, AK-508-04, AK-508-05 (Ebene `daten`, über die Testschnittstelle) und
 AK-508-06, AK-508-07, AK-508-08, AK-508-09, AK-508-10, AK-508-11 (Ebene `fachlogik`, `uebergangPruefen`).
@@ -434,32 +464,38 @@ gesehenen Stand gleichzeitig `transition` (Zurückziehen durch Anna, Freigeben d
 `ReportTransitionException` und einem Grund aus M05-R20; `version` ist genau um 1 gestiegen; genau ein neuer Eintrag in
 `BH_StatusChange`. Gegenstück zu `tests/db/transitions.test.ts` („AK-508 Zurückziehen und Freigeben gleichzeitig“).
 
-**Gegenprobe (P05):** Sperre und Bedingung `AND version = ?` vorübergehend entfernen → der Test zeigt zwei Erfolge
-oder zwei Historieneinträge und wird rot; danach zurücknehmen.
+**Gegenprobe (P05):** die Sperre entfernen und das Update ganz ohne Bedingung schreiben (nur
+`WHERE weeklyReportId = ?`, weder `status` noch `version`) → beide Threads lesen denselben Stand, beide Prüfungen
+gelingen, der Test zeigt zwei Erfolge bzw. zwei Historieneinträge und wird rot; danach zurücknehmen. Bleibt
+`AND status = ?` stehen, wertet PostgreSQL die Bedingung nach dem Warten neu aus, und der Test bliebe grün.
 
 ## Bitte bestätigen und in P00 zu bestätigen
 
 ### Bitte bestätigen
 
-- [ ] Anmeldung mit Liferay-eigenen Konten als Standard; **abweichend, begründet** für AK-101 (AK-101-01, AK-101-02,
-      AK-101-03) und AK-106 (nur AK-106-01). Die Prüffälle bekommen dafür `"abweichend": { "liferay-72": … }`
-      (Änderung unter `specs/pruefung/` in einem eigenen, freigegebenen Paket).
+- [ ] Anmeldung mit Liferay-eigenen Konten als Standard; **abweichend, begründet** nur AK-101-01 und AK-106-01
+      (AK-101-02 und AK-101-03 gleichwertig). Die beiden Fälle bekommen `"abweichend": { "liferay-72": … }` (Änderung
+      unter `specs/pruefung/` in einem eigenen, freigegebenen Paket).
 - [ ] OIDC nur als Option unter den sechs Bedingungen aus 6.2; ohne Nachweis in P00 bleibt es aus.
 - [ ] **UI-AK-16 abweichend, begründet** für die Verwaltung von Liferay (Control Panel, Admin-Theme); alle Seiten der App
-      bleiben im Umfang (6.3). Alle übrigen UI-AK von M09 gleichwertig (3.4).
+      bleiben im Umfang (6.3). Alle übrigen UI-AK von M09 gleichwertig (3.4), UI-AK-03 unter der Bedingung unten.
 - [ ] „Bestätigte E-Mail“ = `User.isEmailAddressVerified()` (6.1, AK-201).
-- [ ] Paketwurzel `de.berichtsheft` für beide Liferay-Umsetzungen (mit G4-E abzustimmen; erleichtert U02).
+- [ ] **Abweichung von gemeinsam 2.5 (Bordmittel):** eigene Glocke im Theme für UI-AK-03; die Liferay-Glocke bleibt
+      Abbild, `readAt` folgt beiden Wegen (3.5). Alternative: nur die Liferay-Glocke, dann UI-AK-03 in P08 neu bewerten.
+- [ ] **Vorschlag für liferay-gemeinsam.md (beide Plattformen):** Paketwurzel `de.berichtsheft` (mit G4-E abzustimmen;
+      erleichtert U02).
 - [ ] Testnamen in Java mit `AK505_…` statt `AK-505 …` (Bindestrich in Methodennamen nicht erlaubt; Abschnitt 4).
-- [ ] **Ergänzung zu gemeinsam 7:** eine JSON-Bibliothek nur für Tests (Prüf-Adapter liest `specs/pruefung/*.json`),
+- [ ] **Vorschlag für liferay-gemeinsam.md (beide Plattformen), Abschnitt 7:** eine JSON-Bibliothek nur für Tests (Prüf-Adapter liest `specs/pruefung/*.json`),
       Vorschlag Gson (Apache-2.0, Maven Central `com.google.code.gson:gson`, Version in P00), für beide Plattformen.
 - [ ] Zeitplan im festen Takt mit Entscheidung in der Fachlogik statt Cron in Berliner Zeit (3.3).
-- [ ] Synchroner Mailversand über die Mail-Sitzung des Portals statt `MailService` (Abschnitt 3); gemeinsam 3.2 nennt
-      nur „Mailservice von Liferay“.
+- [ ] **Vorschlag für liferay-gemeinsam.md (beide Plattformen), Abschnitt 3.2:** synchroner Mailversand über die
+      Mail-Sitzung des Portals statt des asynchronen `MailService`, damit der Ausgangskorb Erfolg und Fehler je Nachricht
+      erfährt (Abschnitt 3, 7). Bis zur Freigabe gilt gemeinsam 3.2.
 - [ ] **Pfadmuster für AM-R04 (gemeinsam 5, Spalte 7.2), Übernahme durch G4-L:**
 
 | Muster aus gemeinsam 5 bzw. neu | Stand | Begründung |
 | --- | --- | --- |
-| `liferay-72/modules/**/login/**` | korrigiert: ersetzt durch `liferay-72/modules/**/events/**` | 7.2 bindet Login, Zugang je Anfrage und Abmelden als `LifecycleAction` im Paket `…access.events`; ein Paket `login` gibt es nicht |
+| `liferay-72/modules/**/login/**` | korrigiert: ersetzt durch `liferay-72/modules/bh-access/**` | 7.2 bindet Login, Zugang je Anfrage, Sitzungsdauer und Abmelden als `LifecycleAction` im Modul `bh-access`; ein Paket `login` gibt es nicht. Das ganze Modul ist sicherheitsrelevant |
 | `liferay-72/modules/**/*LoginPostAction*.java` | bestätigt | Klasse `BhLoginPostAction` |
 | `liferay-72/modules/**/servlet/filter/**`, `liferay-72/modules/**/*Filter.java` | bestätigt | falls ein Servlet-Filter nötig wird (Sitzungsdauer); Standard ist die Pre-Action |
 | `liferay-72/modules/**/domain/access/**` | bestätigt | `bh-domain`, Paket `de.berichtsheft.domain.access` |
@@ -468,7 +504,7 @@ oder zwei Historieneinträge und wird rot; danach zurücknehmen.
 | `liferay-72/modules/**/portlet/**Portlet.java` | korrigiert: `liferay-72/modules/**/portlet/**/*Portlet.java` | gültige Glob-Form; Rechte stehen in den Komponenten-Eigenschaften der Portlet-Klasse |
 | `liferay-72/modules/**/resource-actions/**` | bestätigt | `liferay-72/modules/<modul>/src/main/resources/resource-actions/default.xml` |
 | `liferay-72/configs/**` | bestätigt | `bh.betrieb`, Anmeldung, OIDC |
-| `liferay-72/modules/**/pruefung/**` | bestätigt | Modul `bh-pruefung` (Testschnittstelle) |
+| `liferay-72/modules/**/pruefung/**` | korrigiert: `liferay-72/modules/bh-pruefung/**` | ganzes Modul der Testschnittstelle (auch Konfiguration und Registrierung), wie bei `bh-clock`; der Fachlogik-Adapter in `bh-domain` liegt außerhalb |
 | `liferay-72/modules/**/service.xml`, `liferay-72/modules/**/sql/**`, `liferay-72/modules/**/model/listener/**` | bestätigt | Schema, erzeugtes SQL, `ModelListener` |
 | neu: `liferay-72/modules/**/upgrade/**` | ergänzt | das Skript „Schutz in der Datenhaltung“ läuft als Upgrade-Schritt (3.1); gemeinsam 6 setzt das Muster voraus, Abschnitt 5 nennt es nicht |
 | neu: `liferay-72/modules/**/custom-sql/**`, `liferay-72/modules/**/service/persistence/impl/**` | ergänzt | Sperre und bedingtes Update (AK-508) |
@@ -498,6 +534,7 @@ oder zwei Historieneinträge und wird rot; danach zurücknehmen.
 - [ ] Clay-Version in 7.2 und Liste der Komponenten mit Token-Überschreibung (3.4).
 - [ ] Scheduler: `SchedulerEngineHelper`/`TriggerFactory`, Speicherart, Takt (3.3).
 - [ ] Synchroner Mailversand über die Mail-Sitzung des Portals (Abschnitt 3).
+- [ ] Gelesen-Markieren über die Liferay-Glocke erreicht den `ModelListener<UserNotificationEvent>` (3.5).
 - [ ] PDFBox per `compileInclude` als OSGi-Modul lauffähig (Abschnitt 3).
 - [ ] Liferay-Arquillian 1.0.20 mit 7.2 (gemeinsam 7) und Aufgabe `testIntegration` im Workspace (Abschnitt 4).
 - [ ] Testschnittstelle als JAX-RS unter `/o/bh-pruefung/` nur bei `bh.betrieb=test` (Abschnitt 4).
