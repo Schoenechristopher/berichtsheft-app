@@ -26,9 +26,10 @@ muss, damit L62 und L72 parallel laufen können und das Upgrade in U03 nur Lifer
 
 Grundlage ist das Datenmodell der Referenz-Umsetzung in `prisma/schema.prisma`. Trigger, CHECK-Constraints,
 Fremdschlüssel-Aktionen und der partielle Index stehen nur in den Migrationen unter `prisma/migrations/` (vor allem
-`prisma/migrations/20261006130221_init/`, `prisma/migrations/20261007090000_einreichen_pruefen/`,
-`prisma/migrations/20261008090000_benachrichtigungen/`, `prisma/migrations/20261012100000_kw53_nur_in_langen_jahren/`
-und `prisma/migrations/20261013090000_historie_fehlercode/`). Die logischen Datenmodelle stehen in Abschnitt 5 der
+`prisma/migrations/20261006130221_init/`, `prisma/migrations/20261006150000_account_binding/`,
+`prisma/migrations/20261007090000_einreichen_pruefen/`, `prisma/migrations/20261008090000_benachrichtigungen/`,
+`prisma/migrations/20261012100000_kw53_nur_in_langen_jahren/`, `prisma/migrations/20261013090000_historie_fehlercode/`
+und `prisma/migrations/20261013100000_erinnerungslauf_wochennummer/`). Die logischen Datenmodelle stehen in Abschnitt 5 der
 Fach-Specs M02, M03, M04, M05, M06 und M08.
 
 **Grundsätze für beide Plattformen:**
@@ -57,7 +58,8 @@ Fach-Specs M02, M03, M04, M05, M06 und M08.
 ### 2.2 Datum und Zeit (M01)
 
 - **Zeitpunkte** (`createdAt`, `ranAt`, `sentAt` usw.) sind Service-Builder-Typ `Date`, SQL `TIMESTAMP` (ohne
-  Zeitzone), und werden **in UTC** gespeichert (M01-R01, M05 und M06 Abschnitt 8 „unabhängig von der Zeitzone des
+  Zeitzone; Service Builder erzeugt für `Date` keinen Typ mit Zeitzone, anders als `timestamptz` in der TypeScript-App),
+  und werden **in UTC** gespeichert (M01-R01, M05 und M06 Abschnitt 8 „unabhängig von der Zeitzone des
   Servers“). Voraussetzung: Die JVM läuft mit `-Duser.timezone=GMT`, wie es die Liferay-Bundles in `setenv.sh`
   vorgeben; die JDBC-Sitzung bleibt in UTC (Entsprechung zu `createPrismaClient` in `src/lib/db.ts`). Angezeigt wird in
   Europe/Berlin (M06-R03). P00 weist das mit einem Test nach, der Liferay mit `TZ=Europe/Berlin` startet (Gegenstück zu
@@ -80,7 +82,7 @@ in 2.6 angelegt), Pflicht = `NOT NULL`.
 | Spalte | Typ | Pflicht | Bemerkung |
 | --- | --- | --- | --- |
 | `personId` | long / BIGINT | PK | |
-| `companyId` | long / BIGINT | ja | Liferay-Instanz |
+| `companyId` | long / BIGINT | ja | Liferay-Instanz (genau eine, siehe 2.5 „Ein Mandant“) |
 | `userId` | long / BIGINT | nein | Liferay-Benutzer (`User_.userId`); leer bis zum ersten Login; eindeutig, sobald gesetzt (ersetzt `account_id`, siehe 2.5) |
 | `email` | String(320) / VARCHAR(320) | ja | klein geschrieben; eindeutig; CHECK `person_email_normalized` |
 | `name` | String(200) / VARCHAR(200) | ja | |
@@ -93,7 +95,7 @@ in 2.6 angelegt), Pflicht = `NOT NULL`.
 | `theme` | String(8) / VARCHAR(8) | ja | `SYSTEM`, `LIGHT`, `DARK`; Voreinstellung `SYSTEM` (UI-AK-14) |
 | `createdAt`, `updatedAt` | Date / TIMESTAMP | ja | UTC, aus der Uhr |
 
-Eindeutig: `email`; `userId` (partieller eindeutiger Index `WHERE userId IS NOT NULL`, SQL-Skript). Index: `trainerId`.
+Eindeutig: `email` (global, weil es genau eine Instanz gibt); `userId` (partieller eindeutiger Index `WHERE userId IS NOT NULL`, SQL-Skript). Index: `trainerId`.
 CHECK wie in der Migration `init` bzw. `account_binding`: `person_trainee_requires_trainer_and_start`,
 `person_training_end_after_start`, `person_trainer_not_self`, `person_email_normalized`. Die Kanalliste wird zu drei
 Spalten, weil Service Builder keine Listen-Spalten kennt; der Wertebereich bleibt „Teilmenge, leer erlaubt“ (M08,
@@ -103,7 +105,7 @@ Abschnitt 5).
 
 | Spalte | Typ | Pflicht | Bemerkung |
 | --- | --- | --- | --- |
-| `settingId` | long / BIGINT | PK | immer `1`; CHECK `setting_single_row` |
+| `settingId` | long / BIGINT | PK | immer `1`; CHECK `setting_single_row` (eine Zeile, weil es genau eine Instanz gibt) |
 | `companyId` | long / BIGINT | ja | |
 | `federalState` | String(2) / VARCHAR(2) | ja | Kürzel nach M01-R13, Voreinstellung `NW`; CHECK auf die 16 Kürzel |
 | `updatedAt` | Date / TIMESTAMP | ja | |
@@ -147,7 +149,7 @@ Eindeutig: (`weeklyReportId`, `dayDate`). Trigger `report_day_locked` (2.6).
 | `toStatus` | String(16) / VARCHAR(16) | ja | |
 | `actorId` | long / BIGINT | ja | FK auf `BH_Person`, `ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED` |
 | `reason` | String(5000) / TEXT | nein | nur bei Rücknahme (M05-R19) |
-| `reviewRound` | int / INTEGER | ja | CHECK `status_change_review_round_not_negative` |
+| `reviewRound` | int / INTEGER | ja | Voreinstellung `0`; CHECK `status_change_review_round_not_negative` |
 | `seq` | long / BIGINT | ja | Reihenfolge (M06-R02), siehe unten |
 | `createdAt` | Date / TIMESTAMP | ja | Zeitpunkt aus der Uhr (M06-R03) |
 
@@ -217,7 +219,7 @@ Index: (`recipientId`, `createdAt`).
 | `reminderRunId` | long / BIGINT | PK | Service Builder braucht für zusammengesetzte Schlüssel eine eigene PK-Klasse; einfacher ist ein eigener Schlüssel |
 | `isoYear`, `isoWeek` | int / INTEGER | ja | eindeutig zusammen (ersetzt den zusammengesetzten Primärschlüssel); CHECK `reminder_run_iso_week_range` |
 | `ranAt` | Date / TIMESTAMP | ja | |
-| `created` → Spalte `createdCount` | int / INTEGER | ja | Anzahl angelegter Benachrichtigungen |
+| `created` → Spalte `createdCount` | int / INTEGER | ja | Voreinstellung `0`; Anzahl angelegter Benachrichtigungen |
 
 Der Vermerk entsteht in derselben Transaktion wie die Nachrichten; der eindeutige Schlüssel (`isoYear`, `isoWeek`) lässt
 von zwei gleichzeitigen Läufen genau einen gelingen (M08 Abschnitt 8, AK-1023).
@@ -236,7 +238,10 @@ Gilt für beide Plattformen gleich und ist die Grundlage für den Abschnitt „N
 - **Ablauf eines Statuswechsels**, in einer Service-Transaktion (`@Transactional` bzw. die Transaktion der
   `*LocalServiceImpl`-Methode):
   1. Zeile des Berichts mit `SELECT … FOR UPDATE` sperren (eigener Finder mit Custom SQL). Das erfüllt die „Sperre“ aus
-     M05 Abschnitt 8: Speichern (M04) und andere Statuswechsel desselben Berichts warten.
+     M05 Abschnitt 8: Speichern (M04) und andere Statuswechsel desselben Berichts warten. Das gilt nur, weil **auch
+     Speichern (M04) dieselbe Zeile zuerst mit `FOR UPDATE` sperrt** und erst danach Status und Tage liest und schreibt,
+     wie es die TypeScript-App tut (`src/lib/reports.ts`). Jede Methode, die Tage eines Berichts schreibt, beginnt mit
+     dieser Sperre.
   2. Rolle, Besitz, Status und gesehenen Stand (Status und `version` aus dem Formular) prüfen, in der Reihenfolge nach
      M05-R21; Fehlercodes nach M05-R20.
   3. Bedingtes Update `UPDATE BH_WeeklyReport SET status = ?, version = version + 1, updatedAt = ? WHERE
@@ -247,6 +252,15 @@ Gilt für beide Plattformen gleich und ist die Grundlage für den Abschnitt „N
      (M05-R22, M08 Abschnitt 8).
 - **Cache:** Nach dem Update per Custom SQL wird der Entity-Cache des Berichts geleert (`clearCache`), sonst liest
   Service Builder den alten Stand.
+- **Endgültiges Löschen eines Azubis (M06-R10, AK-206, AK-803-05):** Die App löscht nur die Zeile in `BH_Person`
+  (`DELETE FROM BH_Person WHERE personId = ?` bzw. `deletePerson` ohne vorheriges Löschen der Kinder). Berichte, Tage,
+  Statuswechsel, Kommentare, Benachrichtigungen und Teams-Nachrichten entfernt **ausschließlich die Kaskade der
+  Datenbank** (2.6), nie Service Builder, kein `removeBy…` und kein eigener Löschaufruf je Kind. Grund: Die Trigger der
+  Historie lassen ein Löschen nur innerhalb der Kaskade zu (`pg_trigger_depth() > 1` und Bericht nicht mehr vorhanden);
+  ein Löschen über Service Builder träfe sie als einzelnes `DELETE` und scheiterte mit `BH803`. Danach leert die App den
+  Entity- und Finder-Cache aller betroffenen Entities (`Person`, `WeeklyReport`, `ReportDay`, `StatusChange`,
+  `Comment`, `Notification`, `TeamsDevMessage`), weil Service Builder vom Löschen der Kinder nichts erfährt. Eine
+  Person in fremder Historie weist die Datenbank über die Fremdschlüssel `actorId`/`authorId` ab (M02-R22).
 - **Nachweis:** die Daten-Fälle AK-508-01 bis AK-508-11 über den Prüf-Adapter; zusätzlich ein plattformeigener Test
   „AK-508 von zwei gleichzeitigen Aktionen gelingt genau eine“ mit zwei parallelen Transaktionen (M05 Abschnitt 10:
   echte Gleichzeitigkeit prüft kein neutraler Fall).
@@ -273,6 +287,10 @@ Gilt für beide Plattformen gleich und ist die Grundlage für den Abschnitt „N
   Login-Post-Action (`login.events.post`) bindet beim ersten Login bedingt `userId` (`WHERE userId IS NULL AND active_`),
   analog zu `resolveLoginPerson()`. P00 entscheidet, ob das Anlegen des Liferay-Benutzers aus der App heraus nötig ist
   oder der Admin ihn in der Liferay-Verwaltung anlegt (siehe „Bitte bestätigen“).
+- **Ein Mandant:** Die App läuft in genau einer Liferay-Instanz (`companyId`) mit einem Mandanten. Deshalb ist
+  `BH_Person.email` global eindeutig und `BH_Setting` hat genau eine Zeile; `companyId` steht in den Tabellen nur, weil
+  Liferay-APIs (Benutzer, Rechte, Benachrichtigungen) sie verlangen. Mehrere Instanzen wären eine eigene Entscheidung
+  mit Schlüsseln (`companyId`, `email`) bzw. `BH_Setting` je `companyId` (siehe „Bitte bestätigen“).
 - **Keine Site-Bindung:** Die App-Daten hängen an der Instanz (`companyId`), nicht an einer Site; deshalb keine
   `groupId`-Spalten. Die Portlets liegen auf einer Site „Berichtsheft“; deren `groupId` braucht nur die Oberfläche.
 - **Sitzung höchstens 8 Stunden (M02-R05):** Liferays `session.timeout` misst Untätigkeit. Die App vermerkt den
@@ -284,7 +302,8 @@ Ein PostgreSQL-Skript, wortgleich in beiden Umsetzungen, angelegt als Upgrade-Sc
 Service-Moduls). Es übernimmt aus den Migrationen der TypeScript-App:
 
 - alle Fremdschlüssel mit ihren `ON DELETE`-Aktionen aus 2.3, `actorId` und `authorId` `DEFERRABLE INITIALLY DEFERRED`,
-  damit das endgültige Löschen eines Azubis seine eigenen Einträge per Kaskade mitnimmt (M06-R10);
+  damit das endgültige Löschen eines Azubis seine eigenen Einträge per Kaskade mitnimmt (M06-R10; Löschablauf in 2.4:
+  nur die Zeile in `BH_Person`, die Kinder nur per Kaskade);
 - alle CHECK-Constraints aus 2.3 mit denselben Namen;
 - die Trigger mit denselben Namen und demselben festen Fehlercode `SQLSTATE 'BH803'`:
   - `status_change_no_update`, `status_change_no_delete` und `comment_no_update`, `comment_no_delete`: Ändern immer
@@ -348,7 +367,11 @@ Quelle belegt, nicht im laufenden System; das bleibt P00.
 - Alle Fachlogik bekommt die Uhr übergeben; keine Klasse liest die Systemzeit selbst.
 
 **Fachlogik als reine Java-Klassen:** Die reinen Funktionen aus `src/domain/` werden in Java ohne Abhängigkeit zu
-Liferay übersetzt, auf Sprachstand Java 8 (auf beiden Plattformen lauffähig, falls 6.2.5 Java 8 nutzt). Ob beide
+Liferay übersetzt, auf Sprachstand Java 8 (auf beiden Plattformen lauffähig, falls 6.2.5 Java 8 nutzt).
+**Ausweichregel, falls 6.2.5 doch Java 7 braucht:** Die Fachlogik wird auf Sprachstand Java 7 geschrieben (ohne
+Lambdas, Streams und `java.time`; Datum über `java.util.Calendar` in UTC bzw. eigene Klasse für Kalendertage), damit
+dieselben Quellen auf beiden Plattformen laufen; PDFBox bleibt 2.0.x (läuft ab Java 6), JDBC wird 42.2.29.jre7
+(Abschnitt 7); 7.2 bleibt bei Java 11. Ob beide
 Umsetzungen dieselben Quelldateien kopieren, legt P00 fest.
 
 **Prüf-Adapter zu `specs/pruefung/format.md`:**
@@ -405,14 +428,14 @@ Abruf von `liferay.dev` scheiterte an der Namensauflösung).
 
 ### 4.2 JDKs
 
-| Quelle | URL | Status | Erreichbar |
-| --- | --- | --- | --- |
-| OpenJDK 8 (Ubuntu 24.04, universe) | `http://archive.ubuntu.com/ubuntu/pool/universe/o/openjdk-8/` (`openjdk-8-jdk-headless_8u504-ga-1ubuntu1~24.04.3_amd64.deb`) | 200 | ja; Paketquellen `noble`, `noble-security` sind eingetragen |
-| OpenJDK 11 (Ubuntu 24.04, universe) | `http://archive.ubuntu.com/ubuntu/pool/universe/o/openjdk-lts/` (`openjdk-11-jdk-headless_11.0.32.1+1-1ubuntu1~24.04_amd64.deb`) | 200 | ja; `apt-cache policy` kennt das Paket ohne `apt-get update` noch nicht |
-| Eclipse Temurin (Adoptium) | `https://api.adoptium.net/v3/info/available_releases`, `https://packages.adoptium.net/` | Proxy 403 | nein; Ausweichquelle Ubuntu-Pakete |
-| Temurin über GitHub | `https://api.github.com/repos/adoptium/temurin8-binaries/releases/latest` | 403 | nein |
-| Azul Zulu (für Java 7) | `https://cdn.azul.com/zulu/bin/` | Proxy 403 | nein; Docker Hub `azul/zulu-openjdk:7` hat Metadaten (200), nur für CI |
-| Docker-Images für CI | Docker Hub `eclipse-temurin:8-jdk`, `eclipse-temurin:11-jdk` | 200 | Metadaten ja |
+| Quelle | URL | Prüfweg | Status | Größe | Erreichbar |
+| --- | --- | --- | --- | --- | --- |
+| OpenJDK 8 (Ubuntu 24.04, universe) | `http://archive.ubuntu.com/ubuntu/pool/universe/o/openjdk-8/` (`openjdk-8-jdk-headless_8u504-ga-1ubuntu1~24.04.3_amd64.deb`) | `GET` der Verzeichnisseite | 200 | nicht gemeldet | ja; Paketquellen `noble`, `noble-security` sind eingetragen |
+| OpenJDK 11 (Ubuntu 24.04, universe) | `http://archive.ubuntu.com/ubuntu/pool/universe/o/openjdk-lts/` (`openjdk-11-jdk-headless_11.0.32.1+1-1ubuntu1~24.04_amd64.deb`) | `GET` der Verzeichnisseite | 200 | nicht gemeldet | ja; `apt-cache policy` kennt das Paket ohne `apt-get update` noch nicht |
+| Eclipse Temurin (Adoptium) | `https://api.adoptium.net/v3/info/available_releases`, `https://packages.adoptium.net/` | `curl -sSI` | Proxy 403 | – | nein; Ausweichquelle Ubuntu-Pakete |
+| Temurin über GitHub | `https://api.github.com/repos/adoptium/temurin8-binaries/releases/latest` | `curl -sSI` | 403 | – | nein |
+| Azul Zulu (für Java 7) | `https://cdn.azul.com/zulu/bin/` | `curl -sSI` | Proxy 403 | – | nein; Docker Hub `azul/zulu-openjdk:7` hat Metadaten (200), nur für CI |
+| Docker-Images für CI | Docker Hub `eclipse-temurin:8-jdk`, `eclipse-temurin:11-jdk` | `GET` `hub.docker.com/v2/repositories/library/eclipse-temurin/tags/<tag>` | 200 | nicht ausgewertet | Metadaten ja |
 
 Vorinstalliert ist nur Java 21; es passt zu keiner der beiden Liferay-Versionen. Vorschlag: 6.2.5 mit Java 8 (Java 7
 ist in der Sitzung nicht beziehbar; Java 8 für 6.2 belegt nur ein Forenbeitrag mit Zitat des Liferay-Supports,
@@ -420,14 +443,14 @@ ist in der Sitzung nicht beziehbar; Java 8 für 6.2 belegt nur ein Forenbeitrag 
 
 ### 4.3 Maven, Plugins SDK und Workspace
 
-| Quelle | URL | Status | Erreichbar |
-| --- | --- | --- | --- |
-| Liferay-Nexus | `https://repository.liferay.com/nexus/content/groups/public/` | Proxy 403 | nein |
-| Liferay-Nexus-CDN | `https://repository-cdn.liferay.com/nexus/content/groups/public/` | Proxy 403 | nein |
-| Maven Central: 6.2.5-API | `https://repo1.maven.org/maven2/com/liferay/portal/portal-service/6.2.5/portal-service-6.2.5.pom` | 200 | ja |
-| Maven Central: 7.2-BOM | `https://repo1.maven.org/maven2/com/liferay/portal/release.portal.bom/7.2.1/release.portal.bom-7.2.1.pom` | 200 (nennt `com.liferay.portal.kernel` 4.35.2, `…search.elasticsearch6.impl` 3.0.39) | ja |
-| Maven Central: Workspace-Plugin | `https://repo1.maven.org/maven2/com/liferay/com.liferay.gradle.plugins.workspace/maven-metadata.xml` | 200 (neueste 13.1.2) | ja |
-| Maven Central: Blade | `https://repo1.maven.org/maven2/com/liferay/blade/com.liferay.blade.cli/maven-metadata.xml` | 200 (neueste 7.0.5) | ja |
+| Quelle | URL | Prüfweg | Status | Größe | Erreichbar |
+| --- | --- | --- | --- | --- | --- |
+| Liferay-Nexus | `https://repository.liferay.com/nexus/content/groups/public/` | `curl -sSI` | Proxy 403 | – | nein |
+| Liferay-Nexus-CDN | `https://repository-cdn.liferay.com/nexus/content/groups/public/` | `curl -sSI` | Proxy 403 | – | nein |
+| Maven Central: 6.2.5-API | `https://repo1.maven.org/maven2/com/liferay/portal/portal-service/6.2.5/portal-service-6.2.5.pom` | `curl -sSI` | 200 | 701 Byte (POM) | ja |
+| Maven Central: 7.2-BOM | `https://repo1.maven.org/maven2/com/liferay/portal/release.portal.bom/7.2.1/release.portal.bom-7.2.1.pom` | `curl -sSI`, dann `GET` des POM | 200 (nennt `com.liferay.portal.kernel` 4.35.2, `…search.elasticsearch6.impl` 3.0.39) | 156.906 Byte | ja |
+| Maven Central: Workspace-Plugin | `https://repo1.maven.org/maven2/com/liferay/com.liferay.gradle.plugins.workspace/maven-metadata.xml` | `GET` | 200 (neueste 13.1.2) | 13.481 Byte | ja |
+| Maven Central: Blade | `https://repo1.maven.org/maven2/com/liferay/blade/com.liferay.blade.cli/maven-metadata.xml` | `GET` | 200 (neueste 7.0.5) | 1.527 Byte | ja |
 
 Maven Central antwortete einmal mit 429 (Rate Limit) und beim nächsten Versuch mit 200; Abrufe deshalb gebündelt und mit
 Pause. Offen für P00: ob der Workspace für 7.2 alle Artefakte aus Maven Central bekommt (sonst braucht er den
@@ -436,10 +459,10 @@ ohne Liferay-Nexus auflöst.
 
 ### 4.4 Suchdienst (7.2)
 
-| Quelle | URL | Status | Erreichbar |
-| --- | --- | --- | --- |
-| Elasticsearch 6.8 (Archiv) | `https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.8.23.tar.gz` | Proxy 403 | nein |
-| Elasticsearch 6.8 (Image) | Docker Hub `elasticsearch:6.8.23` | 200 (Metadaten) | nur für CI |
+| Quelle | URL | Prüfweg | Status | Größe | Erreichbar |
+| --- | --- | --- | --- | --- | --- |
+| Elasticsearch 6.8 (Archiv) | `https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.8.23.tar.gz` | `curl -sSI` | Proxy 403 | – | nein |
+| Elasticsearch 6.8 (Image) | Docker Hub `elasticsearch:6.8.23` | `GET` `hub.docker.com/v2/repositories/library/elasticsearch/tags/6.8.23` | 200 (Metadaten) | nicht ausgewertet | nur für CI |
 
 7.2 bringt einen **eingebetteten** Elasticsearch-Knoten im Liferay-Prozess mit (Port 9200); er ist nur für Entwicklung
 und Tests gedacht, nicht für den Produktivbetrieb
@@ -449,12 +472,14 @@ die Suche nicht braucht. Welche Elasticsearch-Version eingebettet ist, klärt P0
 
 ### 4.5 Datenbank
 
-| Punkt | Stand | Quelle |
-| --- | --- | --- |
-| PostgreSQL in der Sitzung | 16.15 vorinstalliert | `psql --version` |
-| 7.2 getestet mit | PostgreSQL 10 | Release-Hinweise 7.2 CE GA2 |
-| 6.2.5 getestet mit | nicht gefunden; Kompatibilitätsmatrix 6.2 per Websuche nicht auffindbar | in P00 zu klären |
-| JDBC-Treiber | `org.postgresql:postgresql` auf Maven Central erreichbar: `42.2.29.jre7` (200, 985.754 Byte) und `42.7.14` (neueste) | Maven Central |
+| Punkt | Stand | Prüfweg bzw. Quelle | Größe |
+| --- | --- | --- | --- |
+| PostgreSQL in der Sitzung | 16.15 vorinstalliert | `psql --version` | – |
+| 7.2 getestet mit | PostgreSQL 10 | Release-Hinweise 7.2 CE GA2 (Websuche) | – |
+| 6.2.5 getestet mit | nicht gefunden; Kompatibilitätsmatrix 6.2 per Websuche nicht auffindbar | in P00 zu klären | – |
+| JDBC-Treiber 42.7.14 | `https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.14/postgresql-42.7.14.jar`, 200 | `curl -sSI` | 1.221.004 Byte |
+| JDBC-Treiber 42.2.29.jre7 | `https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.29.jre7/postgresql-42.2.29.jre7.jar`, 200 | `curl -sSI` | 985.754 Byte |
+| Download-Seite des Treibers | `https://jdbc.postgresql.org/download/` | `curl -sSI`: Proxy 403 | – |
 
 Risiko: PostgreSQL 16 ist neuer als jede getestete Version; die alten Bundles bringen womöglich einen alten JDBC-Treiber
 ohne SCRAM-Anmeldung mit (Voreinstellung ab PostgreSQL 14). P00 tauscht den Treiber gegen die Version aus Abschnitt 7 und
@@ -472,7 +497,8 @@ prüft, ob Liferay auf PostgreSQL 16 startet; sonst Ausweichen auf eine ältere 
 ## 5. Sicherheitsrelevante Dateien (Eingabe für AM-R04)
 
 Vorschlag für die Ergänzung von AM-R04 in `docs/07-spec-automatisches-mergen.md` (umgesetzt in G4-L). Die Pfadmuster
-setzen die Projektstruktur der Profile voraus (6.2.5: `liferay-625/portlets/<portlet>/docroot/…`, 7.2:
+sind vorläufig: Die Profile bestätigen oder korrigieren sie, sobald ihre Projektstruktur feststeht (Abschnitt 2 der
+Profile), und G4-L übernimmt den bestätigten Stand. Sie setzen die Projektstruktur der Profile voraus (6.2.5: `liferay-625/portlets/<portlet>/docroot/…`, 7.2:
 `liferay-72/modules/<modul>/…`, `liferay-72/configs/…`); die Profile bestätigen oder korrigieren sie.
 
 | Entsprechung zu | 6.2.5 (`liferay-625/`) | 7.2 (`liferay-72/`) | Begründung |
@@ -511,9 +537,9 @@ Alles „Vorschlag, in P00 zu bestätigen“. Eine Bibliothek, die hier nicht st
 | Feiertage (M01) | eigene Umsetzung ohne Bibliothek (Osterformel, feste Regeln je Bundesland, Referenzdaten aus M01 Abschnitt 5) | wie 6.2.5 | – | – |
 | Feiertage, Ausweiche | Jollyday 0.5.10 | Jollyday 0.5.10 | Apache-2.0 | Maven Central `de.jollyday:jollyday`; einmalige Feiertage nach M01-R16 müssten ergänzt werden |
 | Komponententests | JUnit 4.13.2 | JUnit 4.13.2 | EPL-1.0 | Maven Central `junit:junit` |
-| Integrationstests | – | Liferay-Arquillian (Teil von Liferay) | LGPL (Liferay) | Liferay-Workspace; in P00 zu klären |
+| Integrationstests | – | Liferay-Arquillian, `com.liferay:com.liferay.arquillian.extension.junit.bridge` 1.0.20 (neueste auf Maven Central am 15.10.2026; ob sie zu 7.2 passt, in P00 zu klären) | LGPL-2.1 (Liferay) | Maven Central |
 | Ablauf-Fälle | Playwright für Node, Version wie in der TypeScript-App (`@playwright/test` 1.56.1) | wie 6.2.5 | Apache-2.0 | npm, bereits Abhängigkeit des Repositorys |
-| JDBC | PostgreSQL-Treiber 42.2.29 (`.jre7`, falls Java 7) bzw. 42.7.x bei Java 8 | PostgreSQL-Treiber 42.7.x | BSD-2-Clause | Maven Central `org.postgresql:postgresql` |
+| JDBC | PostgreSQL-Treiber 42.7.14 bei Java 8; 42.2.29.jre7, falls Java 7 | PostgreSQL-Treiber 42.7.14 | BSD-2-Clause | Maven Central `org.postgresql:postgresql` (42.7.14: 1.221.004 Byte, 42.2.29.jre7: 985.754 Byte) |
 
 Begründung Feiertage: Die eigene Umsetzung ist eine reine Funktion wie in `src/domain/`, hat keine Abhängigkeit und
 bildet die Regeln M01-R15 bis M01-R19 einschließlich der einmaligen Feiertage genau ab; geprüft durch AK-1206-01 bis
@@ -541,7 +567,13 @@ AK-1206-11.
       tut (2.5); beides behält das Binden nach M02-R07.
 - [ ] Eigenschaft `bh.betrieb` (`produktion`/`test`) als Ersatz für `NODE_ENV` (3.2).
 - [ ] Feiertage als eigene Umsetzung ohne Bibliothek (Abschnitt 7).
-- [ ] Java 8 für 6.2.5 und Java 11 für 7.2 (Abschnitt 4.2).
+- [ ] Java 8 für 6.2.5 und Java 11 für 7.2 (Abschnitt 4.2); Ausweichregel für Java 7 in 3.2.
+- [ ] Zeitpunkte als `TIMESTAMP` ohne Zeitzone, in UTC gespeichert, statt `timestamptz` wie in der TypeScript-App (2.2).
+      Begründung: Service Builder erzeugt für `Date` auf beiden Plattformen `TIMESTAMP`; ein abweichender Spaltentyp
+      bräuchte eigenes SQL und ein eigenes Mapping. Gleichwertig, solange JVM und JDBC-Sitzung fest in UTC laufen; P00 weist
+      das mit gestellter Server-Zeitzone nach.
+- [ ] Genau eine Liferay-Instanz und ein Mandant: `email` global eindeutig, `BH_Setting` mit einer Zeile (2.5). Alternative
+      wären Schlüssel mit `companyId`.
 
 ### Für P00 (beide Plattformen)
 
@@ -568,6 +600,11 @@ AK-1206-11.
 | Laufzeit von 6.2.5 (Java, Tomcat 7, Docker-Image) | Tomcat-Bundle bestätigt; Docker-Image `liferay/portal:6.2.5-ga6` existiert (nur CI) |
 | Suchdienst von 7.2 | eingebettet nur für Entwicklung und Tests zulässig (4.4) |
 | Speicher und Laufzeit auf dem Standard-Runner | ungeprüft → P00 misst |
+| Kein Herstellersupport für 6.2 und 7.2 | unverändert: nur Demo und Übung, kein Produktivbetrieb → gilt für beide Profile, Abschnitt 7 |
+| Öffentliches Repository | unverändert: nur Testdaten, Demo-Zugänge nur als Platzhalter, keine Geheimnisse in `portal-ext.properties` → P00 und `docs/ci-richtlinie.md` |
+| Oberfläche auf 6.2 (AlloyUI, Bootstrap 2) | unverändert offen → Profil 6.2.5, UI-AK einzeln bewerten |
+| Umfang einer kompletten Liferay-App | diese Datei verkleinert die Profile (Schema und Bausteine gemeinsam); Aufteilung in Arbeitspakete → Playbooks |
+| Abweichende Plattformmittel verändern Verhalten unbemerkt | gleiche Prüffälle, Abweichungen nur unter „Bitte bestätigen“; neu erkannt: ModelListener allein und Löschen über Service Builder (2.4, 2.6) → Profile |
 | Upgrade-Pfad 6.2 → 7.2 | Upgrade-Werkzeug liegt im Tools-Archiv von 7.2.1 (4.1); ob 6.2 direkt auf 7.2 geht, nicht belegt → U00 |
 | Liferay-spezifische Teile von AM-R04 (`docs/07-spec-automatisches-mergen.md`) | Vorschlag in Abschnitt 5, 6 und 7 → G4-L |
 
