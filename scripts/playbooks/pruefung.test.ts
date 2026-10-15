@@ -156,6 +156,11 @@ describe("Playbook", () => {
     const markdown = `${fixture("playbook-p05.md")}\nAK-508, KE-AK-01, AM-AK-02, MW-R03.\n`;
     expect(checkDocument(PLAYBOOK, markdown, context)).toEqual([]);
   });
+  it("KE-AK-06 und AM-AK-13 sind keine Fach-AK", () => {
+    const markdown = `${fixture("playbook-p05.md")}\nAK-508; KE-AK-01, KE-AK-04, KE-AK-05, KE-AK-06, AM-AK-13, MW-AK-01, MW-AK-02.\n`;
+    expect(checkDocument(PLAYBOOK, markdown, context)).toEqual([]);
+    expect(checkDocument("playbooks/00-steuerung.md", "KE-AK-06 und AM-AK-13 (AM-AK-13-01)", context)).toEqual([]);
+  });
 });
 
 describe("Profil", () => {
