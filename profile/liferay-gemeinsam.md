@@ -240,8 +240,10 @@ Gilt für beide Plattformen gleich und ist die Grundlage für den Abschnitt „N
   1. Zeile des Berichts mit `SELECT … FOR UPDATE` sperren (eigener Finder mit Custom SQL). Das erfüllt die „Sperre“ aus
      M05 Abschnitt 8: Speichern (M04) und andere Statuswechsel desselben Berichts warten. Das gilt nur, weil **auch
      Speichern (M04) dieselbe Zeile zuerst mit `FOR UPDATE` sperrt** und erst danach Status und Tage liest und schreibt,
-     wie es die TypeScript-App tut (`src/lib/reports.ts`). Jede Methode, die Tage eines Berichts schreibt, beginnt mit
-     dieser Sperre.
+     wie es die TypeScript-App beim Speichern tut (`src/lib/reports.ts`). **Bewusst strengere Liferay-Regel:** Jede
+     Methode, die Tage eines bestehenden Berichts schreibt, beginnt mit dieser Sperre; die TypeScript-App sperrt beim
+     Anlegen fehlender Wochen (M03, `ensureReportsForTrainee`) nicht, das bleibt auf Liferay für neu angelegte Berichte
+     ebenso zulässig.
   2. Rolle, Besitz, Status und gesehenen Stand (Status und `version` aus dem Formular) prüfen, in der Reihenfolge nach
      M05-R21; Fehlercodes nach M05-R20.
   3. Bedingtes Update `UPDATE BH_WeeklyReport SET status = ?, version = version + 1, updatedAt = ? WHERE
@@ -260,7 +262,9 @@ Gilt für beide Plattformen gleich und ist die Grundlage für den Abschnitt „N
   ein Löschen über Service Builder träfe sie als einzelnes `DELETE` und scheiterte mit `BH803`. Danach leert die App den
   Entity- und Finder-Cache aller betroffenen Entities (`Person`, `WeeklyReport`, `ReportDay`, `StatusChange`,
   `Comment`, `Notification`, `TeamsDevMessage`), weil Service Builder vom Löschen der Kinder nichts erfährt. Eine
-  Person in fremder Historie weist die Datenbank über die Fremdschlüssel `actorId`/`authorId` ab (M02-R22).
+  Person in fremder Historie erkennt zuerst die Fachlogik (`loeschenPruefen` → `fremde_historie`, Deaktivieren wird
+  angeboten; M02-R22, `specs/pruefung/format.md`); die Fremdschlüssel `actorId`/`authorId` sind nur das Netz dahinter
+  und weisen das Löschen auch an der Fachlogik vorbei ab.
 - **Nachweis:** die Daten-Fälle AK-508-01 bis AK-508-11 über den Prüf-Adapter; zusätzlich ein plattformeigener Test
   „AK-508 von zwei gleichzeitigen Aktionen gelingt genau eine“ mit zwei parallelen Transaktionen (M05 Abschnitt 10:
   echte Gleichzeitigkeit prüft kein neutraler Fall).
@@ -371,8 +375,7 @@ Liferay übersetzt, auf Sprachstand Java 8 (auf beiden Plattformen lauffähig, f
 **Ausweichregel, falls 6.2.5 doch Java 7 braucht:** Die Fachlogik wird auf Sprachstand Java 7 geschrieben (ohne
 Lambdas, Streams und `java.time`; Datum über `java.util.Calendar` in UTC bzw. eigene Klasse für Kalendertage), damit
 dieselben Quellen auf beiden Plattformen laufen; PDFBox bleibt 2.0.x (läuft ab Java 6), JDBC wird 42.2.29.jre7
-(Abschnitt 7); 7.2 bleibt bei Java 11. Ob beide
-Umsetzungen dieselben Quelldateien kopieren, legt P00 fest.
+(Abschnitt 7); 7.2 bleibt bei Java 11. Ob beide Umsetzungen dieselben Quelldateien kopieren, legt P00 fest.
 
 **Prüf-Adapter zu `specs/pruefung/format.md`:**
 
@@ -498,8 +501,8 @@ prüft, ob Liferay auf PostgreSQL 16 startet; sonst Ausweichen auf eine ältere 
 
 Vorschlag für die Ergänzung von AM-R04 in `docs/07-spec-automatisches-mergen.md` (umgesetzt in G4-L). Die Pfadmuster
 sind vorläufig: Die Profile bestätigen oder korrigieren sie, sobald ihre Projektstruktur feststeht (Abschnitt 2 der
-Profile), und G4-L übernimmt den bestätigten Stand. Sie setzen die Projektstruktur der Profile voraus (6.2.5: `liferay-625/portlets/<portlet>/docroot/…`, 7.2:
-`liferay-72/modules/<modul>/…`, `liferay-72/configs/…`); die Profile bestätigen oder korrigieren sie.
+Profile), und G4-L übernimmt den bestätigten Stand. Angenommen ist diese Struktur: 6.2.5
+`liferay-625/portlets/<portlet>/docroot/…`, 7.2 `liferay-72/modules/<modul>/…` und `liferay-72/configs/…`.
 
 | Entsprechung zu | 6.2.5 (`liferay-625/`) | 7.2 (`liferay-72/`) | Begründung |
 | --- | --- | --- | --- |
@@ -600,7 +603,7 @@ AK-1206-11.
 | Laufzeit von 6.2.5 (Java, Tomcat 7, Docker-Image) | Tomcat-Bundle bestätigt; Docker-Image `liferay/portal:6.2.5-ga6` existiert (nur CI) |
 | Suchdienst von 7.2 | eingebettet nur für Entwicklung und Tests zulässig (4.4) |
 | Speicher und Laufzeit auf dem Standard-Runner | ungeprüft → P00 misst |
-| Kein Herstellersupport für 6.2 und 7.2 | unverändert: nur Demo und Übung, kein Produktivbetrieb → gilt für beide Profile, Abschnitt 7 |
+| Kein Herstellersupport für 6.2 und 7.2 | unverändert: nur Demo und Übung, kein Produktivbetrieb; gilt für beide Plattformen und steht je Profil in „7. Fallstricke und Grenzen“ |
 | Öffentliches Repository | unverändert: nur Testdaten, Demo-Zugänge nur als Platzhalter, keine Geheimnisse in `portal-ext.properties` → P00 und `docs/ci-richtlinie.md` |
 | Oberfläche auf 6.2 (AlloyUI, Bootstrap 2) | unverändert offen → Profil 6.2.5, UI-AK einzeln bewerten |
 | Umfang einer kompletten Liferay-App | diese Datei verkleinert die Profile (Schema und Bausteine gemeinsam); Aufteilung in Arbeitspakete → Playbooks |
