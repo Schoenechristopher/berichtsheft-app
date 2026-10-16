@@ -73,6 +73,7 @@ berichtsheft-app/
 │       └── upgrade/                  Datenbestand vor dem Upgrade, erwarteter Zustand danach
 ├── profile/
 │   ├── typescript-nextjs.md
+│   ├── liferay-gemeinsam.md      gemeinsame Grundlage beider Liferay-Profile
 │   ├── liferay-625.md
 │   └── liferay-72.md
 ├── playbooks/
@@ -277,7 +278,7 @@ sinngemäß.
 | Rollen und Besitz | eigene Prüfung in jeder Serveraktion | Liferay-Rollen plus eigene Prüfung im Service | wie 6.2.5 |
 | Persistenz | Prisma | Service Builder | Service Builder |
 | Transaktion und Gleichzeitigkeit | bedingtes Update mit Version | Service-Transaktion, Versionsspalte von Hand | Service-Transaktion, Versionsspalte |
-| Historie unveränderlich | Datenbank-Trigger | ModelListener sperrt Ändern und Löschen | wie 6.2.5 |
+| Historie unveränderlich | Datenbank-Trigger | PostgreSQL-Trigger plus ModelListener (Freigabe 15.10.2026; Folge: Liferay nur auf PostgreSQL) | wie 6.2.5 |
 | Uhr | `src/domain/clock.ts` | eigener Uhr-Service, für Tests stellbar | eigener OSGi-Uhr-Service |
 | Hintergrundjobs | pg-boss Worker | Scheduler-Eintrag im Portlet | Scheduler mit MessageListener |
 | Benachrichtigung in der App | eigene Tabelle und Glocke | Liferay-Benachrichtigungen (UserNotification) | wie 6.2.5 |

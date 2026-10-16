@@ -28,10 +28,17 @@ Diese Datei schreibt nur die Steuerungsinstanz, jeweils nach dem Merge eines Pak
 | G4 Profile und Playbooks | G: Playbooks Liferay 6.2.5 (`playbooks/liferay-625/` P00, P02, P05, P06, P09, P10) | abgenommen, gemergt | 16.10.2026 | #59, Merge `058c971` |
 | G4 Profile und Playbooks | H: Playbooks Liferay 7.2 (`playbooks/liferay-72/` P00, P02, P05, P06, P10) | abgenommen, gemergt | 16.10.2026 | #58, Merge `b79c004` |
 | G4 Profile und Playbooks | Doku: Fortschritt Welle 3, Stufe 3a | gemergt | 16.10.2026 | #57, Merge `4488629` |
+| G4 Profile und Playbooks | Doku: Fortschritt Welle 3, Stufe 3b | gemergt | 16.10.2026 | #60, Merge `4cfb806` |
+| G4 Profile und Playbooks | L: Vorlagen, Datenübernahme, Liferay-Teile von AM-R04 | abgenommen, gemergt | 16.10.2026 | #61, Merge `332846d` |
+| G4 Profile und Playbooks | K: Playbooks Liferay 7.2 (S2-Teil P01, P03, P04, P07, P08, P09) | abgenommen, gemergt | 16.10.2026 | #62, Merge `53f0f54` |
+| G4 Profile und Playbooks | J: Playbooks Liferay 6.2.5 (S2-Teil P01, P03, P04, P07, P08) | abgenommen, gemergt | 16.10.2026 | #63, Merge `1f7068c` |
+| G4 Profile und Playbooks | Etappe G4 | abgeschlossen | 16.10.2026 | Rückblick und Übergabe unten |
 | A Automatisches Mergen | CI-Rückmeldung: Workflow `rueckmeldung.yml`, Regel CI-38 | abgenommen, gemergt | 16.10.2026 | #48, Merge `516888b` |
 | A Automatisches Mergen | Welle 1: A1 AM-AK in `ak:abdeckung` | abgenommen, gemergt | 13.10.2026 | #30, Merge `e5e0adc` |
 | A Automatisches Mergen | A3 Ablauf-Kriterien AM-AK-11 bis -14 an Test-PRs | nachgewiesen | 13.10.2026 | #32 (gemergt in `am-test/main`), #33, #34 (geschlossen) |
-| A Automatisches Mergen | Welle 2: A2 CI-37 (nach #28, I, J) | geplant | – | – |
+| A Automatisches Mergen | Welle 2: A2b Merge-Kriterien nachbessern, A2a CI-37 | abgenommen, gemergt | 15.10.2026 | #40, #41 |
+| A Automatisches Mergen | Welle 2: A2c E2E parallelisieren | nach Bestandsaufnahme abgebrochen, kein PR | 14.10.2026 | Befund unten |
+| A Automatisches Mergen | Etappe A | abgeschlossen; Schalter `aktiv: true` und Pflicht-Check „Merge-Kriterien“ im Regelsatz durch Chris | 16.10.2026 | Rückblick A unten |
 
 ## G1 – Rahmen und Pilotmodul M01
 
@@ -677,7 +684,81 @@ Chris. Die Etappen-Steuerung trägt die Freigabe als `[x]` mit Vermerk in die PR
 - SDK-Entpackort 6.2.5.
 - CI-Workflows L62/L72 und Klasse U als eigene Klasse-I-Aufträge.
 
+### Welle 4 – Pakete L, K und J
+
+Gemergt am 16.10.2026 (#61, #62, #63) zusammen mit dem Doku-PR W3b (#60). Steuerung W4 in einer frischen Sitzung.
+
+| PR | Paket | Inhalt | Merge |
+| --- | --- | --- | --- |
+| #60 | Doku W3b | Fortschritt Welle 3, Stufe 3b | `4cfb806` |
+| #61 | G4-L | Vorlagen, Datenübernahme und Liferay-Teile von AM-R04 | `332846d` |
+| #62 | G4-K | Playbooks Liferay 7.2, S2-Teil (P01, P03, P04, P07, P08, P09) | `53f0f54` |
+| #63 | G4-J | Playbooks Liferay 6.2.5, S2-Teil (P01, P03, P04, P07, P08) | `1f7068c` |
+
+**Freigaben:** Seit 16.10.2026 laufen die Punkte „Bitte bestätigen“ über die Gesamtsteuerung (Kurzfassung): #61 Punkte
+1–8, #62 Punkte 1–11, #63 Punkte 1–12. Chris mergt weiter.
+
+**Paket-Einträge (MW-R10, KE-R18; Kosten in US-Dollar):**
+
+| Feld | G4-L (#61) | G4-K (#62) | G4-J (#63) |
+| --- | --- | --- | --- |
+| Stufe | S3 | S2 | S2 |
+| Kosten von harter Grenze | 5,11 von 12 | 6,57 von 10 | 7,91 von 10 |
+| Merge | `332846d` | `53f0f54` | `1f7068c` |
+
+**Steuerung W4:** 10,52 bei einer Grenze von 7. Überschritten durch viele Ereignis-Runden.
+
+**Fallen aus Welle 4:**
+
+- **Profilverweise uneinheitlich.** Vorschlag: in die Playbook-Prüfung aufnehmen.
+- **„Bitte bestätigen“ nicht als `- [ ]` schreiben,** sonst zählt es als offener Punkt (AM-R05).
+- `get_session` liefert für S2-Sitzungen teils keine Kosten.
+- `effort_level` ist nicht immer sichtbar.
+
+### Rückblick G4 (MW-R12, KE-R18)
+
+| Kennzahl | G4 |
+| --- | --- |
+| KZ-1 Abnahme | alle 15 Pakete abgenommen; 3 mit zweitem Anlauf (D, E, F), sonst je eine Nachbesserung |
+| KZ-4 Pakete über Budget | über der harten Grenze: kein Paket. Steuerungen: 4 von 6 über der Grenze |
+| KZ-5 Verbrauch je Paket | A 4,17 · B 4,10 · C 8,52 · D 4,43 · E 6,09 · F 5,35 · M 0,32 · W 0,60 · N 1,13 · I 7,96 · G 7,19 · H 5,32 · L 5,11 · K 6,57 · J 7,91 US-Dollar |
+| Steuerung | W1a 11,31 · W1b 3,94 · W2 15,16 · W3 8,68 · W3b 4,03 · W4 10,52 US-Dollar |
+| Eskalationen je Stufe | keine |
+
+**Summe G4: rund 132 US-Dollar.** Plan: 110–155. Pakete 74,77; Steuerungen 53,64; Doku-PRs 2,54; dazu CI-Rückmeldung
+(Etappe A, #48) 0,87 und A-Abschluss Teil 1 0,30.
+
+**Lehren:**
+
+1. **Steuerungskosten entstehen durch Ereignis-Runden mit großem Kontext.** Wirksam waren: S2-Reviews nur auf den Diff,
+   PR-Abos erst bei „fertig“, kurze Aufträge mit Verweis auf die Vorlage.
+2. **Die CI-Rückmeldung (CI-38)** löst das Problem, dass grüne Läufe nicht als Ereignis ankamen.
+3. **Freigaben über die Gesamtsteuerung** beschleunigen den Ablauf.
+4. **Chris will kurze Meldungen:** Merge-Reihenfolge als Liste, Entscheidungen in wenigen Wörtern.
+5. **Die Gesamtsteuerung selbst** kostete rund 40 US-Dollar bei 576.000 Token Kontext. Vorschlag (zur Freigabe): nach
+   jeder Etappe oder bei 250.000 Token eine frische Gesamtsteuerung.
+
+## Übergabe an L62 und L72
+
+- **Voraussetzungen erfüllt:** G4 und A sind abgeschlossen. Den Schalter `aktiv: true` und den Pflicht-Check
+  „Merge-Kriterien“ setzt Chris spätestens vor L62 (`docs/07`, Einführung Schritt 5).
+- **Vor dem Start:**
+  - CI-Workflows L62/L72 und Klasse U als eigene Klasse-I-Aufträge.
+  - Paket G4-Nacharbeit (läuft).
+  - Nach P00 die geschützten Liferay-Pfade neu bewerten (AM-R04).
+  - Ungleiche Muster 625/72 klären.
+- **Offene Punkte:**
+  - `ak:abdeckung` für Java (Ant-Ziel `pruefbericht`).
+  - SDK-Entpackort 6.2.5.
+  - Code-Landkarte M02 (`matchLogin`).
+  - `coverage.ts`-Ausnahme für die Ebene `upgrade`.
+  - Für G5: Reformationstag 2017 (M01-R15 gegen Referenzliste), Testgrenze AK-408-03, M09-R20.
+- **Blindtests (B)** nur nach Freigabe durch Chris und erst nach U.
+
 ## A – Automatisches Mergen
+
+**Status: abgeschlossen (16.10.2026); Schalter `aktiv: true` und Pflicht-Check „Merge-Kriterien“ im Regelsatz durch
+Chris.**
 
 Plan „Etappe A“, freigegeben von Chris am 13.10.2026 mit E2 bis E7 wie vorgeschlagen; E1 offen. Grundlage:
 `docs/07-spec-automatisches-mergen.md`, Einführung Schritt 4 und 5. Stufen nach `docs/08` (MW-R03).
@@ -735,11 +816,15 @@ Kriterien und Entscheidung von Chris weichen voneinander ab.
 | 14 | #56 | G4 W3a, I | 33dae6b | nein | geschützte Pfade `specs/pruefung/**`, `playbooks/**` (AM-R04); „Bitte bestätigen“ als `[ ]` im PR-Text (AM-R05 möglich); Schalter aus (AM-R12). Check im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
 | 15 | #59 | G4 W3b, G | 254ea06 | nein | geschützter Pfad `playbooks/**` (AM-R04); „Bitte bestätigen“ offen (AM-R05); Schalter aus (AM-R12). Check „Merge-Kriterien“ im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
 | 16 | #58 | G4 W3b, H | 291f0f9 | nein | geschützter Pfad `playbooks/**` (AM-R04); „Bitte bestätigen“ offen (AM-R05); Schalter aus (AM-R12). Check „Merge-Kriterien“: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
+| 17 | #61 | G4 W4, L | e8ed447 | nein | geschützte Pfade `playbooks/**`, `profile/**` (AM-R04); Schalter aus (AM-R12) | Chris: gemergt | nein |
+| 18 | #62 | G4 W4, K | 7b0e205 | nein | geschützter Pfad `playbooks/**` (AM-R04); Schalter aus (AM-R12) | Chris: gemergt | nein |
+| 19 | #63 | G4 W4, J | 6180376 | nein | geschützter Pfad `playbooks/**` (AM-R04); Schalter aus (AM-R12) | Chris: gemergt | nein |
 
 Die Zusammenfassung des Checks ist bei allen vier PRs leer (auch bei den Läufen mit Status success); die gelisteten Gründe
 sind deshalb die nach AM-R04, AM-R05 und AM-R12 erwarteten und nicht aus dem Check abgelesen.
 
-**Zählung: 16 Paket-PRs im Schattenbetrieb, kein Widerspruch.** Das Ziel von A (10 Paket-PRs ohne Widerspruch) ist erreicht;
+**Zählung: 19 Paket-PRs im Schattenbetrieb, kein Widerspruch.** Die Gründe für #61 bis #63 sind die nach AM-R04 und
+AM-R12 erwarteten, nicht aus dem Check abgelesen. Das Ziel von A (10 Paket-PRs ohne Widerspruch) ist erreicht;
 der Schalter `aktiv: true` liegt bei Chris.
 
 ### Welle 1 – Paket A1
@@ -888,10 +973,42 @@ lokal rund 16 statt 23,5 Minuten); (b) fachlich prüfen, ob in smartphone-375 je
 - **Am Ende von A:** `docs/07` (Einführung Schritt 4, offene Punkte) nachziehen (geschützter Pfad), Rückblick nach
   MW-R12/KE-R18. Sitzungen A2a, A2b, A2c erst nach Zustimmung von Chris archivieren.
 
+### Rückblick A (MW-R12, KE-R18)
+
+| Kennzahl | A |
+| --- | --- |
+| Pakete | A1 0,57 · A2b 1,91 · A2a 4,42 · A2c 1,34 (abgebrochen, kein PR) · zusammen 8,24 US-Dollar |
+| Steuerung | Welle 1 und Welle 2 bis 14.10.: 16,91 US-Dollar (Gesamtsteuerung, Tabelle „Kosten bis 14.10.2026“) |
+| Dazu | CI-Rückmeldung (#48, CI-38) 0,87 · A-Abschluss Teil 1 0,30 US-Dollar; beide sind in der Summe G4 gezählt |
+| Schattenbetrieb | 19 Paket-PRs, kein Widerspruch (Ziel 10) |
+| Eskalationen | keine |
+
+**Ergebnis:** AM-AK-01 bis -10 in `ak:abdeckung`, AM-AK-11 bis -14 an Test-PRs belegt, Merge-Kriterien nachgebessert
+(jedes Kriterium einzeln, AM-R05 fail-closed), CI-37 (Auswahl nach Modul), CI-38 (Rückmeldung). AM-S04 steht in
+`playbooks/00-steuerung.md`, die Liferay-Teile von AM-R04 in #61. A2c ist nach Messung und Gegenprobe abgebrochen worden;
+die Optionen (a) und (b) bleiben ein eigenes Paket.
+
+**Lehren:** Im `merge_group`-Lauf meldet „Merge-Kriterien“ immer Erfolg „Merge-Warteschlange“; maßgeblich ist der
+`pull_request`-Lauf auf dem aktuellen Head (jetzt in `docs/07`). Die Kriterien lehnten alle Paket-PRs aus G3 und G4 zu
+Recht ab (geschützte Pfade); der Schalter ändert daran nichts, solange `playbooks/**`, `profile/**` und `specs/**`
+geschützt sind.
+
 ## Gesamtsteuerung
 
 Die Gesamtsteuerung führt die Etappen, startet je Etappe bzw. Welle eine Etappen-Steuerung, legt deren Pläne und Fragen
 Chris vor und gibt seine Entscheidungen zurück. Sie entwickelt nicht, nimmt nicht ab und hält keine PR-Abos.
+
+### Stand 16.10.2026 (Übergabe an die nächste Gesamtsteuerung)
+
+- **G4 und A abgeschlossen** (G4: 15 Pakete, #44–#63 mit Doku-PRs; A: #30, #40, #41, #48; Rückblicke oben).
+- **Neue Regeln:**
+  - Freigaben („Bitte bestätigen“) trifft die Gesamtsteuerung im Auftrag von Chris; Chris mergt weiter.
+  - Die Zeile „Co-Authored-By“ in Commits bleibt (MW-R03 gilt für Dateien und PR-Texte).
+  - Meldungen sind kurz: Merge-Reihenfolge als Liste, Entscheidungen in wenigen Wörtern.
+  - CI-38: Die CI-Rückmeldung kommt als Kommentar am PR; kein `send_later` und keine Abfrageschleifen.
+- **Kosten der Gesamtsteuerung** ab 14.10.: rund 40 US-Dollar bei 576.000 Token Kontext.
+- **Nächster Schritt:** frische Gesamtsteuerung, die L62 und L72 planen lässt (Übergabe an L62 und L72 oben). Chris
+  setzt den Schalter `aktiv: true` und den Pflicht-Check vor L62.
 
 ### Stand 14.10.2026, 22:00 UTC (Übergabe an die nächste Gesamtsteuerung)
 
