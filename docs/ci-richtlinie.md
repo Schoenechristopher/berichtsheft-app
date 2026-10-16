@@ -229,14 +229,30 @@ Festlegung des Umfangs (12.10.2026, von Chris an Claude übertragen):
   mindestens Compose mit Chromium und 375 px. Der Workflow „Merge-Kriterien“ (nur lesende Rechte, CI-27) wertet den
   Antrag aus.
 
+### Browser für Liferay (L62, L72)
+
+Vorschlag (G4-L, 16.10.2026), gilt für die Ablauf-Prüffälle beider Liferay-Umsetzungen:
+
+- **Je PR (volle Prüfung der Klasse L62 bzw. L72):** Ablauf-Prüffälle in Chromium und in 375 px (`chromium`,
+  `smartphone-375`), wie Klasse L der TypeScript-App.
+- **Firefox und Edge** (`firefox`, `msedge`): im Wochenlauf (CI-14) und bei einem PR mit dem Label `volle-pruefung`
+  (CI-35); P10 der Plattform läuft mit diesem Label.
+- **Begründung:** AK-1101 verlangt jeden Browser-Test in Chromium, Firefox und Edge; das erfüllen Wochenlauf und
+  P10-Abnahme. Je PR alle drei Browser zu prüfen, verdreifacht die Laufzeit des Ablauf-Teils in einem Job, der mit
+  Portal-Start ohnehin bis zu 60 Minuten braucht (P00 misst). Die Liferay-Pakete ändern meist Service und Logik;
+  Darstellung und Bedienung prüfen Chromium und 375 px (AK-1102). Restrisiko wie oben: Ein Fehler nur in Firefox oder
+  Edge fällt spätestens im Wochenlauf auf.
+- **Bitte bestätigen:** Diese Festlegung ersetzt den Hinweis „Prüffälle mit Playwright (Chromium)“ in der Tabelle
+  unten; die Workflows setzt ein eigener Auftrag der Klasse I um.
+
 ### Prüfungen je Teil
 
 | Teil | Schnelle Prüfung | Kern-Prüfung im Draft | Volle Prüfung | Doku-Pfade |
 |---|---|---|---|---|
 | TypeScript-App | Lint, Formatierung, Typecheck, Vitest mit PostgreSQL, AK-Abdeckung, Beispiel-PDF | keine; die Sitzungen testen lokal mit Test-Login | Docker Compose + Playwright (Chromium, Firefox, Edge, 375 px, axe, Screenshots); Umfang nach Änderungsklasse | siehe Klasse D |
 | Specs und Prüffälle (ab G1) | Prüf-Runner für TypeScript, AK-Abdeckung | keine | wie TypeScript-App | `specs/**/*.md` |
-| Liferay 6.2.5 (ab L62) | wird in P00 festgelegt (Build, JUnit) | keine | Liferay mit Datenbank, Prüffälle mit Playwright (Chromium); nur bei Änderungen unter `liferay-625/` | wird in P00 festgelegt |
-| Liferay 7.2 (ab L72) | wird in P00 festgelegt (Gradle, JUnit) | keine | Liferay mit Datenbank und Elasticsearch, Prüffälle mit Playwright (Chromium); nur bei Änderungen unter `liferay-72/` | wird in P00 festgelegt |
+| Liferay 6.2.5 (ab L62) | wird in P00 festgelegt (Build, JUnit) | keine | Liferay mit Datenbank, Prüffälle mit Playwright (Chromium, 375 px; Firefox und Edge siehe „Browser für Liferay“); nur bei Änderungen unter `liferay-625/` | wird in P00 festgelegt |
+| Liferay 7.2 (ab L72) | wird in P00 festgelegt (Gradle, JUnit) | keine | Liferay mit Datenbank und Elasticsearch, Prüffälle mit Playwright (Chromium, 375 px; Firefox und Edge siehe „Browser für Liferay“); nur bei Änderungen unter `liferay-72/` | wird in P00 festgelegt |
 | Upgrade 6.2.5 → 7.2 (ab U) | – | – | nur von Hand (`workflow_dispatch`): 6.2.5 befüllen, Upgrade, 7.2 prüfen | – |
 
 ## 8. Reihenfolge der Umsetzung
