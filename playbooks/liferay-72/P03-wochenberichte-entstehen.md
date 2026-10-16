@@ -19,7 +19,7 @@ Azubi-Liste des Ausbilders. Fachregeln liegen als reine Java-Klassen in `bh-doma
    Zugriff);
 3. jede Gegenprobe aus Schritt 11 die dort benannten Prüffälle bzw. Tests rot gemacht hat und zurückgenommen ist.
 
-Schemaänderung: die Entities `WeeklyReport` und `ReportDay` (gemeinsam 2.3) und im Skript „Schutz in der Datenhaltung“ (gemeinsam
+Schemaänderung: die Entities `WeeklyReport` und `ReportDay` (gemeinsames Profil, Abschnitt 2.3) und im Skript „Schutz in der Datenhaltung“ (gemeinsam
 2.6) Fremdschlüssel, CHECK-Constraints und Eindeutigkeit dieser zwei Tabellen; Migration über den Upgrade-Schritt aus P00. Keine
 Abweichung gegenüber der TypeScript-App.
 
@@ -27,10 +27,10 @@ Abweichung gegenüber der TypeScript-App.
 
 - L72-P00, L72-P01 (Wochen, Feiertage, Uhr) und L72-P02 (Personen, Zugriff, Bundesland, `getActiveTrainees()`) abgenommen und
   gemergt. M03 ist die Grundlage von M04, M05 und M08; die Tabelle `BH_WeeklyReport` trägt deshalb schon `status` und `version`
-  (gemeinsam 2.3, 2.4).
+  (gemeinsames Profil, Abschnitt 2.3, 2.4).
 - Profil 7.2: Abschnitt 3 (Persistenz, Transaktion und Gleichzeitigkeit, Hintergrundjobs, Zeitplan 3.3), 4 (Daten-Adapter,
-  plattformeigene Tests) und 7 („Service Builder schreibt am Cache vorbei“, Scheduler in UTC); gemeinsam 2.2, 2.3 und 2.6.
-- Der Scheduler-Eintrag liegt im Modul `bh-notification` (Profil 2); P08 nutzt dieselbe Registrierung für Ausgangskorb und
+  plattformeigene Tests) und 7 („Service Builder schreibt am Cache vorbei“, Scheduler in UTC); gemeinsames Profil, Abschnitt 2.2, 2.3 und 2.6.
+- Der Scheduler-Eintrag liegt im Modul `bh-notification` (Profil 7.2, Abschnitt 2); P08 nutzt dieselbe Registrierung für Ausgangskorb und
   Erinnerung.
 
 ## 3. Eingaben
@@ -59,7 +59,7 @@ AK die Prüffälle (alle in `specs/pruefung/M03.json`; Zählweise: Prüffälle *
 | AK-ID | Kriterium (Kurzfassung aus der Fach-Spec) | Prüffälle | Bewertung auf 7.2 |
 | --- | --- | --- | --- |
 | AK-301 | Für jede Woche vom Ausbildungsbeginn bis zur aktuellen Woche existiert automatisch genau ein Bericht im Status „Entwurf“; Beispiel Beginn 01.09.2026, heute 06.10.2026 → KW 36–41. | 3 (3 fachlogik) | gleichwertig; Bericht und fünf Tage in einer Transaktion (Schritt 5) |
-| AK-302 | Für zukünftige Wochen gibt es keine Berichte; mit Beginn einer neuen Woche erscheint ihr Bericht automatisch. | 4 (4 fachlogik) | gleichwertig; „automatisch“ durch Scheduler-Takt (Profil 3.3) und beim Aufruf der Übersicht; Test `WeekGenerationJobTest.AK302_…` |
+| AK-302 | Für zukünftige Wochen gibt es keine Berichte; mit Beginn einer neuen Woche erscheint ihr Bericht automatisch. | 4 (4 fachlogik) | gleichwertig; „automatisch“ durch Scheduler-Takt (Profil 7.2, Abschnitt 3.3) und beim Aufruf der Übersicht; Test `WeekGenerationJobTest.AK302_…` |
 | AK-303 | Nach dem Ausbildungsende entstehen keine Berichte mehr. | 4 (4 fachlogik) | gleichwertig |
 | AK-304 | Kein manuelles oder doppeltes Anlegen; pro Azubi und Woche immer genau ein Bericht. | 2 (2 fachlogik) | gleichwertig; Eindeutigkeit und Wochen-CHECK in der Datenhaltung, Nachweis `ReportConstraintsTest.AK304_…` und `WeekGenerationTest.AK304_…` |
 | AK-305 | Tage außerhalb der Ausbildung (Beginn oder Ende mitten in der Woche) sind ausgegraut, brauchen weder Tagesart noch Text und sind nicht änderbar. | 9 (9 fachlogik) | gleichwertig; AK-305-09 zurückgestellt bis P04 (Schnittstelle `tageSpeichern`), die anderen 8 gebaut |
@@ -77,7 +77,7 @@ Anlegen, Scheduler, Cache) folgt dem Profil und hat in der Referenz kein Gegenst
 
 1. **Branch** `claude/l72-p03-wochenberichte-entstehen`; Spec (insbesondere M03-R04 bis M03-R06, M03-R10 bis M03-R15) und Prüffälle
    lesen. Prüfschritt: AK-Tabelle (Abschnitt 5) im PR-Entwurf.
-2. **Entities und Datenhaltung** in `modules/bh/bh-service/service.xml` nach gemeinsam 2.3: `WeeklyReport` (`BH_WeeklyReport`:
+2. **Entities und Datenhaltung** in `modules/bh/bh-service/service.xml` nach dem gemeinsamen Profil, Abschnitt 2.3: `WeeklyReport` (`BH_WeeklyReport`:
    `traineeId`, `isoYear`, `isoWeek`, `status` mit Anfang `DRAFT`, `version` int mit Anfang 0, `createdAt`, `updatedAt`) mit
    eindeutigem Finder (`traineeId`, `isoYear`, `isoWeek`) und `ReportDay` (`BH_ReportDay`: `weeklyReportId`, `dayDate` als
    `VARCHAR(10)` im Format `JJJJ-MM-TT`, `dayType` leer erlaubt, `activities` als `TEXT`, `outsideTraining`, `holidayPreset`) mit
@@ -86,7 +86,7 @@ Anlegen, Scheduler, Cache) folgt dem Profil und hat in der Referenz kein Gegenst
    `BH_WeeklyReport`, je `ON DELETE CASCADE`), den CHECK **`weekly_report_iso_week_range`** (Woche 1 bis 52, die 53 nur in Jahren mit
    53 Wochen, wie die Migration `20261012100000_kw53_nur_in_langen_jahren`), die CHECK-Constraints auf `status` und `dayType` (feste
    Werte) und auf das Datumsformat von `dayDate`. Der Trigger `report_day_locked` kommt erst mit P05. `buildService`, Datenbank
-   `berichtsheft_l72` neu anlegen, Bundle neu starten. Prüfschritt: erzeugte `tables.sql` gegen gemeinsam 2.3; ein direktes
+   `berichtsheft_l72` neu anlegen, Bundle neu starten. Prüfschritt: erzeugte `tables.sql` gegen dem gemeinsamen Profil, Abschnitt 2.3; ein direktes
    `INSERT` einer zweiten Zeile für denselben Azubi und dieselbe Woche sowie einer KW 53/2027 scheitert in PostgreSQL.
 3. **Fachfunktionen** `de.berichtsheft.domain.reports` in `bh-domain` (M03-R01 bis M03-R16, Java 8, nur `java.time`, „jetzt“ als
    Parameter): `ReportGeneration.dueWeeks(beginn, ende, now)` (AK-301, AK-302, AK-303, AK-304: von der Woche des Beginns bis zur
@@ -111,7 +111,7 @@ Anlegen, Scheduler, Cache) folgt dem Profil und hat in der Referenz kein Gegenst
    aus `planReportDays()` einfügen, sonst fehlende Tage ergänzen (`ON CONFLICT (weeklyReportId, dayDate) DO NOTHING`; M03-R07,
    vorhandene Tage und Inhalte bleiben). Grund für `ON CONFLICT`: Eine Unique-Verletzung würde die PostgreSQL-Transaktion
    abbrechen; wiederholtes und gleichzeitiges Anlegen müssen ohne Wirkung und ohne Ausnahme enden. Danach den Finder-Cache beider
-   Entities leeren (Profil, Abschnitt 7). Für **deaktivierte Azubis** entstehen keine neuen Berichte (M03-R06): `ensureReportsForAllTrainees()`
+   Entities leeren (Profil 7.2, Abschnitt 7). Für **deaktivierte Azubis** entstehen keine neuen Berichte (M03-R06): `ensureReportsForAllTrainees()`
    nimmt nur `getActiveTrainees()` aus P02. Nach einer Änderung des Ausbildungszeitraums (P02, `updatePerson`) ruft die
    Personenverwaltung `correctOutsideTraining()` auf **offene** Berichte (auch für Wochen ganz außerhalb) und `ensureReports…`; Tage mit
    Inhalt, eingereichte und freigegebene Berichte bleiben (M03-R11 bis M03-R13); gelöscht wird nichts. Vorbelegte Feiertage werden
@@ -127,10 +127,10 @@ Anlegen, Scheduler, Cache) folgt dem Profil und hat in der Referenz kein Gegenst
    „Bitte bestätigen“. Ausgeblendet wird nur in der Anzeige. Prüfschritt: `OverviewAccessTest.AK306_azubiSiehtNurDieEigeneUebersicht`
    (Anna liest die Übersicht eines zweiten, nur im Test angelegten Azubis: `zugriff_verweigert`) und `OverviewAccessTest.AK306_ausbilderSiehtDieUebersichtLesend`
    (Bernd und Clara sehen Annas Liste, die Zahl der vergangen offenen Wochen stimmt bei festgestellter Uhr).
-7. **Scheduler-Lauf** im Modul `bh-notification` (Profil 3.3): `WeekGenerationMessageListener` (`MessageListener`) mit
+7. **Scheduler-Lauf** im Modul `bh-notification` (Profil 7.2, Abschnitt 3.3): `WeekGenerationMessageListener` (`MessageListener`) mit
    `SchedulerEngineHelper.register(…)`, `TriggerFactory` im Takt von 15 Minuten, `StorageType.MEMORY_CLUSTERED`. Der Lauf ruft
    `ensureReportsForAllTrainees()`; weil das Anlegen wiederholbar ist, braucht er keinen Vermerk. Die Cron-Zeit ist nie Berliner
-   Zeit; „Montag 0:00 Uhr Berlin“ entscheidet `dueWeeks()` mit der Uhr (Profil 3.3). Beim Aufruf der Übersicht und der
+   Zeit; „Montag 0:00 Uhr Berlin“ entscheidet `dueWeeks()` mit der Uhr (Profil 7.2, Abschnitt 3.3). Beim Aufruf der Übersicht und der
    Startseite des Azubis läuft zusätzlich `ensureReportsForTrainee()` (M03-R02: spätestens dann). Prüfschritt:
    `WeekGenerationJobTest.AK302_neueWocheEntstehtMitDemLauf` (Uhr auf Sonntag 11.10.2026, 23:59 Uhr Berlin: kein Bericht für KW 42; auf
    Montag 12.10.2026, 0:00 Uhr: Lauf legt KW 42 an) und `WeekGenerationJobTest.AK302_schedulerEintragIstRegistriert` (der Eintrag steht
@@ -144,7 +144,7 @@ Anlegen, Scheduler, Cache) folgt dem Profil und hat in der Referenz kein Gegenst
    `AK304_datenhaltungWeistDoppelteAb` (direktes JDBC-`INSERT` einer zweiten Zeile für Azubi und Woche scheitert),
    `AK304_datenhaltungWeistWocheAusserhalbAb` (KW 53/2027 und KW 0 scheitern am CHECK `weekly_report_iso_week_range`, KW 53/2026
    gelingt) und `AK305_datenhaltungKenntFuenfTageJeBerichtGenau` (zweiter Tag mit demselben Datum scheitert). Prüfschritt: grün.
-10. **Testschnittstelle und Bau-Stand.** `bh-pruefung` bekommt die Aktion „Berichte anlegen“ (Aufruf von
+10. **Testschnittstelle und Bau-Stand.** Zustand setzt der Runner nur über die Testschnittstelle `/o/bh-pruefung/zustand` (Uhr, Bestand, Daten-Aktionen; nur bei `bh.betrieb=test`, P00). Konto-IDs sind an dieser Grenze immer `String` (`String.valueOf(userId)`; Profil 7.2, Abschnitt 6.1: Konto-ID = `userId`); die Dienste arbeiten mit `long actorUserId`, der Adapter wandelt um und ändert sonst nichts. `bh-pruefung` bekommt die Aktion „Berichte anlegen“ (Aufruf von
     `ensureReportsForAllTrainees()` bei gestellter Uhr), damit Ablauf-Fälle späterer Module Berichte vorfinden; in Produktion
     antwortet sie nicht (P00, Schritt 13). M03 in die Bau-Liste eintragen; AK-305-09 bleibt zurückgestellt bis P04.
 11. **Gegenproben** (je ein benannter Fehler, je ein roter Lauf, danach zurücknehmen und grün zeigen):
@@ -188,7 +188,7 @@ Nur in CI: Firefox und Edge. Im PR vermerken.
   Fachlogik-Adapter von M03 und die plattformeigenen Tests lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-301, AK-302, AK-303, AK-304, AK-305, AK-306 mit Test und Prüffällen), dem zurückgestellten Fall
   AK-305-09, den Gegenproben mit den roten Fällen und „Bitte bestätigen“. Geschützte Pfade: `service.xml`, `**/sql/**`,
-  `**/custom-sql/**`, `**/service/persistence/impl/**`, `**/service/impl/**`, `**/upgrade/**` und `bh-pruefung` (gemeinsam 5);
+  `**/custom-sql/**`, `**/service/persistence/impl/**`, `**/service/impl/**`, `**/upgrade/**` und `bh-pruefung` (gemeinsames Profil, Abschnitt 5);
   Chris mergt.
 - Bericht an die Steuerung per `send_message`; `FORTSCHRITT.md` schreibt die Steuerung.
 
@@ -199,10 +199,10 @@ Nur in CI: Firefox und Edge. Im PR vermerken.
 | Doppelte Berichte bei gleichzeitigem Aufruf | Eindeutigkeit der Datenbank nutzen, nie erst lesen und dann schreiben (Schritt 5) |
 | Transaktion bricht bei Unique-Verletzung ab („current transaction is aborted“) | `INSERT … ON CONFLICT DO NOTHING` statt `addWeeklyReport` mit Ausnahme |
 | Bericht ohne Tage sichtbar | Bericht und Tage in derselben Transaktion; Gegenprobe F-P03-10 |
-| Neu angelegter Bericht erscheint nicht in der Übersicht | Finder-Cache nach dem Anlegen am Service Builder vorbei leeren (Profil, Abschnitt 7) |
+| Neu angelegter Bericht erscheint nicht in der Übersicht | Finder-Cache nach dem Anlegen am Service Builder vorbei leeren (Profil 7.2, Abschnitt 7) |
 | Hinweis „Feiertag (vorbelegt)“ ändert sich nach Bundeslandwechsel | den gespeicherten Merker `holidayPreset` lesen, nicht `Holidays.isHoliday()` mit dem aktuellen Bundesland |
 | KW 53 in der Datenhaltung akzeptiert | CHECK `weekly_report_iso_week_range` mit der genauen Regel (28. Dezember), nicht nur 1 bis 53 |
 | Woche ganz außerhalb wird gezählt oder gespeichert | `classifyWeek()` rechnet aus dem aktuellen Zeitraum; gespeichert wird dazu nichts |
-| Neue Woche erscheint erst Stunden nach Montag 0:00 Uhr | Scheduler läuft im festen Takt in UTC; „fällig“ entscheidet `dueWeeks()` mit der Uhr, nicht die Cron-Zeit (Profil 3.3) |
+| Neue Woche erscheint erst Stunden nach Montag 0:00 Uhr | Scheduler läuft im festen Takt in UTC; „fällig“ entscheidet `dueWeeks()` mit der Uhr, nicht die Cron-Zeit (Profil 7.2, Abschnitt 3.3) |
 | Zeitraumänderung ändert eingereichte oder freigegebene Berichte | Neuberechnung nur für Berichte mit offenem Status |
-| Tage um einen Tag verschoben | Kalendertage nur als `JJJJ-MM-TT` und `LocalDate`, JVM und JDBC in UTC (gemeinsam 2.2) |
+| Tage um einen Tag verschoben | Kalendertage nur als `JJJJ-MM-TT` und `LocalDate`, JVM und JDBC in UTC (gemeinsames Profil, Abschnitt 2.2) |

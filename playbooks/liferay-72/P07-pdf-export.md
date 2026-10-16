@@ -24,9 +24,9 @@ Keine Schemaänderung: M07 speichert nichts (Spec, Abschnitt 5). Keine Abweichun
 
 - L72-P00 bis L72-P06 abgenommen und gemergt (Zugriff aus M02, Wochen und Ausblendung aus M03, Status und Freigabe aus M05, Historie mit
   `currentApproval()` und `getHistory()` aus M06, Uhr und Zeitzone aus M01).
-- Profil 7.2: Abschnitte 1 und 3 (PDF), 4 (Daten-Adapter, Zeitzone) und 7 (Zeit, OSGi-Abhängigkeiten); gemeinsam 2.2 (Zeit in UTC, Anzeige
+- Profil 7.2: Abschnitte 1 und 3 (PDF), 4 (Daten-Adapter, Zeitzone) und 7 (Zeit, OSGi-Abhängigkeiten); gemeinsames Profil, Abschnitt 2.2 (Zeit in UTC, Anzeige
   in Europe/Berlin) und 7 (PDFBox 2.0.37, Noto Sans).
-- P00 hat bestätigt, dass PDFBox per `compileInclude` als OSGi-Modul läuft (Profil, „In P00 zu bestätigen“); ohne diesen Nachweis
+- P00 hat bestätigt, dass PDFBox per `compileInclude` als OSGi-Modul läuft (Profil 7.2, „In P00 zu bestätigen“); ohne diesen Nachweis
   bleibt Schritt 4 stehen und wird gemeldet.
 - Die Schrift liegt als Datei im Repository (`assets/fonts/NotoSans-Regular.ttf`, `assets/fonts/NotoSans-Bold.ttf`, Lizenz
   `assets/fonts/OFL.txt`) und wird als Ressource in `bh-pdf` kopiert, nicht aus dem Internet geladen.
@@ -106,8 +106,8 @@ Dokument. Weg A nur für die Übersetzung von `report-pdf.ts` und nur auf ausdr�
    legt nichts an; die Ausnahme rollt zusätzlich die Transaktion zurück), danach Bericht, Tage, Statuswechsel und Namen **in einer kurzen
    Lese-Transaktion** laden; das Rendern geschieht außerhalb der Transaktion. Es gibt keine aufbewahrte Fassung: jeder Abruf liest neu aus
    der Datenbank (M07-R03). Prüfschritt: Arquillian-Test `PdfExportServiceTest.AK906_fremderBerichtUndUnbekannterBericht`.
-5. **Layout mit PDFBox** in `bh-pdf` (Profil, Abschnitt 3; `compileInclude` von `org.apache.pdfbox:pdfbox:2.0.37` samt Abhängigkeiten, Lizenz
-   Apache-2.0, gemeinsam 7): `PdfRenderer.render(PdfDocument)` liefert `byte[]` und läuft auch ohne OSGi (reines Java), damit
+5. **Layout mit PDFBox** in `bh-pdf` (Profil 7.2, Abschnitt 3; `compileInclude` von `org.apache.pdfbox:pdfbox:2.0.37` samt Abhängigkeiten, Lizenz
+   Apache-2.0, gemeinsames Profil, Abschnitt 7): `PdfRenderer.render(PdfDocument)` liefert `byte[]` und läuft auch ohne OSGi (reines Java), damit
    `PdfLayoutTest` als normaler JUnit-Test läuft. Der Inhalt aus Schritt 2 wird in zwei Durchgängen gesetzt: erst der **Umbruch** in
    Zeilen und Seiten (eigene Klasse `LineBreaker`), dann das Zeichnen, weil „Seite x von y“ die Seitenzahl des ganzen Dokuments braucht.
    - **Schrift:** `PDType0Font.load(document, InputStream)` aus den Ressourcen (Noto Sans Regular und Bold, eingebettet); die Standardschriften
@@ -138,7 +138,7 @@ Dokument. Weg A nur für die Übersetzung von `report-pdf.ts` und nur auf ausdr�
    gespeicherte Stand exportiert.“ als eigener `<dialog>`; der Link ist als Download markiert und löst die Warnung beim Verlassen aus P04
    nicht aus, weil die Seite nicht verlassen wird. Prüfschritt: von Hand als Anna (eigene Woche, Sammel-PDF), als Bernd (Annas Woche) und als
    Anna auf einem fremden Bericht (403).
-7. **Adapter.** Fachlogik: `pdfWoche` und `pdfZeitraum` (Formate nach `specs/pruefung/format.md`; Fälle mit `uhr` stellen die Uhr des
+7. **Adapter.** Zustand setzt der Runner nur über die Testschnittstelle `/o/bh-pruefung/zustand` (Uhr, Bestand, Daten-Aktionen; nur bei `bh.betrieb=test`, P00). Konto-IDs sind an dieser Grenze immer `String` (`String.valueOf(userId)`; Profil 7.2, Abschnitt 6.1: Konto-ID = `userId`); die Dienste arbeiten mit `long actorUserId`, der Adapter wandelt um und ändert sonst nichts. Fachlogik: `pdfWoche` und `pdfZeitraum` (Formate nach `specs/pruefung/format.md`; Fälle mit `uhr` stellen die Uhr des
    Adapters; Fehler `von_ungueltig`, `bis_ungueltig`, `bis_vor_von` über die Fehlerart). Daten: `pdf_woche_exportieren` und
    `pdf_zeitraum_exportieren` über **dieselben** Dienst-Methoden wie der Abruf, mit dem Inhalt (`PdfDocument`), nicht den Bytes; Fehler
    `zugriff_verweigert` und `nicht_gefunden` über den Grund der Ausnahme, nie über den Text. Die Schritte der Fälle nutzen die
@@ -212,7 +212,7 @@ Nur in CI: Firefox und Edge. Im PR vermerken.
   von M07 und die plattformeigenen Tests lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-901, AK-902, AK-903, AK-904, AK-905, AK-906, AK-907 mit Test und Prüffällen), den Gegenproben mit den
   roten Fällen, der Messung zu 150 Wochen und „Bitte bestätigen“ (Ersatzzeichen für Zeichen ohne Glyph). Geschützte Pfade: `**/service/impl/**`,
-  `**/security/permission/**` und die Build-Dateien (`build.gradle`, `bnd.bnd` des Moduls mit der neuen Bibliothek; gemeinsam 5 und 7); eine
+  `**/security/permission/**` und die Build-Dateien (`build.gradle`, `bnd.bnd` des Moduls mit der neuen Bibliothek; gemeinsames Profil, Abschnitt 5 und 7); eine
   Bibliothek außerhalb der freigegebenen Liste schließt automatisches Mergen aus. Chris mergt.
 - Bericht an die Steuerung per `send_message`; `FORTSCHRITT.md` schreibt die Steuerung.
 
@@ -223,12 +223,12 @@ Nur in CI: Firefox und Edge. Im PR vermerken.
 | Umlaute fehlen, Kästchen oder Ausnahme „No glyph“ | Noto Sans einbetten (`PDType0Font.load`); Zeichen ohne Glyph vorher ersetzen |
 | „ä“ im Dateinamen wird zu „a“ | zuerst umschreiben, danach Akzente entfernen (Schritt 3) |
 | Freigabevermerk bei zurückgenommener Freigabe | `currentApproval()` gilt nur bei Status Freigegeben; sonst Kennzeichnung |
-| Vermerk zeigt UTC statt Berliner Zeit | `TIMESTAMP` ist UTC (gemeinsam 2.2); Formatierung mit `Europe/Berlin` aus P01, nie die Zeitzone des Servers |
+| Vermerk zeigt UTC statt Berliner Zeit | `TIMESTAMP` ist UTC (gemeinsames Profil, Abschnitt 2.2); Formatierung mit `Europe/Berlin` aus P01, nie die Zeitzone des Servers |
 | Wochentag oder Monat in falscher Sprache | feste deutsche Tabellen statt `Locale` des Servers |
 | `new Date()` oder `Instant.now()` im Export | Erstellungszeitpunkt und „heute“ aus `Clock` hineinreichen |
 | Abgewiesener Zeitraum legt Wochen an | Zeitraum zuerst prüfen, dann `ensureReportsForTrainee()` |
 | PDF wird zwischengespeichert | `Cache-Control: no-store`; Hilfen wie `sendFile` setzen eigene Kopfzeilen, deshalb den Antwortkopf im Test prüfen |
 | „Seite x von y“ stimmt nicht | erst umbrechen, dann zeichnen; die Gesamtzahl steht erst nach dem Umbruch fest |
 | Überlanges Wort sprengt die Seite | Wörter über 24 Zeichen am Zeilenende mit Trennstrich umbrechen |
-| Bundle bleibt `INSTALLED` nach dem Einbetten von PDFBox | ungelöster Import: Abhängigkeiten per `compileInclude`, `diag <id>` in der Gogo-Shell (Profil, Abschnitt 7) |
+| Bundle bleibt `INSTALLED` nach dem Einbetten von PDFBox | ungelöster Import: Abhängigkeiten per `compileInclude`, `diag <id>` in der Gogo-Shell (Profil 7.2, Abschnitt 7) |
 | Export dauert bei 150 Wochen zu lange | Schrift einmal je Dokument laden, nicht je Zeile; Messung im PR |

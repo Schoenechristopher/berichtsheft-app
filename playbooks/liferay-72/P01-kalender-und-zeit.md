@@ -26,7 +26,7 @@ TypeScript-App („gleichwertig“ für alle sieben AK-IDs).
   Systemzeit-Prüfung im Build). M01 hängt von keinem Modul ab, wird aber **vor** P02 gebaut: P01 und P02 ändern beide den
   Fachlogik-Adapter und den Bau-Stand, und P02 braucht die Bundesland-Referenzdaten (`FederalStates`) und die Uhr.
 - Profil 7.2: Abschnitt 1 (Java 11 zur Laufzeit, Java 8 als Quellstand der Fachlogik), 3.2 (Uhr als OSGi-Service), 4
-  (Fachlogik-Adapter, Gegenprobe) und 7 (Zeitzone); gemeinsam 2.2 (Datum und Zeit), 3.2 (Uhr-Service, Fachlogik als reine Java-Klassen)
+  (Fachlogik-Adapter, Gegenprobe) und 7 (Zeitzone); gemeinsames Profil, Abschnitt 2.2 (Datum und Zeit), 3.2 (Uhr-Service, Fachlogik als reine Java-Klassen)
   und 7 (Feiertage ohne Bibliothek).
 - JDK 11 und die JVM-Einstellung `-Duser.timezone=GMT` aus P00: Die Fachlogik darf sich darauf **nicht** verlassen (Schritt 4).
 
@@ -42,8 +42,8 @@ TypeScript-App („gleichwertig“ für alle sieben AK-IDs).
 
 Nur auf ausdrücklichen Auftrag und bei vorhandenem Quellcode. `src/domain/clock.ts`, `src/domain/weeks.ts`,
 `src/domain/federal-states.ts` und `src/domain/holidays.ts` lassen sich nach Java übersetzen; plattformgebunden sind nach der
-Code-Landkarte nur `clockFromEnvironment()` (auf 7.2 `bh.betrieb`, Profil 3.2), `calendarDateIn()` (auf 7.2 `java.time` mit
-`ZoneId.of("Europe/Berlin")`) und die Feiertagsbibliothek `feiertagejs` (auf 7.2 eigene Umsetzung ohne Bibliothek, gemeinsam 7).
+Code-Landkarte nur `clockFromEnvironment()` (auf 7.2 `bh.betrieb`, Profil 7.2, Abschnitt 3.2), `calendarDateIn()` (auf 7.2 `java.time` mit
+`ZoneId.of("Europe/Berlin")`) und die Feiertagsbibliothek `feiertagejs` (auf 7.2 eigene Umsetzung ohne Bibliothek, gemeinsames Profil, Abschnitt 7).
 Dasselbe Quellmaterial dient in Schritt 8 als Gegenstück für den Abgleich der Feiertage. Belege der Referenz:
 `src/domain/clock.test.ts`, `src/domain/weeks.test.ts`, `src/domain/federal-states.test.ts`, `src/domain/holidays.test.ts`.
 
@@ -56,12 +56,12 @@ Ablauf-Szenario, M01 hat keines):
 | AK-ID | Kriterium (Kurzfassung aus der Fach-Spec) | Prüffälle | Bewertung auf 7.2 |
 | --- | --- | --- | --- |
 | AK-404 | Gesetzliche Feiertage des eingestellten Bundeslands sind als „Feiertag“ vorbelegt; Beispiele 25.12.2026, Fronleichnam 2027 in NW ja, NI nein. Das Vorbelegen beim Anlegen regelt M03. | 3 (3 fachlogik) | gleichwertig; hier nur `Holidays.isHoliday()`, das Vorbelegen folgt in P03 |
-| AK-1201 | „Jetzt“ aus einer zentralen Uhr, für Tests und Vorführungen stellbar, im Produktivbetrieb nicht. | 5 (5 fachlogik) | gleichwertig; `bh.betrieb` statt `NODE_ENV` (Profil 3.2); zusätzlich zwei plattformeigene Tests |
-| AK-1202 | Maßgeblich ist der Kalendertag in Europe/Berlin, mit Sommer- und Winterzeit. | 9 (9 fachlogik) | gleichwertig; die JVM läuft in UTC (gemeinsam 2.2), die Zone steht deshalb immer ausdrücklich im Code |
+| AK-1201 | „Jetzt“ aus einer zentralen Uhr, für Tests und Vorführungen stellbar, im Produktivbetrieb nicht. | 5 (5 fachlogik) | gleichwertig; `bh.betrieb` statt `NODE_ENV` (Profil 7.2, Abschnitt 3.2); zusätzlich zwei plattformeigene Tests |
+| AK-1202 | Maßgeblich ist der Kalendertag in Europe/Berlin, mit Sommer- und Winterzeit. | 9 (9 fachlogik) | gleichwertig; die JVM läuft in UTC (gemeinsames Profil, Abschnitt 2.2), die Zone steht deshalb immer ausdrücklich im Code |
 | AK-1203 | ISO-8601-Kalenderwochen (Woche 1 enthält den 4. Januar). | 10 (10 fachlogik) | gleichwertig; Wochenjahr über `IsoFields.WEEK_BASED_YEAR` |
 | AK-1204 | Eine Woche, die es nicht gibt, wird abgewiesen, z. B. KW 53/2027 oder KW 0. | 6 (6 fachlogik) | gleichwertig; `InvalidIsoWeekException` mit Fehlercode `woche_ungueltig` |
 | AK-1205 | Genau die 16 Bundesländer mit festen Kürzeln; ein unbekanntes Kürzel wird abgewiesen. | 6 (6 fachlogik) | gleichwertig; `UnknownFederalStateException` mit Fehlercode `bundesland_unbekannt` |
-| AK-1206 | Feiertag ist jeder landesweite gesetzliche Feiertag, einschließlich einmaliger; kommunale und regionale zählen nicht. | 11 (11 fachlogik) | gleichwertig; eigene Umsetzung ohne Bibliothek (gemeinsam 7), einmalige Feiertage aus den Referenzdaten der Spec |
+| AK-1206 | Feiertag ist jeder landesweite gesetzliche Feiertag, einschließlich einmaliger; kommunale und regionale zählen nicht. | 11 (11 fachlogik) | gleichwertig; eigene Umsetzung ohne Bibliothek (gemeinsames Profil, Abschnitt 7), einmalige Feiertage aus den Referenzdaten der Spec |
 
 Summe: 7 AK-IDs, 50 Prüffälle (50 fachlogik, 0 daten, 0 ablauf, 0 Szenario).
 
@@ -86,11 +86,11 @@ Auftrag.
    dieselbe Regel nutzen. Prüfschritt: JUnit-Tests `AK1201_…` in `bh-domain`.
 3. **Kalendertag** `de.berichtsheft.domain.calendar` (M01-R05, M01-R06, AK-1202): `Weeks.ZONE = ZoneId.of("Europe/Berlin")`,
    `Weeks.calendarDateIn(Instant)` und `Weeks.today(Clock)`; ein Kalendertag ist ein `java.time.LocalDate`. `CalendarDays`
-   wandelt ihn streng in die Zeichenkette `JJJJ-MM-TT` und zurück (Spalten `VARCHAR(10)`, gemeinsam 2.2); ungültiger Text wirft
+   wandelt ihn streng in die Zeichenkette `JJJJ-MM-TT` und zurück (Spalten `VARCHAR(10)`, gemeinsames Profil, Abschnitt 2.2); ungültiger Text wirft
    `IllegalArgumentException`. Prüfschritt: JUnit-Tests `AK1202_…` mit Zeitpunkten um Mitternacht, in der Umstellung auf
    Sommer- und Winterzeit und zum Jahreswechsel.
 4. **Zeitzone nie aus dem System lesen.** Nirgends `ZoneId.systemDefault()`, `LocalDate.now()`, `Instant.now()` oder
-   `Calendar.getInstance()`; die JVM des Portals läuft in UTC (gemeinsam 2.2), die Tests der Fachlogik aber in der Zone der
+   `Calendar.getInstance()`; die JVM des Portals läuft in UTC (gemeinsames Profil, Abschnitt 2.2), die Tests der Fachlogik aber in der Zone der
    Entwicklungsmaschine. `CalendarZoneTest.AK1202_ergebnisUnabhaengigVonDerJvmZeitzone` setzt nacheinander `GMT`,
    `Europe/Berlin`, `Pacific/Auckland` und `America/Los_Angeles` als Standardzone (`TimeZone.setDefault`, danach
    zurückgestellt) und führt `calendarDateIn`, `isoWeekOf`, `arbeitstage` und `feiertage` mit festen Eingaben aus; das Ergebnis
@@ -105,11 +105,11 @@ Auftrag.
 6. **Bundesländer** `de.berichtsheft.domain.federal` (M01-R13, M01-R14, M01-R18, AK-1205): `FederalStates` mit den 16 Kürzeln
    in der Reihenfolge der Spec (BW, BY, BE, BB, HB, HH, HE, MV, NI, NW, RP, SL, SN, ST, SH, TH), Namen, `isFederalState()` (nur
    Großbuchstaben, „nw“ ist unbekannt) und `UnknownFederalStateException` (Fehlercode `bundesland_unbekannt`). Prüfschritt:
-   JUnit-Tests `AK1205_…`; derselbe Wertebereich steht im CHECK von `BH_Setting.federalState` (gemeinsam 2.3) und wird in P02
+   JUnit-Tests `AK1205_…`; derselbe Wertebereich steht im CHECK von `BH_Setting.federalState` (gemeinsames Profil, Abschnitt 2.3) und wird in P02
    gegen diese Klasse geprüft.
 7. **Feiertage** `de.berichtsheft.domain.holidays` (M01-R15 bis M01-R19, AK-404, AK-1206): `Holidays.isHoliday(String bundesland,
    LocalDate)` und `Holidays.holidays(String bundesland, int jahr)` (Kalendertage aufsteigend, auch Sonn- und Samstage) ohne
-   Bibliothek (gemeinsam 7): `EasterDate` (Osterformel nach Gauß), feste und bewegliche Feiertage und die Länderregeln als
+   Bibliothek (gemeinsames Profil, Abschnitt 7): `EasterDate` (Osterformel nach Gauß), feste und bewegliche Feiertage und die Länderregeln als
    Tabelle im Code, die Korrektur des Reformationstags (2017 einmalig in allen Ländern; sonst in BB, MV, SN, ST und TH immer, in HB, HH, NI
    und SH seit 2018) und `OneTimeHolidays` nach den Referenzdaten aus Abschnitt 5 der Spec (08.05.2020, 08.05.2025 und 17.06.2028 in Berlin).
    Kommunale und regionale Feiertage (Augsburger Friedensfest, Fronleichnam in Teilen Sachsens und Thüringens) zählen nicht.
@@ -169,7 +169,7 @@ Playwright wird in P01 nicht gebraucht (keine Seite, keine Ablauf-Fälle).
   Fachlogik-Adapter von M01 lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-404, AK-1201, AK-1202, AK-1203, AK-1204, AK-1205, AK-1206 mit Test und Prüffällen), dem
   Ergebnis des Abgleichs (Schritt 8), den Gegenproben mit den roten Fällen und „Bitte bestätigen“. Geschützte Pfade:
-  `bh-clock` (stellbare Uhr, M01-R03) und `**/configuration/**` (Voreinstellung `produktion`) nach gemeinsam 5; Chris mergt.
+  `bh-clock` (stellbare Uhr, M01-R03) und `**/configuration/**` (Voreinstellung `produktion`) nach dem gemeinsamen Profil, Abschnitt 5; Chris mergt.
 - Bericht an die Steuerung per `send_message`: Stand, Befehle und Ergebnisse, offene Punkte. `FORTSCHRITT.md` schreibt die
   Steuerung.
 
@@ -184,4 +184,4 @@ Playwright wird in P01 nicht gebraucht (keine Seite, keine Ablauf-Fälle).
 | Feiertag fehlt oder zu viel (Reformationstag, einmalige Feiertage, Ostersonntag in BB) | Länderregeln und Referenzdaten aus Abschnitt 5 der Spec prüfen; nur landesweite Feiertage; Abgleich Schritt 8 |
 | Uhr lässt sich im Portal in Produktion stellen | `ClockImpl` liest `bh.betrieb` in `@Activate` und `@Modified`; Voreinstellung `produktion`; Gegenprobe F-P01-4 |
 | Gestellte Uhr bleibt nach einem Fall stehen | Uhr des Adapters nach jedem Fall zurückstellen; im Portal über die Testschnittstelle |
-| Kalendertag als `java.util.Date` gespeichert | Spalten sind `VARCHAR(10)` mit `JJJJ-MM-TT` (gemeinsam 2.2), Umwandlung nur über `CalendarDays` |
+| Kalendertag als `java.util.Date` gespeichert | Spalten sind `VARCHAR(10)` mit `JJJJ-MM-TT` (gemeinsames Profil, Abschnitt 2.2), Umwandlung nur über `CalendarDays` |

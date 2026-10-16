@@ -25,7 +25,7 @@ Keine Schemaänderung: M04 ändert nur Inhalte der Tabelle `BH_ReportDay` aus P0
 
 - L72-P00 bis L72-P03 abgenommen und gemergt (Berichte und Tage existieren, Bundesland, Zugriff, Merker „vorbelegt“).
 - Profil 7.2: Abschnitte 3 (Transaktion und Gleichzeitigkeit, Oberfläche), 4 (Ablauf-Adapter, plattformeigene Tests) und 7
-  („`PortalException` und Rollback“, Senna, „Service Builder schreibt am Cache vorbei“); gemeinsam 2.3 (`BH_ReportDay`), 2.4 (Sperre
+  („`PortalException` und Rollback“, Senna, „Service Builder schreibt am Cache vorbei“); gemeinsames Profil, Abschnitt 2.3 (`BH_ReportDay`), 2.4 (Sperre
   und Cache).
 - **Senna ist für die Site „Berichtsheft“ abgeschaltet** (P00, Profil 7.2, Abschnitt 7): Jede Navigation lädt die Seite neu; die
   Warnung stützt sich auf `beforeunload` und auf die Links der App, nicht auf die SPA-Navigation von Liferay.
@@ -58,11 +58,11 @@ Warnung beim Verlassen, (6) Adapter, (7) plattformeigene Tests und Gegenproben. 
 | AK-ID | Kriterium (Kurzfassung aus der Fach-Spec) | Prüffälle | Bewertung auf 7.2 |
 | --- | --- | --- | --- |
 | AK-401 | Jeder Bericht zeigt Mo–Fr mit Datum, pro Tag eine Auswahl der Tagesart und ein Freitextfeld „Tätigkeiten“. | 2 (2 fachlogik) | gleichwertig; die Anzeige belegt zusätzlich AK-403-01 |
-| AK-402 | Zur Auswahl stehen genau: Betrieb, Berufsschule, Urlaub, Krank, Feiertag. | 4 (4 fachlogik) | gleichwertig; Anzeigewerte deutsch, gespeicherte Werte `WORK`, `SCHOOL`, `VACATION`, `SICK`, `HOLIDAY` (gemeinsam 2.1) |
+| AK-402 | Zur Auswahl stehen genau: Betrieb, Berufsschule, Urlaub, Krank, Feiertag. | 4 (4 fachlogik) | gleichwertig; Anzeigewerte deutsch, gespeicherte Werte `WORK`, `SCHOOL`, `VACATION`, `SICK`, `HOLIDAY` (gemeinsames Profil, Abschnitt 2.1) |
 | AK-403 | Felder für Stunden, Abteilung oder Lernfeld gibt es nicht. | 2 (2 ablauf) | gleichwertig; das JSP bietet je Tag genau zwei Felder, der Adapter meldet jedes weitere als `ohne_merker` |
 | AK-405 | Der Azubi kann eine vorbelegte Tagesart ändern, z. B. von „Feiertag“ auf „Berufsschule“. | 2 (2 fachlogik) | gleichwertig; Hinweis nach dem gespeicherten Merker, Test `DayViewTest.AK405_…` |
 | AK-406 | Ein Entwurf lässt sich ausdrücklich speichern, auch unvollständig, und später unverändert weiterbearbeiten, auch nach Ab- und erneuter Anmeldung. | 3 (3 fachlogik) | gleichwertig; Sperre und Prüfung im Service, Test `ReportDaySaveTest.AK406_…` |
-| AK-407 | Umlaute, Zeilenumbrüche und lange Texte (mindestens 2.000 Zeichen) unverändert; höchstens 5.000 Zeichen je Tag mit Meldung am Feld; Zeilenumbrüche einheitlich. | 8 (8 fachlogik) | gleichwertig; `activities` als `TEXT` (gemeinsam 2.3), Länge in Unicode-Zeichen |
+| AK-407 | Umlaute, Zeilenumbrüche und lange Texte (mindestens 2.000 Zeichen) unverändert; höchstens 5.000 Zeichen je Tag mit Meldung am Feld; Zeilenumbrüche einheitlich. | 8 (8 fachlogik) | gleichwertig; `activities` als `TEXT` (gemeinsames Profil, Abschnitt 2.3), Länge in Unicode-Zeichen |
 | AK-408 | Wer die Seite mit ungespeicherten Änderungen verlässt, wird gewarnt (Links, Formulare, Schließen, Neuladen, Zurück und Vor). | 7 (7 ablauf) | gleichwertig bei abgeschaltetem Senna; AK-408-07 zurückgestellt bis P06; AK-408-03 in Firefox nur in CI (P10, Schritt 8) |
 
 Summe: 7 AK-IDs, 28 Prüffälle (19 fachlogik, 0 daten, 9 ablauf, 0 Szenario), davon AK-408-07 zurückgestellt; dazu AK-305-09 aus M03.
@@ -98,7 +98,7 @@ Referenz kein übertragbares Gegenstück. Weg A nur für `report-days.ts` und nu
    weeklyReportId, List<DayInput> inputs)` in **einer** Transaktion (Voreinstellung `@Transactional(rollbackFor =
    {PortalException.class, SystemException.class})`):
    - (a) Zeile des Berichts mit `SELECT … FOR UPDATE` sperren (`WeeklyReportFinderImpl`, Custom SQL in
-     `META-INF/custom-sql/default.xml`, gemeinsam 2.4, Schritt 1); der Finder liefert Status, Version und Besitzer **aus dieser
+     `META-INF/custom-sql/default.xml`, gemeinsames Profil, Abschnitt 2.4, Schritt 1); der Finder liefert Status, Version und Besitzer **aus dieser
      Abfrage**, nicht aus dem Entity-Cache: Nur so gilt der Status, der beim Speichern tatsächlich gilt (Spec, Abschnitt 8). P05
      nutzt denselben Finder für die Statuswechsel; jede Methode, die Tage eines bestehenden Berichts schreibt, beginnt mit dieser
      Sperre.
@@ -110,7 +110,7 @@ Referenz kein übertragbares Gegenstück. Weg A nur für `report-days.ts` und nu
      der Person bleiben im Formular (Schritt 6).
    - (d) Nur die geänderten Tage über `ReportDayLocalService.updateReportDay(…)` schreiben (Service Builder; ein später in P05
      angelegter `ReportDayModelListener` weist dann Tage eingereichter Berichte ab). `version` und `status` bleiben unverändert
-     (gemeinsam 2.4); keine Historie, keine Nachricht (M04 Abschnitt 7).
+     (gemeinsames Profil, Abschnitt 2.4); keine Historie, keine Nachricht (M04 Abschnitt 7).
    - Die Schreib- und Prüflogik steckt in einer Hilfsklasse im Paket der Service-Implementierung (ohne eigene Sperre; der Aufrufer
      sperrt); P05 ruft sie in `submit` nach seiner eigenen Sperre, damit Speichern und Einreichen dieselbe Regel nutzen.
    Prüfschritt: `ReportDaySaveTest.AK407_ungueltigeEingabeSpeichertNichts` (Montag gültig, Dienstag 5.001 Zeichen: nach der
@@ -143,7 +143,7 @@ Referenz kein übertragbares Gegenstück. Weg A nur für `report-days.ts` und nu
    - Merker `data-ungespeichert`, `data-warnung-verlassen` und die übrigen Merker der Referenz (Liste in `specs/code-landkarte.md`,
      Abschnitt „M09 Oberfläche“).
    Prüfschritt: von Hand in Chromium: Eingabe, dann Link, „Abmelden“, Neuladen, Zurück: jeweils Warnung; nach dem Speichern nicht.
-8. **Ablauf-Adapter.** Aktionen `tag_erfassen` (Tagesart wählen und Text füllen, ohne zu speichern), `speichern`
+8. **Ablauf-Adapter.** Zustand setzt der Runner nur über die Testschnittstelle `/o/bh-pruefung/zustand` (Uhr, Bestand, Daten-Aktionen; nur bei `bh.betrieb=test`, P00). Konto-IDs sind an dieser Grenze immer `String` (`String.valueOf(userId)`; Profil 7.2, Abschnitt 6.1: Konto-ID = `userId`); die Dienste arbeiten mit `long actorUserId`, der Adapter wandelt um und ändert sonst nichts. Aktionen `tag_erfassen` (Tagesart wählen und Text füllen, ohne zu speichern), `speichern`
    (`{ "gespeichert": true }`), `seite_verlassen` (alle fünf Wege `link`, `neu_laden`, `zurueck`, `vor`, `schliessen`, Dialog
    `abbrechen` oder `bestaetigen`), `seite_aufrufen` und `seite_lesen` auf der Seite `bericht` mit `woche`, `status`,
    `ungespeichert`, `tage` (je Tag die Felder `tagesart` und `taetigkeiten`), `weitere_felder` (jedes andere Eingabefeld als
@@ -205,7 +205,7 @@ entscheidet P10 (Schritt 8). Im PR vermerken.
   die Prüf-Adapter von M04 und die plattformeigenen Tests lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-401, AK-402, AK-403, AK-405, AK-406, AK-407, AK-408 mit Test und Prüffällen), dem freigegebenen
   Fall AK-305-09, dem zurückgestellten Fall AK-408-07, den Gegenproben mit den roten Fällen und „Bitte bestätigen“. Geschützte
-  Pfade: `**/service/impl/**`, `**/custom-sql/**`, `**/service/persistence/impl/**` und `**/domain/access/**` (gemeinsam 5); Chris
+  Pfade: `**/service/impl/**`, `**/custom-sql/**`, `**/service/persistence/impl/**` und `**/domain/access/**` (gemeinsames Profil, Abschnitt 5); Chris
   mergt.
 - Bericht an die Steuerung per `send_message`; `FORTSCHRITT.md` schreibt die Steuerung.
 
@@ -217,7 +217,7 @@ entscheidet P10 (Schritt 8). Im PR vermerken.
 | `\r\n` in der Datenbank | Browser senden CRLF; vor dem Zählen und Speichern `normalize()` |
 | Leeres Feld wird übersehen | nicht mitgeschickt (`null`) bleibt, leer (`""`) leert die Tagesart |
 | Ungültige Eingabe verliert die Eingaben der Person | `ReportDaysInvalidException` im `MVCActionCommand` fangen und das Formular mit den Eingaben wieder anzeigen; die Ausnahme rollt nur die (noch leere) Transaktion zurück |
-| Speichern überfährt ein gleichzeitiges Einreichen | Sperre `FOR UPDATE` und Status aus der Sperr-Abfrage, nicht aus dem Entity-Cache (Profil, Abschnitt 7) |
+| Speichern überfährt ein gleichzeitiges Einreichen | Sperre `FOR UPDATE` und Status aus der Sperr-Abfrage, nicht aus dem Entity-Cache (Profil 7.2, Abschnitt 7) |
 | Hinweis „Feiertag (vorbelegt)“ stimmt nach Bundeslandwechsel nicht | den gespeicherten Merker `holidayPreset` lesen |
 | Warnung fehlt bei Links des Themes (Abmelden) | Klick-Handler in der Fangphase auf `document`, nicht nur im Portlet |
 | Doppelte Rückfrage beim Verlassen | nach „Verlassen“ im eigenen Dialog den `beforeunload`-Handler für diese Navigation abschalten |

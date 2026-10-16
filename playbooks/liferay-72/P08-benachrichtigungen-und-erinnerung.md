@@ -9,7 +9,7 @@ Statuswechsel und die Montags-Erinnerung lösen Benachrichtigungen aus: je gewä
 mit Ausgangskorb, Wiederholung mit Wartezeit, „nicht zustellbar“, Zähler und Liste in der App und dem Erinnerungslauf Montag 9:00 Uhr
 Berliner Zeit mit Nachholen. Fachregeln liegen als reine Java-Klassen in `bh-domain`; Anlegen, Versandlauf und Erinnerungslauf in
 `bh-notification` und `bh/bh-service`; E-Mail geht **synchron** über die `javax.mail.Session` des Portals, nicht über den asynchronen
-`MailService` (gemeinsam 3.2). Fertig, wenn:
+`MailService` (gemeinsames Profil, Abschnitt 3.2). Fertig, wenn:
 
 1. alle Prüffälle in `specs/pruefung/M08.json` über die Prüf-Adapter grün sind (14 AK-IDs; 58 Fachlogik- und 22 Daten-Fälle, keine
    Ablauf-Fälle in der Datei; das Ablauf-Szenario AK-1022-07 liegt in `specs/pruefung/szenarien.json` und ist hier nur vorbereitet,
@@ -21,8 +21,8 @@ Berliner Zeit mit Nachholen. Fachregeln liegen als reine Java-Klassen in `bh-dom
    `EmailChannelTest`, `TeamsChannelTest`, `ReminderRunTest`, `ReminderJobTest`, `BellTest` und `LoginRedirectTest`;
 4. jede Gegenprobe aus Schritt 12 die dort benannten Prüffälle bzw. Tests rot gemacht hat und zurückgenommen ist.
 
-Schemaänderung: die Entities `Notification`, `TeamsDevMessage` und `ReminderRun` (gemeinsam 2.3) und im Skript „Schutz in der
-Datenhaltung“ (gemeinsam 2.6) Fremdschlüssel, CHECK-Constraints und die partiellen Indizes dieser Tabellen; Migration über den
+Schemaänderung: die Entities `Notification`, `TeamsDevMessage` und `ReminderRun` (gemeinsames Profil, Abschnitt 2.3) und im Skript „Schutz in der
+Datenhaltung“ (gemeinsames Profil, Abschnitt 2.6) Fremdschlüssel, CHECK-Constraints und die partiellen Indizes dieser Tabellen; Migration über den
 Upgrade-Schritt aus P00. Die Kanal-Spalten von `BH_Person` gibt es seit P02. Keine Abweichung gegenüber der TypeScript-App; für die
 Glocke gilt Profil 7.2, Abschnitt 3.5.
 
@@ -32,11 +32,11 @@ Glocke gilt Profil 7.2, Abschnitt 3.5.
   (Statuswechsel mit `TransitionEvent`) ab, nicht von M07. P03 hat den Scheduler-Rahmen in `bh-notification` angelegt, P05 den
   Einhängepunkt in `transition` und `submit` (P05, Schritt 7).
 - Profil 7.2: Abschnitte 3 (Hintergrundjobs, Zeitplan 3.3, Benachrichtigung in der App 3.5, E-Mail, Teams), 4 (Daten-Adapter), 5
-  (SMTP-Mock, Mailpit nur in CI) und 7 („`PortalException` und Rollback“, „Mail asynchron“, „Scheduler in UTC“); gemeinsam 2.3, 2.5 und 3.2.
-- P00 hat bestätigt (Profil, „In P00 zu bestätigen“): der synchrone Mailversand über die Mail-Sitzung des Portals, die Scheduler-Aufrufe
+  (SMTP-Mock, Mailpit nur in CI) und 7 („`PortalException` und Rollback“, „Mail asynchron“, „Scheduler in UTC“); gemeinsames Profil, Abschnitt 2.3, 2.5 und 3.2.
+- P00 hat bestätigt (Profil 7.2, „In P00 zu bestätigen“): der synchrone Mailversand über die Mail-Sitzung des Portals, die Scheduler-Aufrufe
   (`SchedulerEngineHelper`, `StorageType.MEMORY_CLUSTERED`, Takt) und dass das Gelesen-Markieren der Liferay-Glocke einen
   `ModelListener<UserNotificationEvent>` erreicht. Ohne diese Nachweise bleibt der betroffene Schritt stehen und wird gemeldet; der
-  Ausweg für die Glocke steht in Profil 3.5.
+  Ausweg für die Glocke steht in Profil 7.2, Abschnitt 3.5.
 - Konfiguration nur über OSGi-Konfiguration und `portal-ext.properties` (`configs/<umgebung>/`), ohne Geheimnisse: SMTP-Host und -Port
   (Demo: Mailpit, Port 1025, ohne Anmeldung; Sitzung: SMTP-Mock), Basisadresse der Links, `bh.teams.modus`.
 
@@ -74,13 +74,13 @@ Prüffälle **ohne** Ablauf-Szenario, das Szenario steht in der Spalte „Bewert
 | AK-1001 | Beim Einreichen wird der zugeordnete Ausbilder benachrichtigt, andere Ausbilder nicht. | 4 (3 fachlogik, 1 daten) | gleichwertig; Anlegen in der Transaktion von P05 |
 | AK-1002 | Bei Freigabe, Ablehnung und Rücknahme wird der Azubi benachrichtigt; erneutes Einreichen benachrichtigt den Ausbilder wie das erste, Zurückziehen niemanden. | 7 (5 fachlogik, 2 daten) | gleichwertig |
 | AK-1003 | Jede Nachricht nennt Azubi, Woche und Anlass und verlinkt den Bericht; ohne Kommentartexte; mehrere Wochen je mit Link; Rücksprung nach der Anmeldung, fremde Adressen ignoriert. | 8 (8 fachlogik) | gleichwertig; Rücksprung über `BhLoginPostAction` und `safeReturnPath()` aus P02, Nachweis `LoginRedirectTest.AK1003_…` |
-| AK-1004 | Pro Ereignis und Kanal genau eine Nachricht; Wiederholung mit Wartezeit; Aufgeben nach Fehlversuchen oder bei deaktiviertem Empfänger; „Nicht zustellbare Nachrichten“ mit „Erneut versuchen“. | 12 (7 fachlogik, 5 daten) | gleichwertig; synchroner Versand über die Mail-Sitzung des Portals (Profil 3), Nachweis Gleichzeitigkeit durch `OutboxTest.AK1004_…` |
-| AK-1011 | Jede Person kann E-Mail, Teams und App beliebig kombinieren, auch alle abwählen. | 5 (4 fachlogik, 1 daten) | gleichwertig; drei Spalten statt Liste (gemeinsam 2.3) |
+| AK-1004 | Pro Ereignis und Kanal genau eine Nachricht; Wiederholung mit Wartezeit; Aufgeben nach Fehlversuchen oder bei deaktiviertem Empfänger; „Nicht zustellbare Nachrichten“ mit „Erneut versuchen“. | 12 (7 fachlogik, 5 daten) | gleichwertig; synchroner Versand über die Mail-Sitzung des Portals (Profil 7.2, Abschnitt 3), Nachweis Gleichzeitigkeit durch `OutboxTest.AK1004_…` |
+| AK-1011 | Jede Person kann E-Mail, Teams und App beliebig kombinieren, auch alle abwählen. | 5 (4 fachlogik, 1 daten) | gleichwertig; drei Spalten statt Liste (gemeinsames Profil, Abschnitt 2.3) |
 | AK-1012 | Neue Personen haben die Voreinstellung E-Mail + App. | 2 (1 fachlogik, 1 daten) | gleichwertig |
 | AK-1013 | Nur über die gewählten Kanäle; ohne Kanal keine Nachricht, der Status bleibt in der App sichtbar. | 5 (4 fachlogik, 1 daten) | gleichwertig |
 | AK-1014 | Geänderte Kanäle gelten ab dem nächsten Ereignis; angelegte, noch nicht versendete Nachrichten über den ursprünglichen Kanal. | 2 (2 daten) | gleichwertig; Kanal steht in der Zeile `BH_Notification` |
-| AK-1015 | Der Kanal App zeigt ungelesene Nachrichten mit Zähler; das Öffnen der Liste markiert alle als gelesen, die ungelesenen sind dabei „Neu“. | 1 (1 daten) | gleichwertig für die eigene Glocke; die Liferay-Glocke ist Abbild, `readAt` folgt beiden Wegen (Profil 3.5), Nachweis `BellTest.AK1015_…` |
-| AK-1021 | Ist die Vorwoche am Montag um 9:00 Uhr noch offen, erhält der Azubi eine Erinnerung; einmal nachgeholt bis Dienstag 23:59 Uhr, Stichtag bleibt Montag. | 17 (12 fachlogik, 5 daten) | gleichwertig; Takt statt Berliner Cron (Profil 3.3), Entscheidung in der Fachlogik, Nachweis `ReminderRunTest.AK1021_…` |
+| AK-1015 | Der Kanal App zeigt ungelesene Nachrichten mit Zähler; das Öffnen der Liste markiert alle als gelesen, die ungelesenen sind dabei „Neu“. | 1 (1 daten) | gleichwertig für die eigene Glocke; die Liferay-Glocke ist Abbild, `readAt` folgt beiden Wegen (Profil 7.2, Abschnitt 3.5), Nachweis `BellTest.AK1015_…` |
+| AK-1021 | Ist die Vorwoche am Montag um 9:00 Uhr noch offen, erhält der Azubi eine Erinnerung; einmal nachgeholt bis Dienstag 23:59 Uhr, Stichtag bleibt Montag. | 17 (12 fachlogik, 5 daten) | gleichwertig; Takt statt Berliner Cron (Profil 7.2, Abschnitt 3.3), Entscheidung in der Fachlogik, Nachweis `ReminderRunTest.AK1021_…` |
 | AK-1022 | Ist dieselbe Woche am folgenden Montag noch offen, wird zusätzlich der zugeordnete Ausbilder informiert; jede offene Woche vor der Vorwoche, auch abgelehnte; eine Nachricht pro Azubi; Azubi ohne Kanal: Ausbilder trotzdem. | 6 (5 fachlogik, 1 daten) | gleichwertig; AK-1022-07 ist Szenario (P10) |
 | AK-1023 | Für eingereichte oder freigegebene Wochen und für die laufende Woche kommt keine Erinnerung. | 5 (4 fachlogik, 1 daten) | gleichwertig |
 | AK-1024 | Erinnerung und Information gehen jeden Montag erneut raus, bis die Woche eingereicht ist. | 4 (3 fachlogik, 1 daten) | gleichwertig |
@@ -103,7 +103,7 @@ PostgreSQL-Transaktion nicht ab (`ON CONFLICT DO NOTHING`).
 1. **Branch** `claude/l72-p08-benachrichtigungen-und-erinnerung`; Spec (insbesondere M08-R07, M08-R11, M08-R13, M08-R17 und Abschnitt 8) und
    Prüffälle lesen. Prüfschritt: AK-Tabelle (Abschnitt 5) im PR-Entwurf; Liste der Fehlercodes (`kanal_unbekannt`,
    `nicht_wiederholbar`, `zugriff_verweigert`) notiert.
-2. **Entities und Datenhaltung** in `modules/bh/bh-service/service.xml` nach gemeinsam 2.3: `Notification` (`BH_Notification`: `eventKey`,
+2. **Entities und Datenhaltung** in `modules/bh/bh-service/service.xml` nach dem gemeinsamen Profil, Abschnitt 2.3: `Notification` (`BH_Notification`: `eventKey`,
    `recipientId`, `channel`, `weeklyReportId` leer erlaubt, `subject`, `body` als `TEXT`, `link`, `createdAt`, `sentAt`, `readAt`,
    `attempts`, `nextAttemptAt`, `lastError`, `failedAt`, `userNotificationEventId`), `TeamsDevMessage` (`BH_TeamsDevMessage`, eindeutig je
    `notificationId`) und `ReminderRun` (`BH_ReminderRun`: eigener Schlüssel, `isoYear`, `isoWeek` eindeutig, `ranAt`, `createdCount`); alle mit
@@ -112,7 +112,7 @@ PostgreSQL-Transaktion nicht ab (`ON CONFLICT DO NOTHING`).
    CASCADE`), die CHECK-Constraints `notification_app_delivered` (Kanal App gilt beim Anlegen als zugestellt: `sentAt` gesetzt),
    `notification_attempts_not_negative` und `reminder_run_iso_week_range` und den partiellen Index `notification_pending_idx` auf
    `nextAttemptAt` (`WHERE sentAt IS NULL AND failedAt IS NULL`). `buildService`, Datenbank `berichtsheft_l72` neu anlegen, Bundle neu
-   starten. Prüfschritt: erzeugte `tables.sql` gegen gemeinsam 2.3; ein zweites `INSERT` mit demselben (`eventKey`, `recipientId`, `channel`)
+   starten. Prüfschritt: erzeugte `tables.sql` gegen dem gemeinsamen Profil, Abschnitt 2.3; ein zweites `INSERT` mit demselben (`eventKey`, `recipientId`, `channel`)
    scheitert in PostgreSQL.
 3. **Fachregeln** `de.berichtsheft.domain.notifications` in `bh-domain` (M08-R01 bis M08-R10, M08-R13, M08-R17 bis M08-R22; Java 8, „jetzt“ als
    Parameter):
@@ -146,7 +146,7 @@ PostgreSQL-Transaktion nicht ab (`ON CONFLICT DO NOTHING`).
      `CounterLocalService`; eine Unique-Verletzung würde die PostgreSQL-Transaktion abbrechen und den Statuswechsel mitreißen), danach Cache
      leeren; nur wenn eine Zeile entstand, geht es weiter;
    - Kanal App: `sentAt` = `createdAt` (zugestellt beim Anlegen, CHECK `notification_app_delivered`), dazu ein `UserNotificationEvent` als Abbild
-     für die Liferay-Glocke über `UserNotificationEventLocalService` (Profil 3.5) und `userNotificationEventId` in der Zeile — erst **nach** dem
+     für die Liferay-Glocke über `UserNotificationEventLocalService` (Profil 7.2, Abschnitt 3.5) und `userNotificationEventId` in der Zeile — erst **nach** dem
      erfolgreichen Einfügen, damit eine Dublette kein verwaistes Ereignis hinterlässt;
    - E-Mail und Teams: `attempts` 0, `nextAttemptAt` = `createdAt`; versendet wird nie in dieser Transaktion (Schritt 6).
    Betreff und Text nennen Anlass, Azubi, Woche mit Zeitraum und den Link, nie Kommentartexte. Scheitert der Statuswechsel, rollt alles
@@ -161,7 +161,7 @@ PostgreSQL-Transaktion nicht ab (`ON CONFLICT DO NOTHING`).
      nicht Teil von L72 und scheitert mit klarer Meldung), das Teams-Postfach im Produktivbetrieb nur, wenn es ausdrücklich eingeschaltet ist.
    - `EmailChannel` sendet **synchron** über die `javax.mail.Session` des Portals (`MailService#getSession()`, SMTP-Host und -Port in
      `portal-ext.properties`; Demo Mailpit, Sitzung SMTP-Mock), nie über `MailService#sendEmail` (asynchron über den Message Bus, Fehler gehen
-     verloren; Profil 7). Jede Nachricht trägt eine feste `Message-ID` aus `notificationId`: eine `MimeMessage`-Unterklasse überschreibt
+     verloren; Profil 7.2, Abschnitt 7). Jede Nachricht trägt eine feste `Message-ID` aus `notificationId`: eine `MimeMessage`-Unterklasse überschreibt
      `updateMessageID()`, weil `Transport.send` die Kennung sonst neu vergibt und der Empfänger eine Wiederholung nicht erkennt.
    - `NotificationDeliveryLocalServiceImpl.deliverNext()` ist **je Zeile eine eigene Transaktion** und wird über den OSGi-Dienst aufgerufen
      (ein Aufruf innerhalb derselben Klasse öffnet keine neue Transaktion): die nächste fällige Zeile mit Custom SQL `… WHERE sentAt IS NULL AND
@@ -189,7 +189,7 @@ PostgreSQL-Transaktion nicht ab (`ON CONFLICT DO NOTHING`).
    ein Schritt, rollt der Vermerk mit zurück, und der nächste Takt holt nach. Ergebnis `ausgefuehrt` mit der Zahl der angelegten Nachrichten.
    Prüfschritt: `ReminderRunTest.AK1021_zweiGleichzeitigeLaeufeLegenGenauEineWocheAn` (zwei Threads: ein `ausgefuehrt`, ein `schon_erledigt`, keine
    doppelte Nachricht), `ReminderRunTest.AK1021_abbruchNachDemVermerkRolltAllesZurueck`.
-8. **Scheduler** in `bh-notification` (Profil 3.3, Rahmen aus P03): `DeliveryMessageListener` (Ausgangskorb, jede Minute) und
+8. **Scheduler** in `bh-notification` (Profil 7.2, Abschnitt 3.3, Rahmen aus P03): `DeliveryMessageListener` (Ausgangskorb, jede Minute) und
    `ReminderMessageListener` (Erinnerung, alle 15 Minuten; ruft `runDueReminders(Clock.now())`), registriert über `SchedulerEngineHelper` und
    `TriggerFactory`, `StorageType.MEMORY_CLUSTERED`. Die Cron-Ausdrücke laufen in UTC und sind **nie** „Montag 9:00“; ob der Lauf fällig ist,
    entscheidet `ReminderSchedule` mit der Uhr und Europe/Berlin. Ein Neustart verliert nichts, weil der nächste Takt nachholt (M08-R17).
@@ -200,10 +200,10 @@ PostgreSQL-Transaktion nicht ab (`ON CONFLICT DO NOTHING`).
      App-Nachrichten, neueste zuerst, `neu` aus `readAt IS NULL` **vor** dem Markieren, danach alle mit `readAt` aus `Clock` markiert und die
      zugehörigen `UserNotificationEvent` archiviert, in einer Transaktion; M08-R16); Art (`statuswechsel`, `erinnerung`, `ueberfaellig`) und Woche je
      Nachricht als Merker `data-art` und `data-woche`.
-   - `ModelListener<UserNotificationEvent>` in `bh-notification` (Profil 3.5): Wird ein Ereignis über die Liferay-Glocke archiviert und ist `readAt` der
+   - `ModelListener<UserNotificationEvent>` in `bh-notification` (Profil 7.2, Abschnitt 3.5): Wird ein Ereignis über die Liferay-Glocke archiviert und ist `readAt` der
      Nachricht mit dieser `userNotificationEventId` noch leer, setzt er `readAt` aus der Uhr. Archiviert die App selbst, ist `readAt` schon gesetzt, der
      Listener tut nichts (keine Schleife). Ein `UserNotificationHandler` führt den Link der Liferay-Glocke zur App. Funktioniert der Listener nicht, gilt
-     der Ausweg aus Profil 3.5 (Link über die App setzt `readAt`).
+     der Ausweg aus Profil 7.2, Abschnitt 3.5 (Link über die App setzt `readAt`).
    - Resource-Befehle für Zähler und Vorschau (nur lesend) für die eigene Glocke im Theme; die Vorschau markiert **nichts** (AK-1015, UI-AK-03).
    - Portlets: Benachrichtigungen (Liste, „Neu“), Einstellungen der Kanäle (`updateOwnChannels(actorUserId, werte)`: nur die eigenen Kanäle, deaktivierte Person
      `zugriff_verweigert`, unbekannter Wert `kanal_unbekannt` und nichts wird geändert), Nicht zustellbar (nur Ausbilder, mit „Erneut versuchen“), Teams-Postfach
@@ -215,7 +215,7 @@ PostgreSQL-Transaktion nicht ab (`ON CONFLICT DO NOTHING`).
     macht, bestätigt dieses Paket mit dem Test unten; sonst Ausweg: die Prüfung im Modul `bh-access` an der Stelle, an der Liferay das Ziel auswertet
     (siehe Bericht, „Bitte bestätigen“). Prüfschritt: `LoginRedirectTest.AK1003_linkDerNachrichtFuehrtNachDerAnmeldungZumBericht` und
     `LoginRedirectTest.AK1003_fremdeAdresseFuehrtZurStartseite` (Playwright, `liferay-72/pruefung/`, plattformeigen).
-11. **Daten-Adapter und Ablauf-Aktionen.** Die Aktionen aus Abschnitt 3 über **dieselben** Dienst-Methoden wie die Portlets und der Scheduler:
+11. **Daten-Adapter und Ablauf-Aktionen.** Zustand setzt der Runner nur über die Testschnittstelle `/o/bh-pruefung/zustand` (Uhr, Bestand, Daten-Aktionen; nur bei `bh.betrieb=test`, P00). Konto-IDs sind an dieser Grenze immer `String` (`String.valueOf(userId)`; Profil 7.2, Abschnitt 6.1: Konto-ID = `userId`); die Dienste arbeiten mit `long actorUserId`, der Adapter wandelt um und ändert sonst nichts. Die Aktionen aus Abschnitt 3 über **dieselben** Dienst-Methoden wie die Portlets und der Scheduler:
     `kanaele_einstellen`, `kanaele_lesen`, `erinnerung_ausloesen` (ohne `als`, Ergebnis `ausgefuehrt` mit `angelegt`, `nicht_faellig`, `schon_erledigt`),
     `nachrichten_versenden` (mit `stoerung`), `nachrichten_lesen` (Reihenfolge Anlegen, Empfänger, Kanal; `zustand`, `versuche`, `naechsterVersuch`,
     `uebergaben`), `ungelesen_zaehlen`, `benachrichtigungen_oeffnen`, `nicht_zustellbar_lesen`, `erneut_versuchen` (der Adapter benennt die eine aufgegebene
@@ -289,7 +289,7 @@ Nur in CI: E-Mail an Mailpit (`http://localhost:8025`) mit sichtbarer Message-ID
   Test und Prüffällen, dazu AK-205), dem vorbereiteten Szenario AK-1022-07, den Gegenproben mit den roten Fällen und „Bitte bestätigen“ (Rücksprung nach
   der Anmeldung, Glocke, neue Konfigurationseigenschaften). Geschützte Pfade: `service.xml`, `**/sql/**`, `**/custom-sql/**`,
   `**/service/persistence/impl/**`, `**/service/impl/**`, `**/model/listener/**`, `**/upgrade/**`, `bh-access` (Rücksprung), `bh-pruefung` (Test-Kanal),
-  `**/configuration/**` und `liferay-72/configs/**` (gemeinsam 5); Chris mergt.
+  `**/configuration/**` und `liferay-72/configs/**` (gemeinsames Profil, Abschnitt 5); Chris mergt.
 - Bericht an die Steuerung per `send_message`; `FORTSCHRITT.md` schreibt die Steuerung.
 
 ## 10. Typische Fehler
@@ -297,7 +297,7 @@ Nur in CI: E-Mail an Mailpit (`http://localhost:8025`) mit sichtbarer Message-ID
 | Fehler | Was tun |
 | --- | --- |
 | Statuswechsel bricht ab, weil die Nachricht schon existiert | `INSERT … ON CONFLICT DO NOTHING`, nie `addNotification` mit Ausnahme (eine Unique-Verletzung bricht die PostgreSQL-Transaktion ab) |
-| Nachricht bleibt nach einem Rollback stehen | Anlegen in derselben Transaktion wie der Statuswechsel, kein `REQUIRES_NEW` (Profil, Abschnitt 7) |
+| Nachricht bleibt nach einem Rollback stehen | Anlegen in derselben Transaktion wie der Statuswechsel, kein `REQUIRES_NEW` (Profil 7.2, Abschnitt 7) |
 | Nachricht doppelt versendet | beide Sicherungen bauen: Eindeutigkeit beim Anlegen und `SKIP LOCKED` beim Versand (AK-1004) |
 | Versand blockiert oder verliert Fehler | `MailService` versendet asynchron; die Mail-Sitzung des Portals nutzen und nie in der Transaktion des Statuswechsels senden |
 | Empfänger erkennt die Wiederholung nicht | feste Message-ID; `updateMessageID()` der `MimeMessage` überschreiben |
@@ -307,6 +307,6 @@ Nur in CI: E-Mail an Mailpit (`http://localhost:8025`) mit sichtbarer Message-ID
 | Wartezeiten stimmen nicht | `nextAttemptAt` aus `Clock`, `TIMESTAMP` in UTC; nie `now()` der Datenbank |
 | Kommentartext in der Nachricht | `TransitionNotices.plan` bekommt die Kommentare gar nicht |
 | Öffnen der Vorschau markiert als gelesen | nur die Liste markiert (AK-1015); Zähler und Vorschau lesen nur |
-| Gelesen in der Liferay-Glocke bleibt in der App ungelesen | `ModelListener<UserNotificationEvent>` setzt `readAt`; Ausweg Link über die App (Profil 3.5) |
+| Gelesen in der Liferay-Glocke bleibt in der App ungelesen | `ModelListener<UserNotificationEvent>` setzt `readAt`; Ausweg Link über die App (Profil 7.2, Abschnitt 3.5) |
 | Echte Mail oder Teams in einem Test | SMTP-Mock bzw. Test-Kanal je Fall |
 | Link der Nachricht führt nach dem Login auf die Startseite | Ziel prüfen, nicht verwerfen: `safeReturnPath()` lässt Pfade der App zu |
