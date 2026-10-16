@@ -78,7 +78,7 @@ export const MAX_ZEILEN = 1500;
 const NICHT_GEZAEHLT = new Set(["package-lock.json", "docs/03-testabdeckung.md"]);
 const ABHAENGIGKEITEN = new Set(["package.json", "package-lock.json"]);
 
-/** Geschützte Pfade (AM-R04): Ordner enden mit `/`, sonst genaue Datei. */
+/** Geschützte Pfade (AM-R04): Ordner enden mit `/`, sonst genaue Datei; Liferay-Muster in {@link GESCHUETZT_LIFERAY}. */
 const GESCHUETZT = [
   // Regeln und Auslegungen
   "docs/01-spezifikation.md",
@@ -125,12 +125,124 @@ const GESCHUETZT = [
 ];
 const NICHT_GESCHUETZT = new Set(["specs/code-landkarte.md"]);
 
+/**
+ * Geschützte Pfade der Liferay-Umsetzungen (AM-R04) als Glob-Muster: `profile/liferay-gemeinsam.md`, Abschnitt 5
+ * (Tabelle, Zeile für Zeile) und Abschnitt 6 (Upgrade-Schritte der Reihe U). `**` steht für beliebig viele Ordner (auch
+ * keinen), `*` für Zeichen innerhalb eines Pfadteils. Jedes Muster beginnt mit `liferay-625/` oder `liferay-72/`.
+ */
+export const GESCHUETZT_LIFERAY = [
+  // Anmeldung, Binden (Entsprechung zu src/auth.ts, src/lib/auth/**)
+  "liferay-625/**/hook/**",
+  "liferay-625/**/liferay-hook.xml",
+  "liferay-625/**/portal.properties",
+  "liferay-625/**/html/hooks/login/**",
+  "liferay-72/modules/bh-access/**",
+  "liferay-72/modules/**/*LoginPostAction*.java",
+  // Zugang je Anfrage (Entsprechung zu src/proxy.ts, src/lib/session.ts)
+  "liferay-625/**/servlet/filter/**",
+  "liferay-625/**/*Filter.java",
+  "liferay-72/modules/**/servlet/filter/**",
+  "liferay-72/modules/**/*Filter.java",
+  // Fachregeln Zugang und Sichtbarkeit (Entsprechung zu src/domain/access.ts, src/domain/report-access.ts)
+  "liferay-625/**/domain/access/**",
+  "liferay-72/modules/**/domain/access/**",
+  // Rollen- und Besitzprüfung in Serveraktionen
+  "liferay-625/**/service/impl/**",
+  "liferay-625/**/service/permission/**",
+  "liferay-72/modules/**/service/impl/**",
+  "liferay-72/modules/**/security/permission/**",
+  // Rechte der Portlets
+  "liferay-625/**/portlet.xml",
+  "liferay-625/**/liferay-portlet.xml",
+  "liferay-625/**/resource-actions/**",
+  "liferay-72/modules/**/portlet/**/*Portlet.java",
+  "liferay-72/modules/**/resource-actions/**",
+  // Konfiguration der Anmeldung, Betriebsart, Testschnittstelle
+  "liferay-625/**/portal-ext*.properties",
+  "liferay-625/**/web.xml",
+  "liferay-625/**/pruefung/**",
+  "liferay-72/configs/**",
+  "liferay-72/modules/bh-pruefung/**",
+  "liferay-72/modules/bh-clock/**",
+  "liferay-72/modules/**/configuration/**",
+  "liferay-72/pruefung/**",
+  // Schema und Schutz in der Datenhaltung
+  "liferay-625/**/service.xml",
+  "liferay-625/**/sql/**",
+  "liferay-625/**/model/listener/**",
+  "liferay-625/**/custom-sql/**",
+  "liferay-625/**/portlet.properties",
+  "liferay-625/**/service*.properties",
+  "liferay-625/**/portlet-model-hints.xml",
+  "liferay-72/modules/**/service.xml",
+  "liferay-72/modules/**/sql/**",
+  "liferay-72/modules/**/model/listener/**",
+  "liferay-72/modules/**/custom-sql/**",
+  "liferay-72/modules/**/service/persistence/impl/**",
+  // Eigene Upgrade-Schritte (Skript „Schutz in der Datenhaltung“)
+  "liferay-625/**/upgrade/**",
+  "liferay-72/modules/**/upgrade/**",
+  // Bibliotheken und Bezugsquellen, Build
+  "liferay-625/**/ivy.xml",
+  "liferay-625/**/ivy-settings.xml",
+  "liferay-625/**/build*.xml",
+  "liferay-625/**/build*.properties",
+  "liferay-72/**/build.gradle",
+  "liferay-72/settings.gradle",
+  "liferay-72/gradle.properties",
+  "liferay-72/modules/**/bnd.bnd",
+  "liferay-72/themes/**/package.json",
+  // Upgrade-Schritte der Reihe U (Abschnitt 6)
+  "liferay-72/modules/bh-upgrade-625/**",
+  "liferay-72/upgrade-625/**",
+];
+
+/**
+ * Glob-Muster als regulärer Ausdruck über den ganzen Pfad: `**` + `/` beliebig viele Ordner, `/` + `**` am Ende
+ * mindestens ein weiterer Pfadteil, `*` beliebige Zeichen ohne `/`.
+ * @param {string} muster
+ */
+export function globZuRegExp(muster) {
+  let ausdruck = "";
+  for (let i = 0; i < muster.length;) {
+    if (muster.startsWith("**/", i)) {
+      ausdruck += "(?:[^/]+/)*";
+      i += 3;
+    } else if (muster.startsWith("/**", i) && i + 3 === muster.length) {
+      ausdruck += "/.+";
+      i += 3;
+    } else if (muster[i] === "*") {
+      ausdruck += "[^/]*";
+      i += 1;
+    } else {
+      ausdruck += muster[i].replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+      i += 1;
+    }
+  }
+  return new RegExp(`^${ausdruck}$`);
+}
+
+const LIFERAY_AUSDRUECKE = GESCHUETZT_LIFERAY.map((muster) => ({ muster, ausdruck: globZuRegExp(muster) }));
+
+/**
+ * Alle Einträge aus AM-R04, die einen Pfad schützen: Präfix-Einträge aus `GESCHUETZT` und Glob-Muster aus
+ * {@link GESCHUETZT_LIFERAY}; leer, wenn der Pfad nicht geschützt ist.
+ * @param {string} pfad
+ * @returns {string[]}
+ */
+export function geschuetztDurch(pfad) {
+  if (NICHT_GESCHUETZT.has(pfad)) {
+    return [];
+  }
+  return [
+    ...GESCHUETZT.filter((eintrag) => (eintrag.endsWith("/") ? pfad.startsWith(eintrag) : pfad === eintrag)),
+    ...LIFERAY_AUSDRUECKE.filter(({ ausdruck }) => ausdruck.test(pfad)).map(({ muster }) => muster),
+  ];
+}
+
 /** @param {string} pfad */
 export function istGeschuetzt(pfad) {
-  if (NICHT_GESCHUETZT.has(pfad)) {
-    return false;
-  }
-  return GESCHUETZT.some((eintrag) => (eintrag.endsWith("/") ? pfad.startsWith(eintrag) : pfad === eintrag));
+  return geschuetztDurch(pfad).length > 0;
 }
 
 /** Testdateien (AM-R06): Vitest, Playwright, Datenbanktests, Testordner der Liferay-Umsetzungen. */

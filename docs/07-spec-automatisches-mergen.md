@@ -59,14 +59,23 @@ bei einem Fehler passiert.**
     `.env.example`.
   - Abhängigkeiten: `package.json`, `package-lock.json` (Ausnahme siehe AM-R09) und die Build-Dateien im
     Wurzelordner der Liferay-Umsetzungen (`settings.gradle`, `gradle.properties`, `build.gradle`, `build.properties`,
-    `build.xml`, `ivy.xml`). Build-Dateien einzelner Module sind nicht geschützt, weil jedes Arbeitspaket Module
-    anlegt; eine externe Bibliothek, die nicht im Profil der Plattform steht, schließt das automatische Mergen aber aus.
+    `build.xml`, `ivy.xml`); dazu auf Liferay die Muster der Zeile „Bibliotheken und Bezugsquellen, Build“ im
+    gemeinsamen Profil (`profile/liferay-gemeinsam.md`), Abschnitt 5, also auch die Build-Dateien einzelner Plugins
+    und Module. Eine externe Bibliothek, die nicht in der Liste im gemeinsamen Profil, Abschnitt 7, steht, schließt
+    das automatische Mergen aus.
   - Sicherheit: `src/auth.ts`, `src/proxy.ts`, `src/lib/auth/**`, `src/domain/access.ts`,
-    `src/domain/report-access.ts`; auf Liferay die entsprechenden Dateien, die das Profil als sicherheitsrelevant
-    benennt.
-  - Datenbank: `prisma/migrations/**`, `prisma/schema.prisma` und die Upgrade-Schritte der Reihe U. Migrationen
-    lassen sich nicht einfach zurücknehmen. `service.xml` in `liferay-625/` und `liferay-72/` ist nicht geschützt, weil
-    dort noch keine Daten bestehen; dass die Tabellen dem Profil entsprechen, prüft die Abnahme der Steuerung (AM-R07).
+    `src/domain/report-access.ts`; auf Liferay die Muster der entsprechenden Zeilen im gemeinsamen Profil, Abschnitt 5
+    (Anmeldung, Zugang je Anfrage, Zugang und Sichtbarkeit, Rollen- und Besitzprüfung, Rechte der Portlets,
+    Konfiguration und Testschnittstelle).
+  - Datenbank: `prisma/migrations/**`, `prisma/schema.prisma`; auf Liferay die Muster der Zeilen „Schema und Schutz
+    in der Datenhaltung“ und „Eigene Upgrade-Schritte“ im gemeinsamen Profil, Abschnitt 5, sowie die Upgrade-Schritte
+    der Reihe U nach Abschnitt 6 (`liferay-72/modules/bh-upgrade-625/**`, `liferay-72/upgrade-625/**`). Migrationen
+    lassen sich nicht einfach zurücknehmen, und Trigger und Constraints aus dem Skript „Schutz in der Datenhaltung“
+    sichern den Schreibschutz (AK-505, AK-803).
+  - Die Liferay-Muster stehen als Glob-Muster (`**` beliebig viele Ordner, `*` innerhalb eines Pfadteils) nur im
+    gemeinsamen Profil, Abschnitte 5 und 6; `scripts/merge-kriterien/merge-kriterien.mjs` (`GESCHUETZT_LIFERAY`)
+    prüft sie maschinell. Sie sind vorläufig, bis P00 der Plattform sie am Projekt bestätigt; eine Abweichung ändert
+    zuerst das Profil, dann die Liste im Skript.
   - Die Umsetzung dieser Spec selbst: `scripts/merge-kriterien/**`.
 - **AM-R05 Offene Fragen:** Steht in der PR-Beschreibung unter „Bitte bestätigen“ ein Listenpunkt, der nicht mit `[x]`
   abgehakt ist, ist automatisches Mergen ausgeschlossen. Das gilt für jeden Listenpunkt, auch nummeriert oder ohne
@@ -189,7 +198,8 @@ Ablauf-Kriterien werden einmal an echten Test-PRs geprüft und im PR der Umsetzu
       up to date“).
 - [ ] Ob Etappen-PRs (G1 bis G5) nach der Freigabe durch Chris ebenfalls über die Warteschlange laufen sollen, damit
       auch dort mit dem aktuellen `main` geprüft wird.
-- [ ] Liferay-spezifische Teile von AM-R04 ergänzen, sobald die Profile sie benennen (G4, P00): sicherheitsrelevante
-      Dateien, Pfad der Upgrade-Schritte der Reihe U, Liste der freigegebenen externen Bibliotheken. Bis dahin prüft
-      `scripts/merge-kriterien/` nur die Build-Dateien im Wurzelordner der Liferay-Umsetzungen.
+- [x] Liferay-spezifische Teile von AM-R04 ergänzen (Plan Etappe A, Punkt E7): sicherheitsrelevante Dateien und Pfad
+      der Upgrade-Schritte der Reihe U nach dem gemeinsamen Profil, Abschnitte 5 und 6, maschinell geprüft; die Liste
+      der freigegebenen externen Bibliotheken steht im gemeinsamen Profil, Abschnitt 7. Erledigt in G4-L (Branch
+      `claude/g4-l-vorlagen-und-am-r04`); die Muster bestätigt P00 der jeweiligen Plattform.
 - [ ] AM-AK-01 bis AM-AK-14 in `npm run ak:abdeckung` aufnehmen, damit die Testabdeckung auch diese IDs zählt.

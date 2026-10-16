@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   entscheideAutomerge,
   erstelleBericht,
+  geschuetztDurch,
+  GESCHUETZT_LIFERAY,
+  globZuRegExp,
   istGeschuetzt,
   KRITERIEN,
   offenePunkte,
@@ -371,13 +374,189 @@ describe("istGeschuetzt (AM-R04)", () => {
     ["src/domain/weeks.ts", false],
     ["prisma/migrations/20261006130221_init/migration.sql", true],
     ["liferay-72/build.gradle", true],
-    ["liferay-72/modules/report/build.gradle", false],
-    ["liferay-72/modules/report/service.xml", false],
+    ["liferay-72/modules/report/build.gradle", true],
+    ["liferay-72/modules/report/service.xml", true],
     ["AUFTRAG-ETAPPE-9.md", false],
     ["docs/04-demo-anleitung.md", false],
     ["scripts/merge-kriterien/index.mjs", true],
   ])("%s → %s", (pfad, erwartet) => {
     expect(istGeschuetzt(pfad)).toBe(erwartet);
+  });
+});
+
+/** Gemeinsames Profil, Abschnitt 5 (Zeilen der Tabelle) und Abschnitt 6, je Plattform. */
+const W625 = "liferay-625/portlets/bh-portlet/docroot/WEB-INF";
+const J625 = `${W625}/src/de/berichtsheft`;
+const J72 = (modul: string) => `liferay-72/modules/${modul}/src/main/java/de/berichtsheft`;
+const R72 = (modul: string) => `liferay-72/modules/${modul}/src/main/resources`;
+
+/** Je Muster ein Pfad, den genau dieses Muster schützt: [Zeile, Muster, Pfad]. */
+const LIFERAY_GESCHUETZT: [string, string, string][] = [
+  ["Anmeldung", "liferay-625/**/hook/**", `${J625}/hook/events/BhLoginPostAction.java`],
+  ["Anmeldung", "liferay-625/**/liferay-hook.xml", `${W625}/liferay-hook.xml`],
+  ["Anmeldung", "liferay-625/**/portal.properties", `${W625}/src/portal.properties`],
+  [
+    "Anmeldung",
+    "liferay-625/**/html/hooks/login/**",
+    "liferay-625/portlets/bh-portlet/docroot/html/hooks/login/html/portlet/login/login.jsp",
+  ],
+  ["Anmeldung", "liferay-72/modules/bh-access/**", `${J72("bh-access")}/access/events/SessionPreAction.java`],
+  ["Anmeldung", "liferay-72/modules/**/*LoginPostAction*.java", `${J72("bh-web")}/web/BhLoginPostActionHelper.java`],
+  ["Zugang je Anfrage", "liferay-625/**/servlet/filter/**", `${J625}/servlet/filter/package-info.java`],
+  ["Zugang je Anfrage", "liferay-625/**/*Filter.java", `${J625}/session/SessionLimitFilter.java`],
+  ["Zugang je Anfrage", "liferay-72/modules/**/servlet/filter/**", `${J72("bh-web")}/servlet/filter/package-info.java`],
+  ["Zugang je Anfrage", "liferay-72/modules/**/*Filter.java", `${J72("bh-web")}/web/SessionLimitFilter.java`],
+  ["Zugang und Sichtbarkeit", "liferay-625/**/domain/access/**", `${J625}/domain/access/AccessRules.java`],
+  [
+    "Zugang und Sichtbarkeit",
+    "liferay-72/modules/**/domain/access/**",
+    `${J72("bh-domain")}/domain/access/AccessRules.java`,
+  ],
+  ["Rollen und Besitz", "liferay-625/**/service/impl/**", `${J625}/service/impl/WeeklyReportLocalServiceImpl.java`],
+  ["Rollen und Besitz", "liferay-625/**/service/permission/**", `${J625}/service/permission/PersonPermission.java`],
+  [
+    "Rollen und Besitz",
+    "liferay-72/modules/**/service/impl/**",
+    `${J72("bh/bh-service")}/service/impl/WeeklyReportLocalServiceImpl.java`,
+  ],
+  [
+    "Rollen und Besitz",
+    "liferay-72/modules/**/security/permission/**",
+    `${J72("bh/bh-service")}/security/permission/PersonPermission.java`,
+  ],
+  ["Rechte der Portlets", "liferay-625/**/portlet.xml", `${W625}/portlet.xml`],
+  ["Rechte der Portlets", "liferay-625/**/liferay-portlet.xml", `${W625}/liferay-portlet.xml`],
+  ["Rechte der Portlets", "liferay-625/**/resource-actions/**", `${W625}/src/resource-actions/default.xml`],
+  [
+    "Rechte der Portlets",
+    "liferay-72/modules/**/portlet/**/*Portlet.java",
+    `${J72("bh-web")}/web/portlet/report/ReportPortlet.java`,
+  ],
+  ["Rechte der Portlets", "liferay-72/modules/**/resource-actions/**", `${R72("bh-web")}/resource-actions/default.xml`],
+  ["Konfiguration", "liferay-625/**/portal-ext*.properties", "liferay-625/config/portal-ext.beispiel.properties"],
+  ["Konfiguration", "liferay-625/**/web.xml", `${W625}/web.xml`],
+  ["Konfiguration", "liferay-625/**/pruefung/**", `${J625}/pruefung/TestApiServlet.java`],
+  ["Konfiguration", "liferay-72/configs/**", "liferay-72/configs/local/portal-ext.properties"],
+  ["Konfiguration", "liferay-72/modules/bh-pruefung/**", "liferay-72/modules/bh-pruefung/bnd.txt"],
+  ["Konfiguration", "liferay-72/modules/bh-clock/**", `${J72("bh-clock")}/clock/ClockImpl.java`],
+  [
+    "Konfiguration",
+    "liferay-72/modules/**/configuration/**",
+    `${J72("bh-notification")}/notification/configuration/TeamsConfiguration.java`,
+  ],
+  ["Konfiguration", "liferay-72/pruefung/**", "liferay-72/pruefung/playwright.config.ts"],
+  ["Schema", "liferay-625/**/service.xml", `${W625}/service.xml`],
+  ["Schema", "liferay-625/**/sql/**", `${W625}/sql/tables.sql`],
+  ["Schema", "liferay-625/**/model/listener/**", `${J625}/model/listener/StatusChangeListener.java`],
+  ["Schema", "liferay-625/**/custom-sql/**", `${W625}/src/custom-sql/default.xml`],
+  ["Schema", "liferay-625/**/portlet.properties", `${W625}/src/portlet.properties`],
+  ["Schema", "liferay-625/**/service*.properties", `${W625}/src/service-ext.properties`],
+  ["Schema", "liferay-625/**/portlet-model-hints.xml", `${W625}/src/META-INF/portlet-model-hints.xml`],
+  ["Schema", "liferay-72/modules/**/service.xml", "liferay-72/modules/bh/bh-service/service.xml"],
+  ["Schema", "liferay-72/modules/**/sql/**", `${R72("bh/bh-service")}/META-INF/sql/tables.sql`],
+  [
+    "Schema",
+    "liferay-72/modules/**/model/listener/**",
+    `${J72("bh/bh-service")}/model/listener/StatusChangeListener.java`,
+  ],
+  ["Schema", "liferay-72/modules/**/custom-sql/**", `${R72("bh/bh-service")}/META-INF/custom-sql/default.xml`],
+  [
+    "Schema",
+    "liferay-72/modules/**/service/persistence/impl/**",
+    `${J72("bh/bh-service")}/service/persistence/impl/WeeklyReportFinderImpl.java`,
+  ],
+  ["Upgrade-Schritte", "liferay-625/**/upgrade/**", `${J625}/upgrade/v1_0_0/UpgradeSchutz.java`],
+  ["Upgrade-Schritte", "liferay-72/modules/**/upgrade/**", `${J72("bh/bh-service")}/upgrade/v1_0_0/UpgradeSchutz.java`],
+  ["Build", "liferay-625/**/ivy.xml", "liferay-625/portlets/bh-portlet/ivy.xml"],
+  ["Build", "liferay-625/**/ivy-settings.xml", "liferay-625/ivy-settings.xml"],
+  ["Build", "liferay-625/**/build*.xml", "liferay-625/portlets/bh-portlet/build-common-pruefung.xml"],
+  ["Build", "liferay-625/**/build*.properties", "liferay-625/build.beispiel.properties"],
+  ["Build", "liferay-72/**/build.gradle", "liferay-72/modules/bh-pdf/build.gradle"],
+  ["Build", "liferay-72/settings.gradle", "liferay-72/settings.gradle"],
+  ["Build", "liferay-72/gradle.properties", "liferay-72/gradle.properties"],
+  ["Build", "liferay-72/modules/**/bnd.bnd", "liferay-72/modules/bh-pdf/bnd.bnd"],
+  ["Build", "liferay-72/themes/**/package.json", "liferay-72/themes/bh-theme/package.json"],
+  [
+    "Reihe U",
+    "liferay-72/modules/bh-upgrade-625/**",
+    "liferay-72/modules/bh-upgrade-625/src/main/resources/META-INF/upgrade-hinweis.txt",
+  ],
+  ["Reihe U", "liferay-72/upgrade-625/**", "liferay-72/upgrade-625/portal-upgrade-database.properties"],
+];
+
+/** Je Zeile und Plattform ein ungeschützter Nachbarpfad: [Zeile, Pfad]. */
+const LIFERAY_UNGESCHUETZT: [string, string][] = [
+  ["Anmeldung", "liferay-625/portlets/bh-portlet/docroot/html/bericht/view.jsp"],
+  ["Anmeldung", `${R72("bh-web")}/META-INF/resources/login_hinweis.jsp`],
+  ["Zugang je Anfrage", `${J625}/domain/report/ReportFilterOptions.java`],
+  ["Zugang je Anfrage", `${J72("bh-web")}/web/FilterOptions.java`],
+  ["Zugang und Sichtbarkeit", `${J625}/domain/weeks/WeekRules.java`],
+  ["Zugang und Sichtbarkeit", `${J72("bh-domain")}/domain/weeks/WeekRules.java`],
+  ["Rollen und Besitz", `${W625}/service/de/berichtsheft/service/WeeklyReportLocalServiceUtil.java`],
+  ["Rollen und Besitz", `${J72("bh/bh-api")}/service/WeeklyReportLocalService.java`],
+  ["Rechte der Portlets", `${W625}/liferay-display.xml`],
+  ["Rechte der Portlets", `${J72("bh-web")}/web/portlet/report/SaveReportMVCActionCommand.java`],
+  ["Konfiguration", `${W625}/liferay-plugin-package.properties`],
+  [
+    "Konfiguration",
+    "liferay-72/modules/bh-domain/src/test/java/de/berichtsheft/domain/pruefung/FachlogikPrueffaelleTest.java",
+  ],
+  ["Konfiguration", "liferay-72/modules/bh-web/src/main/webapp/WEB-INF/web.xml"],
+  ["Schema", `${W625}/src/content/Language.properties`],
+  ["Schema", `${R72("bh/bh-service")}/content/Language.properties`],
+  ["Upgrade-Schritte", `${J72("bh-web")}/web/UpgradeHinweis.java`],
+  ["Upgrade-Schritte", "src/lib/upgrade/migrate.ts"],
+  ["Upgrade-Schritte", "scripts/upgrade/daten.mjs"],
+  ["Upgrade-Schritte", "e2e/upgrade/ablauf.spec.ts"],
+  ["Build", "liferay-625/themes/bh-theme/docroot/_diffs/js/main.js"],
+  ["Build", `${R72("bh-web")}/META-INF/resources/js/main.js`],
+  ["Build", "src/main/java/de/berichtsheft/web/build.gradle"],
+  ["außerhalb", "src/main/java/de/berichtsheft/web/ReportPortlet.java"],
+  ["außerhalb", "liferay-72/portlets/bh-portlet/docroot/WEB-INF/liferay-hook.xml"],
+];
+
+describe("istGeschuetzt auf Liferay (AM-R04, gemeinsames Profil Abschnitte 5 und 6)", () => {
+  it.each(LIFERAY_GESCHUETZT)("AM-AK-02 %s: Muster %s schützt %s", (_zeile, muster, pfad) => {
+    expect(istGeschuetzt(pfad)).toBe(true);
+    expect(geschuetztDurch(pfad)).toContain(muster);
+  });
+
+  it.each(LIFERAY_UNGESCHUETZT)("AM-AK-02 %s: Nachbarpfad %s ist nicht geschützt", (_zeile, pfad) => {
+    expect(geschuetztDurch(pfad)).toEqual([]);
+  });
+
+  it("AM-AK-02 jedes Liferay-Muster hat einen Testpfad, und jeder Testpfad nennt ein Muster der Liste", () => {
+    expect(new Set(LIFERAY_GESCHUETZT.map(([, muster]) => muster))).toEqual(new Set(GESCHUETZT_LIFERAY));
+    expect(GESCHUETZT_LIFERAY.every((muster) => /^liferay-(625|72)\//.test(muster))).toBe(true);
+  });
+
+  it("AM-AK-02 Glob: ** steht für keinen oder beliebig viele Ordner, * nie für einen /", () => {
+    expect(globZuRegExp("liferay-625/**/upgrade/**").test("liferay-625/upgrade/a.java")).toBe(true);
+    expect(globZuRegExp("liferay-625/**/upgrade/**").test("liferay-625/a/b/upgrade/c/d.java")).toBe(true);
+    expect(globZuRegExp("liferay-625/**/upgrade/**").test("liferay-625/a/upgrade")).toBe(false);
+    expect(globZuRegExp("liferay-625/**/upgrade/**").test("liferay-625/a/myupgrade/b.java")).toBe(false);
+    expect(globZuRegExp("liferay-625/**/build*.xml").test("liferay-625/build.xml")).toBe(true);
+    expect(globZuRegExp("liferay-625/**/build*.xml").test("liferay-625/build/x.xml")).toBe(false);
+    expect(globZuRegExp("liferay-625/**/web.xml").test("liferay-625/a/liferay-web.xml")).toBe(false);
+    expect(globZuRegExp("liferay-72/settings.gradle").test("liferay-72/settings.gradle.bak")).toBe(false);
+  });
+
+  it("AM-AK-10 mehrere geschützte Liferay-Pfade: jeder einzeln mit festem Grund", () => {
+    const entscheidung = entscheideAutomerge(
+      pr({
+        dateien: [
+          { pfad: `${J625}/upgrade/v1_0_0/UpgradeSchutz.java`, status: "M", zeilen: 4 },
+          { pfad: "liferay-625/portlets/bh-portlet/ivy.xml", status: "M", zeilen: 2 },
+          { pfad: "liferay-72/modules/bh-pdf/bnd.bnd", status: "M", zeilen: 1 },
+          { pfad: `${J72("bh-domain")}/domain/weeks/WeekRules.java`, status: "M", zeilen: 10 },
+        ],
+      }),
+    );
+    expect(verstoesse(entscheidung)).toEqual([
+      { id: "AM-R04", code: "geschuetzter-pfad", detail: `${J625}/upgrade/v1_0_0/UpgradeSchutz.java` },
+      { id: "AM-R04", code: "geschuetzter-pfad", detail: "liferay-625/portlets/bh-portlet/ivy.xml" },
+      { id: "AM-R04", code: "geschuetzter-pfad", detail: "liferay-72/modules/bh-pdf/bnd.bnd" },
+    ]);
   });
 });
 
