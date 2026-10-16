@@ -23,7 +23,7 @@ jede Woche auf einer neuen Seite, Umlaute und lange Texte vollständig. Der Inha
 4. die Prüffälle von M01 bis M06 weiterhin grün sind.
 
 Schemaänderung: nein. M07 speichert nichts (Fach-Spec M07, Abschnitt 5). Neue Bibliothek: PDFBox 2.0.37 und die Schrift Noto Sans
-(gemeinsames Profil 7) in `ivy.xml`.
+(gemeinsames Profil, Abschnitt 7) in `ivy.xml`.
 
 ## 2. Voraussetzungen
 
@@ -32,7 +32,7 @@ Schemaänderung: nein. M07 speichert nichts (Fach-Spec M07, Abschnitt 5). Neue B
   Sichtbarkeit `canViewReport()` (P02); Uhr, Wochen und Zeitzone (P01). P07 hat keinen Vorgänger in M07, aber alle Daten-Fälle
   brauchen `freigeben` und `freigabe_zuruecknehmen` aus P05.
 - Profil 6.2.5: Abschnitte 3 (PDF, Transaktion, Oberfläche), 4.1, 4.2 und 7 („Lesende Transaktionen“, „Zurückrollen“,
-  „Mehrere Klassenlader“, JSP mit Jasper von Tomcat 7, `build.auto.upgrade`). Gemeinsames Profil: 2.2 (Uhr, Zeit in UTC), 3.2 und 7
+  „Mehrere Klassenlader“, JSP mit Jasper von Tomcat 7, `build.auto.upgrade`). Gemeinsames Profil, Abschnitte 2.2 (Uhr, Zeit in UTC), 3.2 und 7
   (PDFBox, Noto Sans).
 
 ## 3. Eingaben
@@ -86,16 +86,16 @@ Schritt 9 am erzeugten PDF.
 **Weg B.** Der Inhalt ist in Spec und Prüffällen genau festgelegt; das Layout ist frei, solange die Inhalte stimmen. Auf 6.2.5
 gibt es dafür drei Stolpersteine: PDFBox hat keine Layoutmaschine (Zeilenumbruch, Seitenumbruch und „Seite x von y“ sind
 eigener Code), die Schrift stellt nicht jedes Zeichen dar (M04 lässt zum Beispiel Emoji zu), und eine lesende Service-Methode
-darf keine Wochen anlegen (Profil 7 „Lesende Transaktionen“). Weg A nur auf ausdrücklichen Auftrag.
+darf keine Wochen anlegen (Profil 6.2.5, Abschnitt 7 „Lesende Transaktionen“). Weg A nur auf ausdrücklichen Auftrag.
 
 ## 7. Schritte
 
 Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, Playwright im Wurzelordner.
 
-1. **Branch** `claude/l62-p07-pdf-export`; Spec (M07-R01 bis M07-R14), Profil 3 (PDF) und Prüffälle lesen. Prüfschritt:
+1. **Branch** `claude/l62-p07-pdf-export`; Spec (M07-R01 bis M07-R14), Profil 6.2.5, Abschnitt 3 (PDF) und Prüffälle lesen. Prüfschritt:
    AK-Tabelle aus Abschnitt 5 im PR-Entwurf.
-2. **Bibliothek und Schrift** (gemeinsames Profil 7). `ivy.xml`: `org.apache.pdfbox:pdfbox` 2.0.37 in der Konfiguration `default`
-   (im WAR, die Konfiguration `test` erbt sie); keine Abhängigkeit vom Portal-Klassenpfad (Profil 7 „Mehrere Klassenlader“:
+2. **Bibliothek und Schrift** (gemeinsames Profil, Abschnitt 7). `ivy.xml`: `org.apache.pdfbox:pdfbox` 2.0.37 in der Konfiguration `default`
+   (im WAR, die Konfiguration `test` erbt sie); keine Abhängigkeit vom Portal-Klassenpfad (Profil 6.2.5, Abschnitt 7 „Mehrere Klassenlader“:
    PDFBox liegt im WAR des Plugins). Die Schrift als Ressource im Plugin, Noto Sans Regular und Bold aus `assets/fonts/` samt
    `OFL.txt` nach `docroot/WEB-INF/src/de/berichtsheft/pdf/fonts/`, kein Abruf aus dem Internet. Prüfschritt:
    `ant compile war`; das WAR enthält PDFBox und die Schrift, weiterhin kein Jackson und kein JUnit.
@@ -112,7 +112,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    `weekPdfFileName()`, `rangePdfFileName()`. Regeln für Java 8: Kalendertage mit `ResolverStyle.STRICT` einlesen (der
    Standardmodus `SMART` rechnet den 31.02. auf den 28.02. zurück und nähme ihn an, M07-R11); Wochentage, Monatsangaben und
    Texte wie „Montag, 28.09.2026“ aus **festen Listen** bilden, nicht aus `Locale`-Daten der JVM; Datum und Uhrzeit des Vermerks
-   und der Erstellung in `Europe/Berlin` (Zeitpunkte liegen als UTC vor, gemeinsames Profil 2.2); der Dateiname schreibt zuerst ä,
+   und der Erstellung in `Europe/Berlin` (Zeitpunkte liegen als UTC vor, gemeinsames Profil, Abschnitt 2.2); der Dateiname schreibt zuerst ä,
    ö, ü, Ä, Ö, Ü, ß um (ae, oe, ue, Ae, Oe, Ue, ss), entfernt erst danach Akzente (`Normalizer.Form.NFD`, Kategorie `\p{M}`), ersetzt
    jede Folge anderer Zeichen als Buchstaben und Ziffern durch „-“, schneidet „-“ an den Rändern ab, höchstens 60 Zeichen, sonst
    „Azubi“. Der Erstellungszeitpunkt und „heute“ kommen als Parameter aus der Uhr (P01), nie aus `new Date()`. Prüfschritt:
@@ -122,11 +122,11 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    eigene, jeder aktive Ausbilder alle, auch deaktivierter Azubis, eine deaktivierte Person nichts → `zugriff_verweigert`;
    unbekannter Bericht oder Person ohne Berichtsheft → `nicht_gefunden`) und `buildRangeExport(viewer, traineeId, von, bis)`.
    **Namen:** Das Sammel-PDF legt fehlende Wochen an (P03 `ensureReportsForTrainee`); eine Methode mit Präfix `get` läuft nur
-   lesend (Profil 7 „Lesende Transaktionen“), das Anlegen ginge verloren oder scheiterte. Deshalb heißt sie nicht `get…`. Ablauf
+   lesend (Profil 6.2.5, Abschnitt 7 „Lesende Transaktionen“), das Anlegen ginge verloren oder scheiterte. Deshalb heißt sie nicht `get…`. Ablauf
    in einer Transaktion: Zugriff prüfen, **den Zeitraum prüfen, bevor** Wochen angelegt werden (ein abgewiesener Zeitraum darf
    nichts anlegen), dann `ensureReportsForTrainee`, dann lesen und `rangeExport()`. Ablehnungen liegen **vor** dem ersten Schreiben
    und sind `DomainRuleException` (Unterklasse von `PortalException`, mit `Fehlercode`); sie rollen zurück, und es steht nichts
-   Geschriebenes im Weg (Profil 7 „Zurückrollen“). Es gibt keinen Zwischenspeicher: Der Inhalt entsteht bei jedem Abruf neu aus
+   Geschriebenes im Weg (Profil 6.2.5, Abschnitt 7 „Zurückrollen“). Es gibt keinen Zwischenspeicher: Der Inhalt entsteht bei jedem Abruf neu aus
    dem gespeicherten Bestand (M07-R03). Prüfschritt: `AK906_ExportPrueftZugriffJeAbrufTest` (Schritt 9).
 5. **Layout `de.berichtsheft.pdf.PdfRenderer`** (M07-R07, M07-R12; AK-902, AK-904, AK-907; nur dieses Paket importiert PDFBox).
    PDFBox liefert keine Layoutmaschine; der Renderer baut selbst: Seitengröße A4, Zeilenumbruch nach gemessener Breite
@@ -142,7 +142,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    Renderer ersetzt solche Zeichen vorher durch ein Ersatzzeichen, der Inhalt (`PdfDocument`) bleibt unverändert (AK-907-02). Der
    Text der Tätigkeiten kommt mit `\n` als Zeilenumbruch an und wird als solcher gesetzt. Prüfschritt: die Unit-Tests am erzeugten PDF
    (Schritt 9), Text mit `PDFTextStripper` je Seite gelesen.
-6. **Ressource-URL und Bedienelemente** (Profil 3 „PDF“). Im `BerichtPortlet` (P04) und im `AzubisPortlet` (P03) je eine
+6. **Ressource-URL und Bedienelemente** (Profil 6.2.5, Abschnitt 3 „PDF“). Im `BerichtPortlet` (P04) und im `AzubisPortlet` (P03) je eine
    `serveResource`-Methode (`pdf-woche`, `pdf-zeitraum`): Sie ruft die Service-Methode **mit der Person der Sitzung** (nie mit
    einer Person aus dem Parameter), erzeugt das PDF und schreibt es in die Antwort mit `Content-Type: application/pdf`,
    `Content-Disposition: attachment` mit dem Dateinamen aus dem Inhalt und `Cache-Control: no-store` (welche Klasse 6.2.5 für
@@ -157,10 +157,10 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    aus dem Meldungstext. Daten-Aktionen der Testschnittstelle: `pdf_woche_exportieren` und `pdf_zeitraum_exportieren` rufen
    **dieselben Service-Methoden** wie die Ressource-URL und liefern den Inhalt `{ "pdf": <PDF-Inhalt> }`, nicht die Bytes;
    Fehler `zugriff_verweigert`, `nicht_gefunden` und die Zeitraumfehler als `{ "fehler": "<code>" }`. Die Aktionen laufen als
-   die Person des Falls (`als`), die Rechteprüfung geschieht im Service, nicht im Adapter. Prüfschritt: `ant pruefung-fachlogik
+   die Person des Falls (`als`), die Rechteprüfung geschieht im Service, nicht im Adapter. Personen stehen an der Grenze zum Prüf-Adapter als Schlüssel (`anna`); Kennungen wie die Konto-ID (`userId`) und die `weeklyReportId` gehen immer als Text (String), nie als JSON-Zahl (Profil 6.2.5, Abschnitt 4.2). Prüfschritt: `ant pruefung-fachlogik
    -Dbh.pruefung.filter=M07.json` (24 Fälle) und `ant pruefung-daten -Dbh.pruefung.filter=M07.json` (5 Fälle) grün.
 8. **Bau-Stand.** M07 in `BauStand.java` eintragen. Prüfschritt: kein roter Fall, die Fälle von M08 bleiben „noch nicht gebaut“.
-9. **Eigene Tests** (Namen beginnen mit der AK-ID, JUnit ohne Bindestrich, Profil 4.1). Die Unit-Tests rendern echte PDF mit dem
+9. **Eigene Tests** (Namen beginnen mit der AK-ID, JUnit ohne Bindestrich, Profil 6.2.5, Abschnitt 4.1). Die Unit-Tests rendern echte PDF mit dem
    Renderer und lesen den Text mit PDFBox (`PDFTextStripper`, je Seite):
    - `AK902_JedeWocheBeginntAufNeuerSeiteTest`: drei Wochen ergeben mindestens drei Seiten; auf Seite 1 steht nur die erste Woche;
      eine sehr lange Woche läuft über mehrere Seiten, die nächste beginnt auf einer neuen.
@@ -187,7 +187,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
      freigegeben – Status: Abgelehnt“ (AK-905, kein Zwischenspeicher); Anna ruft die Ressource-URL des Berichts von Clara per
      Adresse auf: 403, kein PDF; unbekannte Kennung: 404.
    Prüfschritt: `ant test-unit test-integration` und der Playwright-Lauf grün.
-10. **Gegenprobe** (Gemeinsame Regeln, „Gegenprobe“; Profil 7 „Lesende Transaktionen“, „Zurückrollen“). Jeden Fehler einzeln
+10. **Gegenprobe** (Gemeinsame Regeln, „Gegenprobe“; Profil 6.2.5, Abschnitt 7 „Lesende Transaktionen“, „Zurückrollen“). Jeden Fehler einzeln
     einbauen, die genannten Befehle laufen lassen, Ergebnis im PR festhalten, Fehler zurücknehmen. Eine Gegenprobe zählt nur,
     wenn die benannten Fälle rot werden:
 
@@ -220,6 +220,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
     | G7-24 (AK-905) | der Renderer merkt sich die Bytes je Bericht und liefert sie beim zweiten Abruf wieder | `ak-901-907-pdf-export.spec.ts` (nach der Rücknahme steht der Vermerk noch im PDF); AK-905-02 bleibt grün, weil der Inhalt neu entsteht | Playwright mit `-g "ak-901"` |
     | G7-25 (AK-902) | `buildRangeExport` heißt `getRangeExport` und legt Wochen an | `AK902_SammelPdfLegtFehlendeWochenAnTest` (lesende Transaktion: nichts angelegt, das PDF ist leer bzw. der Aufruf scheitert) | `ant test-integration -Dtest.class=AK902_SammelPdfLegtFehlendeWochenAnTest` |
     | G7-26 (AK-902) | der Zeitraum wird erst nach `ensureReportsForTrainee` geprüft | `AK902_SammelPdfLegtFehlendeWochenAnTest`, Teil „Bis vor Von legt nichts an“ (Zahl der Berichte nach dem Aufruf ist nicht 0) | `ant test-integration -Dtest.class=AK902_SammelPdfLegtFehlendeWochenAnTest` |
+    | G7-27 (AK-902) | der Renderer lädt und bettet die Schrift für jede Woche neu ein (statt einmal je Dokument) | `AK902_SammelPdfMit150WochenTest` (Laufzeit über der Grenze; Messwert vor und nach dem Fehler im PR, bleibt der Test grün, ist die Grenze zu großzügig und wird enger gesetzt) | `ant test-unit -Dtest.class=AK902_SammelPdfMit150WochenTest` |
 
     Prüfschritt: Tabelle mit dem tatsächlichen Ergebnis je Zeile im PR; nach dem Zurücknehmen alles grün. Wird ein
     benannter Fall nicht rot, ist die Prüfung ohne Wirkung: anhalten und der Steuerung melden.
@@ -250,7 +251,7 @@ Nur in CI: der volle Liferay-6.2.5-Job; im PR vermerken.
 - Draft-PR mit der AK-Tabelle (AK-901, AK-902, AK-903, AK-904, AK-905, AK-906, AK-907 mit Test und Prüffällen), der Gegenprobe-Tabelle
   mit Ergebnis, der Messung für 150 Wochen und „Bitte bestätigen“. Neue Bibliothek PDFBox: `ivy.xml` ist nach
   `profile/liferay-625.md`, Abschnitt 2.3, nicht von den Pfadmustern erfasst; die Bibliothek steht in der freigegebenen Liste
-  (gemeinsames Profil 7). `service/impl/**` ist sicherheitsrelevant (gemeinsam 5); Chris gibt frei.
+  (gemeinsames Profil, Abschnitt 7). `service/impl/**` ist sicherheitsrelevant (gemeinsames Profil, Abschnitt 5); Chris gibt frei.
 - Bericht an die Steuerung; `FORTSCHRITT.md` schreibt die Steuerung.
 
 ## 10. Typische Fehler
@@ -270,7 +271,7 @@ Nur in CI: der volle Liferay-6.2.5-Job; im PR vermerken.
 | Dateiname enthält „ö“ oder „..“ | erst umschreiben, dann Akzente entfernen, dann Sonderzeichen zu „-“ (G7-15, G7-16) |
 | Der Browser zeigt das PDF statt eines Downloads, oder lädt eine alte Fassung | `Content-Disposition: attachment` und `Cache-Control: no-store` prüfen (Schritt 6, G7-24) |
 | Ressource-URL liefert dem Fremden das PDF | Person aus der Sitzung, Prüfung im Service bei jedem Abruf (G7-22, G7-23) |
-| Schrift findet das Plugin nicht | Ressource im Klassenpfad des Plugins, nicht im Portal (Profil 7 „Mehrere Klassenlader“) |
+| Schrift findet das Plugin nicht | Ressource im Klassenpfad des Plugins, nicht im Portal (Profil 6.2.5, Abschnitt 7 „Mehrere Klassenlader“) |
 
 ## Bitte bestätigen
 

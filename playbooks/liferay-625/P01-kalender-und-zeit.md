@@ -25,7 +25,7 @@ P02 und P03 als `VARCHAR(10)` gespeichert (gemeinsames Profil, Abschnitt 2.2). P
   Prüf-Runner mit Bau-Stand, Testschnittstelle, `DomainOhneLiferayTest`, Ant-Ziele.
 - M01 hängt von keinem Modul ab und wird vor P02 gebaut: P02 braucht die Uhr, P03 die Wochenfunktionen und die Feiertage.
 - Profil 6.2.5: Abschnitte 2.1 (Paketwurzel, `domain/`), 4.1 (Ebenen, Testnamen, Fehlercodes) und 7 („Service Builder
-  liest Java-Quellen …“). Gemeinsames Profil: 2.2 (Datum und Zeit), 3.2 (Uhr-Service, Fachlogik als reine Java-Klassen,
+  liest Java-Quellen …“). Gemeinsames Profil, Abschnitte 2.2 (Datum und Zeit), 3.2 (Uhr-Service, Fachlogik als reine Java-Klassen,
   Ausweichregel Java 7) und 7 (Feiertage ohne Bibliothek).
 
 ## 3. Eingaben
@@ -47,7 +47,7 @@ lesen: `src/domain/clock.ts` (`now()`, `setFixedNow()`, `clockFromEnvironment()`
 `src/domain/holidays.ts` (`publicHolidays()`, `ONE_TIME_HOLIDAYS`). Übertragbar sind die Wochenfunktionen, die Liste der
 Bundesländer und die Referenzdaten der einmaligen Feiertage 1:1. Nach Profil neu zu bauen sind `clockFromEnvironment()`
 (`bh.betrieb` statt `NODE_ENV`), die Zeitzonenrechnung (`java.time` statt `Intl.DateTimeFormat`) und die Feiertage
-(`feiertagejs` hat keine Entsprechung, gemeinsames Profil 7: eigene Berechnung). Belege zum Abgleich:
+(`feiertagejs` hat keine Entsprechung, gemeinsames Profil, Abschnitt 7: eigene Berechnung). Belege zum Abgleich:
 `src/domain/clock.test.ts`, `src/domain/weeks.test.ts`, `src/domain/federal-states.test.ts`,
 `src/domain/holidays.test.ts`.
 
@@ -79,7 +79,7 @@ TypeScript-App (Schritt 6) Pflicht. Weg A nur auf ausdrücklichen Auftrag.
 
 ## 7. Schritte
 
-Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh` (Profil 2.2). Fachlogik liegt unter
+Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh` (Profil 6.2.5, Abschnitt 2.2). Fachlogik liegt unter
 `docroot/WEB-INF/src/de/berichtsheft/domain/calendar/`, Tests unter `test/unit/`.
 
 1. **Branch** `claude/l62-p01-kalender-und-zeit`; Spec (M01-R01 bis M01-R19) und Prüffälle lesen. Prüfschritt: Liste der 13
@@ -92,12 +92,12 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh` (
    (M01-R03), sonst liest sie `ISO-8601` mit Offset (`java.time.OffsetDateTime`) und stellt die Uhr; ein unlesbarer Wert wirft
    `InvalidInstantException` (Fehlercode `zeitpunkt_ungueltig`, M01-R04). „Jetzt“ ist ein `java.time.Instant` (legt P00
    die Uhr anders fest, gilt P00). Die Ausnahme ist eine Unterklasse von `RuntimeException` ohne Liferay-Bezug (die
-   Fachlogik kennt `PortalException` nicht; der Service übersetzt dort, wo eine Transaktion zurückrollen muss, Profil 7
+   Fachlogik kennt `PortalException` nicht; der Service übersetzt dort, wo eine Transaktion zurückrollen muss, Profil 6.2.5, Abschnitt 7
    „Zurückrollen“). Prüfschritt: `ant test-unit` mit Tests zu fester Uhr, Rückstellung, Produktion ignoriert die Vorgabe,
    unlesbarer Wert.
 3. **Kalendertag und Zeitzone** (M01-R05, M01-R06, AK-1202). `CalendarDays` mit `APP_ZONE = ZoneId.of("Europe/Berlin")`,
    `calendarDateIn(Instant)` → `LocalDate` und `today(Clock)`. Ein Kalendertag ist in der Fachlogik ein `LocalDate`, in der
-   Datenhaltung der Text `JJJJ-MM-TT` (gemeinsames Profil 2.2); umgewandelt wird nur an der Grenze (Persistenz, Adapter).
+   Datenhaltung der Text `JJJJ-MM-TT` (gemeinsames Profil, Abschnitt 2.2); umgewandelt wird nur an der Grenze (Persistenz, Adapter).
    Keine Klasse unter `domain/` liest die Systemzeit oder die Zeitzone der JVM: kein `LocalDate.now()`, `Instant.now()`,
    `ZoneId.systemDefault()`, `TimeZone.getDefault()`, `Calendar.getInstance()`. Zwei eigene Tests:
    `AK1201_DomainLiestKeineSystemzeitTest` durchsucht alle Quellen unter `domain/` nach diesen Aufrufen (erweitert
@@ -105,7 +105,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh` (
    Kalendertag- und Wochenfunktionen mit den Zeitpunkten aus AK-1202-01 bis AK-1202-08 nacheinander unter
    `TimeZone.setDefault` auf `GMT`, `Europe/Berlin`, `America/Los_Angeles` und `Pacific/Kiritimati` aus und verlangt
    überall dasselbe Ergebnis (danach Zeitzone zurücksetzen). Das Ant-Ziel `test-unit` startet die Test-JVM mit
-   `-Duser.timezone=GMT` wie der Server (gemeinsames Profil 2.2); fehlt der Schalter, ergänzt ihn P01 in der `build.xml`
+   `-Duser.timezone=GMT` wie der Server (gemeinsames Profil, Abschnitt 2.2); fehlt der Schalter, ergänzt ihn P01 in der `build.xml`
    des Plugins. Prüfschritt: beide Tests grün.
 4. **ISO-Wochen** (M01-R07 bis M01-R12, AK-1202, AK-1203, AK-1204). `IsoWeek` (Jahr, Nummer; Textform `JJJJ-Www`,
    Merker `data-woche`) und `IsoWeeks`: `weekOf(LocalDate)`, `mondayOf(IsoWeek)`, `weeksInYear(int)` (53 genau dann, wenn
@@ -119,7 +119,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh` (
    BY, BE, BB, HB, HH, HE, MV, NI, NW, RP, SL, SN, ST, SH, TH) mit Namen, `isFederalState()`, `UnknownFederalStateException`
    (`bundesland_unbekannt`). Die Kürzel sind in Großbuchstaben fest: `nw` ist unbekannt (AK-1205-04), ebenso eine Stadt
    (AK-1205-06). Prüfschritt: Unit-Test.
-6. **Feiertage `Holidays`** (M01-R15 bis M01-R19, AK-404, AK-1206; gemeinsames Profil 7: eigene Umsetzung ohne
+6. **Feiertage `Holidays`** (M01-R15 bis M01-R19, AK-404, AK-1206; gemeinsames Profil, Abschnitt 7: eigene Umsetzung ohne
    Bibliothek). Osterformel, feste und bewegliche Feiertage je Bundesland, nur landesweite gesetzliche (M01-R17): Fronleichnam
    in NW, aber nicht in NI und nicht in SN (AK-404-02, AK-1206-08), kein Augsburger Friedensfest (AK-1206-07). Dazu
    `ONE_TIME` mit den drei Einträgen aus Abschnitt 5 der Spec (BE 08.05.2020, 08.05.2025, 17.06.2028) und dem
@@ -131,7 +131,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh` (
    Java-Berechnung vergleichen; jede Abweichung ist ein Befund, den die Fach-Spec und die Prüffälle entscheiden, nicht die
    Bibliothek der TypeScript-App (Zeile unter „Bitte bestätigen“). Prüfschritt: Unit-Test mit dem Abgleich als Tabelle der
    Stichproben (Ostersonntag in BB, 08.03.2025 in BE, Fronleichnam 2027).
-7. **Adapter `PruefungFachlogikTest`** (Profil 4.1; Regeln für Adapter in `specs/pruefung/format.md`). Klasse
+7. **Adapter `PruefungFachlogikTest`** (Profil 6.2.5, Abschnitt 4.1; Regeln für Adapter in `specs/pruefung/format.md`). Klasse
    `de.berichtsheft.pruefung.FachlogikAdapter` (P02 und die folgenden Playbooks ergänzen sie) mit `call(schnittstelle, eingabe)` für die 13
    Schnittstellen von M01; Formate: Zeitpunkt
    mit Offset in Berliner Ortszeit (`2026-10-06T00:30:00+02:00`, AK-1202-09), Kalendertag `JJJJ-MM-TT`, Wochentag `Mo` bis
@@ -201,16 +201,15 @@ Nur in CI: der volle Liferay-6.2.5-Job; P01 braucht kein laufendes Portal und ke
 | Feiertag fehlt oder ist zu viel (Reformationstag, einmalige, regionale) | Referenzdaten aus Abschnitt 5 der Spec, nur landesweite; Abgleich mit der TypeScript-App (Schritt 6) |
 | Vorgabe der Uhr wirkt im Produktivbetrieb | `bh.betrieb` prüfen, nicht eine eigene Eigenschaft (G1-1) |
 | Gestellte Uhr bleibt im nächsten Fall | im Runner nach jedem Fall `ClockHolder.reset()` |
-| Service Builder meldet einen Fehler bei einer Klasse unter `domain/` | nur Klassen, die Service Builder liest, brauchen Sprachstand 7 (Profil 7); `domain/` ist Java 8 und wird nicht gelesen |
-| Fachlogik mit Java-8-Datum läuft unter Java 7 nicht | Ausweichregel (gemeinsames Profil 3.2): `Calendar` in UTC und eigene Klasse für Kalendertage; nur bei Java 7 |
+| Service Builder meldet einen Fehler bei einer Klasse unter `domain/` | nur Klassen, die Service Builder liest, brauchen Sprachstand 7 (Profil 6.2.5, Abschnitt 7); `domain/` ist Java 8 und wird nicht gelesen |
+| Fachlogik mit Java-8-Datum läuft unter Java 7 nicht | Ausweichregel (gemeinsames Profil, Abschnitt 3.2): `Calendar` in UTC und eigene Klasse für Kalendertage; nur bei Java 7 |
 
 ## Bitte bestätigen
 
-- [ ] Fachlogik rechnet mit `java.time` (`Instant`, `LocalDate`, `ZoneId`); die Ausweichregel Java 7 (gemeinsames Profil
-      3.2) würde P01 neu schreiben (`Calendar` in UTC). Greift sie, ist P01 vor P02 zu wiederholen.
-- [ ] Paket `de.berichtsheft.domain.calendar` für Uhr-Erweiterung, Wochen, Bundesländer und Feiertage (Profil 2.1 nennt
+- [ ] Fachlogik rechnet mit `java.time` (`Instant`, `LocalDate`, `ZoneId`); die Ausweichregel Java 7 (gemeinsames Profil, Abschnitt 3.2) würde P01 neu schreiben (`Calendar` in UTC). Greift sie, ist P01 vor P02 zu wiederholen.
+- [ ] Paket `de.berichtsheft.domain.calendar` für Uhr-Erweiterung, Wochen, Bundesländer und Feiertage (Profil 6.2.5, Abschnitt 2.1 nennt
       nur `domain/`).
-- [ ] Eigene Feiertagsberechnung statt Jollyday (gemeinsames Profil 7): Der Abgleich aus Schritt 6 entscheidet, ob die Ausweiche
+- [ ] Eigene Feiertagsberechnung statt Jollyday (gemeinsames Profil, Abschnitt 7): Der Abgleich aus Schritt 6 entscheidet, ob die Ausweiche
       Jollyday 0.5.10 nötig wird (einmalige Feiertage müssten dann ergänzt werden).
 - [ ] Der Reformationstag 2017 (bundesweit, einmalig) steht in M01-R15, aber nicht in der Referenzliste von Abschnitt 5 der
       Spec; die Liste in P01 führt ihn mit, der Spec-Eigentümer klärt die Pflege (offener Punkt 10 der Spec).

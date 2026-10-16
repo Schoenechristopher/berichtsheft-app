@@ -21,7 +21,7 @@ Datenhaltung“, täglicher Lauf als Scheduler-Eintrag, Seiten „Start“, „M
 4. der Ablauf-Test `ak-306-wochenuebersicht.spec.ts` in Chromium und bei 375 px grün ist (Schritt 9).
 
 Schemaänderung: ja. Neue Entities `WeeklyReport` (mit Spalte `version`, damit P05 sie nicht nachrüsten muss) und `ReportDay`
-(`service.xml`), im Skript „Schutz in der Datenhaltung“ (gemeinsam 2.3, 2.6): Fremdschlüssel, eindeutige Indizes, CHECK
+(`service.xml`), im Skript „Schutz in der Datenhaltung“ (gemeinsames Profil, Abschnitte 2.3 und 2.6): Fremdschlüssel, eindeutige Indizes, CHECK
 `weekly_report_iso_week_range` und die CHECK-Constraints der Aufzählungen. Bis `1.0.0` wird die Demo-Datenbank neu angelegt
 (P02, „Bitte bestätigen“).
 
@@ -32,7 +32,7 @@ Schemaänderung: ja. Neue Entities `WeeklyReport` (mit Spalte `version`, damit P
   `Fehlercode`, das Skript `UpgradeSchutzDerDatenhaltung` und die Testdaten (P02).
 - P03 blockiert P04 (Tage speichern braucht Berichte und Tage) und P05.
 - Profil 6.2.5: Abschnitte 2.1, 3 (Persistenz, Transaktion, Hintergrundjobs, Schema-Schritte), 4.1, 4.2 (Testschnittstelle)
-  und 7 („Lesende Transaktionen“, „Cache nach Custom SQL“, „Scheduler in GMT“, `build.auto.upgrade`). Gemeinsames Profil: 2.2,
+  und 7 („Lesende Transaktionen“, „Cache nach Custom SQL“, „Scheduler in GMT“, `build.auto.upgrade`). Gemeinsames Profil, Abschnitte 2.2,
   2.3 (Tabellen `BH_WeeklyReport`, `BH_ReportDay`), 2.4 (Cache), 2.5 (Scheduler, `BH_ReminderRun` erst P08) und 2.6.
 
 ## 3. Eingaben
@@ -87,16 +87,16 @@ in den Regeln: Service Builder schreibt über Hibernate und bricht bei einem dop
 
 Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`.
 
-1. **Branch** `claude/l62-p03-wochenberichte-entstehen`; Spec (M03-R01 bis M03-R17), Profil 3 und 7 und Prüffälle lesen.
+1. **Branch** `claude/l62-p03-wochenberichte-entstehen`; Spec (M03-R01 bis M03-R17), Profil 6.2.5, Abschnitte 3 und 7 und Prüffälle lesen.
    Prüfschritt: AK-Tabelle aus Abschnitt 5 im PR-Entwurf.
-2. **Schema und Skript** (gemeinsam 2.3, 2.6; Profil 3 „Persistenz“, 7 „`build.auto.upgrade`“). `service.xml`: Entity
+2. **Schema und Skript** (gemeinsames Profil, Abschnitte 2.3 und 2.6; Profil 6.2.5, Abschnitte 3 „Persistenz“ und 7 „`build.auto.upgrade`“). `service.xml`: Entity
    `WeeklyReport` (`weeklyReportId`, `companyId`, `traineeId`, `isoYear`, `isoWeek`, `status` mit Anfang `DRAFT`, `version`
-   mit Anfang 0, `createdAt`, `updatedAt`; `mvcc-enabled` nach dem Ergebnis von P00, gemeinsam 2.4) und `ReportDay`
+   mit Anfang 0, `createdAt`, `updatedAt`; `mvcc-enabled` nach dem Ergebnis von P00, gemeinsames Profil, Abschnitt 2.4) und `ReportDay`
    (`reportDayId`, `weeklyReportId`, `dayDate` als Text `JJJJ-MM-TT`, `dayType` leer oder einer der fünf Werte, `activities`
    bis 5.000 Zeichen, `outsideTraining`, `holidayPreset`); beide mit `remote-service="false"`, damit die
    `*LocalServiceImpl`-Methoden nicht als Web-Service des Portals erreichbar sind. Finder: `WeeklyReport` nach `traineeId`
    und der eindeutige Finder (`traineeId`, `isoYear`, `isoWeek`), `ReportDay` nach `weeklyReportId`; Spaltenlängen in
-   `portlet-model-hints.xml`. `ant build-service`; erzeugte `tables.sql` gegen gemeinsam 2.3 vergleichen. Das Skript
+   `portlet-model-hints.xml`. `ant build-service`; erzeugte `tables.sql` gegen gemeinsames Profil, Abschnitt 2.3 vergleichen. Das Skript
    `schutz-in-der-datenhaltung.sql` (P02) wächst um: Fremdschlüssel `traineeId` auf `BH_Person` (`ON DELETE CASCADE`) und
    `weeklyReportId` auf `BH_WeeklyReport` (`ON DELETE CASCADE`), eindeutiger Index (`traineeId`, `isoYear`, `isoWeek`)
    und (`weeklyReportId`, `dayDate`), **`weekly_report_iso_week_range`** (Nummer 1 bis 52, die 53 nur, wenn
@@ -120,12 +120,12 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`.
    `UnknownFederalStateException`). Prüfschritt: Unit-Tests in `test/unit/` mit Namen ab der AK-ID.
 4. **Anlegen `WeeklyReportLocalServiceImpl`** (M03-R01 bis M03-R07, M03-R10 bis M03-R13; AK-301 bis AK-305). Die
    Methoden heißen `ensureReportsForTrainee(traineeId)` und `ensureReportsForAllTrainees()` (nie `get…`: sie schreiben,
-   Profil 7 „Lesende Transaktionen“). Ablauf in **einer** Service-Transaktion: Person und Bundesland lesen, `weeksDue()` und
+   Profil 6.2.5, Abschnitt 7 „Lesende Transaktionen“). Ablauf in **einer** Service-Transaktion: Person und Bundesland lesen, `weeksDue()` und
    `planReportDays()` rechnen; dann Custom SQL in `WeeklyReportFinderImpl` (`custom-sql/default.xml`): `insertMissingReport`
    (`INSERT INTO BH_WeeklyReport … ON CONFLICT (traineeId, isoYear, isoWeek) DO NOTHING`, Gegenstück zu `createMany` mit
    `skipDuplicates`, Schlüssel aus dem Zähler `CounterLocalServiceUtil.increment`) und `insertMissingDay` (ebenso mit
    `ON CONFLICT (weeklyReportId, dayDate) DO NOTHING`). Der doppelte Schlüssel darf **keine Ausnahme** auslösen, weil
-   PostgreSQL die Transaktion danach abbricht (Profil 7 „Zurückrollen“); eine zweite, gleichzeitige Transaktion wartet auf
+   PostgreSQL die Transaktion danach abbricht (Profil 6.2.5, Abschnitt 7 „Zurückrollen“); eine zweite, gleichzeitige Transaktion wartet auf
    die erste, legt nichts an und sieht danach deren Bericht. Tage legt die Transaktion für jeden Bericht der Wochen an,
    auch für einen schon vorhandenen, dem Tage fehlen (`missingDays()`, M03-R07; vorhandene Tage und Inhalte bleiben).
    **Deaktivierte Azubis** bekommen keine neuen Berichte, bestehende bleiben (M03-R06); `ensureReportsForAllTrainees()`
@@ -134,7 +134,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`.
    eingereichte und freigegebene Berichte und die deaktivierter Azubis bleiben unverändert (M03-R13); der Aufruf liegt in
    `PersonLocalServiceImpl.updatePerson` aus P02 (dort in derselben Transaktion ergänzen). Der Merker `holidayPreset` wird
    gespeichert, nie aus dem Bundesland neu berechnet (M03-R10). Nach dem Custom SQL Entity- und Finder-Cache von `WeeklyReport`
-   und `ReportDay` leeren (Profil 7). Es entsteht kein Bericht ohne Tage. Prüfschritt: Unit-Tests; `ant test-db` für Schritt 9.
+   und `ReportDay` leeren (Profil 6.2.5, Abschnitt 7). Es entsteht kein Bericht ohne Tage. Prüfschritt: Unit-Tests; `ant test-db` für Schritt 9.
 5. **Übersichten** (lesend; Methodenpräfix `get`): `getTraineeWeeks(viewer, traineeId)` (alle nicht ausgeblendeten Wochen,
    neueste zuerst, eingeordnet mit `classifyWeek()`; Azubi nur die eigene, Ausbilder jede, nur lesend, `canViewReport()` aus
    P02, sonst `zugriff_verweigert`; AK-103, AK-105, AK-306) und `getTraineesWithProgress(viewer)` (nur Ausbilder: je Azubi
@@ -145,7 +145,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`.
    Prüfschritt: Test „Wochen ganz außerhalb zählen nicht als offen“.
 6. **Täglicher Lauf und Seitenaufrufe.** `de.berichtsheft.scheduler.WochenAnlegenMessageListener` ruft
    `ensureReportsForAllTrainees()`; Eintrag `scheduler-entry` in `liferay-portlet.xml` mit Speicherart `MEMORY_CLUSTERED`
-   (Profil 3 „Hintergrundjobs“). Quartz rechnet in GMT; weil das Anlegen idempotent ist und die Woche aus der Uhr nach
+   (Profil 6.2.5, Abschnitt 3 „Hintergrundjobs“). Quartz rechnet in GMT; weil das Anlegen idempotent ist und die Woche aus der Uhr nach
    Europe/Berlin kommt, genügt ein fester Zeitpunkt nach Mitternacht Berliner Zeit: `0 0 3 * * ?` (3:00 Uhr GMT, also
    4:00 oder 5:00 Uhr in Berlin). Bis zum Lauf holt jeder Aufruf der Seiten „Start“, „Wochen“ und „Azubis“ das Anlegen nach
    (M03-R02). Dieselbe Methode ruft die Testschnittstelle (Schritt 7). Prüfschritt: Tomcat-Log zeigt den Eintrag beim
@@ -162,12 +162,12 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`.
    Bau-Stand zurückgestellt bis P04. **Daten-Ausgangsbestand:** Die Testschnittstelle ergänzt Schritt 3 („Berichte
    entstehen wie in M03 bis ‚jetzt‘“) mit der neuen Aktion `berichte_anlegen` (für einen Azubi oder alle aktiven; nur bei
    `bh.betrieb=test`; ruft denselben Service wie das Portlet und der Scheduler) und gibt den Bestand `berichte` mit `status`
-   und `tage` zurück; `historie` und `kommentare` folgen in P05 und P06. Prüfschritt: `ant pruefung-fachlogik
+   und `tage` zurück; `historie` und `kommentare` folgen in P05 und P06. Personen stehen an der Grenze zum Prüf-Adapter als Schlüssel (`anna`); Kennungen wie die Konto-ID (`userId`) und die `weeklyReportId` gehen immer als Text (String), nie als JSON-Zahl (Profil 6.2.5, Abschnitt 4.2). Prüfschritt: `ant pruefung-fachlogik
    -Dbh.pruefung.filter=M03.json` grün (38 Fälle, AK-305-09 „noch nicht gebaut“); `berichte_anlegen` für Anna zu
    `uhr` 06.10.2026 ergibt KW 36 bis 41.
 8. **Bau-Stand.** M03 in `BauStand.java` eintragen; AK-305-09 bleibt zurückgestellt (P04). Prüfschritt: dieselbe Zeile wie
    in Schritt 7, kein roter Fall.
-9. **Eigene Tests** (Namen beginnen mit der AK-ID, JUnit ohne Bindestrich, Profil 4.1):
+9. **Eigene Tests** (Namen beginnen mit der AK-ID, JUnit ohne Bindestrich, Profil 6.2.5, Abschnitt 4.1):
    - `AK304_EindeutigJeAzubiUndWocheTest` (`test/db/`): (a) ein zweiter `INSERT` für denselben Azubi und dieselbe Woche
      scheitert mit `23505`; (b) zwei JDBC-Verbindungen fügen gleichzeitig denselben Bericht ein, genau eine gelingt; (c) A
      legt in einer offenen Transaktion den Bericht an, B führt das SQL `insertMissingReport` (aus `custom-sql/default.xml`
@@ -187,7 +187,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`.
      dieser Reihenfolge, KW 36 bis 40 mit `data-past-open`, KW 41 ohne; Bernd sieht dieselbe Liste über `azubis`, ohne
      Eingabefelder; Anna ruft die Seite `azubis` per Adresse auf und bekommt keinen Zugang.
    Prüfschritt: `ant test-unit test-db test-integration` und der Playwright-Lauf grün.
-10. **Gegenprobe** (Gemeinsame Regeln, „Gegenprobe“; Profil 7 „Zurückrollen“). Jeden Fehler einzeln einbauen, die genannten
+10. **Gegenprobe** (Gemeinsame Regeln, „Gegenprobe“; Profil 6.2.5, Abschnitt 7 „Zurückrollen“). Jeden Fehler einzeln einbauen, die genannten
     Befehle laufen lassen, Ergebnis im PR festhalten, Fehler zurücknehmen. Eine Gegenprobe zählt nur, wenn die benannten
     Fälle rot werden:
 
@@ -239,7 +239,7 @@ Nur in CI: der volle Liferay-6.2.5-Job; im PR vermerken.
   Abschnitt 8 lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-301, AK-302, AK-303, AK-304, AK-305, AK-306 mit Test und Prüffällen), dem zurückgestellten
   Fall AK-305-09, der Gegenprobe-Tabelle mit Ergebnis und „Bitte bestätigen“. `service.xml`, `sql/**`, `upgrade/**`,
-  `custom-sql/**` und `service/impl/**` sind sicherheitsrelevant (gemeinsam 5); Chris gibt frei.
+  `custom-sql/**` und `service/impl/**` sind sicherheitsrelevant (gemeinsames Profil, Abschnitt 5); Chris gibt frei.
 - Bericht an die Steuerung; `FORTSCHRITT.md` schreibt die Steuerung.
 
 ## 10. Typische Fehler
@@ -248,9 +248,9 @@ Nur in CI: der volle Liferay-6.2.5-Job; im PR vermerken.
 | --- | --- |
 | Zweites Anlegen bricht mit „current transaction is aborted“ ab | `INSERT … ON CONFLICT DO NOTHING` statt `addWeeklyReport` und Ausnahme abfangen; PostgreSQL bricht die Transaktion nach dem Fehler ab (G3-13) |
 | Doppelte Berichte bei gleichzeitigem Aufruf | eindeutiger Index im Skript, nicht nur Prüfung im Code (G3-12) |
-| Bericht ohne Tage sichtbar | Bericht und Tage in derselben Service-Transaktion anlegen; Methode heißt nicht `get…` (Profil 7) |
+| Bericht ohne Tage sichtbar | Bericht und Tage in derselben Service-Transaktion anlegen; Methode heißt nicht `get…` (Profil 6.2.5, Abschnitt 7) |
 | Anlegen speichert nichts | Methodenname mit `get`, `is`, `has` läuft nur lesend |
-| Übersicht zeigt alte Berichte nach dem Anlegen | Entity- und Finder-Cache nach dem Custom SQL leeren (Profil 7) |
+| Übersicht zeigt alte Berichte nach dem Anlegen | Entity- und Finder-Cache nach dem Custom SQL leeren (Profil 6.2.5, Abschnitt 7) |
 | „Feiertag (vorbelegt)“ ändert sich nach Bundeslandwechsel | den gespeicherten Merker `holidayPreset` lesen, nicht Feiertage neu berechnen (G3-15) |
 | KW 53 in der Datenhaltung akzeptiert | CHECK mit der genauen Regel (28. Dezember), nicht nur 1 bis 53 (G3-14) |
 | Woche ganz außerhalb wird gezählt oder gespeichert | `classifyWeek()` rechnet aus dem aktuellen Zeitraum, gespeichert wird dazu nichts (G3-8) |
@@ -264,15 +264,15 @@ Nur in CI: der volle Liferay-6.2.5-Job; im PR vermerken.
 - [ ] Anlegen über Custom SQL mit `INSERT … ON CONFLICT DO NOTHING` (PostgreSQL ab 9.5) statt über die Persistenz von
       Service Builder: Gegenstück zu `createMany` mit `skipDuplicates`; nur so bricht das gleichzeitige Anlegen die
       Transaktion nicht ab. Alternative: Zeilensperre auf `BH_Person` des Azubis; sie widerspräche der Aussage in
-      gemeinsam 2.4, dass das Anlegen nicht sperrt.
+      gemeinsames Profil, Abschnitt 2.4, dass das Anlegen nicht sperrt.
 - [ ] Testaktionen `berichte_anlegen` und `bundesland_einstellen` der Testschnittstelle (nur bei `bh.betrieb=test`), kein
       neutraler Fall, keine Änderung an `specs/pruefung/format.md`. Gibt es `bundesland_einstellen` schon aus P02, entfällt
       die zweite.
 - [ ] Täglicher Lauf `0 0 3 * * ?` (3:00 Uhr GMT = 4:00 oder 5:00 Uhr Berlin), weil die Fachlogik die Woche aus der Uhr nach
       Europe/Berlin bestimmt und der Lauf idempotent ist; M03 Abschnitt 8 verlangt „nach Berliner Zeit“.
 - [ ] `hasStatusChange()` als Platzhalter („nein“) bis P05; `ReportStatus` und `isOpenStatus()` legt P03 an, P05 baut darauf auf.
-- [ ] Namen der CHECK-Constraints für `status`, `dayType` und das Format von `dayDate`: gemeinsam 2.1 und 2.3 nennen
+- [ ] Namen der CHECK-Constraints für `status`, `dayType` und das Format von `dayDate`: gemeinsames Profil, Abschnitte 2.1 und 2.3 nennen
       keine Namen; sie müssen auf 6.2.5 und 7.2 gleich sein (Abgleich mit der Reihe 7.2).
-- [ ] `remote-service="false"` für alle Entities der App (Profil 2.1 sagt dazu nichts).
+- [ ] `remote-service="false"` für alle Entities der App (Profil 6.2.5, Abschnitt 2.1 sagt dazu nichts).
 - [ ] Das Playbook folgt dem Aufbau aus P05 der Reihe und „Aufbau der Reihe (gilt für P01 bis P10)“ aus
       `playbooks/liferay-72/P00-grundgeruest.md`; die P00 der Reihe 6.2.5 trägt diesen Abschnitt nicht.

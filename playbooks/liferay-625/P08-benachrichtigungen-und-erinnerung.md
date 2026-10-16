@@ -29,7 +29,7 @@ Fertig, wenn:
 5. die Prüffälle von M01 bis M07 weiterhin grün sind.
 
 Schemaänderung: ja. Neue Entities `Notification`, `TeamsDevMessage` und `ReminderRun` (`service.xml`), Teile im Skript
-„Schutz in der Datenhaltung“ (gemeinsam 2.3, 2.6): Fremdschlüssel, eindeutige Indizes, CHECK-Constraints und der partielle
+„Schutz in der Datenhaltung“ (gemeinsames Profil, Abschnitte 2.3 und 2.6): Fremdschlüssel, eindeutige Indizes, CHECK-Constraints und der partielle
 Index `notification_pending_idx`. Bis `1.0.0` wird die Demo-Datenbank neu angelegt (P02, „Bitte bestätigen“). Neue Schlüssel in
 `portal-ext.beispiel.properties` (Abschnitt „Bitte bestätigen“).
 
@@ -41,7 +41,7 @@ Index `notification_pending_idx`. Bis `1.0.0` wird die Demo-Datenbank neu angele
   (zuerst Schritte 3 bis 6: Ausgangskorb und Versand, neuartig; danach Erinnerung und Oberfläche nach dem Muster).
 - Profil 6.2.5: Abschnitte 3 („Transaktion“, „Sperre und bedingtes Update“, „Hintergrundjobs“, „Benachrichtigung in der App“,
   „E-Mail“, „Teams“), 3.1 (Glocke), 4.1, 4.2 (Testschnittstelle), 4.3 und 7 („Lesende Transaktionen“, „Zurückrollen“, „Cache nach
-  Custom SQL“, „Scheduler in GMT“, „Mail“). Gemeinsames Profil: 2.2, 2.3 (Tabellen), 2.4 (Cache), 2.5 (Glocke, `BH_ReminderRun`),
+  Custom SQL“, „Scheduler in GMT“, „Mail“). Gemeinsames Profil, Abschnitte 2.2, 2.3 (Tabellen), 2.4 (Cache), 2.5 (Glocke, `BH_ReminderRun`),
   2.6 und 3.2 (Teams-Adapter, E-Mail, Ausgangskorb und Zeitplan).
 
 ## 3. Eingaben
@@ -103,17 +103,17 @@ Tests aus Schritt 11 da.
 **Weg B.** Die Regeln sind als reine Funktionen in der Spec beschrieben; Versand und Zeitplan sind Plattformarbeit nach Profil.
 Auf 6.2.5 sitzen die Gefahren in der Transaktion: Eine `PortalException` rollt alles zurück, auch das Buchführen des Fehlversuchs
 und den Vermerk des Erinnerungslaufs; ein lesender Methodenname (`get…`) schreibt nichts; E-Mail geht synchron über
-`MailEngine.send`, weil `MailServiceUtil` Fehler verschluckt (Profil 3 „E-Mail“, 7 „Mail“); Quartz rechnet in GMT, die Fälligkeit
-entscheidet deshalb die Fachlogik (Profil 3 „Hintergrundjobs“). Die Schritte 4, 5 und 12 sind deshalb Pflicht. Weg A nur auf
+`MailEngine.send`, weil `MailServiceUtil` Fehler verschluckt (Profil 6.2.5, Abschnitte 3 „E-Mail“ und 7 „Mail“); Quartz rechnet in GMT, die Fälligkeit
+entscheidet deshalb die Fachlogik (Profil 6.2.5, Abschnitt 3 „Hintergrundjobs“). Die Schritte 4, 5 und 12 sind deshalb Pflicht. Weg A nur auf
 ausdrücklichen Auftrag.
 
 ## 7. Schritte
 
 Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, Playwright im Wurzelordner.
 
-1. **Branch** `claude/l62-p08-benachrichtigungen-und-erinnerung`; Spec (M08-R01 bis M08-R22), Profil 3 und 7 und Prüffälle lesen.
+1. **Branch** `claude/l62-p08-benachrichtigungen-und-erinnerung`; Spec (M08-R01 bis M08-R22), Profil 6.2.5, Abschnitte 3 und 7 und Prüffälle lesen.
    Prüfschritt: AK-Tabelle aus Abschnitt 5 im PR-Entwurf.
-2. **Schema und Skript** (gemeinsam 2.3, 2.6; Profil 3 „Schema-Schritte“). `service.xml`: Entity `Notification`
+2. **Schema und Skript** (gemeinsames Profil, Abschnitte 2.3 und 2.6; Profil 6.2.5, Abschnitt 3 „Schema-Schritte“). `service.xml`: Entity `Notification`
    (`notificationId`, `companyId`, `eventKey`, `recipientId`, `channel`, `weeklyReportId` optional, `subject`, `body`, `link`,
    `createdAt`, `sentAt`, `readAt`, `attempts`, `nextAttemptAt`, `lastError`, `failedAt`, `userNotificationEventId` optional),
    `TeamsDevMessage` (`notificationId` eindeutig, `recipientId`, `subject`, `body`, `link`, `createdAt`) und `ReminderRun`
@@ -141,7 +141,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    Uhr in `Europe/Berlin` mit `java.time`, Nachholen bis Dienstag 23:59 Uhr, gleiche Woche, danach nicht mehr; Sommer- und
    Winterzeit) und `RetryPolicy.retryDelaySeconds(n)` (30 s × 2^(n−1), höchstens 3.600 s; nach dem 8. Fehlversuch aufgeben, M08-R13).
    Der Ereignisschlüssel trägt die Art und für Erinnerungen die Woche des Stichtags: `status-change:<statusChangeId>`,
-   `reminder:<Jahr>-W<Woche>:<traineeId>`, `trainer-info:<Jahr>-W<Woche>:<traineeId>` (gemeinsam 2.3; ein Lauf mit anderer Woche
+   `reminder:<Jahr>-W<Woche>:<traineeId>`, `trainer-info:<Jahr>-W<Woche>:<traineeId>` (gemeinsames Profil, Abschnitt 2.3; ein Lauf mit anderer Woche
    erzeugt neue Nachrichten, derselbe nicht). `safeReturnPath()` (M08-R10) gibt es seit P02; P08 verdrahtet es im Adapter
    `ruecksprungZiel`. „Jetzt“ nur als Parameter aus der Uhr (P01). Prüfschritt: Unit-Tests in `test/unit/` mit Namen ab der
    AK-ID.
@@ -151,12 +151,12 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    (`REQUIRES_NEW`), und wird aus `WeeklyReportLocalServiceImpl` intern aufgerufen, nicht als öffentlicher Service. Es legt je
    Entwurf aus `plan()` eine Zeile an, über Custom SQL in `NotificationFinderImpl` (`insertNotification`: `INSERT … ON CONFLICT
    (eventKey, recipientId, channel) DO NOTHING`, Schlüssel aus `CounterLocalServiceUtil`): ein zweites Anlegen desselben Ereignisses
-   erzeugt keine Dublette und bricht die Transaktion nicht ab (PostgreSQL bricht sie nach einem Schlüsselfehler ab, Profil 7
+   erzeugt keine Dublette und bricht die Transaktion nicht ab (PostgreSQL bricht sie nach einem Schlüsselfehler ab, Profil 6.2.5, Abschnitt 7
    „Zurückrollen“). App-Nachrichten bekommen `sentAt = createdAt` (M08-R12), E-Mail und Teams `nextAttemptAt = createdAt` und
    `attempts = 0`. Die Kanäle gelten wie beim Ereignis eingestellt (M08-R07). Ein gescheiterter Statuswechsel legt nichts an: Die
    Ablehnung rollt als `PortalException` zurück, und die Nachrichten sind mit zurückgerollt. Nach dem Custom SQL den Entity- und
-   Finder-Cache von `Notification` leeren (Profil 7). Prüfschritt: Test in Schritt 11.
-5. **Kanäle und Versand** (M08-R11 bis M08-R15, Abschnitt 8 der Spec; gemeinsam 3.2). Kanäle als Schnittstelle
+   Finder-Cache von `Notification` leeren (Profil 6.2.5, Abschnitt 7). Prüfschritt: Test in Schritt 11.
+5. **Kanäle und Versand** (M08-R11 bis M08-R15, Abschnitt 8 der Spec; gemeinsames Profil, Abschnitt 3.2). Kanäle als Schnittstelle
    `DeliveryChannel` mit den Umsetzungen `EmailChannel` (synchron über `MailEngine.send`, Absender und SMTP aus
    `portal-ext.properties`, Mailpit Port 1025, feste `Message-ID` aus der Kennung der Benachrichtigung, damit eine Wiederholung
    erkennbar ist), `TeamsDevChannel` (schreibt in `BH_TeamsDevMessage`, höchstens eine Zeile je Benachrichtigung über den
@@ -164,14 +164,14 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    (kein Versand). Der Versand ist **ein Lauf aus vielen kleinen Transaktionen**: `deliverNextNotification(now, channels)`
    (Name ohne `get…`) sperrt in **einer** Service-Transaktion die nächste fällige Zeile mit Custom SQL `SELECT … WHERE sentAt
    IS NULL AND failedAt IS NULL AND nextAttemptAt <= ? AND channel IN ('EMAIL','TEAMS') ORDER BY nextAttemptAt, notificationId
-   LIMIT 1 FOR UPDATE SKIP LOCKED` (Profil 3, „In P00 zu bestätigen“ 10), übergibt sie dem Kanal und schreibt das Ergebnis; der
+   LIMIT 1 FOR UPDATE SKIP LOCKED` (Profil 6.2.5, Abschnitt 3, „In P00 zu bestätigen“ 10), übergibt sie dem Kanal und schreibt das Ergebnis; der
    Dispatcher ruft die Methode, bis sie `NONE` meldet. Zwei gleichzeitige Läufe bekommen so nie dieselbe Zeile. **Genau einmal**
    hängt an zwei Stellen: dem eindeutigen Schlüssel beim Anlegen (Schritt 4) und `SKIP LOCKED` beim Versand; wer nur eine baut,
    verliert AK-1004. **Zurückrollen:** Der Fehlschlag eines Kanals, das Aufgeben und der deaktivierte Empfänger sind
    **Ergebnisse** (`DELIVERED`, `RETRY`, `GAVE_UP`, `NONE`), keine Ausnahmen: Die Transaktion endet normal, und die Buchführung
    (`attempts + 1`, `lastError`, `nextAttemptAt` nach `retryDelaySeconds(attempts)`, bei acht Fehlversuchen `failedAt`) bleibt
    erhalten. Würde die Methode für einen Fehlversuch eine `PortalException` werfen, rollte Liferay die Buchführung mit zurück, die
-   Nachricht bliebe auf `attempts = 0` und würde in jedem Lauf sofort wiederholt (Profil 7 „Zurückrollen“). Ein Empfänger, der
+   Nachricht bliebe auf `attempts = 0` und würde in jedem Lauf sofort wiederholt (Profil 6.2.5, Abschnitt 7 „Zurückrollen“). Ein Empfänger, der
    beim Versand deaktiviert ist, wird ohne Versuch aufgegeben (M08-R14, `failedAt`, Fehlertext `RECIPIENT_INACTIVE`). Erst nach
    erfolgreicher Übergabe wird `sentAt` gesetzt; bricht die Plattform dazwischen ab, wird erneut übergeben und der Kanal erkennt die
    Wiederholung an der `Message-ID`. Die Transaktion hält die Zeilensperre während der Übergabe; bei dieser Größe vertretbar
@@ -185,7 +185,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    werden mit dem tatsächlichen Zeitpunkt angelegt (geplant wird mit dem Stichtag), (4) `createdCount` im Vermerk setzen. Der
    Vermerk und die Nachrichten stehen so in derselben Transaktion: Scheitert etwas, rollt alles zurück (auch der Vermerk), und der
    nächste Takt versucht es noch einmal; zwei gleichzeitige Läufe: genau einer gelingt. Ergebnis `{ lauf: "ausgefuehrt", angelegt: n }`,
-   `nicht_faellig` oder `schon_erledigt`. **Scheduler** (Profil 3 „Hintergrundjobs“, „Scheduler in GMT“): `scheduler-entry` in
+   `nicht_faellig` oder `schon_erledigt`. **Scheduler** (Profil 6.2.5, Abschnitt 3 „Hintergrundjobs“, „Scheduler in GMT“): `scheduler-entry` in
    `liferay-portlet.xml` mit Speicherart `MEMORY_CLUSTERED`, zwei `MessageListener` im Takt von 15 Minuten (`0 0/15 * * * ?`):
    `de.berichtsheft.scheduler.AusgangskorbMessageListener` (Versandlauf) und `de.berichtsheft.scheduler.ErinnerungMessageListener`
    (`runDueReminders` mit der Uhr). Kein Cron-Ausdruck für „9:00 Uhr“: Quartz rechnet in GMT, die Fälligkeit entscheidet die
@@ -193,7 +193,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    Listener nichts** (sie melden es im Log): Läufe geschehen dort nur über die Testschnittstelle, sonst änderte ein Takt den
    Bestand eines Daten-Falls zwischen zwei Schritten. Prüfschritt: Tomcat-Log zeigt beide Einträge beim Deployment;
    `AK1021_ZweiGleichzeitigeErinnerungslaeufeTest`.
-7. **Portlets** (Profil 3 „Oberfläche“, 3.1, 4.3). Dienste für die Anzeige, lesend (Präfix `get`): `getUnreadCount(viewer)`,
+7. **Portlets** (Profil 6.2.5, Abschnitte 3 „Oberfläche“, 3.1 und 4.3). Dienste für die Anzeige, lesend (Präfix `get`): `getUnreadCount(viewer)`,
    `getPreview(viewer, n)` (markiert nichts, M08-R16), `getUndeliverable(viewer)` und `getTeamsMailbox(viewer)`; schreibend:
    `openNotifications(viewer)` (liefert die eigenen App-Nachrichten, neueste zuerst, mit dem Merker „Neu“ für die bis dahin
    ungelesenen, und markiert alle als gelesen; ein Lesen mit Schreiben, deshalb ohne `get…`), `updateOwnChannels(actor, werte)`
@@ -206,9 +206,9 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    die Darstellung ergänzt P09), `NichtZustellbarPortlet` (Seite `nicht_zustellbar`, Zähler, „Erneut versuchen“; Azubis sehen die
    Seite nicht) und das Teams-Postfach der Demo (Azubis eigene, Ausbilder alle; nur wenn eingeschaltet). Jede `processAction` ruft den
    Service, und der Service prüft Rolle und Besitz selbst. Die Glocke im Theme baut P09 aus `getUnreadCount` und `getPreview`; P08
-   schreibt kein `UserNotificationEvent` (`userNotificationEventId` bleibt leer, Wahl in P09 und U00, Profil 3.1). Gestaltung folgt
+   schreibt kein `UserNotificationEvent` (`userNotificationEventId` bleibt leer, Wahl in P09 und U00, Profil 6.2.5, Abschnitt 3.1). Gestaltung folgt
    in P09. Prüfschritt: Browser-Test aus Schritt 11.
-8. **Adapter und Testschnittstelle** (Profil 4.2). Fachlogik (`FachlogikAdapter`): `kanaeleWaehlen`, `voreinstellungKanaele`,
+8. **Adapter und Testschnittstelle** (Profil 6.2.5, Abschnitt 4.2). Fachlogik (`FachlogikAdapter`): `kanaeleWaehlen`, `voreinstellungKanaele`,
    `benachrichtigungenPlanen`, `erinnerungenPlanen` (Uhr = Stichtag), `erinnerungFaellig`, `wartezeitNachFehlversuch`,
    `ruecksprungZiel`, dazu die M02-Schnittstelle `erinnerungenPlanen` für AK-205-01. Daten-Aktionen der Testschnittstelle:
    `kanaele_einstellen`, `kanaele_lesen`, `erinnerung_ausloesen`, `nachrichten_versenden`, `nachrichten_lesen`, `ungelesen_zaehlen`,
@@ -227,9 +227,9 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    bis auf das, was P04 zurückgestellt hat (AK-408-07, P06). Prüfschritt: kein roter Fall.
 10. **Konfiguration.** `liferay-625/config/portal-ext.beispiel.properties` um `bh.app.url` (Basis der Links in Nachrichten),
     die Absenderadresse der E-Mail und, falls nötig, `bh.teams.modus` ergänzen (nur Platzhalter); der Schlüssel `index.on.startup=false`
-    und die SMTP-Einstellungen aus P00 bleiben (Einstellungen im Control Panel überschreiben sie, Profil 7 „Mail“). Prüfschritt:
+    und die SMTP-Einstellungen aus P00 bleiben (Einstellungen im Control Panel überschreiben sie, Profil 6.2.5, Abschnitt 7 „Mail“). Prüfschritt:
     `grep` findet die neuen Schlüssel; keine Zugangsdaten im Repository.
-11. **Eigene Tests** (Namen beginnen mit der AK-ID, JUnit ohne Bindestrich, Profil 4.1):
+11. **Eigene Tests** (Namen beginnen mit der AK-ID, JUnit ohne Bindestrich, Profil 6.2.5, Abschnitt 4.1):
     - `AK1004_EindeutigJeEreignisEmpfaengerKanalTest` (`test/db/`): zweiter `INSERT` mit demselben Schlüssel scheitert mit `23505`;
       A legt in einer offenen Transaktion an, B führt `insertNotification` (aus `custom-sql/default.xml` gelesen) aus und wartet, ändert
       danach 0 Zeilen; Kanal App ohne `sentAt` scheitert am CHECK `notification_app_delivered`; negative Versuche am CHECK.
@@ -262,7 +262,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
       `kanal: "konfiguriert"`) trägt Anlass, Azubi, Woche und Link ohne Kommentartext, der Link führt nach der Anmeldung direkt zum
       Bericht (AK-1003, `auth.forward.by.last.path` aus P02).
     Prüfschritt: `ant test-db test-integration` und der Playwright-Lauf grün.
-12. **Gegenprobe** (Gemeinsame Regeln, „Gegenprobe“; Profil 7 „Zurückrollen“). Jeden Fehler einzeln einbauen, die genannten
+12. **Gegenprobe** (Gemeinsame Regeln, „Gegenprobe“; Profil 6.2.5, Abschnitt 7 „Zurückrollen“). Jeden Fehler einzeln einbauen, die genannten
     Befehle laufen lassen, Ergebnis im PR festhalten, Fehler zurücknehmen. Eine Gegenprobe zählt nur, wenn die benannten Fälle rot
     werden. Die Nummern tragen `G08`, weil `G8-n` in P05 die Gegenproben zu AK-508 meint:
 
@@ -303,6 +303,8 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
     | G08-33 (AK-1025) | die Erinnerung nennt nur die älteste Woche | AK-1025-01 und AK-1025-02 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1025` |
     | G08-34 (AK-205) | deaktivierte Azubis bekommen eine Erinnerung | AK-205-01 und AK-205-02 (daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-205-01`, `ant pruefung-daten -Dbh.pruefung.filter=AK-205-02` |
     | G08-35 (AK-1004) | die Listener prüfen `bh.betrieb` nicht und laufen auch im Testbetrieb | `AK1004_ListenerTutImTestbetriebNichtsTest` (offene Nachrichten werden übergeben) | `ant test-integration -Dtest.class=AK1004_ListenerTutImTestbetriebNichtsTest` |
+    | G08-36 (AK-1021) | `reminder_run_iso_week_range` im Skript ausgelassen (oder nur 1 bis 52) | `AK1021_ErinnerungslaufDatenhaltungTest` (KW 0 und KW 54 gelingen, KW 53 scheitert) | `ant test-db -Dtest.class=AK1021_ErinnerungslaufDatenhaltungTest` |
+    | G08-37 (AK-1021) | eindeutiger Index (`isoYear`, `isoWeek`) in `BH_ReminderRun` ausgelassen | `AK1021_ErinnerungslaufDatenhaltungTest` (zweiter Vermerk gelingt; `ON CONFLICT` ohne Index scheitert mit einem Fehler) | wie G08-36 |
 
     Prüfschritt: Tabelle mit dem tatsächlichen Ergebnis je Zeile im PR; nach dem Zurücknehmen alles grün. Wird ein benannter Fall
     nicht rot, ist die Prüfung ohne Wirkung: anhalten und der Steuerung melden.
@@ -334,7 +336,7 @@ Nur in CI: der volle Liferay-6.2.5-Job mit Mailpit als Dienst-Container; im PR v
 - Draft-PR mit der AK-Tabelle (AK-1001, AK-1002, AK-1003, AK-1004, AK-1011, AK-1012, AK-1013, AK-1014, AK-1015, AK-1021, AK-1022,
   AK-1023, AK-1024, AK-1025 mit Test und Prüffällen), den freigegebenen Fällen AK-205-01 und AK-205-02, dem vorbereiteten Szenario
   AK-1022-07, der Gegenprobe-Tabelle mit Ergebnis und „Bitte bestätigen“. `service.xml`, `sql/**`, `upgrade/**`, `custom-sql/**`,
-  `service/impl/**`, `portal-ext.beispiel.properties` und `pruefung/**` sind sicherheitsrelevant (gemeinsam 5); Chris gibt frei.
+  `service/impl/**`, `portal-ext.beispiel.properties` und `pruefung/**` sind sicherheitsrelevant (gemeinsames Profil, Abschnitt 5); Chris gibt frei.
 - Bericht an die Steuerung; `FORTSCHRITT.md` schreibt die Steuerung.
 
 ## 10. Typische Fehler
@@ -347,22 +349,22 @@ Nur in CI: der volle Liferay-6.2.5-Job mit Mailpit als Dienst-Container; im PR v
 | Nachricht entsteht, obwohl der Statuswechsel scheiterte | Anlegen in der Transaktion des Wechsels, kein `REQUIRES_NEW` (G08-15) |
 | Zweites Anlegen bricht mit „current transaction is aborted“ ab | `INSERT … ON CONFLICT DO NOTHING`, keinen Schlüsselfehler provozieren (G08-10) |
 | Zwei Versandläufe übergeben dieselbe Nachricht | `FOR UPDATE SKIP LOCKED` und je Zeile eine Transaktion (G08-12); eindeutiger Schlüssel allein genügt nicht |
-| Fehler der E-Mail kommen nie an | `MailEngine.send` synchron, nicht `MailServiceUtil` (Profil 3, 7) |
-| Mails erscheinen nicht in Mailpit oder dem Mock | Einstellungen im Control Panel überschreiben `portal-ext.properties` (Profil 7); Port prüfen |
+| Fehler der E-Mail kommen nie an | `MailEngine.send` synchron, nicht `MailServiceUtil` (Profil 6.2.5, Abschnitt 3, 7) |
+| Mails erscheinen nicht in Mailpit oder dem Mock | Einstellungen im Control Panel überschreiben `portal-ext.properties` (Profil 6.2.5, Abschnitt 7); Port prüfen |
 | Erinnerung kommt um 10:00 oder 11:00 Uhr | die Fachlogik rechnet in GMT; Stichtag in `Europe/Berlin` bestimmen, nicht per Cron (G08-23) |
 | Der Takt ändert den Bestand eines Daten-Falls | Listener sind bei `bh.betrieb=test` ohne Wirkung; Läufe nur über die Testschnittstelle (Schritt 6) |
-| Zeiten der Wartezeit stimmen nicht | Datenbankverbindung nicht in UTC oder JVM nicht in GMT (gemeinsam 2.2) |
+| Zeiten der Wartezeit stimmen nicht | Datenbankverbindung nicht in UTC oder JVM nicht in GMT (gemeinsames Profil, Abschnitt 2.2) |
 | Der Zähler der Glocke sinkt beim Anzeigen der Vorschau | `getPreview` markiert nichts; nur `openNotifications` markiert (G08-21) |
 | Kommentartext steht in der Nachricht | `plan()` bekommt Kommentare gar nicht (Schritt 3) |
 | Rücksprung führt auf eine fremde Adresse | `safeReturnPath` anwenden, nicht den rohen Parameter (G08-6) |
-| Methode `getX` schreibt nichts | Methodenname mit `get`, `is`, `has` läuft nur lesend; `openNotifications` und `runDueReminders` heißen deshalb nicht so (Profil 7) |
+| Methode `getX` schreibt nichts | Methodenname mit `get`, `is`, `has` läuft nur lesend; `openNotifications` und `runDueReminders` heißen deshalb nicht so (Profil 6.2.5, Abschnitt 7) |
 | Nachricht an einen Empfänger, der inzwischen deaktiviert ist | beim Versand erneut prüfen und ohne Versuch aufgeben (G08-14) |
 | Teams-Nachricht doppelt im Postfach | eindeutiger Schlüssel `notificationId` und `ON CONFLICT DO NOTHING` |
 
 ## Bitte bestätigen
 
 - [ ] Neue Schlüssel in `portal-ext.beispiel.properties`: `bh.app.url` (Basis der Links in Nachrichten; im Scheduler gibt es keine
-      Anfrage, aus der sich die Adresse ergäbe) und die Absenderadresse der E-Mail; Profil 5.1 Schritt 4 nennt beide nicht.
+      Anfrage, aus der sich die Adresse ergäbe) und die Absenderadresse der E-Mail; Profil 6.2.5, Abschnitt 5.1 Schritt 4 nennt beide nicht.
 - [ ] Test-Kanal als Argument des Versandlaufs (nicht als Konfiguration) und Listener bei `bh.betrieb=test` ohne Wirkung; die Testaktion
       `nachrichten_versenden` bekommt außerhalb des neutralen Formats den Wert `kanal: "konfiguriert"` (echter Versand an den Mock bzw.
       Mailpit für den Playwright-Test).
@@ -370,14 +372,13 @@ Nur in CI: der volle Liferay-6.2.5-Job mit Mailpit als Dienst-Container; im PR v
       die Störungen `nach_nachrichten` (eine Prüfstelle im Statuswechsel) und `nach_vermerk` (im Erinnerungslauf), beide in Produktion
       ohne Wirkung, sowie die Aktionen `vorschau_lesen` und `listener_ausloesen`. Sie berühren `service/impl/**` bzw. `pruefung/**`
       (sicherheitsrelevant).
-- [ ] Versand und Erinnerung im Takt von 15 Minuten (Profil 3 und „Bitte bestätigen“ dort); die Wartezeiten von 30 Sekunden bis 1 Stunde
+- [ ] Versand und Erinnerung im Takt von 15 Minuten (Profil 6.2.5, Abschnitt 3 und „Bitte bestätigen“ dort); die Wartezeiten von 30 Sekunden bis 1 Stunde
       sind damit nur so fein wie der Takt. Die Daten-Fälle prüfen die Wartezeit über die gestellte Uhr und die Testaktion.
 - [ ] Die Transaktion des Versands hält die Zeilensperre während der Übergabe an den Kanal (kein Zwischenzustand „in Arbeit“); Alternative:
       Sperre in einer Transaktion, Übergabe außerhalb, Markieren in einer zweiten. Gewählt ist die erste, weil Abschnitt 8 der Spec die
       Wiederholung nach Abbruch zulässt.
-- [ ] Seite `entwickler-postfach` (Teams-Postfach der Demo, Azubis eigene, Ausbilder alle) steht nicht in der Adressliste von Profil
-      4.3; die Adresstabelle in P00 ist entsprechend zu ergänzen.
-- [ ] `userNotificationEventId` bleibt auf 6.2.5 leer (kein Abbild in der Glocke der Plattform, Profil 3.1); die Wahl gehört zu P09 und U00.
+- [ ] Seite `entwickler-postfach` (Teams-Postfach der Demo, Azubis eigene, Ausbilder alle) steht nicht in der Adressliste von Profil 6.2.5, Abschnitt 4.3; die Adresstabelle in P00 ist entsprechend zu ergänzen.
+- [ ] `userNotificationEventId` bleibt auf 6.2.5 leer (kein Abbild in der Glocke der Plattform, Profil 6.2.5, Abschnitt 3.1); die Wahl gehört zu P09 und U00.
 - [ ] Nummerierung der Gegenproben `G08-n`, weil `G8-n` in P05 die Gegenproben zu AK-508 meint (Zählweise: Szenario getrennt
       ausgewiesen, AK-1022-07 ist Szenario (P10); in P05 ist das Szenario bisher mitgezählt).
 - [ ] Das Playbook folgt dem Aufbau aus P05 der Reihe und „Aufbau der Reihe (gilt für P01 bis P10)“ aus

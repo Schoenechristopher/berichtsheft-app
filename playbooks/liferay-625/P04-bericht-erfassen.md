@@ -32,7 +32,7 @@ fasst (Schritt 9). AK-404 (Feiertag vorbelegt) gehört zu M01; der Hinweis in de
 - P04 blockiert P05 (Einreichen speichert über denselben Baustein).
 - Profil 6.2.5: Abschnitte 3 (Transaktion, Sperre und bedingtes Update, Oberfläche), 4.2, 4.3 (Ablauf-Adapter, Merker) und 7
   („Lesende Transaktionen“, „Zurückrollen“, „Cache nach Custom SQL“, „Portal-Bausteine mit festen Farben“, JSP mit Jasper von
-  Tomcat 7). Gemeinsames Profil: 2.3 (`BH_ReportDay`), 2.4 (Sperre, Cache) und 2.6.
+  Tomcat 7). Gemeinsames Profil, Abschnitte 2.3 (`BH_ReportDay`), 2.4 (Sperre, Cache) und 2.6.
 
 ## 3. Eingaben
 
@@ -87,7 +87,7 @@ der Sperre des Berichts und der Warnung ohne einseitige Navigation. Weg A nur au
 
 Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, Playwright im Wurzelordner.
 
-1. **Branch** `claude/l62-p04-bericht-erfassen`; Spec (M04-R01 bis M04-R13), Profil 3 und 7 und Prüffälle lesen. Prüfschritt:
+1. **Branch** `claude/l62-p04-bericht-erfassen`; Spec (M04-R01 bis M04-R13), Profil 6.2.5, Abschnitte 3 und 7 und Prüffälle lesen. Prüfschritt:
    AK-Tabelle aus Abschnitt 5 im PR-Entwurf.
 2. **Regeln `de.berichtsheft.domain.days.ReportDays`** (Gegenstück zu `src/domain/report-days.ts`; M04-R02, M04-R04, M04-R06 bis
    M04-R11; AK-402, AK-405, AK-406, AK-407, AK-305; Java 8, kein Import aus `com.liferay.*`): `DayType` aus P03 mit genau
@@ -106,10 +106,10 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    Speichern es braucht, legt P04 es an, P05 ergänzt nur die Fälle zu AK-505 und AK-704 (siehe „Bitte bestätigen“). Prüfschritt:
    Unit-Test für die vier Status und die Rollen.
 4. **Speichern `saveDays`** in `WeeklyReportLocalServiceImpl` (M04-R06, M04-R12; AK-406, AK-204). Der Name beginnt nicht mit `get`,
-   `is`, `has` (Profil 7 „Lesende Transaktionen“). Ablauf in **einer** Transaktion:
+   `is`, `has` (Profil 6.2.5, Abschnitt 7 „Lesende Transaktionen“). Ablauf in **einer** Transaktion:
    1. `lockForUpdate` (Custom SQL `SELECT … FROM BH_WeeklyReport WHERE weeklyReportId = ? FOR UPDATE` in
-      `WeeklyReportFinderImpl`, Profil 3 „Sperre und bedingtes Update“): Erst danach werden Status und Person geprüft, damit ein
-      gleichzeitiger Statuswechsel aus P05 das Speichern nicht übergeht und umgekehrt (gemeinsam 2.4). P05 verwendet dieselbe
+      `WeeklyReportFinderImpl`, Profil 6.2.5, Abschnitt 3 „Sperre und bedingtes Update“): Erst danach werden Status und Person geprüft, damit ein
+      gleichzeitiger Statuswechsel aus P05 das Speichern nicht übergeht und umgekehrt (gemeinsames Profil, Abschnitt 2.4). P05 verwendet dieselbe
       Methode und ergänzt `updateStatusConditional`.
    2. Handelnde Person aus `BH_Person` (nicht aus Liferay-Rollen), `canViewReport()` und `canEditReport()` auf dem gesperrten
       Stand; sonst `zugriff_verweigert` (fremder Bericht, falsche Rolle, deaktivierte Person) bzw. `nicht_bearbeitbar` (Status
@@ -119,14 +119,14 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
       zurück und hinterlässt nichts, das ist hier gewollt (alles oder nichts, M04-R11). Eine fachliche Ablehnung **nach** dem
       Schreiben, bei der das Geschriebene bleiben soll, darf **nicht** werfen, weil `PortalException` die ganze Transaktion
       zurückrollt, auch die Tage: Das ist `pflichtangaben_fehlen` beim Einreichen in P05, das als Ergebnis zurückkommt und die
-      Tage als Entwurf erhält (Profil 7 „Zurückrollen“). Deshalb liegt das Schreiben in einer eigenen Methode
+      Tage als Entwurf erhält (Profil 6.2.5, Abschnitt 7 „Zurückrollen“). Deshalb liegt das Schreiben in einer eigenen Methode
       `applyDayUpdates(report, updates)`, die `saveDays` und später `submitReport` (P05) aufrufen; sie prüft nichts mehr.
    4. Nur die geänderten Tage schreiben (`updatedAt` aus der Uhr, nie `new Date()`); `version` und Status ändert Speichern
-      nicht (gemeinsam 2.4). Nach dem Schreiben Entity- und Finder-Cache von `ReportDay` leeren, wenn über Custom SQL
-      geschrieben wurde (Profil 7). Rückgabe: Zahl der geänderten Tage.
+      nicht (gemeinsames Profil, Abschnitt 2.4). Nach dem Schreiben Entity- und Finder-Cache von `ReportDay` leeren, wenn über Custom SQL
+      geschrieben wurde (Profil 6.2.5, Abschnitt 7). Rückgabe: Zahl der geänderten Tage.
    Prüfschritt: `AK406_SpeichernPrueftRechteAufDemServerTest` und `AK402_UngueltigeEingabeSpeichertNichtsTest` (Schritt 9).
 5. **Berichtsseite und Editor.** `BerichtPortlet` (`MVCPortlet`) mit JSP unter `docroot/html/bericht/`; Adresse mit der
-   `weeklyReportId` über `friendly-url-routes.xml` (Profil 4.3, „Bitte bestätigen“ dort). `render` liest über `getReportForEdit`
+   `weeklyReportId` über `friendly-url-routes.xml` (Profil 6.2.5, Abschnitt 4.3, „Bitte bestätigen“ dort). `render` liest über `getReportForEdit`
    (`get…`, lesend; prüft `canViewReport()`; ein Bericht, den es nicht gibt oder den die Person nicht sehen darf, ergibt
    dieselbe Antwort wie `zugriff_verweigert`), `processAction` „speichern“ ruft `saveDays`. Je Tag genau zwei Eingaben: Tagesart
    (fünf Werte plus „keine Tagesart“, Beschriftung „Feiertag (vorbelegt)“ nach dem **gespeicherten** Merker `holidayPreset`,
@@ -143,7 +143,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    Unicode-Zeichen (`codePointAt`-Schleife oder Regex für Ersatzpaare, kein `length`); maßgeblich bleibt der Server. Gestaltung
    (UI-AK-07, UI-AK-08) folgt in P09. Prüfschritt: Anna speichert Montag mit Umlauten, Leerzeichen am Ende und einem
    Zeilenumbruch; die Seite zeigt den Text unverändert.
-6. **Warnung beim Verlassen** (M04-R13, AK-408). 6.2.5 hat keine einseitige Navigation (Profil 1): Jeder Link, jedes Formular,
+6. **Warnung beim Verlassen** (M04-R13, AK-408). 6.2.5 hat keine einseitige Navigation (Profil 6.2.5, Abschnitt 1): Jeder Link, jedes Formular,
    Neuladen, Zurück, Vor und Schließen lädt die Seite neu oder verlässt sie; die Warnung ist deshalb das `beforeunload`-Ereignis
    des Browsers (Dialog des Browsers, kein Text der App). Ein eigenes Skript im Portlet (ES5, ohne AlloyUI) prüft beim Verlassen,
    ob ein Feld von seinem Ausgangswert (`defaultValue`) abweicht, statt auf Eingabeereignisse zu bauen: Eingaben vor dem Laden
@@ -153,7 +153,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    gespeicherten Werten neu und warnt nicht mehr. Dieselben Merker wie in der TypeScript-App (Liste in
    `specs/code-landkarte.md`, Abschnitt M09): `data-ungespeichert`, `data-warnung-verlassen`, `data-ausstehend`,
    `data-speicherstand`. Prüfschritt: Browser-Test AK-408 in Chromium und bei 375 px.
-7. **Ablauf-Adapter** (Profil 4.3) unter `liferay-625/e2e/`: Aktionen `tag_erfassen` (Eingabe mit echten Tastenanschlägen,
+7. **Ablauf-Adapter** (Profil 6.2.5, Abschnitt 4.3) unter `liferay-625/e2e/`: Aktionen `tag_erfassen` (Eingabe mit echten Tastenanschlägen,
    `keyboard.type`, nicht `fill`: Chromium zeigt den `beforeunload`-Dialog nur nach einer Nutzerinteraktion), `speichern`,
    `seite_verlassen` mit allen Wegen (`link`, `neu_laden`, `zurueck`, `vor`, `schliessen`) und `dialog` (`abbrechen`,
    `bestaetigen`); der Adapter hört auf `page.on("dialog")`, nimmt den Code der Warnung aus `data-warnung-verlassen` und
@@ -165,15 +165,15 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
    Kennung als Text, nie als Zahl). Die Testgrenze für AK-408-03 in Firefox (Q-R06) gilt unverändert. **Fachlogik-Adapter**
    (`FachlogikAdapter`): `tagesarten`, `tageSpeichern`, `berichtstageAnlegen` (aus P03). **Daten-Aktion** `tage_speichern`
    (`als`, `azubi`, `woche`, `tage` mit `alle` und `Mo` bis `Fr`) in der Testschnittstelle, ruft **denselben Service** wie das
-   Portlet (`saveDays`); Fehler als `{ "fehler": "<code>" }` aus dem `Fehlercode`, nie aus dem Meldungstext; den Ausgangsbestand
+   Portlet (`saveDays`); Fehler als `{ "fehler": "<code>" }` aus dem `Fehlercode`, nie aus dem Meldungstext; Personen stehen an der Grenze zum Prüf-Adapter als Schlüssel (`anna`); Kennungen wie die Konto-ID (`userId`) und die `weeklyReportId` gehen immer als Text (String), nie als JSON-Zahl (Profil 6.2.5, Abschnitt 4.2). Den Ausgangsbestand
    `tage` stellt sie für alle Module her. Prüfschritt: `ant pruefung-fachlogik -Dbh.pruefung.filter=M04.json` (19 Fälle) und
    `-Dbh.pruefung.filter=AK-305-09` grün; Playwright mit `-g "M04.json"` in Chromium und bei 375 px.
 8. **Bau-Stand.** M04 in `BauStand.java` eintragen, AK-305-09 freigeben, AK-408-07 als zurückgestellt (bis P06) eintragen.
    Prüfschritt: kein roter Fall, AK-408-07 „noch nicht gebaut“.
-9. **Eigene Tests** (Namen beginnen mit der AK-ID, JUnit ohne Bindestrich, Profil 4.1):
+9. **Eigene Tests** (Namen beginnen mit der AK-ID, JUnit ohne Bindestrich, Profil 6.2.5, Abschnitt 4.1):
    - `AK407_TextspalteFuenftausendZeichenTest` (`test/db/`): Ein `INSERT` in `BH_ReportDay` mit 5.000 Zeichen einschließlich eines
      Emojis und `\n` liest dieselben Zeichen zurück (die Spalte ist `TEXT`, die Verbindung UTF-8; Service Builder legt Texte über
-     4.000 Zeichen so an, gemeinsam 2.1).
+     4.000 Zeichen so an, gemeinsames Profil, Abschnitt 2.1).
    - `AK406_SpeichernPrueftRechteAufDemServerTest` (`test/integration/`): über `tage_speichern` der Testschnittstelle:
      Anna speichert ihren Entwurf (gelingt); Clara speichert Annas Bericht, Bernd (Ausbilder) ebenso und die deaktivierte Anna
      ihren eigenen: jeweils `zugriff_verweigert` (die Oberfläche ist dabei nie beteiligt, M04-R12).
@@ -191,7 +191,7 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
      die nennt, um wie viele Zeichen zu kürzen ist (AK-407).
    - Unit-Tests der Regeln (Schritt 2) und `canEditReport()` (Schritt 3).
    Prüfschritt: `ant test-unit test-db test-integration` und der Playwright-Lauf grün.
-10. **Gegenprobe** (Gemeinsame Regeln, „Gegenprobe“; Profil 7 „Zurückrollen“). Jeden Fehler einzeln einbauen, die genannten
+10. **Gegenprobe** (Gemeinsame Regeln, „Gegenprobe“; Profil 6.2.5, Abschnitt 7 „Zurückrollen“). Jeden Fehler einzeln einbauen, die genannten
     Befehle laufen lassen, Ergebnis im PR festhalten, Fehler zurücknehmen. Eine Gegenprobe zählt nur, wenn die benannten
     Fälle rot werden:
 
@@ -245,7 +245,7 @@ Nur in CI: der volle Liferay-6.2.5-Job; Firefox und Edge (AK-408-03 in Firefox i
   aus Abschnitt 8 lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-401, AK-402, AK-403, AK-405, AK-406, AK-407, AK-408 mit Test und Prüffällen), den
   zurückgestellten Fällen (AK-408-07 bis P06), der Gegenprobe-Tabelle mit Ergebnis und „Bitte bestätigen“. `custom-sql/**` und
-  `service/impl/**` sind sicherheitsrelevant (gemeinsam 5); Chris gibt frei.
+  `service/impl/**` sind sicherheitsrelevant (gemeinsames Profil, Abschnitt 5); Chris gibt frei.
 - Bericht an die Steuerung; `FORTSCHRITT.md` schreibt die Steuerung.
 
 ## 10. Typische Fehler
@@ -260,7 +260,7 @@ Nur in CI: der volle Liferay-6.2.5-Job; Firefox und Edge (AK-408-03 in Firefox i
 | Ungültige Eingabe speichert trotzdem einen Teil | Ablehnung vor dem Schreiben als `PortalException`, nie als Rückgabewert nach dem Schreiben (G4-12) |
 | Einreichen verliert die Tage, wenn Pflichtangaben fehlen | nicht werfen: `pflichtangaben_fehlen` ist ein Ergebnis (P05); `applyDayUpdates` ist der gemeinsame Baustein |
 | Speichern überfährt ein gleichzeitiges Einreichen | `lockForUpdate` zuerst, Status danach prüfen (G4-14) |
-| Speichern speichert nichts | Methodenname mit `get`, `is`, `has` läuft nur lesend (Profil 7) |
+| Speichern speichert nichts | Methodenname mit `get`, `is`, `has` läuft nur lesend (Profil 6.2.5, Abschnitt 7) |
 | Die Warnung erscheint nicht, obwohl Änderungen vorliegen | Chromium zeigt `beforeunload` nur nach Nutzerinteraktion; im Adapter mit `keyboard.type` eingeben, nicht mit `fill` |
 | Die Warnung erscheint nach dem Speichern | Ausgangswerte (`defaultValue`) aus dem gespeicherten Stand neu rendern; Weiterleitung nach dem Speichern (G4-17) |
 | Hinweis „Feiertag (vorbelegt)“ stimmt nach Bundeslandwechsel nicht | `holidayPreset` aus der Datenhaltung lesen (G4-19) |
@@ -278,7 +278,7 @@ Nur in CI: der volle Liferay-6.2.5-Job; Firefox und Edge (AK-408-03 in Firefox i
 - [ ] Formularfelder über `actionRequest.getParameter` statt `ParamUtil`; ob `ParamUtil.getString` Werte kürzt, ist in Schritt 5
       zu bestätigen (das Profil sagt dazu nichts).
 - [ ] Testaktion `bericht_adresse` (Kennung als Text) der Testschnittstelle, damit der Ablauf-Adapter `azubi` und `woche` in die
-      Adresse der Seite übersetzt; die Adressform über `friendly-url-routes.xml` legt P00 fest (Profil 4.3).
+      Adresse der Seite übersetzt; die Adressform über `friendly-url-routes.xml` legt P00 fest (Profil 6.2.5, Abschnitt 4.3).
 - [ ] Warnung beim Verlassen als `beforeunload`-Dialog des Browsers für alle Wege (Links, Formulare, Neuladen, Zurück, Vor,
       Schließen); die TypeScript-App fängt Links mit einer Rückfrage der App ab. Der Merker `data-warnung-verlassen` bleibt gleich.
 - [ ] Das Playbook folgt dem Aufbau aus P05 der Reihe und „Aufbau der Reihe (gilt für P01 bis P10)“ aus
