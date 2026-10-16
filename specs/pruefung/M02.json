@@ -2641,6 +2641,10 @@
           "anmeldewege": ["firmenkonto"]
         }
       ]
+    },
+    "abweichend": {
+      "liferay-625": "profile/liferay-625.md, Abschnitt 6.1",
+      "liferay-72": "profile/liferay-72.md, Abschnitt 6.1"
     }
   },
   {
@@ -2765,6 +2769,10 @@
           "anmeldewege": ["firmenkonto"]
         }
       ]
+    },
+    "abweichend": {
+      "liferay-625": "profile/liferay-625.md, Abschnitt 6.1",
+      "liferay-72": "profile/liferay-72.md, Abschnitt 6.1"
     }
   },
   {
