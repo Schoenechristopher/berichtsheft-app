@@ -13,7 +13,7 @@ const NOT_CASES = new Set(["testdaten.json"]);
 /** Ordner, deren Markdown-Dateien ohne Argument geprüft werden. */
 export const CHECKED_DIRS = ["playbooks", "profile"];
 
-export function loadContext(root: string): Context {
+export function loadContext(root: string, blindtest = false): Context {
   const specsDir = path.join(root, "specs");
   const moduleCriteria = new Map<string, string[]>();
   for (const name of readdirSync(specsDir)) {
@@ -30,7 +30,7 @@ export function loadContext(root: string): Context {
       cases.forEach((checkCase) => caseIds.add(checkCase.id));
     }
   }
-  return { moduleCriteria, caseIds, pathExists: (file) => existsSync(path.join(root, file)) };
+  return { moduleCriteria, caseIds, pathExists: (file) => existsSync(path.join(root, file)), blindtest };
 }
 
 /** Alle Markdown-Dateien unter `playbooks/` und `profile/` als Repository-Pfade mit `/`; fehlende Ordner sind leer. */
@@ -49,9 +49,9 @@ export function listDocuments(root: string): string[] {
   return files.sort();
 }
 
-/** Prüft die genannten Dateien als Aufträge oder, ohne Angabe, alle Dateien unter `playbooks/` und `profile/`. */
-export function checkFiles(root: string, files: string[] = []): Finding[] {
-  const context = loadContext(root);
+/** Prüft die genannten Dateien als Aufträge oder, ohne Angabe, alle Dateien unter `playbooks/` und `profile/`. `blindtest` siehe `Context`. */
+export function checkFiles(root: string, files: string[] = [], blindtest = false): Finding[] {
+  const context = loadContext(root, blindtest);
   const asOrder = files.length > 0;
   const targets = asOrder
     ? files.map((file) => path.relative(root, path.resolve(root, file)).split(path.sep).join("/"))

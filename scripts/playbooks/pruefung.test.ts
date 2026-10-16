@@ -217,6 +217,16 @@ describe("Pfade und Modellkennungen", () => {
     ]);
   });
 
+  it("KE-AK-01 Blindtest-Schalter nimmt src/, prisma/, e2e/ und tests/ aus, andere Pfade nicht", () => {
+    const markdown = "`src/a.ts` `prisma/schema.prisma` `e2e/x.spec.ts` `tests/y.ts` `specs/fehlt.md` `docs/fehlt.md`";
+    const without = reasons(checkDocument("playbooks/00-steuerung.md", markdown, context));
+    expect(without).toHaveLength(6);
+    const withSwitch = reasons(checkDocument("playbooks/00-steuerung.md", markdown, { ...context, blindtest: true }));
+    expect(withSwitch).toEqual(["fehlender-pfad specs/fehlt.md", "fehlender-pfad docs/fehlt.md"]);
+    expect(repositoryPath("src/a.ts", true)).toBeNull();
+    expect(repositoryPath("src/a.ts")).toBe("src/a.ts");
+  });
+
   it("repositoryPath erkennt nur einzelne Pfade mit bekanntem Anfang", () => {
     expect(repositoryPath("docs/ci-richtlinie.md#abschnitt")).toBe("docs/ci-richtlinie.md");
     expect(repositoryPath("npx tsx scripts/playbooks/pruefen.ts")).toBeNull();
@@ -237,6 +247,18 @@ describe("Pfade und Modellkennungen", () => {
       `modellkennung ${named}`,
       `modellkennung ${versioned}`,
       `modellkennung ${family}`,
+    ]);
+  });
+});
+
+describe("Kennungen nur mit Versionszahl", () => {
+  it("MW-AK-02 Kennung aus Präfix und einer Versionszahl wird gemeldet, Pfade mit Zahl nicht", () => {
+    const bare = ["claude", "7"].join("-");
+    const longer = ["claude", "12", "x"].join("-");
+    const text = `Kennung ${bare} und ${longer}; Pfade \`/tmp/claude-0/x\` und /tmp/claude-12/y sind erlaubt.`;
+    expect(reasons(checkDocument("profile/liferay-gemeinsam.md", text, context))).toEqual([
+      `modellkennung ${bare}`,
+      `modellkennung ${longer}`,
     ]);
   });
 });
