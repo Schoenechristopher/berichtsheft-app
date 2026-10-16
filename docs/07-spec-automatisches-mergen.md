@@ -167,6 +167,8 @@ Ablauf-Kriterien werden einmal an echten Test-PRs geprüft und im PR der Umsetzu
   - Er setzt nie selbst Labels und mergt nie selbst. Ein Merge mit dem `GITHUB_TOKEN` würde die Prüfung auf `main` nicht
     auslösen.
   - Bei `merge_group` meldet er Erfolg, weil die Warteschlange nur PRs aufnimmt, deren Pflicht-Checks schon grün waren.
+    Im `merge_group`-Lauf meldet „Merge-Kriterien“ immer Erfolg „Merge-Warteschlange“ ohne Kriterienliste; maßgeblich ist
+    der `pull_request`-Lauf auf dem aktuellen Head.
 - **AM-S03 Einstellungen** (setzt Chris):
   - Regelsatz für `main` mit dem Pflicht-Check „Prüfung abgeschlossen“. „Merge-Kriterien“ wird erst Pflicht-Check,
     wenn Chris den Schalter auf `aktiv: true` stellt: Im Schattenbetrieb ist der Check mit Antrag immer rot (AM-R12)
@@ -188,7 +190,9 @@ Ablauf-Kriterien werden einmal an echten Test-PRs geprüft und im PR der Umsetzu
 2. AM-S01 mit Unit-Tests zu AM-AK-01 bis AM-AK-10 und der Job aus AM-S02, eigener PR; `.github/automerge.yml` mit
    `aktiv: false`. Umgesetzt am 12.10.2026 in `scripts/merge-kriterien/` und `.github/workflows/merge-kriterien.yml`.
 3. Chris setzt die Einstellungen aus AM-S03.
-4. Schattenbetrieb (AM-R14) ab G1, Ablauf-Kriterien AM-AK-11 bis AM-AK-14 an Test-PRs prüfen.
+4. Schattenbetrieb (AM-R14) ab G1, Ablauf-Kriterien AM-AK-11 bis AM-AK-14 an Test-PRs prüfen. **Erledigt am
+   16.10.2026:** AM-AK-11 bis -14 an Test-PRs belegt, 19 Paket-PRs im Schattenbetrieb ohne Widerspruch (Ziel: 10;
+   Tabelle in `FORTSCHRITT.md`, Abschnitt A).
 5. Chris setzt `aktiv: true`. Spätestens vor L62.
 
 ## Offene Punkte
@@ -200,6 +204,7 @@ Ablauf-Kriterien werden einmal an echten Test-PRs geprüft und im PR der Umsetzu
       auch dort mit dem aktuellen `main` geprüft wird.
 - [x] Liferay-spezifische Teile von AM-R04 ergänzen (Plan Etappe A, Punkt E7): sicherheitsrelevante Dateien und Pfad
       der Upgrade-Schritte der Reihe U nach dem gemeinsamen Profil, Abschnitte 5 und 6, maschinell geprüft; die Liste
-      der freigegebenen externen Bibliotheken steht im gemeinsamen Profil, Abschnitt 7. Erledigt in G4-L (Branch
-      `claude/g4-l-vorlagen-und-am-r04`); die Muster bestätigt P00 der jeweiligen Plattform.
+      der freigegebenen externen Bibliotheken steht im gemeinsamen Profil, Abschnitt 7. Erledigt in G4-L (#61, Branch
+      `claude/g4-l-vorlagen-und-am-r04`); die Muster bestätigt P00 der jeweiligen Plattform. AM-S04 steht in
+      `playbooks/00-steuerung.md`. Punkt E7 aus dem Plan Etappe A damit geschlossen (16.10.2026).
 - [ ] AM-AK-01 bis AM-AK-14 in `npm run ak:abdeckung` aufnehmen, damit die Testabdeckung auch diese IDs zählt.
