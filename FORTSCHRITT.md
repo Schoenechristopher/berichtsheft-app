@@ -22,6 +22,10 @@ Diese Datei schreibt nur die Steuerungsinstanz, jeweils nach dem Merge eines Pak
 | G4 Profile und Playbooks | A: Vorlage Arbeitspaket, Playbook-Prüfung | abgenommen, gemergt | 15.10.2026 | #45, Merge `1d9be30` |
 | G4 Profile und Playbooks | C: `profile/liferay-gemeinsam.md` | abgenommen, gemergt | 15.10.2026 | #46, Merge `42774f8` |
 | G4 Profile und Playbooks | B: Leitfaden der Steuerung | abgenommen, gemergt | 15.10.2026 | #44, Merge `a4e0d8c` |
+| G4 Profile und Playbooks | D: Profil TypeScript/Next.js, Playbook-Reihe P00–P10 | abgenommen, gemergt | 16.10.2026 | #51, Merge `f481f63` |
+| G4 Profile und Playbooks | E: Profil Liferay 6.2.5 (S3-Teil) | abgenommen, gemergt | 16.10.2026 | #50, Merge `e6f72c4` |
+| G4 Profile und Playbooks | F: Profil Liferay 7.2 (S3-Teil) | abgenommen, gemergt | 16.10.2026 | #49, Merge `c82b608` |
+| A Automatisches Mergen | CI-Rückmeldung: Workflow `rueckmeldung.yml`, Regel CI-38 | abgenommen, gemergt | 16.10.2026 | #48, Merge `516888b` |
 | A Automatisches Mergen | Welle 1: A1 AM-AK in `ak:abdeckung` | abgenommen, gemergt | 13.10.2026 | #30, Merge `e5e0adc` |
 | A Automatisches Mergen | A3 Ablauf-Kriterien AM-AK-11 bis -14 an Test-PRs | nachgewiesen | 13.10.2026 | #32 (gemergt in `am-test/main`), #33, #34 (geschlossen) |
 | A Automatisches Mergen | Welle 2: A2 CI-37 (nach #28, I, J) | geplant | – | – |
@@ -521,6 +525,54 @@ Gemergt am 15.10.2026. Steuerung je Welle in einer frischen Sitzung.
 - Bekannte Grenze von `pruefen.ts`: Kennungen wie `claude-5` ohne Familiennamen werden nicht erkannt (Vorschlag
   `claude-\d+(?![\d/])`).
 
+### Welle 2 – Pakete D, E und F (parallel)
+
+Gemergt am 16.10.2026 (#51, #50, #49). Steuerung W2 in einer frischen Sitzung.
+
+**Freigaben aus „Bitte bestätigen“ (Chris, 15./16.10.2026):**
+
+- **G4-E und G4-F (#50, #49):** eigene Glocke im Theme; Jackson Databind 2.12.x als einzige JSON-Testbibliothek;
+  synchroner Mailversand; Paketwurzel `de.berichtsheft`; „bestätigte E-Mail“ = `isEmailAddressVerified`; Zeitplan alle
+  15 Minuten; `pflichtangaben_fehlen` als Ergebnis; Anmeldung abweichend nur bei AK-101-01 und AK-106-01 (der Eintrag in den
+  Prüffällen kommt per eigenem Paket); OIDC 7.2 nur optional; das Liferay-Konto wird bei Deaktivierung nicht mit
+  deaktiviert; Verwaltung und Fehlerseiten bleiben im Dunkelmodus hell; ein Plugin plus Theme; Java-Testnamen `AK505_…`;
+  Pfadmuster für AM-R04.
+- **G4-D (#51):** AK-505 bezeichnet den Schreibschutz, AK-803 die Historie; ungebaute Fälle sind `todo`; ein Werkzeugpaket
+  ist Voraussetzung für den Blindtest; `docs/03` wird je Playbook neu erzeugt; M01 und M02 laufen nacheinander; die
+  Zielstruktur folgt der Referenz.
+
+**Paket-Einträge (MW-R10, KE-R18; Kosten aus den Sitzungsdaten, US-Dollar):**
+
+| Feld | G4-D (#51) | G4-E (#50) | G4-F (#49) | CI-Rückmeldung (#48) |
+| --- | --- | --- | --- | --- |
+| Inhalt | Profil TypeScript/Next.js, Playbook-Reihe P00–P10 | Profil Liferay 6.2.5 (S3-Teil) | Profil Liferay 7.2 (S3-Teil) | Workflow `rueckmeldung.yml`, Regel CI-38 (von Chris am 15.10.2026 freigegeben) |
+| Stufe | S2 | S3 hoch | S3 hoch | S2 |
+| Kosten | 4,43 | 6,09 | 5,35 | 0,87 |
+| Harte Grenze | 13 | 16 | 16 | – |
+| Anläufe | 3 | 2 | 2 | – |
+| Diagnose-Budget gebraucht | nein | nein | nein | – |
+| Merge | `f481f63` | `e6f72c4` | `c82b608` | `516888b` |
+
+**Steuerung W2:** 15,16 (über der Grenze von 7). Doku-PR W1 (#47): 0,74.
+**Summe Pakete W2: 15,87** (D, E, F), dazu CI-Rückmeldung 0,87.
+
+**Fallen und Lehren aus Welle 2:**
+
+- **Steuerungskosten zu hoch:** Die S3-Reviews als Hilfsagenten kosten je 150 000–230 000 Token. Ab W3 gilt: Reviews auf
+  S2, nur auf den Diff, mit Checkliste; keine Zweit-Reviews für Hinweise; PR-Abos erst, wenn das Paket „fertig“ meldet.
+- **Fehler im Auftrag** (AK-505 statt AK-803) hat einen Anlauf gekostet. Specs vor dem Auftragschreiben prüfen.
+- „bereit“ plus Label erzeugt erwartetes Rot (abgebrochener Lauf, Merge-Kriterien); nicht weiter prüfen.
+- `pruefen.ts` ist im Blindtest-Zustand nicht nutzbar (503 Befunde „fehlender-pfad“); Werkzeugpaket in W3.
+- `effort_level` erscheint in `get_session` erst nach dem Umstellen durch Chris.
+- Beide Liferay-Reviews fanden dieselben Fehler: `PortalException` rollt beim Einreichen die Tage zurück; wirkungslose
+  Gegenprobe zu AK-508; AK-101-02/-03 fälschlich als abweichend markiert. Als Fallen in die W3-Aufträge übernehmen.
+
+**Übergabe an Welle 3:**
+
+- G4-G und G4-H: S3-Teile der Reihen 6.2.5 und 7.2. G4-I: Upgrade U00–U06 plus Prüffälle.
+- Dazu das Werkzeugpaket, der Nachtrag `liferay-gemeinsam.md` (Glocke, Mail, Paketwurzel, Testbibliothek, `**/upgrade/**`,
+  Pfadmuster, Korrektur der Ebenen in 2.4 und 2.6) und die abweichend-Markierung in `specs/pruefung`.
+
 ## A – Automatisches Mergen
 
 Plan „Etappe A“, freigegeben von Chris am 13.10.2026 mit E2 bis E7 wie vorgeschlagen; E1 offen. Grundlage:
@@ -570,6 +622,12 @@ Kriterien und Entscheidung von Chris weichen voneinander ab.
 | 5 | #45 | G4 W1, A | 4bc7fcc | nein | geschützter Pfad `playbooks/**` (AM-R04); „Bitte bestätigen“ nicht als `[x]` (AM-R05); Schalter aus (AM-R12) | Chris: gemergt | nein |
 | 6 | #46 | G4 W1, C | 8076603 | nein | geschützter Pfad `profile/**` (AM-R04); Schalter aus (AM-R12); Check „Merge-Kriterien“ im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
 | 7 | #44 | G4 W1, B | 0fa1801 | nein | geschützter Pfad `playbooks/**` (AM-R04); Schalter aus (AM-R12); Check „Merge-Kriterien“ im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
+| 8 | #51 | G4 W2, D | b8bd635 | nein | geschützter Pfad `playbooks/**` (AM-R04); Schalter aus (AM-R12); Check „Merge-Kriterien“ im Lauf der Warteschlange: Status failure, Zusammenfassung leer, AM-R05 daraus nicht ablesbar | Chris: gemergt | nein |
+| 9 | #50 | G4 W2, E | eeb7246 | nein | geschützter Pfad `profile/**` (AM-R04); Schalter aus (AM-R12); Check „Merge-Kriterien“ im Lauf der Warteschlange: Status failure, Zusammenfassung leer, AM-R05 daraus nicht ablesbar | Chris: gemergt | nein |
+| 10 | #49 | G4 W2, F | 243d7ce | nein | geschützter Pfad `profile/**` (AM-R04); Schalter aus (AM-R12); Check „Merge-Kriterien“ im Lauf der Warteschlange: Status failure, Zusammenfassung leer, AM-R05 daraus nicht ablesbar | Chris: gemergt | nein |
+
+**Zählung: 10 Paket-PRs im Schattenbetrieb, kein Widerspruch.** Das Ziel von A (10 Paket-PRs ohne Widerspruch) ist erreicht;
+der Schalter `aktiv: true` liegt bei Chris.
 
 ### Welle 1 – Paket A1
 
