@@ -25,6 +25,9 @@ Diese Datei schreibt nur die Steuerungsinstanz, jeweils nach dem Merge eines Pak
 | G4 Profile und Playbooks | D: Profil TypeScript/Next.js, Playbook-Reihe P00–P10 | abgenommen, gemergt | 16.10.2026 | #51, Merge `f481f63` |
 | G4 Profile und Playbooks | E: Profil Liferay 6.2.5 (S3-Teil) | abgenommen, gemergt | 16.10.2026 | #50, Merge `e6f72c4` |
 | G4 Profile und Playbooks | F: Profil Liferay 7.2 (S3-Teil) | abgenommen, gemergt | 16.10.2026 | #49, Merge `c82b608` |
+| G4 Profile und Playbooks | G: Playbooks Liferay 6.2.5 (`playbooks/liferay-625/` P00, P02, P05, P06, P09, P10) | abgenommen, gemergt | 16.10.2026 | #59, Merge `058c971` |
+| G4 Profile und Playbooks | H: Playbooks Liferay 7.2 (`playbooks/liferay-72/` P00, P02, P05, P06, P10) | abgenommen, gemergt | 16.10.2026 | #58, Merge `b79c004` |
+| G4 Profile und Playbooks | Doku: Fortschritt Welle 3, Stufe 3a | gemergt | 16.10.2026 | #57, Merge `4488629` |
 | A Automatisches Mergen | CI-Rückmeldung: Workflow `rueckmeldung.yml`, Regel CI-38 | abgenommen, gemergt | 16.10.2026 | #48, Merge `516888b` |
 | A Automatisches Mergen | Welle 1: A1 AM-AK in `ak:abdeckung` | abgenommen, gemergt | 13.10.2026 | #30, Merge `e5e0adc` |
 | A Automatisches Mergen | A3 Ablauf-Kriterien AM-AK-11 bis -14 an Test-PRs | nachgewiesen | 13.10.2026 | #32 (gemergt in `am-test/main`), #33, #34 (geschlossen) |
@@ -628,6 +631,52 @@ abgeschlossen wird.
 - Eigenes Paket für eine `coverage.ts`-Ausnahme auf Ebene `upgrade`.
 - Eigenes Paket für einen CI-Workflow der Klasse U, vor Etappe U.
 
+### Welle 3, Stufe 3b – Pakete G und H
+
+Gemergt am 16.10.2026 (#59, #58). Steuerung W3b in einer frischen Sitzung.
+
+| PR | Paket | Inhalt | Merge |
+| --- | --- | --- | --- |
+| #59 | G4-G | Playbook-Reihe Liferay 6.2.5 (`playbooks/liferay-625/` P00, P02, P05, P06, P09, P10) | `058c971` |
+| #58 | G4-H | Playbook-Reihe Liferay 7.2 (`playbooks/liferay-72/` P00, P02, P05, P06, P10) | `b79c004` |
+
+**Freigaben (Chris, 16.10.2026):**
+
+- Jackson 2.12.7.2 gilt auch für 6.2.5.
+- Firefox und Edge für Liferay kommen in W4 in die CI-Richtlinie.
+- Das Schutzskript wächst bis 1.0.0.
+- `BH_Setting` wird mit `FOR UPDATE` gesperrt (beide Reihen).
+
+**Neue Regel (Chris, 16.10.2026):** „Bitte bestätigen“-Punkte entscheidet ab jetzt die Gesamtsteuerung im Auftrag von
+Chris. Die Etappen-Steuerung trägt die Freigabe als `[x]` mit Vermerk in die PR-Beschreibung ein. Chris mergt weiter.
+
+**Paket-Einträge (MW-R10, KE-R18; Kosten aus den Sitzungsdaten, US-Dollar):**
+
+| Feld | G4-G (#59) | G4-H (#58) |
+| --- | --- | --- |
+| Stufe | S3 | S3 |
+| Kosten | 7,19 | 5,32 |
+| Harte Grenze | 18 | 17 |
+| Diagnose-Budget gebraucht | nein | nein |
+| Merge | `058c971` | `b79c004` |
+
+**Steuerung W3b:** 4,03 (unter der Grenze von 7). Doku-PR W3a (#57): 0,59.
+
+**Fallen aus Welle 3b:**
+
+- `pruefen.ts` meldet im frischen Worktree ohne `npx prisma generate` drei Fremdbefunde.
+- Der Kontext der Steuerung füllt sich vor allem durch die Texte der PR-Ereignisse.
+
+**Offene Punkte für W4 und später:**
+
+- Zählweise der P05-Tabellen.
+- Testschnittstelle `/o/bh-pruefung/zustand`.
+- Konto-ID als String.
+- Landkarte M02 gegenüber Profil 3.
+- `ak:abdeckung` für Java (Ant-Ziel `pruefbericht`).
+- SDK-Entpackort 6.2.5.
+- CI-Workflows L62/L72 und Klasse U als eigene Klasse-I-Aufträge.
+
 ## A – Automatisches Mergen
 
 Plan „Etappe A“, freigegeben von Chris am 13.10.2026 mit E2 bis E7 wie vorgeschlagen; E1 offen. Grundlage:
@@ -684,11 +733,13 @@ Kriterien und Entscheidung von Chris weichen voneinander ab.
 | 12 | #54 | G4 W3a, W | 954fade | nur „Schalter aus“ (Klasse L) | Schalter aus (AM-R12). Check im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
 | 13 | #55 | G4 W3a, N | 0ef33fb | nein | geschützter Pfad `profile/**` (AM-R04); „Bitte bestätigen“ als `[ ]` im PR-Text (AM-R05 möglich); Schalter aus (AM-R12). Check im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
 | 14 | #56 | G4 W3a, I | 33dae6b | nein | geschützte Pfade `specs/pruefung/**`, `playbooks/**` (AM-R04); „Bitte bestätigen“ als `[ ]` im PR-Text (AM-R05 möglich); Schalter aus (AM-R12). Check im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
+| 15 | #59 | G4 W3b, G | 254ea06 | nein | geschützter Pfad `playbooks/**` (AM-R04); „Bitte bestätigen“ offen (AM-R05); Schalter aus (AM-R12). Check „Merge-Kriterien“ im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
+| 16 | #58 | G4 W3b, H | 291f0f9 | nein | geschützter Pfad `playbooks/**` (AM-R04); „Bitte bestätigen“ offen (AM-R05); Schalter aus (AM-R12). Check „Merge-Kriterien“: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
 
 Die Zusammenfassung des Checks ist bei allen vier PRs leer (auch bei den Läufen mit Status success); die gelisteten Gründe
 sind deshalb die nach AM-R04, AM-R05 und AM-R12 erwarteten und nicht aus dem Check abgelesen.
 
-**Zählung: 14 Paket-PRs im Schattenbetrieb, kein Widerspruch.** Das Ziel von A (10 Paket-PRs ohne Widerspruch) ist erreicht;
+**Zählung: 16 Paket-PRs im Schattenbetrieb, kein Widerspruch.** Das Ziel von A (10 Paket-PRs ohne Widerspruch) ist erreicht;
 der Schalter `aktiv: true` liegt bei Chris.
 
 ### Welle 1 – Paket A1
