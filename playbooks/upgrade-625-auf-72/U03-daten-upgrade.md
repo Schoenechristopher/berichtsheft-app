@@ -95,13 +95,17 @@ Regeln in Bau-Reihenfolge:
 7. **Konten und Rollen nicht anfassen.** `User_` und `Role_` übernimmt das Upgrade-Werkzeug; `BH_Person.userId` zeigt
    weiter auf denselben Benutzer, die Rollen „BH Azubi“ und „BH Ausbilder“ bleiben. Prüfschritt: Abfrage
    `BH_Person` ⋈ `User_` über `userId` liefert für jede gebundene Person ihre E-Mail aus den Testdaten.
-8. **Glocke anlegen** (Vorschlag Variante B aus U00, sofern freigegeben). Begründung (U00, Schritt 8): Das Abbild
-   entsteht unmittelbar aus der Quelle `BH_Notification` (K1), der Gelesen-Status kommt aus `readAt` statt aus einem auf
-   6.2.5 nie angezeigten Abbild (K2, K4), und Einträge aus 6.2.5 müssten wegen Typ und Nutzdaten des 6.2-Plugins
-   ohnehin umgeschrieben werden (K3). Gilt die Freigabe für Variante A, entfällt das Anlegen; dann schreibt dieser
-   Schritt nur Typ und Nutzdaten der vorhandenen Einträge um und gleicht `archived` mit `readAt` ab. Für jede Zeile von
-   `BH_Notification` mit Kanal `APP`, deren Empfänger an einen Liferay-Benutzer gebunden ist:
-   - vorhandenen Eintrag aus `userNotificationEventId` entfernen (nur falls 6.2.5 doch Abbilder geschrieben hat);
+8. **Glocke: Abbild erzeugen** (Vorschlag Variante B aus U00, sofern freigegeben). Beide Plattformen haben eine eigene
+   Glocke aus `BH_Notification`; 6.2.5 schreibt kein Abbild in `UserNotificationEvent`, 7.2 legt es zu jeder
+   App-Nachricht an (`profile/liferay-72.md`, 3.5). Nach dem Upgrade fehlt es also für alle Nachrichten aus 6.2.5, und
+   U03 erzeugt es. Begründung (U00, Schritt 8): Abbild und Gelesen-Status entstehen unmittelbar aus der Quelle
+   (`readAt`, K1, K2); aus 6.2.5 gibt es nichts zu übernehmen, und ein Abbild nur für das Upgrade wäre Code auf 6.2.5,
+   den 6.2.5 nie anzeigt (K4, K6); Einträge des 6.2-Plugins müssten ohnehin umgeschrieben werden (K3). Gilt die
+   Freigabe für Variante A, beschreibt U00 die Folgen für 6.2.5; dieser Schritt schreibt dann nur Typ und Nutzdaten
+   vorhandener Einträge um und gleicht `archived` mit `readAt` ab. Für jede Zeile von `BH_Notification` mit Kanal
+   `APP`, deren Empfänger an einen Liferay-Benutzer gebunden ist:
+   - vorhandenen Eintrag aus `userNotificationEventId` entfernen (nur falls U00 wider Erwarten Einträge des
+     6.2-Plugins gefunden hat);
    - neuen Eintrag in `UserNotificationEvent` über `UserNotificationEventLocalService` anlegen: Empfänger `userId`,
      Zeitpunkt `createdAt`, Typ und Nutzdaten wie `bh-notification` (U02, Schritt 3), `archived` gesetzt genau dann,
      wenn `readAt` gesetzt ist;

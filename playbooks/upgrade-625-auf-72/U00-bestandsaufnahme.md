@@ -111,11 +111,14 @@ Profilen. Den Ist-Stand liefern die laufende 6.2.5-Instanz (Schritte 1 bis 5) un
    `UpgradeStepRegistrator`) und `liferay-72/upgrade-625/` (Einstellungen des Upgrade-Werkzeugs, Upgrade-Runner,
    Bestandsliste). Prüfschritt: beide Muster stehen in AM-R04 (`docs/07-spec-automatisches-mergen.md`); fehlen sie,
    Hinweis an die Steuerung (die Ergänzung gehört nicht in dieses Paket).
-8. **Entscheidung Glocke.** 6.2.5 zeigt eine eigene Glocke im Theme aus `BH_Notification`
-   (`profile/liferay-625.md`, 3.1), 7.2 nutzt zusätzlich die Liferay-Glocke über `UserNotificationEvent`
-   (`profile/liferay-72.md`, 3.5). Zu entscheiden: Übernimmt U03 Einträge in `UserNotificationEvent`, die 6.2.5 als
-   Abbild geschrieben hat (Variante A), oder legt U03 sie aus `BH_Notification` selbst an (Variante B)? Kriterien, je
-   mit Befund aus Schritt 5:
+8. **Entscheidung Glocke.** Beide Plattformen haben eine eigene Glocke mit der Quelle `BH_Notification`. 6.2.5 zeigt
+   nur diese Glocke im Theme und schreibt kein Abbild in `UserNotificationEvent` (`profile/liferay-625.md`, 3.1).
+   7.2 legt zu jeder App-Nachricht zusätzlich einen `UserNotificationEvent` als Abbild an und merkt dessen ID in
+   `userNotificationEventId`; gelesen wird über die eigene Glocke oder die Liferay-Glocke (`profile/liferay-72.md`, 3.5,
+   `ModelListener` auf `archived`). Nach dem Upgrade fehlt deshalb zu jeder App-Nachricht aus 6.2.5 das Abbild. Zu
+   entscheiden: Erzeugt U03 das Abbild aus `BH_Notification` (Variante B), oder übernimmt U03 etwas aus 6.2.5
+   (Variante A, z. B. vorhandene Einträge in `UserNotificationEvent` des 6.2-Plugins, oder 6.2.5 müsste dafür vorab ein
+   Abbild schreiben)? Kriterien, je mit Befund aus Schritt 5:
    - **K1 Quelle:** `BH_Notification` ist die Quelle, die Glocke ein Abbild (gemeinsam 2.5). Welche Variante leitet das
      Abbild unmittelbar aus der Quelle ab?
    - **K2 Gelesen-Status:** Auf 6.2.5 setzt die eigene Glocke nur `readAt`. Ein Abbild auf 6.2.5 müsste `archived`
@@ -127,10 +130,12 @@ Profilen. Den Ist-Stand liefern die laufende 6.2.5-Instanz (Schritte 1 bis 5) un
    - **K5 Wiederholbarkeit:** Der Schritt in U03 muss nach einem Abbruch auf einer neuen Kopie gleich ablaufen.
    - **K6 Aufwand:** zusätzlicher Code auf 6.2.5 (P08 der Reihe 6.2.5) gegen einen Schritt in `bh-upgrade-625`.
 
-   **Vorschlag: Variante B, U03 legt die Einträge selbst an.** K1, K2 und K4 sprechen klar für B; K3 nimmt A den
-   einzigen Vorteil, weil U03 die Einträge ohnehin anfassen müsste; K5 erfüllt B ohne Abgleich mit Altbestand; K6 spart
-   Code auf 6.2.5. Folgen: Auf 6.2.5 bleibt `userNotificationEventId` leer (Alternative in `profile/liferay-625.md`, 3.1);
-   hat 6.2.5 doch Abbilder geschrieben, ersetzt U03 sie (entfernen und neu anlegen). Prüfschritt: Befund zu K1 bis K6 und
+   **Vorschlag: Variante B, U03 erzeugt das Abbild aus `BH_Notification`.** Ohne Abbild auf 6.2.5 gibt es nichts zu
+   übernehmen; A hieße zusätzlicher Code auf 6.2.5 nur für das Upgrade (K4, K6). K1 und K2 sprechen für B, weil Abbild
+   und Gelesen-Status direkt aus der Quelle (`readAt`) entstehen; K3 nimmt A den einzigen Vorteil, weil U03 Einträge aus
+   6.2.5 ohnehin umschreiben müsste; K5 erfüllt B ohne Abgleich mit Altbestand. Folgen: Auf 6.2.5 bleibt
+   `userNotificationEventId` leer; findet Schritt 5 dennoch Einträge des 6.2-Plugins, ersetzt U03 sie (entfernen und
+   neu anlegen). Prüfschritt: Befund zu K1 bis K6 und
    die Zahl der App-Nachrichten mit gesetztem `userNotificationEventId` auf 6.2.5 stehen in der Bestandsliste; der
    Vorschlag steht unter „Bitte bestätigen“ im PR.
 9. **Prüffälle zuordnen.** Tabelle „Prüffall-Datei → Schritt, der sie grün macht“: `berichte.json`, `historie.json`,
