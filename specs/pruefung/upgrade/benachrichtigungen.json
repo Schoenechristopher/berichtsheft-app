@@ -1,0 +1,752 @@
+[
+  {
+    "id": "AK-1015-51",
+    "modul": "M08",
+    "ebene": "upgrade",
+    "beschreibung": "Glocke: Gelesene und ungelesene App-Nachrichten kommen mit ihrem Zustand an; Zähler und Liste auf 7.2 wie vorher",
+    "vorher": {
+      "uhr": "2026-10-06T10:00:00+02:00",
+      "ausgangsbestand": {
+        "berichte": [
+          {
+            "azubi": "anna",
+            "woche": "2026-W39",
+            "tage": {
+              "alle": {
+                "tagesart": "Betrieb",
+                "text": "Netzwerk geplant"
+              }
+            }
+          },
+          {
+            "azubi": "anna",
+            "woche": "2026-W40",
+            "tage": {
+              "alle": {
+                "tagesart": "Betrieb",
+                "text": "Netzwerk geplant"
+              }
+            }
+          }
+        ]
+      },
+      "schritte": [
+        {
+          "als": "anna",
+          "aktion": "einreichen",
+          "azubi": "anna",
+          "woche": "2026-W39"
+        },
+        {
+          "als": "bernd",
+          "aktion": "benachrichtigungen_oeffnen",
+          "uhr": "2026-10-06T10:05:00+02:00"
+        },
+        {
+          "als": "anna",
+          "aktion": "einreichen",
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "uhr": "2026-10-06T10:10:00+02:00"
+        }
+      ],
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "nachrichten": [
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W39",
+              "neu": true
+            }
+          ]
+        },
+        {
+          "status": "Eingereicht"
+        }
+      ]
+    },
+    "nachher": {
+      "uhr": "2026-10-07T09:00:00+02:00",
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W39",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:10:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ],
+      "schritte": [
+        {
+          "als": "bernd",
+          "aktion": "ungelesen_zaehlen"
+        },
+        {
+          "als": "anna",
+          "aktion": "ungelesen_zaehlen"
+        },
+        {
+          "als": "bernd",
+          "aktion": "benachrichtigungen_oeffnen"
+        },
+        {
+          "als": "bernd",
+          "aktion": "ungelesen_zaehlen"
+        }
+      ],
+      "ergebnisse": [
+        {
+          "anzahl": 1
+        },
+        {
+          "anzahl": 0
+        },
+        {
+          "nachrichten": [
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "neu": true
+            },
+            {
+              "art": "statuswechsel",
+              "woche": "2026-W39",
+              "neu": false
+            }
+          ]
+        },
+        {
+          "anzahl": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1004-51",
+    "modul": "M08",
+    "ebene": "upgrade",
+    "beschreibung": "Ausgangskorb: Eine auf 6.2.5 zugestellte E-Mail geht auf 7.2 nicht noch einmal hinaus, eine noch offene genau einmal",
+    "vorher": {
+      "uhr": "2026-10-06T10:00:00+02:00",
+      "ausgangsbestand": {
+        "berichte": [
+          {
+            "azubi": "anna",
+            "woche": "2026-W39",
+            "tage": {
+              "alle": {
+                "tagesart": "Betrieb",
+                "text": "Netzwerk geplant"
+              }
+            }
+          },
+          {
+            "azubi": "anna",
+            "woche": "2026-W40",
+            "tage": {
+              "alle": {
+                "tagesart": "Betrieb",
+                "text": "Netzwerk geplant"
+              }
+            }
+          }
+        ]
+      },
+      "schritte": [
+        {
+          "als": "anna",
+          "aktion": "einreichen",
+          "azubi": "anna",
+          "woche": "2026-W39"
+        },
+        {
+          "aktion": "nachrichten_versenden",
+          "uhr": "2026-10-06T10:01:00+02:00"
+        },
+        {
+          "als": "anna",
+          "aktion": "einreichen",
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "uhr": "2026-10-06T10:10:00+02:00"
+        }
+      ],
+      "ergebnisse": [
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "versendet": 1,
+          "erneut": 0,
+          "aufgegeben": 0
+        },
+        {
+          "status": "Eingereicht"
+        }
+      ]
+    },
+    "nachher": {
+      "uhr": "2026-10-07T09:00:00+02:00",
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W39",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:10:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ],
+      "schritte": [
+        {
+          "aktion": "nachrichten_lesen",
+          "empfaenger": "bernd"
+        },
+        {
+          "aktion": "nachrichten_versenden"
+        },
+        {
+          "aktion": "nachrichten_versenden",
+          "uhr": "2026-10-07T09:01:00+02:00"
+        },
+        {
+          "aktion": "nachrichten_lesen",
+          "empfaenger": "bernd"
+        }
+      ],
+      "ergebnisse": [
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W39",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 1,
+              "naechsterVersuch": null,
+              "uebergaben": 1
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W39",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:10:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-10-06T10:10:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:10:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        },
+        {
+          "versendet": 1,
+          "erneut": 0,
+          "aufgegeben": 0
+        },
+        {
+          "versendet": 0,
+          "erneut": 0,
+          "aufgegeben": 0
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W39",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 1,
+              "naechsterVersuch": null,
+              "uebergaben": 1
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W39",
+              "angelegt": "2026-10-06T10:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "email",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:10:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 1,
+              "naechsterVersuch": null,
+              "uebergaben": 1
+            },
+            {
+              "empfaenger": "bernd",
+              "kanal": "app",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-06T10:10:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1011-51",
+    "modul": "M08",
+    "ebene": "upgrade",
+    "beschreibung": "Die Kanalwahl kommt an und gilt auf 7.2 für das nächste Ereignis",
+    "vorher": {
+      "uhr": "2026-10-06T10:00:00+02:00",
+      "ausgangsbestand": {
+        "berichte": [
+          {
+            "azubi": "anna",
+            "woche": "2026-W40",
+            "tage": {
+              "alle": {
+                "tagesart": "Betrieb",
+                "text": "Netzwerk geplant"
+              }
+            }
+          }
+        ]
+      },
+      "schritte": [
+        {
+          "als": "bernd",
+          "aktion": "kanaele_einstellen",
+          "kanaele": ["teams"]
+        }
+      ],
+      "ergebnisse": [
+        {
+          "gespeichert": true
+        }
+      ]
+    },
+    "nachher": {
+      "uhr": "2026-10-07T09:00:00+02:00",
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [],
+          "kommentare": []
+        }
+      ],
+      "personen": [
+        {
+          "schluessel": "anna",
+          "name": "Anna Azubi",
+          "rolle": "azubi",
+          "aktiv": true,
+          "ausbilder": "bernd",
+          "ausbildungsbeginn": "2026-09-01",
+          "ausbildungsende": null,
+          "kanaele": ["email", "app"],
+          "gebunden": true
+        },
+        {
+          "schluessel": "bernd",
+          "name": "Bernd Ausbilder",
+          "rolle": "ausbilder",
+          "aktiv": true,
+          "ausbilder": null,
+          "ausbildungsbeginn": null,
+          "ausbildungsende": null,
+          "kanaele": ["teams"],
+          "gebunden": true
+        },
+        {
+          "schluessel": "clara",
+          "name": "Clara Ausbilderin",
+          "rolle": "ausbilder",
+          "aktiv": true,
+          "ausbilder": null,
+          "ausbildungsbeginn": null,
+          "ausbildungsende": null,
+          "kanaele": ["email", "app"],
+          "gebunden": true
+        }
+      ],
+      "schritte": [
+        {
+          "aktion": "kanaele_lesen",
+          "person": "bernd"
+        },
+        {
+          "aktion": "kanaele_lesen",
+          "person": "anna"
+        },
+        {
+          "als": "anna",
+          "aktion": "einreichen",
+          "azubi": "anna",
+          "woche": "2026-W40"
+        },
+        {
+          "aktion": "nachrichten_lesen",
+          "empfaenger": "bernd"
+        }
+      ],
+      "ergebnisse": [
+        {
+          "kanaele": ["teams"]
+        },
+        {
+          "kanaele": ["email", "app"]
+        },
+        {
+          "status": "Eingereicht"
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "bernd",
+              "kanal": "teams",
+              "art": "statuswechsel",
+              "woche": "2026-W40",
+              "angelegt": "2026-10-07T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-10-07T09:00:00+02:00",
+              "uebergaben": 0
+            }
+          ]
+        }
+      ],
+      "berichteDanach": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-07T09:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-1021-51",
+    "modul": "M08",
+    "ebene": "upgrade",
+    "beschreibung": "Der Erinnerungslauf einer Woche ist nach dem Upgrade als erledigt bekannt; am selben Montag entsteht keine zweite Erinnerung",
+    "vorher": {
+      "uhr": "2026-09-07T08:00:00+02:00",
+      "schritte": [
+        {
+          "aktion": "erinnerung_ausloesen",
+          "uhr": "2026-09-07T09:00:00+02:00"
+        }
+      ],
+      "ergebnisse": [
+        {
+          "lauf": "ausgefuehrt",
+          "angelegt": 2
+        }
+      ]
+    },
+    "nachher": {
+      "uhr": "2026-09-07T10:00:00+02:00",
+      "berichte": [],
+      "schritte": [
+        {
+          "aktion": "erinnerung_ausloesen"
+        },
+        {
+          "aktion": "nachrichten_lesen",
+          "empfaenger": "anna"
+        }
+      ],
+      "ergebnisse": [
+        {
+          "lauf": "schon_erledigt"
+        },
+        {
+          "nachrichten": [
+            {
+              "empfaenger": "anna",
+              "kanal": "email",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-07T09:00:00+02:00",
+              "zustand": "offen",
+              "versuche": 0,
+              "naechsterVersuch": "2026-09-07T09:00:00+02:00",
+              "uebergaben": 0
+            },
+            {
+              "empfaenger": "anna",
+              "kanal": "app",
+              "art": "erinnerung",
+              "woche": "2026-W36",
+              "angelegt": "2026-09-07T09:00:00+02:00",
+              "zustand": "zugestellt",
+              "versuche": 0,
+              "naechsterVersuch": null,
+              "uebergaben": 0
+            }
+          ]
+        }
+      ]
+    }
+  }
+]
