@@ -7,7 +7,7 @@ von `profile/liferay-gemeinsam.md`) · Stand: 16.10.2026 (Etappe G4, Paket G) ·
 
 Die Oberfläche der App folgt der UI-Spezifikation mit den Mitteln von 6.2.5: eigenes Theme `bh-theme` (Velocity, Eltern-Theme
 `_styled`) mit Tokens für Hell und Dunkel im `<head>`, Seitenleiste und Schublade, **eigene Glocke im Theme** aus
-`BH_Notification` (Profil 3.1), Portlets ohne eigene Überschrift, Status-Chips mit SVG, Darstellung System/Hell/Dunkel
+`BH_Notification` (Profil 6.2.5, Abschnitt 3.1), Portlets ohne eigene Überschrift, Status-Chips mit SVG, Darstellung System/Hell/Dunkel
 vom Server ohne Aufblitzen, eigene Dialoge mit Fokusfalle, Seitentitel, Lade- und Leerzustände, WCAG 2.2 AA. Fertig,
 wenn:
 
@@ -17,7 +17,7 @@ wenn:
    (`UIAK14_DarstellungAmKontoTest` in `test/integration/`) grün sind;
 3. der axe-Lauf `liferay-625/e2e/barrierefreiheit.spec.ts` auf allen Seiten der Abläufe einschließlich Anmeldeseite,
    „Passwort vergessen“ und „Passwort setzen“ hell und dunkel bei 1280 und 375 px ohne Verstoß ist;
-4. jede UI-AK eine Bewertung nach Profil 3.2 hat; „abweichend, begründet“ gilt nur für die Seiten des Portals außerhalb
+4. jede UI-AK eine Bewertung nach Profil 6.2.5, Abschnitt 3.2 hat; „abweichend, begründet“ gilt nur für die Seiten des Portals außerhalb
    der App (Control Panel, Fehlerseiten des Portals, UI-AK-16, M09-R19) und steht unter „Bitte bestätigen“.
 
 Schemaänderung: keine neue Spalte; `BH_Person.theme` legt P02 mit an (gemeinsam 2.3). Falls sie fehlt: Spalte `theme`
@@ -28,9 +28,9 @@ Schemaänderung: keine neue Spalte; `BH_Person.theme` legt P02 mit an (gemeinsam
 - P00 bis P08 der Reihe abgenommen. Die Portlets der Module existieren funktional (Anmelden über den JSP-Hook, Kein
   Zugang, Start, Meine Wochen, Bericht, Prüfliste, Azubis, Personen, Benachrichtigungen, Nicht zustellbar,
   Einstellungen); P09 gibt ihnen Rahmen, Gestaltung und Zugänglichkeit.
-- P00 hat Profil-Punkte 14, 17 und 18 (Dockbar-Glocke, Sass, Eltern-Theme, Portlet-Rahmen, Titelvorlage) als „offen bis
+- P00 hat Profil 6.2.5, „In P00 zu bestätigen“ Punkte 14, 17 und 18 (Dockbar-Glocke, Sass, Eltern-Theme, Portlet-Rahmen, Titelvorlage) als „offen bis
   P09“ vermerkt; P09 bestätigt sie in Schritt 2.
-- Profil 6.2.5: Abschnitte 3 („Oberfläche“, „Theme-Daten“, „Dunkelmodus“), 3.1 (Glocke), 3.2 (Umfang, Technik,
+- Profil 6.2.5, Abschnitte 3 („Oberfläche“, „Theme-Daten“, „Dunkelmodus“), 3.1 (Glocke), 3.2 (Umfang, Technik,
   Bewertung je UI-AK), 4.3 (Ablauf-Adapter, Merker) und 7 („Sass des Themes“, „Portal-Bausteine“, „Mehrere
   Klassenlader“).
 - Chromium und 375 px lokal; Firefox und Edge nur in CI.
@@ -57,13 +57,13 @@ und Verhalten entstehen in Velocity, JSP und eigenem Skript. Belege zum Abgleich
 Bau-Reihenfolge: (1) Theme-Gerüst und Tokens, (2) reine Fachfunktionen der Oberfläche, (3) Theme-Daten über die
 `ServicePreAction`, (4) Rahmen, Menü und Glocke, (5) Bausteine (Chip, Dialog, Fehlerleiste, Fußleiste, Platzhalter), (6)
 Seiten, (7) Darstellung, (8) Barrierefreiheit und Fokus, (9) Prüfaktionen des Ablauf-Adapters. Zu jedem UI-AK die
-Prüffälle und die Umsetzung nach Profil 3.2:
+Prüffälle und die Umsetzung nach Profil 6.2.5, Abschnitt 3.2:
 
 | AK-ID | Kriterium (Kurzfassung aus der Fach-Spec) | Prüffälle | Umsetzung auf 6.2.5 (Bewertung) |
 | --- | --- | --- | --- |
 | UI-AK-01 | Seitenleiste ab 1024 px, darunter Menüknopf und Schublade mit Escape und Fokusrückgabe. | 4 (4 ablauf) | Seitenleiste und Schublade in `portal_normal.vm` und `main.js`, Fokusfalle und Escape von Hand (gleichwertig) |
 | UI-AK-02 | Aktiver Menüpunkt gekennzeichnet; jede Rolle sieht genau ihre Menüpunkte. | 2 (2 ablauf) | Menü aus den Request-Attributen (Rolle, Zähler), `aria-current`; Schutz im Service (gleichwertig) |
-| UI-AK-03 | Glocke mit Zähler, ab 100 „99+“, genaue Zahl im Namen. | 4 (4 fachlogik) | eigene Glocke im Theme aus `BH_Notification` (Profil 3.1; gleichwertig, wenn der Vorschlag freigegeben ist) |
+| UI-AK-03 | Glocke mit Zähler, ab 100 „99+“, genaue Zahl im Namen. | 4 (4 fachlogik) | eigene Glocke im Theme aus `BH_Notification` (Profil 6.2.5, Abschnitt 3.1; gleichwertig, wenn der Vorschlag freigegeben ist) |
 | UI-AK-04 | Start Azubi: aktuelle Woche mit Fortschritt; „Zu erledigen“ älteste zuerst, abgelehnte oben. | 4 (4 fachlogik) | `StartPortlet` (JSP), Fachlogik in `domain/` (gleichwertig) |
 | UI-AK-05 | Leerzustand „Alles erledigt – keine offenen Wochen.“ | 2 (2 ablauf) | Leerzustand im Portlet (gleichwertig) |
 | UI-AK-06 | Fünf Tage nebeneinander ab 1280 px, kein waagerechtes Scrollen bei 1280 und 375 px. | 3 (3 ablauf) | eigenes CSS-Raster, einspaltige Layout-Vorlage ohne Seitenränder des Portals (gleichwertig) |
@@ -94,16 +94,16 @@ Prüfaktionen). Weg A nur auf ausdrücklichen Auftrag.
 
 ## 7. Schritte
 
-1. **Branch** `claude/l62-p09-oberflaeche`; Spec, `docs/05-ui-spezifikation.md`, Profil 3.2 und Prüffälle lesen.
+1. **Branch** `claude/l62-p09-oberflaeche`; Spec, `docs/05-ui-spezifikation.md`, Profil 6.2.5, Abschnitt 3.2 und Prüffälle lesen.
    Prüfschritt: Liste der festen Texte und der Elemente aus `specs/pruefung/format.md` im PR-Entwurf.
-2. **Theme bestätigen** (Profil „In P00 zu bestätigen“ 14, 17, 18). `bh-theme` mit Eltern-Theme `_styled`; Probe in
+2. **Theme bestätigen** (Profil 6.2.5, „In P00 zu bestätigen“ 14, 17, 18). `bh-theme` mit Eltern-Theme `_styled`; Probe in
    `custom.css` mit CSS-Variablen, `var()`, `:root:not([data-theme=light])` und `@media (prefers-color-scheme: dark)`;
    Sass-Übersetzung beim Deployment im Tomcat-Log prüfen. Dockbar je Rolle ausblendbar, Portlet-Rahmen ohne `h1`
    (`portlet.vm`, `portlet-decorate` aus), Titelvorlage. Prüfschritt: Ergebnis je Punkt im PR; lässt Sass die Tokens
    nicht unverändert durch, bleiben sie im `<head>` (Schritt 3), sonst wandern sie nach `custom.css`.
 3. **Tokens** (`docs/05-ui-spezifikation.md`, „Design-Tokens“; M09 Abschnitt 8). Farben nur als Tokens, einmal für Hell,
    einmal für Dunkel (`[data-theme=dark]` und `@media (prefers-color-scheme: dark)` für `:root:not([data-theme=light])`),
-   dazu `color-scheme`, als `<style>`-Block im `<head>` von `portal_normal.vm` (Profil 3.2, „Technik“). Bootstrap 2 und
+   dazu `color-scheme`, als `<style>`-Block im `<head>` von `portal_normal.vm` (Profil 6.2.5, Abschnitt 3.2, „Technik“). Bootstrap 2 und
    AlloyUI haben feste Farben: Das Theme überschreibt die genutzten Klassen (`.btn`, `.alert`, `.table`, Formularfelder,
    `.control-group`) mit Tokens. Eigene Breakpoints 1024 px und 1280 px; das Raster von Bootstrap 2 wird nicht genutzt.
    Schriften aus dem Theme, kein Abruf aus dem Internet. Prüfschritt: keine feste Farbe in JSP oder `custom.css` außer in
@@ -114,7 +114,7 @@ Prüfaktionen). Weg A nur auf ausdrücklichen Auftrag.
    UI-AK-14, UI-AK-15), `RelativeTime`, `Bell` (`bellCount()` ab 100 „99+“, `bellLabel()` mit genauer Zahl; UI-AK-03),
    `StatusChip` (Symbol und Text je Status; UI-AK-13). Prüfschritt: Unit-Tests mit Namen ab der UI-AK-ID
    (`UIAK03_…`, `UIAK13_…`).
-5. **Theme-Daten** (Profil 3 „Theme-Daten“, 7 „Mehrere Klassenlader“). `de.berichtsheft.hook.events.ServicePreAction`
+5. **Theme-Daten** (Profil 6.2.5, Abschnitt 3 „Theme-Daten“, 7 „Mehrere Klassenlader“). `de.berichtsheft.hook.events.ServicePreAction`
    (`servlet.service.events.pre`) legt Person, Rolle, Darstellung (`resolveTheme()`), Zähler der Glocke, der Prüfliste
    und von Nicht zustellbar als Request-Attribute ab; `portal_normal.vm` liest nur diese, `serviceLocator` bleibt in
    Velocity gesperrt. Prüfschritt: Seite ohne Anmeldung zeigt das Theme ohne Fehler im Log; angemeldet stehen die
@@ -123,7 +123,7 @@ Prüfaktionen). Weg A nur auf ausdrücklichen Auftrag.
    mit Glocke und Konto, ab 1024 px Seitenleiste, darunter Menüknopf und Schublade (`main.js`: Fokusfalle, Escape,
    Fokus zurück), Menüpunkte je Rolle in der Reihenfolge der Spec mit `aria-current`, „Zum Inhalt springen“, Demo-Hinweis,
    „Abmelden“ (`/c/portal/logout`). Dockbar für Azubis und Ausbilder aus; die Sitzungswarnung des Portals ist aus
-   (`session.timeout.warning=0`). **Eigene Glocke** (Profil 3.1): Zähler und Vorschau aus `BH_Notification` mit
+   (`session.timeout.warning=0`). **Eigene Glocke** (Profil 6.2.5, Abschnitt 3.1): Zähler und Vorschau aus `BH_Notification` mit
    `Bell`; Markieren nach AK-1015 über die Seite Benachrichtigungen. Merker `data-menue`, `data-menue-knopf`,
    `data-drawer-close`, `data-glocke`, `data-glocke-vorschau`. Prüfschritt: Ablauf-Fälle zu UI-AK-01 und UI-AK-02 bei
    1280 und 375 px.
@@ -139,7 +139,7 @@ Prüfaktionen). Weg A nur auf ausdrücklichen Auftrag.
    Benachrichtigungen („Keine Benachrichtigungen.“), Nicht zustellbar, Einstellungen; Anmelden, „Passwort vergessen“,
    „Passwort setzen“ und Kein Zugang in einer zentrierten Karte über den JSP-Hook (`custom-jsp-dir` `/html/hooks/login`).
    Seitentitel „<Seite> – Berichtsheft“ über `PortalUtil.setPageTitle` und die Titelvorlage, genau ein `h1` je Seite.
-   Texte aus der Spec wörtlich, Merker aus der Landkarte (Liste dort). Keine Java-8-Syntax in JSPs (Profil 7).
+   Texte aus der Spec wörtlich, Merker aus der Landkarte (Liste dort). Keine Java-8-Syntax in JSPs (Profil 6.2.5, Abschnitt 7).
    Prüfschritt: Ablauf- und Fachlogik-Fälle dieser UI-AK grün.
 8. **Darstellung** (M09-R16 bis M09-R18, UI-AK-14, UI-AK-15). `PersonLocalServiceImpl.updateOwnTheme()` (nur eigene,
    nur aktive Person, nur gültige Werte; Fehlercodes nach `darstellungPruefen`), `EinstellungenPortlet` speichert am Konto
@@ -156,7 +156,7 @@ Prüfaktionen). Weg A nur auf ausdrücklichen Auftrag.
    `ansicht_lesen`, `elemente_lesen`, `anordnung_lesen`, `fokus_lesen`, `bedienen`, `taste_druecken`, `tastatur_bis`,
    `tippen`, `warten`, `erstes_bild_lesen`, `barrierefreiheit_pruefen`, `darstellung_waehlen`; das Gerät (`geraet`:
    Breite, Höhe, Farbschema, langsames Netz) stellt der Runner ein, `netz: langsam` verzögert nur Ressource-Aufrufe
-   (`p_p_lifecycle=2`, Profil 4.3). Der Adapter liest nur feste Merker, nie Meldungstexte (Ausnahme: Seitentitel).
+   (`p_p_lifecycle=2`, Profil 6.2.5, Abschnitt 4.3). Der Adapter liest nur feste Merker, nie Meldungstexte (Ausnahme: Seitentitel).
    Fachlogik-Adapter: `statusChip`, `glockenZaehler`, `wochenFortschritt`, `ersteZeile`, `darstellungPruefen`,
    `darstellungErmitteln`. Prüfschritt: `-g "M09.json"` im Ablauf-Runner und `ant pruefung-fachlogik
    -Dbh.pruefung.filter=M09.json` grün.
@@ -198,23 +198,23 @@ Nur in CI: Firefox und Edge für alle Ablauf-Fälle (P10), der volle Liferay-6.2
 | Fehler | Was tun |
 | --- | --- |
 | Dunkelmodus blitzt beim Laden hell auf | `data-theme` und Tokens vom Server im `<head>` (Schritt 8), nie erst per Skript |
-| Theme-Änderung wirkt nicht, keine Fehlermeldung | Sass-Fehler beim Deployment stehen nur im Tomcat-Log (Profil 7) |
+| Theme-Änderung wirkt nicht, keine Fehlermeldung | Sass-Fehler beim Deployment stehen nur im Tomcat-Log (Profil 6.2.5, Abschnitt 7) |
 | Tokens kommen in `custom.css` verändert an | Sass von 6.2 lässt CSS-Variablen nicht durch; Tokens im `<head>` lassen (Schritt 2) |
 | Farben von Bootstrap 2 oder AlloyUI tauchen auf (Kontrast im Dunkelmodus) | genutzte Klassen im Theme mit Tokens überschreiben; keine AlloyUI-Bausteine mit eigener Farbe (`aui-modal`, Datumsauswahl) |
 | Fokus verschwindet hinter einer festen Leiste | Dockbar für Azubis und Ausbilder aus; `scroll-margin` setzen (UI-AK-17) |
 | Zwei Hauptüberschriften auf einer Seite | Portlet-Rahmen mit Titel (`portlet-decorate`) aus; Seitenkopf ohne `h1` (UI-AK-19) |
-| Theme sieht die Daten der App nicht | Klassen des Plugins sind im Theme unsichtbar; nur Request-Attribute der `ServicePreAction` (Profil 7) |
-| Glocke zeigt Liferay-Benachrichtigungen statt der App | eigene Glocke aus `BH_Notification` (Profil 3.1), nicht die der Dockbar |
+| Theme sieht die Daten der App nicht | Klassen des Plugins sind im Theme unsichtbar; nur Request-Attribute der `ServicePreAction` (Profil 6.2.5, Abschnitt 7) |
+| Glocke zeigt Liferay-Benachrichtigungen statt der App | eigene Glocke aus `BH_Notification` (Profil 6.2.5, Abschnitt 3.1), nicht die der Dockbar |
 | Ablauf-Fall findet ein Element nicht | feste Merker nicht umbenennen oder weglassen; Liste in der Landkarte (Abschnitt M09) |
-| JSP lässt sich nicht übersetzen | Java-8-Syntax in einer JSP; Jasper von Tomcat 7 kennt sie nicht (Profil 7) |
+| JSP lässt sich nicht übersetzen | Java-8-Syntax in einer JSP; Jasper von Tomcat 7 kennt sie nicht (Profil 6.2.5, Abschnitt 7) |
 | Waagerechtes Scrollen bei 375 px | Raster von Bootstrap 2 (feste Breiten) statt eigener Breakpoints; Layout-Vorlage mit Seitenrändern des Portals |
 | Serveraktion nur durch Ausblenden geschützt | Rolle und Besitz prüft der Service selbst (M02-R13) |
 
 ## Bitte bestätigen
 
-- [ ] Eigene Glocke im Theme aus `BH_Notification` statt der Glocke der Dockbar (Profil 3.1); Profil 6.2.5 nennt sie
+- [ ] Eigene Glocke im Theme aus `BH_Notification` statt der Glocke der Dockbar (Profil 6.2.5, Abschnitt 3.1); Profil 6.2.5 nennt sie
       einen Vorschlag mit Geltung von gemeinsam 2.5 bis zur Freigabe, gemeinsam 2.5 und 3.1 führen sie schon als
       geändert. P09 baut die eigene Glocke; ohne Freigabe ist UI-AK-03 auf 6.2.5 nicht erfüllbar.
-- [ ] Dunkelmodus-Umfang nach Profil 3.2: Control Panel und Fehlerseiten des Portals bleiben hell und ungeprüft
+- [ ] Dunkelmodus-Umfang nach Profil 6.2.5, Abschnitt 3.2: Control Panel und Fehlerseiten des Portals bleiben hell und ungeprüft
       (**abweichend, begründet** zu M09-R19, UI-AK-16).
 - [ ] Gegenprobe (a) bis (c) als Nachweis, dass Farbschema-, Kontrast- und Fokusprüfungen wirken.

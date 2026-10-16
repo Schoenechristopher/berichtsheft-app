@@ -25,7 +25,7 @@ Skript „Schutz in der Datenhaltung“ (gemeinsam 2.6); Migration über den Upg
 - L72-P00 bis L72-P04 abgenommen (Berichte, Tage, Speichern mit Sperre, Berichtsseite); M02 liefert Rollen und Besitz, M04 das
   Speichern. Speichern (M04) sperrt die Zeile des Berichts bereits mit `SELECT … FOR UPDATE`, bevor es Status und Tage liest
   (gemeinsam 2.4, Schritt 1); sonst gilt die Sperre dieses Playbooks nicht.
-- Profil: Abschnitte 3 (Transaktion und Gleichzeitigkeit, Historie und Schreibschutz), 4 (Daten-Adapter, plattformeigene
+- Profil 7.2, Abschnitte 3 (Transaktion und Gleichzeitigkeit, Historie und Schreibschutz), 4 (Daten-Adapter, plattformeigene
   Tests), 7 („`PortalException` und Rollback“, „Service Builder schreibt am Cache vorbei“) und „Nachweis AK-505 und AK-508“;
   gemeinsam 2.4 und 2.6.
 - Die Historie wird hier geschrieben; ihre Unveränderlichkeit und Anzeige folgen in P06, die Nachrichten in P08
@@ -59,7 +59,7 @@ plattformeigene Tests und Gegenproben. Zu jedem AK die Prüffälle:
 | AK-ID | Kriterium (Kurzfassung aus der Fach-Spec) | Prüffälle | Bewertung auf 7.2 |
 | --- | --- | --- | --- |
 | AK-501 | Ein offener Bericht lässt sich nur mit vollständigen Pflichtangaben einreichen (nur Leerzeichen gelten als leer); nicht bei Wochen ganz außerhalb; die laufende Woche schon vor ihrem Ende. | 11 (9 fachlogik, 2 daten) | gleichwertig |
-| AK-502 | Fehlt eine Pflichtangabe, wird nicht eingereicht; die Tage werden mit „Tagesart fehlt“ bzw. „Tätigkeiten fehlen“ benannt und markiert. | 4 (2 fachlogik, 1 daten, 1 ablauf) | gleichwertig; AK-502-04 ist Szenario (P10) |
+| AK-502 | Fehlt eine Pflichtangabe, wird nicht eingereicht; die Tage werden mit „Tagesart fehlt“ bzw. „Tätigkeiten fehlen“ benannt und markiert. | 3 (2 fachlogik, 1 daten): AK-502-01, AK-502-02, AK-502-03; AK-502-04 ist Szenario (P10) | gleichwertig |
 | AK-503 | Bei Urlaub, Krank und Feiertag ist kein Text nötig; ein eingetragener Text bleibt. | 2 (1 fachlogik, 1 daten) | gleichwertig |
 | AK-504 | Auch eine Woche nur aus Urlaub und Feiertagen muss eingereicht werden und zählt bis dahin als offen. | 2 (1 fachlogik, 1 daten) | gleichwertig |
 | AK-505 | Nach dem Einreichen „Eingereicht“ und schreibgeschützt; Einreichen speichert Eingaben mit, beim Scheitern bleiben sie als Entwurf; zusätzlich Schutz in der Datenhaltung. | 7 (4 daten, 3 fachlogik) | gleichwertig; Nachweis nach Profil (Trigger plus `ModelListener`, Ergebnis statt Ausnahme) |
@@ -75,8 +75,11 @@ plattformeigene Tests und Gegenproben. Zu jedem AK die Prüffälle:
 | AK-607 | Berichte im Status „Entwurf“ kann der Ausbilder weder freigeben noch ablehnen. | 5 (4 fachlogik, 1 daten) | gleichwertig |
 | AK-701 | Ein abgelehnter Bericht ist bearbeitbar und erneut einreichbar; danach „Eingereicht“ und wieder in der Prüfliste. | 3 (1 daten, 2 fachlogik) | gleichwertig |
 | AK-702 | Der Zyklus aus Ablehnen und erneutem Einreichen funktioniert beliebig oft (dreimal ablehnen, dann freigeben). | 6 (1 daten, 5 fachlogik) | gleichwertig |
-| AK-703 | Eine Freigabe lässt sich nur mit nicht leerer Begründung zurücknehmen; danach „Abgelehnt“ und bearbeitbar. | 6 (4 fachlogik, 1 daten, 1 ablauf) | gleichwertig; AK-703-06 ist Szenario (P10) |
+| AK-703 | Eine Freigabe lässt sich nur mit nicht leerer Begründung zurücknehmen; danach „Abgelehnt“ und bearbeitbar. | 5 (4 fachlogik, 1 daten): AK-703-01, AK-703-02, AK-703-03, AK-703-04, AK-703-05; AK-703-06 ist Szenario (P10) | gleichwertig |
 | AK-704 | Außer durch die Rücknahme kann niemand einen freigegebenen Bericht ändern, auch kein Ausbilder. | 6 (5 fachlogik, 1 daten) | gleichwertig; Trigger sperrt auch `APPROVED` |
+
+Summe: 19 AK-IDs, 95 Prüffälle in `M05.json` (59 `fachlogik`, 36 `daten`), dazu die zwei Ablauf-Szenarien AK-502-04 und
+AK-703-06 (P10, getrennt gezählt).
 
 ## 6. Empfehlung
 
@@ -93,7 +96,7 @@ wann eine Abweisung wirft (Rollback) und wann sie ein Ergebnis ist (Tage bleiben
    `reviewRound`, Tag leer = Gesamtkommentar, `authorId`, `commentText`, `createdAt`) nach gemeinsam 2.3, beide mit
    `mvcc-enabled="false"` und `remote-service="false"`. `BH_WeeklyReport.version` (int, Anfang 0) nach gemeinsam 2.4, falls P03
    sie noch nicht angelegt hat. Das Skript „Schutz in der Datenhaltung“ bekommt die Fremdschlüssel (`actorId`, `authorId`
-   `DEFERRABLE INITIALLY DEFERRED`), die CHECK-Constraints aus gemeinsam 2.3 und den Trigger **`report_day_locked`** (`BEFORE
+   `DEFERRABLE INITIALLY DEFERRED`), die CHECK-Constraints `status_change_review_round_not_negative`, `comment_review_round_positive` und `comment_text_not_blank` (gemeinsam 2.3) und den Trigger **`report_day_locked`** (`BEFORE
    UPDATE` auf `BH_ReportDay`, weist ab, wenn der Bericht `SUBMITTED` oder `APPROVED` ist; allgemeiner Code `P0001`). Danach
    `buildService`, Datenbank `berichtsheft_l72` neu anlegen, Bundle neu starten. Prüfschritt: ein direktes
    `UPDATE BH_ReportDay` auf einen eingereichten Bericht scheitert mit SQLState `P0001`, der Trigger steht in `pg_trigger`.
@@ -110,20 +113,21 @@ wann eine Abweisung wirft (Rollback) und wann sie ein Ergebnis ist (Tage bleiben
    `SubmissionRules.validate()` mit den Tagesfehlern `tagesart_fehlt` und `taetigkeiten_fehlen` in Kalenderreihenfolge; bei
    Urlaub, Krank und Feiertag kein Text nötig, ein eingetragener bleibt; Tage außerhalb zählen nicht; Woche ganz außerhalb nicht
    einreichbar; laufende Woche schon vor ihrem Ende. Prüfschritt: JUnit-Tests `AK501_…` bis `AK504_…`.
-5. **Bearbeitbarkeit und `ModelListener`.** `ReportAccess.canEditReport()` vollständig (Entwurf oder Abgelehnt, nur eigener
-   aktiver Azubi, kein Ausbilder in keinem Status; AK-505, AK-506, AK-701, AK-703, AK-704). `ReportDayModelListener extends
+5. **Bearbeitbarkeit und `ModelListener`.** `ReportAccess.canEditReport()` entstand schon in P04 (Schritt 3), weil Speichern es
+   braucht; P05 ergänzt nur die Unit-Tests zu AK-505 und AK-704 (Eingereicht und Freigegeben nicht bearbeitbar, kein Ausbilder in
+   keinem Status; AK-506, AK-701, AK-703). `ReportDayModelListener extends
    BaseModelListener<ReportDay>` (`@Component(service = ModelListener.class)`) weist in `onBeforeUpdate` und `onBeforeRemove`
-   mit `ModelListenerException` ab, wenn der Bericht eingereicht oder freigegeben ist (Profil, Nachweis AK-505, Punkt 3). Die
+   mit `ModelListenerException` ab, wenn der Bericht eingereicht oder freigegeben ist (Profil 7.2, Nachweis AK-505, Punkt 3). Die
    Abweisung des Listeners ist ein **technischer** Fehler: Weder Service noch Testschnittstelle deuten sie in den Fachgrund
    `nicht_bearbeitbar` um; diesen liefert nur die Fachlogik. Prüfschritt: JUnit-Tests `AK505_…` und `AK704_…` in `bh-domain`.
 6. **Statuswechsel und Einreichen** in `WeeklyReportLocalServiceImpl` (M05-R05 bis M05-R08, M05-R13, M05-R14, M05-R20 bis
    M05-R22), je **eine** Service-Transaktion (`@Transactional(rollbackFor = {PortalException.class, SystemException.class})`,
    Voreinstellung):
    - `transition(long actorUserId, long weeklyReportId, String action, String seenStatus, int seenVersion, String text,
-     Map<String, String> dayComments)` nach Profil, Nachweis AK-508: (a) Zeile mit `SELECT … FOR UPDATE` sperren
-     (`WeeklyReportFinderImpl`, Custom SQL in `META-INF/custom-sql/default.xml`); (b) `canViewReport()` und
+     Map<String, String> dayComments)` nach Profil 7.2, Nachweis AK-508: (a) Zeile mit `lockForUpdate` sperren
+     (`SELECT … FOR UPDATE`, aus P04, Schritt 5 (a); `WeeklyReportFinderImpl`, Custom SQL in `META-INF/custom-sql/default.xml`); (b) `canViewReport()` und
      `TransitionRules.decide()` mit dem gesehenen Stand; jede Abweisung als `ReportTransitionException extends PortalException`
-     mit dem Grund aus der Fachlogik, der Service erfindet keinen; (c) **bedingtes Update**
+     mit dem Grund aus der Fachlogik, der Service erfindet keinen; (c) **bedingtes Update** (`updateStatusConditional`, neu in P05, im `WeeklyReportFinderImpl`)
      `UPDATE BH_WeeklyReport SET status = ?, version = version + 1, updatedAt = ? WHERE weeklyReportId = ? AND status = ? AND
      version = ?` mit dem gesehenen Stand über `SQLQuery.executeUpdate()`, genau eine Zeile verlangen, sonst
      `inzwischen_geaendert` (zweite Sicherung); danach `clearCache` des Berichts und das Objekt aus der Hibernate-Sitzung
@@ -136,20 +140,21 @@ wann eine Abweisung wirft (Rollback) und wann sie ein Ergebnis ist (Tage bleiben
    - `submit(long actorUserId, long weeklyReportId, String seenStatus, int seenVersion, Map<String, DayInput> days)` gibt ein
      `SubmitResult` zurück: Sperre wie (a), Rechte und Übergang wie (b) – Abweisung wirft vor dem Speichern; ungültige Eingaben
      (`tage_ungueltig`) und nicht bearbeitbarer Bericht (`ReportNotEditableException extends PortalException`, Grund
-     `nicht_bearbeitbar`) werfen und rollen alles zurück (AK-505-04); sonst die Tage speichern, dann `SubmissionRules.validate()`
+     `nicht_bearbeitbar`) werfen und rollen alles zurück (AK-505-04); sonst die Tage mit der Schreib- und Prüfhilfsklasse aus P04 speichern, dann `SubmissionRules.validate()`
      auf dem gespeicherten Stand. Fehlt eine Pflichtangabe, endet die Methode **normal** mit `SubmitResult.pflichtangabenFehlen(tage)`:
      Status, Version und Historie bleiben unverändert, die Tage als Entwurf gespeichert. Sonst weiter mit (c) bis (e). Kein
-     `noRollbackFor`, weil es auch Fehler nach dem Speichern festschreiben würde (Profil, Abschnitt 7).
+     `noRollbackFor`, weil es auch Fehler nach dem Speichern festschreiben würde (Profil 7.2, Abschnitt 7).
    Prüfschritt: Daten-Fälle AK-505-02, AK-505-03, AK-505-04 grün.
 7. **Einhängepunkt für Benachrichtigungen.** `transition` und `submit` liefern im Ergebnis ein `TransitionEvent` (Bericht,
    Statuswechsel, handelnde Person). P08 schreibt daraus in **derselben** Transaktion in `BH_Notification` und legt den
-   `UserNotificationEvent` als Abbild für die Liferay-Glocke an (Profil 3.5); versendet wird nie in der Transaktion, sondern im
+   `UserNotificationEvent` als Abbild für die Liferay-Glocke an (Profil 7.2, Abschnitt 3.5); versendet wird nie in der Transaktion, sondern im
    Ausgangskorb-Lauf, synchron über die `javax.mail.Session` des Portals, nicht über den asynchronen `MailService`
    (gemeinsam 3.2). Prüfschritt: Ergebnis trägt das Ereignis; noch kein Versand.
 8. **Prüfliste.** `getReviewQueue(long actorUserId, ReviewScope scope)` (eingereichte Berichte, standardmäßig eigene Azubis, per
    Filter alle, letzte Einreichung, älteste zuerst; AK-601, AK-602) und `getRejectionTexts()` (Gesamtkommentar bzw. Begründung
-   der aktuellen Ablehnung; AK-606; P06 ersetzt den Zugriff durch `currentFeedback()`). Prüfschritt: Daten-Fälle AK-601-01,
-   AK-601-02, AK-606-01 grün.
+   der aktuellen Ablehnung; AK-606; P06 ersetzt den Zugriff durch `currentFeedback()`). **Statuswechsel scharf (P03):** der
+   Platzhalter-Finder für `historie` (Übersicht, P03 Schritt 5) fragt jetzt `BH_StatusChange` ab; sein Test aus P03 wird mit einem
+   Bericht mit Statuswechsel scharfgestellt. Prüfschritt: Daten-Fälle AK-601-01, AK-601-02, AK-606-01 grün, Test des Finders grün.
 9. **Portlets** in `bh-web`: MVC-Action-Commands für Einreichen, Zurückziehen, Freigeben, Ablehnen und Freigabe zurücknehmen;
    jeder übergibt nur `userId`, Bericht, Aktion und **gesehenen Stand** (Status und Version als versteckte Felder) an den Service.
    „Einreichen“ ruft `submit` (speichert und reicht ein, UI-AK-09); bei `pflichtangaben_fehlen` Fehlerleiste mit Sprunglinks.
@@ -166,7 +171,7 @@ wann eine Abweisung wirft (Rollback) und wann sie ein Ergebnis ist (Tage bleiben
     `./gradlew :modules:bh-test-integration:testIntegration --tests '*DatenPrueffaelleTest*' -Pbh.pruefung.modul=M05` grün (36 Fälle).
 11. **Fachlogik-Adapter.** Schnittstellen `einreichenPruefen`, `uebergangPruefen`, `moeglicheAktionen`, `pruefrunde`,
     `darfBearbeiten`. Prüfschritt: `./gradlew :modules:bh-domain:test -Pbh.pruefung.modul=M05` grün (59 Fälle).
-12. **Plattformeigene Tests** (Arquillian, `bh-test-integration`, Profil „Nachweis AK-505 und AK-508“):
+12. **Plattformeigene Tests** (Arquillian, `bh-test-integration`, Profil 7.2, „Nachweis AK-505 und AK-508“):
     - `ReportDayProtectionTest.AK505_datenhaltungWeistAendernEinesEingereichtenTagsAb`: direktes JDBC-`UPDATE BH_ReportDay` auf
       einen eingereichten Bericht scheitert mit `P0001`.
     - `ReportDayProtectionTest.AK505_modelListenerWeistAendernUeberDiePersistenzAb`: `reportDayLocalService.updateReportDay(…)` auf
@@ -224,9 +229,9 @@ wann eine Abweisung wirft (Rollback) und wann sie ein Ergebnis ist (Tage bleiben
 | --- | --- |
 | Eingaben sind weg, wenn nur die Pflichtprüfung scheitert | `pflichtangaben_fehlen` ist ein Ergebnis, keine `PortalException`; die Transaktion endet normal (AK-505-03) |
 | Halber Statuswechsel festgeschrieben | eine Abweisung ohne `PortalException` als Oberklasse rollt nicht zurück; jede Abweisung außer `pflichtangaben_fehlen` wirft eine Unterklasse von `PortalException` |
-| `noRollbackFor` soll die Tage retten | nicht verwenden: es schreibt auch Fehler nach dem Speichern fest (Profil, Abschnitt 7) |
+| `noRollbackFor` soll die Tage retten | nicht verwenden: es schreibt auch Fehler nach dem Speichern fest (Profil 7.2, Abschnitt 7) |
 | Beide gleichzeitigen Aktionen gelingen | Sperre `FOR UPDATE` und bedingtes Update mit Status **und** Version; Version bei jedem Wechsel erhöhen (AK-508) |
-| Service liest nach dem Update den alten Status | `clearCache` des Berichts und Objekt aus der Hibernate-Sitzung entfernen (gemeinsam 2.4, Profil, Abschnitt 7) |
+| Service liest nach dem Update den alten Status | `clearCache` des Berichts und Objekt aus der Hibernate-Sitzung entfernen (gemeinsam 2.4, Profil 7.2, Abschnitt 7) |
 | Daten-Fall meldet `nicht_bearbeitbar`, obwohl die Fachlogik falsch ist | die `ModelListenerException` nie in einen Fachgrund umdeuten; den Grund liefert nur `canEditReport()` |
 | Ausbilder kann Tage eines freigegebenen Berichts ändern | Trigger und Listener prüfen nur `SUBMITTED`; auch `APPROVED` sperren (AK-704) |
 | Meldung falsch nach gleichzeitiger Aktion | Gründe nur aus `TransitionRules.decide()`; trifft das bedingte Update keine Zeile, `inzwischen_geaendert` |

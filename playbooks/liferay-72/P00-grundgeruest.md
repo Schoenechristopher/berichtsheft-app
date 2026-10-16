@@ -66,15 +66,15 @@ Bau-Reihenfolge des Gerüsts:
 
 1. JDK 11 und Bundle nach gemeinsam 4.1 und 4.2, Datenbank `berichtsheft_l72`.
 2. Liferay Workspace `liferay-72/` mit Target Platform 7.2.1 und Konfigurationen `configs/common|local|ci|prod`
-   (Profil, Abschnitt 2).
-3. Suchdienst eingebettet nach gemeinsam 4.4 (Profil, Abschnitt 1).
+   (Profil 7.2, Abschnitt 2).
+3. Suchdienst eingebettet nach gemeinsam 4.4 (Profil 7.2, Abschnitt 1).
 4. Module ohne Fachcode: `bh-domain` (Uhr-Schnittstelle, Prüf-Adapter Fachlogik), `bh-clock`, `bh/bh-api` und
    `bh/bh-service` (leeres `service.xml` mit Namespace `BH`, Upgrade-Schritt `0.0.0` → `1.0.0`), `bh-pruefung`
    (Testschnittstelle), `bh-test-integration` (Arquillian, Daten-Adapter), `pruefung/` (Ablauf-Adapter), dazu die leeren
    Module `bh-access`, `bh-web`, `bh-notification`, `bh-pdf` und das Theme `bh-theme`.
 5. Prüfungen im Build (Systemzeit nur in `ClockImpl`, Bundle-Zustände), Messung, Vorschlag für den CI-Job.
 
-Paketwurzel aller Java-Quellen ist `de.berichtsheft` (Profil, Abschnitt 2), Code-Bezeichner englisch, Oberfläche deutsch.
+Paketwurzel aller Java-Quellen ist `de.berichtsheft` (Profil 7.2, Abschnitt 2), Code-Bezeichner englisch, Oberfläche deutsch.
 Für das Gerüst gibt es keine Akzeptanzkriterien; die Regeln der Plattform dazu (Q, Abschnitt 8 „Prüfbarkeit“) werden in
 P10 abgenommen.
 
@@ -94,7 +94,7 @@ Reihenfolge ist, dass jede Annahme des Profils im laufenden System bestätigt od
 - Fachlogik in `bh-domain` (Java 8, keine Liferay-Abhängigkeit, Paket `de.berichtsheft.domain.<bereich>`), Service in
   `bh/bh-service` (`*LocalServiceImpl` prüft Rolle und Besitz selbst), Oberfläche in `bh-web`; „jetzt“ nur aus `Clock`.
 - Plattformeigene JUnit-Tests beginnen mit der AK-ID ohne Bindestrich (`AK505_…`), Prüffall-Tests tragen die ID
-  unverändert (`AK-505-01`); Berichte nennen die AK-ID mit Bindestrich (Profil, Abschnitt 4).
+  unverändert (`AK-505-01`); Berichte nennen die AK-ID mit Bindestrich (Profil 7.2, Abschnitt 4).
 - Jede Prüfung, die ein Playbook baut, bekommt eine **wirksame Gegenprobe**: ein benannter, absichtlich eingebauter Fehler
   und die benannten Prüffälle bzw. Tests, die er rot macht; danach zurücknehmen.
 - Abschnitt 8 nennt mindestens: Fachlogik-Adapter des Moduls, Daten-Adapter des Moduls, plattformeigene Tests,
@@ -113,11 +113,11 @@ Reihenfolge ist, dass jede Annahme des Profils im laufenden System bestätigt od
    einmal nach `/opt/liferay-72-bundle/` laden, nie ins Repository; Prüfsumme notieren. In `liferay-72/gradle-local.properties`
    (nicht committet) `liferay.workspace.bundle.url=file:///opt/liferay-72-bundle/<archiv>`; das Liferay-CDN ist gesperrt.
    Prüfschritt: Größe des Archivs stimmt; `gradle-local.properties` und `bundles/` stehen in `liferay-72/.gitignore`.
-4. **Workspace** `liferay-72/` nach Profil, Abschnitt 2: `settings.gradle` mit dem Workspace-Plugin von Maven Central (die
+4. **Workspace** `liferay-72/` nach Profil 7.2, Abschnitt 2: `settings.gradle` mit dem Workspace-Plugin von Maven Central (die
    letzte Version, die 7.2 noch kann, hier ermitteln), `gradle.properties` mit `liferay.workspace.product=portal-7.2-ga2`
    und Target Platform 7.2.1 (`release.portal.bom` 7.2.1), `node.download=false`, Gradle-Wrapper. Kein Liferay-Nexus.
    Prüfschritt: `./gradlew tasks` löst alle Abhängigkeiten aus Maven Central auf; fehlt ein Artefakt, **anhalten und melden**
-   (Profil, Abschnitt 7).
+   (Profil 7.2, Abschnitt 7).
 5. **Bundle einrichten und Treiber tauschen.** `./gradlew initBundle`; JDBC-Treiber 42.7.14 (gemeinsam 7) nach
    `bundles/tomcat-9.0.x/lib/ext/`, den alten Treiber des Bundles entfernen; Datenbank `berichtsheft_l72` mit Rolle
    `berichtsheft` anlegen (nicht die Datenbanken der TypeScript-App). `configs/local/portal-ext.properties`: JDBC auf
@@ -128,24 +128,24 @@ Reihenfolge ist, dass jede Annahme des Profils im laufenden System bestätigt od
    `configs/common/osgi/configs/com.liferay.portal.search.elasticsearch6.configuration.ElasticsearchConfiguration.config`
    mit `operationMode="EMBEDDED"` und festem `clusterName`. Kein eigener Elasticsearch-Dienst, kein Docker-Image in der
    Sitzung. Prüfschritt: nach dem Start (Schritt 7) antwortet `curl -s localhost:9200` mit dem Clusternamen; Version des
-   eingebetteten Knotens notieren; im Log keine Sidecar-Betriebsart (Profil, Abschnitt 1).
+   eingebetteten Knotens notieren; im Log keine Sidecar-Betriebsart (Profil 7.2, Abschnitt 1).
 7. **Erster Start.** `JAVA_TOOL_OPTIONS= TZ=Europe/Berlin bundles/tomcat-9.0.x/bin/catalina.sh run` im Hintergrund mit
-   Protokoll (Profil, Abschnitt 5); bereit bei „Server startup in“. Heap vorläufig nach Profil, Abschnitt 1 (`-Xmx3g`,
+   Protokoll (Profil 7.2, Abschnitt 5); bereit bei „Server startup in“. Heap vorläufig nach Profil 7.2, Abschnitt 1 (`-Xmx3g`,
    Voreinstellung in `setenv.sh` prüfen). Prüfschritt: Startseite antwortet mit 200; `pg_stat_activity` zeigt Verbindungen auf
    `berichtsheft_l72`; Zeit bis „Server startup in“ notieren (Messung, Schritt 15).
 8. **Module anlegen** (Paketwurzel `de.berichtsheft`): `bh-domain` als reines Java-8-Projekt ohne Liferay-Abhängigkeit mit
    der Schnittstelle `Clock` (Paket `de.berichtsheft.domain.clock`); `bh-clock` mit `ClockImpl` und `ClockControl` nach
-   Profil 3.2, `BetriebConfiguration` mit `@Meta.AD(deflt = "produktion")`; `bh/bh-api` und `bh/bh-service` mit `service.xml`
+   Profil 7.2, Abschnitt 3.2, `BetriebConfiguration` mit `@Meta.AD(deflt = "produktion")`; `bh/bh-api` und `bh/bh-service` mit `service.xml`
    (`dependency-injector="ds"`, `namespace` `BH`, noch ohne Entity); leere Module `bh-access`, `bh-web`, `bh-notification`,
    `bh-pdf`, Theme `bh-theme`. Prüfschritt: `./gradlew build deploy`; im Log „STARTED de.berichtsheft…“ für jedes Modul; in
-   der Gogo-Shell kein Bundle in `INSTALLED` (ungelöste Imports, Profil, Abschnitt 7).
-9. **Upgrade-Schritt und Schutz in der Datenhaltung** nach Profil 3.1 und gemeinsam 2.6: `UpgradeStepRegistrator` in
+   der Gogo-Shell kein Bundle in `INSTALLED` (ungelöste Imports, Profil 7.2, Abschnitt 7).
+9. **Upgrade-Schritt und Schutz in der Datenhaltung** nach Profil 7.2, Abschnitt 3.1 und gemeinsam 2.6: `UpgradeStepRegistrator` in
    `bh-service` mit dem Schritt `0.0.0` → `1.0.0`, `bnd.bnd` mit `Liferay-Require-SchemaVersion: 1.0.0`. Das Skript „Schutz in
    der Datenhaltung“ ist hier noch leer; es wächst mit den Tabellen in P02, P03, P05, P06 und P08. Bestätigen, ob 7.2 bei
-   frischer Installation die Tabellen von Service Builder vor dem Schritt anlegt und den Schritt ausführt (Profil 3.1); sonst
+   frischer Installation die Tabellen von Service Builder vor dem Schritt anlegt und den Schritt ausführt (Profil 7.2, Abschnitt 3.1); sonst
    der Ausweg dort (Prüfung im Katalog `pg_trigger`). Prüfschritt: Eine Probe-Entity mit einem Probe-Trigger zeigt die
    Reihenfolge; danach Probe entfernen und Datenbank neu anlegen.
-10. **Testschnittstelle `bh-pruefung`** (Profil, Abschnitt 4): JAX-RS unter `/o/bh-pruefung/` mit Uhr stellen, Bestand leeren,
+10. **Testschnittstelle `bh-pruefung`** (Profil 7.2, Abschnitt 4): JAX-RS unter `/o/bh-pruefung/` mit Uhr stellen, Bestand leeren,
     Testdaten laden; Komponente mit `ConfigurationPolicy.REQUIRE`, registriert nur bei `bh.betrieb=test`. Die Daten-Aktionen
     der Module kommen ab P01 dazu. Prüfschritt: `curl -s -o /dev/null -w "%{http_code}" -X POST localhost:8080/o/bh-pruefung/zustand`
     liefert 200 bei `test`.
@@ -162,7 +162,7 @@ Reihenfolge ist, dass jede Annahme des Profils im laufenden System bestätigt od
     Testfall mit der Prüffall-ID im Namen. **Bau-Stand:** eine Liste der gebauten Module (anfangs leer) und der
     zurückgestellten Fälle, gemeinsam für beide Runner; ungebaute und zurückgestellte Fälle werden als Assumption „noch nicht
     gebaut“ gemeldet und getrennt gezählt, Fälle mit `abweichend.liferay-72` als Assumption „abweichend, begründet“ mit Verweis.
-    Zurückgestellt sind wie in der Referenz AK-305-09 bis P04 und AK-205-01, AK-205-02 bis P08. Jedes Playbook P01 bis P09
+    Zurückgestellt sind AK-305-09 bis P04, AK-408-07 bis P06 (er braucht Einreichen aus P05 und die Historie auf der Berichtsseite; die Referenz baut ihn schon in P04) und AK-205-01, AK-205-02 bis P08. Jedes Playbook P01 bis P09
     trägt am Ende sein Modul ein; P10 löscht beide Listen. Prüfschritt: `./gradlew :modules:bh-domain:test` meldet alle Fälle
     als „noch nicht gebaut“, keinen roten; Testdaten-Test (fünf Personen, Anna, Bernd und Clara `angelegt`, Dora und Emil
     nicht) grün.
@@ -170,10 +170,10 @@ Reihenfolge ist, dass jede Annahme des Profils im laufenden System bestätigt od
     - Testschnittstelle: `bh.betrieb=produktion` setzen → `/o/bh-pruefung/zustand` antwortet 404, `ClockControl.setFixed`
       wirft; zurück auf `test`.
     - Fachlogik-Adapter: ein Modul ohne Umsetzung in den Bau-Stand eintragen → dessen Fälle werden rot; zurücknehmen.
-    - Systemzeit: die Prüfung im Build (Profil 3.2) meldet einen absichtlich eingebauten Aufruf von `Instant.now()` in
+    - Systemzeit: die Prüfung im Build (Profil 7.2, Abschnitt 3.2) meldet einen absichtlich eingebauten Aufruf von `Instant.now()` in
       `bh-domain`; zurücknehmen.
     Prüfschritt: drei rote Läufe gesehen und im PR notiert, danach alles grün.
-14. **Zeitzone.** Integrationstest „Zeitpunkte unabhängig von der Server-Zeitzone“ (Profil, Abschnitt 4) mit `TZ=Europe/Berlin`
+14. **Zeitzone.** Integrationstest „Zeitpunkte unabhängig von der Server-Zeitzone“ (Profil 7.2, Abschnitt 4) mit `TZ=Europe/Berlin`
     und `-Duser.timezone=GMT`: ein Zeitpunkt wird über eine Probe-Tabelle geschrieben und in UTC zurückgelesen. Der
     vollständige Test auf `BH_StatusChange` entsteht in P06. Prüfschritt: grün; Gegenprobe ohne `-Duser.timezone=GMT` rot.
 15. **Messung von Speicher und Laufzeit.** In der Sitzung (wenn das Bundle geladen ist) und auf dem Standard-Runner (4 Kerne,
@@ -189,7 +189,7 @@ Reihenfolge ist, dass jede Annahme des Profils im laufenden System bestätigt od
     | Platte | `du -sh bundles/ bundles/data/elasticsearch6` nach dem Testlauf |
 
     Prüfschritt: Tabelle mit Zahlen im PR; Heap-Einstellung (`-Xmx`) danach festgelegt. Reicht der Speicher nicht: Heap senken,
-    Firefox und Edge in getrennte Jobs, sonst entfernter Knoten als Dienst-Container (Profil, Abschnitt 7).
+    Firefox und Edge in getrennte Jobs, sonst entfernter Knoten als Dienst-Container (Profil 7.2, Abschnitt 7).
 16. **CI-Klasse L72** nach `docs/ci-richtlinie.md` (Abschnitt 7, Klassentabelle: L72 `liferay-72/**`, Job „Liferay 7.2“):
     Vorschlag für den Job mit den Messwerten aus Schritt 15: nur bei Änderungen unter `liferay-72/` und erst bei „bereit“; JDK 11
     und Node, Bundle aus dem Actions-Cache (Schlüssel: URL und Prüfsumme des Archivs), PostgreSQL als Dienst-Container,
@@ -206,7 +206,7 @@ Reihenfolge ist, dass jede Annahme des Profils im laufenden System bestätigt od
     `LifecycleAction`-Schlüssel; `TemplateContextContributor` und Senna aus; Scheduler (`SchedulerEngineHelper`,
     `StorageType.MEMORY_CLUSTERED`, Takt); synchroner Mailversand über die `javax.mail.Session` des Portals (ein Probeversand an
     den SMTP-Mock liefert Erfolg bzw. Fehler sofort zurück, nicht über den Message Bus); Gelesen-Markieren über die
-    Liferay-Glocke erreicht einen `ModelListener<UserNotificationEvent>` (Profil 3.5); PDFBox per `compileInclude`;
+    Liferay-Glocke erreicht einen `ModelListener<UserNotificationEvent>` (Profil 7.2, Abschnitt 3.5); PDFBox per `compileInclude`;
     Liferay-Arquillian 1.0.20 mit `testIntegration`; Jackson 2.12.7.2 lädt mit Java 11. Prüfschritt: jeder Punkt im PR mit
     „bestätigt“, „Ausweg“ oder „Bitte bestätigen“; danach
     `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` ohne Befund.
@@ -246,7 +246,7 @@ Reihenfolge ist, dass jede Annahme des Profils im laufenden System bestätigt od
 | Portal startet mit Java 21 und bricht ab | `JAVA_HOME` auf JDK 11, `JAVA_TOOL_OPTIONS` leer |
 | Zeiten um eine oder zwei Stunden verschoben | `-Duser.timezone=GMT` fehlt; JVM und JDBC-Sitzung müssen in UTC laufen (gemeinsam 2.2) |
 | Bundle bleibt `INSTALLED` | ungelöster Import: Nicht-OSGi-Bibliothek per `compileInclude` einbetten; `diag <id>` in der Gogo-Shell |
-| Speicher reicht nicht, Elasticsearch stirbt | Heap aus der Messung setzen; Firefox und Edge in CI trennen; sonst entfernter Knoten (Profil, Abschnitt 7) |
+| Speicher reicht nicht, Elasticsearch stirbt | Heap aus der Messung setzen; Firefox und Edge in CI trennen; sonst entfernter Knoten (Profil 7.2, Abschnitt 7) |
 | Testschnittstelle antwortet in Produktion | Komponente ohne `ConfigurationPolicy.REQUIRE` oder `bh.betrieb` nicht ausgewertet; Gegenprobe Schritt 13 |
 | Prüf-Adapter zeigt „0 Tests“ | `bh.pruefung.dir` relativ zum Modul falsch gesetzt (`../../../specs/pruefung`) |
 | Jackson landet im Bundle | nur `testImplementation`, nie `compileInclude` (gemeinsam 7) |

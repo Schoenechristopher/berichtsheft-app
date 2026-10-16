@@ -11,7 +11,7 @@ der Runner sind entfernt und eine Demo-Anleitung für 6.2.5 liegt vor. Fertig, w
 
 1. alle Prüffälle in `specs/pruefung/*.json` (außer `testdaten.json`) über die Runner von 6.2.5 grün sind; ausgenommen
    sind nur die Fälle mit `abweichend.liferay-625`, deren Abweichung Chris im Profil freigegeben hat (heute AK-101-01
-   und AK-106-01, Profil 6.1), und freigegebene Testgrenzen (Q-R06). Beide erscheinen im Bericht getrennt, nie als grün;
+   und AK-106-01, Profil 6.2.5, Abschnitt 6.1), und freigegebene Testgrenzen (Q-R06). Beide erscheinen im Bericht getrennt, nie als grün;
 2. die Prüffälle der Q-AK grün sind (2 AK-IDs; je ein Ablauf-Fall in `specs/pruefung/Q.json`): AK-1101-01 in
    `chromium`, `firefox` und `msedge`, AK-1102-01 in `smartphone-375`;
 3. die drei Szenario-Fälle in `specs/pruefung/szenarien.json` (AK-502-04, AK-703-06, AK-1022-07) in jedem Browser und bei
@@ -25,7 +25,7 @@ Keine Schemaänderung; kein neuer Fachcode.
 ## 2. Voraussetzungen
 
 - P00 bis P09 der Reihe abgenommen und gemergt; der letzte Lauf des Liferay-6.2.5-Jobs auf dem Hauptzweig ist grün.
-- Profil 6.2.5: Abschnitte 4 (Prüf-Adapter, abweichende Fälle), 5 (Start, CI), 6 (Abweichungen), 7 und „Nachweis AK-505
+- Profil 6.2.5, Abschnitte 4 (Prüf-Adapter, abweichende Fälle), 5 (Start, CI), 6 (Abweichungen), 7 und „Nachweis AK-505
   und AK-508“; Fach-Spec `specs/Q-plattform-und-qualitaet.md` (Regeln Q-R01 bis Q-R06, Abschnitt 8).
 - Zugriff auf GitHub Actions: Portal mit Mailpit, Firefox und Edge laufen nur dort.
 
@@ -45,7 +45,7 @@ Keine Schemaänderung; kein neuer Fachcode.
 Nur auf ausdrücklichen Auftrag. Vorbild für Konfiguration und Ablauf der Abnahme sind die Dateien der TypeScript-App
 `e2e/pruefung-ablauf.spec.ts`, `e2e/pruefung/testgrenzen.ts`, `e2e/ak-1101-browser.spec.ts`,
 `e2e/ak-1102-smartphone.spec.ts`, `e2e/beispielszenarien.spec.ts` und `.github/workflows/ci.yml`; übertragen wird nur
-die Struktur, Adressen und Anmeldung kommen aus Profil 4.3.
+die Struktur, Adressen und Anmeldung kommen aus Profil 6.2.5, Abschnitt 4.3.
 
 ## 5. Weg B: aus der Spec
 
@@ -85,9 +85,9 @@ Fehler, meldet die Sitzung ihn der Steuerung, die das Modul-Playbook erneut verg
    (Namen ab der AK-ID). Prüfschritt: beide Fälle grün in `chromium` und `smartphone-375`; Firefox und Edge in Schritt 9.
 5. **Beispielszenarien.** AK-502-04 (Einreichen scheitert an fehlendem Text), AK-703-06 (Vertretung nimmt Freigabe zurück)
    und AK-1022-07 (Erinnerung und Information an den Ausbilder; Erinnerungslauf über die Testschnittstelle, Takt und
-   Fälligkeit nach Profil 3 „Hintergrundjobs“). Prüfschritt: grün in Chromium und bei 375 px.
+   Fälligkeit nach Profil 6.2.5, Abschnitt 3 „Hintergrundjobs“). Prüfschritt: grün in Chromium und bei 375 px.
 6. **Abweichende Fälle.** Der Runner weist jeden Fall mit `abweichend.liferay-625` als „abweichend, begründet“ mit Verweis
-   aus (heute AK-101-01 und AK-106-01, Profil 6.1); er zählt nie als grün. Prüfschritt: Liste im Bericht stimmt mit
+   aus (heute AK-101-01 und AK-106-01, Profil 6.2.5, Abschnitt 6.1); er zählt nie als grün. Prüfschritt: Liste im Bericht stimmt mit
    `grep -l '"liferay-625"' specs/pruefung/*.json` und den Fällen darin überein; ein Fall mit Markierung, dessen Verweis
    nicht auf einen freigegebenen Abschnitt des Profils zeigt, ist ein Befund für die Steuerung.
 7. **Testgrenzen** (Q-R06). Läuft AK-408-03 in Firefox (Schritt 9) grün, gibt es auf 6.2.5 keine Testgrenze. Zeigt der
@@ -110,8 +110,8 @@ Fehler, meldet die Sitzung ihn der Steuerung, die das Modul-Playbook erneut verg
    höchstens einmal neu gestartet. Prüfschritt: alle Jobs grün; Ergebnisse für Firefox und Edge stehen im PR.
 10. **Abdeckung.** `npm run ak:abdeckung` zählt nur Tests der TypeScript-App. Für 6.2.5 erzeugt das Ant-Ziel
     `pruefbericht` aus den JUnit-Berichten (`test-results/`) und dem Playwright-Bericht eine Tabelle je AK-ID: Prüffälle
-    (grün, abweichend, Testgrenze) und eigene Tests (Namen ab der AK-ID, Profil 4.1). Ob `npm run ak:abdeckung` die
-    Java-Tests mitzählen soll, ist eine Werkzeugänderung mit eigenem Auftrag (Profil 4.1, „Bitte bestätigen“).
+    (grün, abweichend, Testgrenze) und eigene Tests (Namen ab der AK-ID, Profil 6.2.5, Abschnitt 4.1). Ob `npm run ak:abdeckung` die
+    Java-Tests mitzählen soll, ist eine Werkzeugänderung mit eigenem Auftrag (Profil 6.2.5, Abschnitt 4.1, „Bitte bestätigen“).
     Prüfschritt: jede AK-ID aller Fach-Specs hat mindestens einen grünen Prüffall oder eigenen Test, oder sie ist
     freigegeben abweichend.
 11. **Demo-Anleitung** in `liferay-625/README.md` (Abschnitt „Demo“): Einrichten nach P00 (JDK 8, Bundle, SDK,
@@ -157,9 +157,9 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
 | Voller Job läuft sehr lange oder bricht aus Speichermangel ab | Messwerte aus P00 vergleichen; Browser nacheinander statt parallel, Heap nach P00 |
 | Abweichender Fall erscheint als grün | Runner liest `abweichend.liferay-625` nicht; „abweichend, begründet“ ausweisen (P00, Schritt 11) |
 | Eine Testgrenze scheint nötig | nie selbst eintragen; Q-R06 verlangt Freigabe von Chris |
-| Szenario AK-1022-07 scheitert an der Uhrzeit | Fälligkeit entscheidet die Fachlogik in Europe/Berlin, nicht der Cron-Ausdruck in GMT (Profil 3, 7) |
+| Szenario AK-1022-07 scheitert an der Uhrzeit | Fälligkeit entscheidet die Fachlogik in Europe/Berlin, nicht der Cron-Ausdruck in GMT (Profil 6.2.5, Abschnitte 3, 7) |
 | Ablauf scheitert nur in CI beim `anmelden` | Folgeseiten der Anmeldung oder Sitzungswarnung im CI-Portal an; `portal-ext.properties` der CI mit der Vorlage vergleichen |
-| AK-ID ohne Beleg im `pruefbericht` | Test mit der AK-ID im Namen anlegen (`CLAUDE.md`, Profil 4.1), nicht den Namen eines Prüffalls umbenennen |
+| AK-ID ohne Beleg im `pruefbericht` | Test mit der AK-ID im Namen anlegen (`CLAUDE.md`, Profil 6.2.5, Abschnitt 4.1), nicht den Namen eines Prüffalls umbenennen |
 | Landkarte und Umsetzung weichen ab | Befund für die Steuerung; ein Playbook ändert die Landkarte nie |
 
 ## Bitte bestätigen

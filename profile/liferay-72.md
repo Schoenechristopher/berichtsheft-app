@@ -203,7 +203,7 @@ unverändert; „abweichend, begründet“ steht zusätzlich unter Abschnitt 6):
 | UI-AK-07 | gleichwertig | Fußleiste im Portlet „Woche erfassen“ |
 | UI-AK-08 | gleichwertig | Fehlerleiste mit Sprunglinks, Fokus per Skript des Portlets |
 | UI-AK-09 | gleichwertig | Einreichen ruft eine Service-Methode, die speichert und einreicht (M05-R08) |
-| UI-AK-10 | gleichwertig | ausgewählter Bericht als Render-Parameter in der Adresse; lesbare Adresse über `FriendlyURLMapper` (P07) |
+| UI-AK-10 | gleichwertig | ausgewählter Bericht als Render-Parameter in der Adresse; lesbare Adresse über `FriendlyURLMapper` (P09) |
 | UI-AK-11 | gleichwertig | nächster Bericht nach `MVCActionCommand` per Weiterleitung |
 | UI-AK-12 | gleichwertig | wie UI-AK-10 unter 1024 px |
 | UI-AK-13 | gleichwertig | Symbole aus dem Clay-Iconset (Stift, Pfeil, Haken, Kreuz im Kreis, Uhr) plus Text; Farben über Status-Tokens |

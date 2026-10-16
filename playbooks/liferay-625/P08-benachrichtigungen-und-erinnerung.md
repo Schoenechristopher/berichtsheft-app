@@ -39,7 +39,7 @@ Index `notification_pending_idx`. Bis `1.0.0` wird die Demo-Datenbank neu angele
   Anmeldung und Rücksprung (P02), Berichte und „offen“ (P03), Statuswechsel mit dem Einhängepunkt `TransitionEvent`, Sperre und
   Historie (P05, P06), Prüf-Runner mit Bau-Stand (P00). P08 ist das größte Paket; die Steuerung darf es nach Stufe teilen
   (zuerst Schritte 3 bis 6: Ausgangskorb und Versand, neuartig; danach Erinnerung und Oberfläche nach dem Muster).
-- Profil 6.2.5: Abschnitte 3 („Transaktion“, „Sperre und bedingtes Update“, „Hintergrundjobs“, „Benachrichtigung in der App“,
+- Profil 6.2.5, Abschnitte 3 („Transaktion“, „Sperre und bedingtes Update“, „Hintergrundjobs“, „Benachrichtigung in der App“,
   „E-Mail“, „Teams“), 3.1 (Glocke), 4.1, 4.2 (Testschnittstelle), 4.3 und 7 („Lesende Transaktionen“, „Zurückrollen“, „Cache nach
   Custom SQL“, „Scheduler in GMT“, „Mail“). Gemeinsames Profil, Abschnitte 2.2, 2.3 (Tabellen), 2.4 (Cache), 2.5 (Glocke, `BH_ReminderRun`),
   2.6 und 3.2 (Teams-Adapter, E-Mail, Ausgangskorb und Zeitplan).
@@ -264,47 +264,47 @@ Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`, 
     Prüfschritt: `ant test-db test-integration` und der Playwright-Lauf grün.
 12. **Gegenprobe** (Gemeinsame Regeln, „Gegenprobe“; Profil 6.2.5, Abschnitt 7 „Zurückrollen“). Jeden Fehler einzeln einbauen, die genannten
     Befehle laufen lassen, Ergebnis im PR festhalten, Fehler zurücknehmen. Eine Gegenprobe zählt nur, wenn die benannten Fälle rot
-    werden. Die Nummern tragen `G08`, weil `G8-n` in P05 die Gegenproben zu AK-508 meint:
+    werden. Die Nummern folgen der Paketnummer (`G8-n`; die Gegenproben zu AK-508 stehen als `G5-4` bis `G5-7` in P05):
 
     | Nr. | Absichtlich eingebauter Fehler | Wird rot | Befehl |
     | --- | --- | --- | --- |
-    | G08-1 (AK-1001) | `plan()` benachrichtigt beim Einreichen auch den Azubi | AK-1001-01 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1001` |
-    | G08-2 (AK-1001) | `recordTransitionNotifications` schickt beim Einreichen an alle aktiven Ausbilder (Vertretung) | AK-1001-04 (daten) | `ant pruefung-daten -Dbh.pruefung.filter=AK-1001` |
-    | G08-3 (AK-1001) | `fanOut` nimmt deaktivierte Empfänger nicht aus | AK-1001-03 und AK-1013-04 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1001`, `-Dbh.pruefung.filter=AK-1013` |
-    | G08-4 (AK-1002) | Zurückziehen erzeugt eine Nachricht an den Ausbilder | AK-1002-05 und AK-1002-07 (daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1002`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1002` |
-    | G08-5 (AK-1002) | erneutes Einreichen trägt den Anlass `eingereicht` statt `erneut_eingereicht` | AK-1002-04 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1002` |
-    | G08-6 (AK-1003) | `safeReturnPath` akzeptiert jede Adresse | AK-1003-04, AK-1003-05, AK-1003-06, AK-1003-07; AK-1003-02, AK-1003-03 und AK-1003-08 bleiben grün | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1003` |
-    | G08-7 (AK-1003) | eine Nachricht mit mehreren Wochen verlinkt einen Bericht statt der Übersicht | AK-1025-01 und AK-1025-02 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1025` |
-    | G08-8 (AK-1004) | die Wartezeit hat keine Obergrenze | AK-1004-06 und AK-1004-07 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1004` |
-    | G08-9 (AK-1004) | die Wartezeit wächst linear (30 s × n) | AK-1004-04, AK-1004-05, AK-1004-06 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1004` |
-    | G08-10 (AK-1004) | `insertNotification` ohne `ON CONFLICT DO NOTHING` | `AK1004_EindeutigJeEreignisEmpfaengerKanalTest` (B scheitert mit `23505`) | `ant test-db -Dtest.class=AK1004_EindeutigJeEreignisEmpfaengerKanalTest` |
-    | G08-11 (AK-1004) | eindeutiger Index (`eventKey`, `recipientId`, `channel`) im Skript ausgelassen | `AK1004_EindeutigJeEreignisEmpfaengerKanalTest` | wie G08-10 |
-    | G08-12 (AK-1004) | der Versand sperrt die Zeile ohne `SKIP LOCKED` und ohne Sperre (reines `SELECT`) | `AK1004_ZweiGleichzeitigeVersandlaeufeTest` (Übergabe zweimal); die neutralen Fälle bleiben grün, weil sie nacheinander laufen | `ant test-integration -Dtest.class=AK1004_ZweiGleichzeitigeVersandlaeufeTest` |
-    | G08-13 (AK-1004) | `deliverNextNotification` wirft bei einem Fehlschlag des Kanals eine `PortalException` statt das Ergebnis `RETRY` zu liefern | `AK1004_FehlversuchBleibtGespeichertTest` (`versuche` bleibt 0) und AK-1004-10, AK-1004-11 (daten) | `ant test-integration -Dtest.class=AK1004_FehlversuchBleibtGespeichertTest`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1004` |
-    | G08-14 (AK-1004) | der Empfänger wird beim Versand nicht auf „aktiv“ geprüft | AK-1004-12 (daten) | `ant pruefung-daten -Dbh.pruefung.filter=AK-1004` |
-    | G08-15 (AK-1004) | `recordTransitionNotifications` läuft in einer eigenen Transaktion (`@Transactional(propagation = Propagation.REQUIRES_NEW)`) | `AK1004_NachrichtenUndStatuswechselInEinerTransaktionTest` (Nachricht bleibt trotz zurückgerolltem Wechsel); AK-1004-09 bleibt grün | `ant test-integration -Dtest.class=AK1004_NachrichtenUndStatuswechselInEinerTransaktionTest` |
-    | G08-16 (AK-1011) | `Channels.parse` fasst Doppelte nicht zusammen und sortiert nicht | AK-1011-02 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1011` |
-    | G08-17 (AK-1011) | ein unbekannter Kanal wird angenommen und gespeichert | AK-1011-04 und AK-1011-05 (daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1011`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1011` |
-    | G08-18 (AK-1012) | Voreinstellung nur E-Mail | AK-1012-01 und AK-1012-02 (daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1012`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1012` |
-    | G08-19 (AK-1013) | ohne gewählten Kanal geht die Nachricht ersatzweise über die App | AK-1013-02, AK-1013-03 und AK-1013-05 (daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1013`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1013` |
-    | G08-20 (AK-1014) | beim Versand gilt der heutige Kanal der Person statt des Kanals der Zeile | AK-1014-01 und AK-1014-02 (daten) | `ant pruefung-daten -Dbh.pruefung.filter=AK-1014` |
-    | G08-21 (AK-1015) | `getPreview` markiert die Nachrichten als gelesen | `AK1015_VorschauMarkiertNichtsTest` (kein neutraler Fall zeigt das) | `ant test-integration -Dtest.class=AK1015_VorschauMarkiertNichtsTest` |
-    | G08-22 (AK-1015) | `openNotifications` markiert nicht als gelesen oder markiert vor dem Lesen von „Neu“ | AK-1015-01 (daten) | `ant pruefung-daten -Dbh.pruefung.filter=AK-1015` |
-    | G08-23 (AK-1021) | `reminderSchedule` rechnet 9:00 Uhr in der Zeitzone der JVM (GMT) statt Europe/Berlin | AK-1021-03, AK-1021-05, AK-1021-08, AK-1021-10, AK-1021-11 und AK-1021-17 (daten); AK-1021-04, AK-1021-06, AK-1021-07, AK-1021-09 und AK-1021-12 bleiben grün | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1021`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1021` (Test-JVM in GMT, P01) |
-    | G08-24 (AK-1021) | der Vermerk des Erinnerungslaufs wird nicht beansprucht (`ON CONFLICT` ausgelassen) | AK-1021-14 (daten, der zweite Lauf meldet `ausgefuehrt` statt `schon_erledigt`) und `AK1021_ZweiGleichzeitigeErinnerungslaeufeTest` | `ant pruefung-daten -Dbh.pruefung.filter=AK-1021`, `ant test-integration -Dtest.class=AK1021_ZweiGleichzeitigeErinnerungslaeufeTest` |
-    | G08-25 (AK-1021) | der Vermerk wird in einer eigenen Transaktion (`REQUIRES_NEW`) vor den Nachrichten geschrieben und bleibt nach einem Fehler stehen | `AK1021_ZweiGleichzeitigeErinnerungslaeufeTest`, zweiter Teil (nach der Störung steht ein Vermerk ohne Nachricht, der nächste Lauf meldet `schon_erledigt`) | `ant test-integration -Dtest.class=AK1021_ZweiGleichzeitigeErinnerungslaeufeTest` |
-    | G08-26 (AK-1021) | der Erinnerungslauf legt die fälligen Wochen vorher nicht an (`ensureReportsForAllTrainees` fehlt) | `AK1021_ErinnerungLegtFehlendeWochenAnTest` (keine Erinnerung für Anna) | `ant test-integration -Dtest.class=AK1021_ErinnerungLegtFehlendeWochenAnTest` |
-    | G08-27 (AK-1022) | die Information fasst alle Azubis in einer Nachricht zusammen | AK-1022-05 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1022` |
-    | G08-28 (AK-1022) | überfällig gilt nur für den Status „Entwurf“, nicht für „Abgelehnt“ | AK-1022-02 und AK-1021-02 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1022`, `-Dbh.pruefung.filter=AK-1021` |
-    | G08-29 (AK-1022) | der Ausbilder wird nur informiert, wenn der Azubi einen Kanal hat | AK-1022-03 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1022` |
-    | G08-30 (AK-1023) | die laufende Woche oder eine eingereichte Woche zählt als offen | AK-1023-01, AK-1023-02, AK-1023-05 (daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1023`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1023` |
-    | G08-31 (AK-1023) | eine Woche ganz außerhalb der Ausbildung zählt als offen | AK-1023-04 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1023` |
-    | G08-32 (AK-1024) | der Ereignisschlüssel der Erinnerung trägt die Woche des Stichtags nicht | AK-1024-04 (daten): der Montag danach legt wegen des alten Schlüssels nichts an; die Fachlogik-Fälle AK-1024-01 bis AK-1024-03 bleiben grün, weil sie den Schlüssel nicht sehen | `ant pruefung-daten -Dbh.pruefung.filter=AK-1024` |
-    | G08-33 (AK-1025) | die Erinnerung nennt nur die älteste Woche | AK-1025-01 und AK-1025-02 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1025` |
-    | G08-34 (AK-205) | deaktivierte Azubis bekommen eine Erinnerung | AK-205-01 und AK-205-02 (daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-205-01`, `ant pruefung-daten -Dbh.pruefung.filter=AK-205-02` |
-    | G08-35 (AK-1004) | die Listener prüfen `bh.betrieb` nicht und laufen auch im Testbetrieb | `AK1004_ListenerTutImTestbetriebNichtsTest` (offene Nachrichten werden übergeben) | `ant test-integration -Dtest.class=AK1004_ListenerTutImTestbetriebNichtsTest` |
-    | G08-36 (AK-1021) | `reminder_run_iso_week_range` im Skript ausgelassen (oder nur 1 bis 52) | `AK1021_ErinnerungslaufDatenhaltungTest` (KW 0 und KW 54 gelingen, KW 53 scheitert) | `ant test-db -Dtest.class=AK1021_ErinnerungslaufDatenhaltungTest` |
-    | G08-37 (AK-1021) | eindeutiger Index (`isoYear`, `isoWeek`) in `BH_ReminderRun` ausgelassen | `AK1021_ErinnerungslaufDatenhaltungTest` (zweiter Vermerk gelingt; `ON CONFLICT` ohne Index scheitert mit einem Fehler) | wie G08-36 |
+    | G8-1 (AK-1001) | `plan()` benachrichtigt beim Einreichen auch den Azubi | AK-1001-01 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1001` |
+    | G8-2 (AK-1001) | `recordTransitionNotifications` schickt beim Einreichen an alle aktiven Ausbilder (Vertretung) | AK-1001-04 (daten) | `ant pruefung-daten -Dbh.pruefung.filter=AK-1001` |
+    | G8-3 (AK-1001) | `fanOut` nimmt deaktivierte Empfänger nicht aus | AK-1001-03 und AK-1013-04 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1001`, `-Dbh.pruefung.filter=AK-1013` |
+    | G8-4 (AK-1002) | Zurückziehen erzeugt eine Nachricht an den Ausbilder | AK-1002-05 und AK-1002-07 (daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1002`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1002` |
+    | G8-5 (AK-1002) | erneutes Einreichen trägt den Anlass `eingereicht` statt `erneut_eingereicht` | AK-1002-04 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1002` |
+    | G8-6 (AK-1003) | `safeReturnPath` akzeptiert jede Adresse | AK-1003-04, AK-1003-05, AK-1003-06, AK-1003-07; AK-1003-02, AK-1003-03 und AK-1003-08 bleiben grün | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1003` |
+    | G8-7 (AK-1003) | eine Nachricht mit mehreren Wochen verlinkt einen Bericht statt der Übersicht | AK-1025-01 und AK-1025-02 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1025` |
+    | G8-8 (AK-1004) | die Wartezeit hat keine Obergrenze | AK-1004-06 und AK-1004-07 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1004` |
+    | G8-9 (AK-1004) | die Wartezeit wächst linear (30 s × n) | AK-1004-04, AK-1004-05, AK-1004-06 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1004` |
+    | G8-10 (AK-1004) | `insertNotification` ohne `ON CONFLICT DO NOTHING` | `AK1004_EindeutigJeEreignisEmpfaengerKanalTest` (B scheitert mit `23505`) | `ant test-db -Dtest.class=AK1004_EindeutigJeEreignisEmpfaengerKanalTest` |
+    | G8-11 (AK-1004) | eindeutiger Index (`eventKey`, `recipientId`, `channel`) im Skript ausgelassen | `AK1004_EindeutigJeEreignisEmpfaengerKanalTest` | wie G8-10 |
+    | G8-12 (AK-1004) | der Versand sperrt die Zeile ohne `SKIP LOCKED` und ohne Sperre (reines `SELECT`) | `AK1004_ZweiGleichzeitigeVersandlaeufeTest` (Übergabe zweimal); die neutralen Fälle bleiben grün, weil sie nacheinander laufen | `ant test-integration -Dtest.class=AK1004_ZweiGleichzeitigeVersandlaeufeTest` |
+    | G8-13 (AK-1004) | `deliverNextNotification` wirft bei einem Fehlschlag des Kanals eine `PortalException` statt das Ergebnis `RETRY` zu liefern | `AK1004_FehlversuchBleibtGespeichertTest` (`versuche` bleibt 0) und AK-1004-10, AK-1004-11 (daten) | `ant test-integration -Dtest.class=AK1004_FehlversuchBleibtGespeichertTest`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1004` |
+    | G8-14 (AK-1004) | der Empfänger wird beim Versand nicht auf „aktiv“ geprüft | AK-1004-12 (daten) | `ant pruefung-daten -Dbh.pruefung.filter=AK-1004` |
+    | G8-15 (AK-1004) | `recordTransitionNotifications` läuft in einer eigenen Transaktion (`@Transactional(propagation = Propagation.REQUIRES_NEW)`) | `AK1004_NachrichtenUndStatuswechselInEinerTransaktionTest` (Nachricht bleibt trotz zurückgerolltem Wechsel); AK-1004-09 bleibt grün | `ant test-integration -Dtest.class=AK1004_NachrichtenUndStatuswechselInEinerTransaktionTest` |
+    | G8-16 (AK-1011) | `Channels.parse` fasst Doppelte nicht zusammen und sortiert nicht | AK-1011-02 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1011` |
+    | G8-17 (AK-1011) | ein unbekannter Kanal wird angenommen und gespeichert | AK-1011-04 und AK-1011-05 (daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1011`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1011` |
+    | G8-18 (AK-1012) | Voreinstellung nur E-Mail | AK-1012-01 und AK-1012-02 (daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1012`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1012` |
+    | G8-19 (AK-1013) | ohne gewählten Kanal geht die Nachricht ersatzweise über die App | AK-1013-02, AK-1013-03 und AK-1013-05 (daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1013`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1013` |
+    | G8-20 (AK-1014) | beim Versand gilt der heutige Kanal der Person statt des Kanals der Zeile | AK-1014-01 und AK-1014-02 (daten) | `ant pruefung-daten -Dbh.pruefung.filter=AK-1014` |
+    | G8-21 (AK-1015) | `getPreview` markiert die Nachrichten als gelesen | `AK1015_VorschauMarkiertNichtsTest` (kein neutraler Fall zeigt das) | `ant test-integration -Dtest.class=AK1015_VorschauMarkiertNichtsTest` |
+    | G8-22 (AK-1015) | `openNotifications` markiert nicht als gelesen oder markiert vor dem Lesen von „Neu“ | AK-1015-01 (daten) | `ant pruefung-daten -Dbh.pruefung.filter=AK-1015` |
+    | G8-23 (AK-1021) | `reminderSchedule` rechnet 9:00 Uhr in der Zeitzone der JVM (GMT) statt Europe/Berlin | AK-1021-03, AK-1021-05, AK-1021-08, AK-1021-10, AK-1021-11 und AK-1021-17 (daten); AK-1021-04, AK-1021-06, AK-1021-07, AK-1021-09 und AK-1021-12 bleiben grün | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1021`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1021` (Test-JVM in GMT, P01) |
+    | G8-24 (AK-1021) | der Vermerk des Erinnerungslaufs wird nicht beansprucht (`ON CONFLICT` ausgelassen) | AK-1021-14 (daten, der zweite Lauf meldet `ausgefuehrt` statt `schon_erledigt`) und `AK1021_ZweiGleichzeitigeErinnerungslaeufeTest` | `ant pruefung-daten -Dbh.pruefung.filter=AK-1021`, `ant test-integration -Dtest.class=AK1021_ZweiGleichzeitigeErinnerungslaeufeTest` |
+    | G8-25 (AK-1021) | der Vermerk wird in einer eigenen Transaktion (`REQUIRES_NEW`) vor den Nachrichten geschrieben und bleibt nach einem Fehler stehen | `AK1021_ZweiGleichzeitigeErinnerungslaeufeTest`, zweiter Teil (nach der Störung steht ein Vermerk ohne Nachricht, der nächste Lauf meldet `schon_erledigt`) | `ant test-integration -Dtest.class=AK1021_ZweiGleichzeitigeErinnerungslaeufeTest` |
+    | G8-26 (AK-1021) | der Erinnerungslauf legt die fälligen Wochen vorher nicht an (`ensureReportsForAllTrainees` fehlt) | `AK1021_ErinnerungLegtFehlendeWochenAnTest` (keine Erinnerung für Anna) | `ant test-integration -Dtest.class=AK1021_ErinnerungLegtFehlendeWochenAnTest` |
+    | G8-27 (AK-1022) | die Information fasst alle Azubis in einer Nachricht zusammen | AK-1022-05 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1022` |
+    | G8-28 (AK-1022) | überfällig gilt nur für den Status „Entwurf“, nicht für „Abgelehnt“ | AK-1022-02 und AK-1021-02 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1022`, `-Dbh.pruefung.filter=AK-1021` |
+    | G8-29 (AK-1022) | der Ausbilder wird nur informiert, wenn der Azubi einen Kanal hat | AK-1022-03 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1022` |
+    | G8-30 (AK-1023) | die laufende Woche oder eine eingereichte Woche zählt als offen | AK-1023-01, AK-1023-02, AK-1023-05 (daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1023`, `ant pruefung-daten -Dbh.pruefung.filter=AK-1023` |
+    | G8-31 (AK-1023) | eine Woche ganz außerhalb der Ausbildung zählt als offen | AK-1023-04 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1023` |
+    | G8-32 (AK-1024) | der Ereignisschlüssel der Erinnerung trägt die Woche des Stichtags nicht | AK-1024-04 (daten): der Montag danach legt wegen des alten Schlüssels nichts an; die Fachlogik-Fälle AK-1024-01 bis AK-1024-03 bleiben grün, weil sie den Schlüssel nicht sehen | `ant pruefung-daten -Dbh.pruefung.filter=AK-1024` |
+    | G8-33 (AK-1025) | die Erinnerung nennt nur die älteste Woche | AK-1025-01 und AK-1025-02 | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-1025` |
+    | G8-34 (AK-205) | deaktivierte Azubis bekommen eine Erinnerung | AK-205-01 und AK-205-02 (daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-205-01`, `ant pruefung-daten -Dbh.pruefung.filter=AK-205-02` |
+    | G8-35 (AK-1004) | die Listener prüfen `bh.betrieb` nicht und laufen auch im Testbetrieb | `AK1004_ListenerTutImTestbetriebNichtsTest` (offene Nachrichten werden übergeben) | `ant test-integration -Dtest.class=AK1004_ListenerTutImTestbetriebNichtsTest` |
+    | G8-36 (AK-1021) | `reminder_run_iso_week_range` im Skript ausgelassen (oder nur 1 bis 52) | `AK1021_ErinnerungslaufDatenhaltungTest` (KW 0 und KW 54 gelingen, KW 53 scheitert) | `ant test-db -Dtest.class=AK1021_ErinnerungslaufDatenhaltungTest` |
+    | G8-37 (AK-1021) | eindeutiger Index (`isoYear`, `isoWeek`) in `BH_ReminderRun` ausgelassen | `AK1021_ErinnerungslaufDatenhaltungTest` (zweiter Vermerk gelingt; `ON CONFLICT` ohne Index scheitert mit einem Fehler) | wie G8-36 |
 
     Prüfschritt: Tabelle mit dem tatsächlichen Ergebnis je Zeile im PR; nach dem Zurücknehmen alles grün. Wird ein benannter Fall
     nicht rot, ist die Prüfung ohne Wirkung: anhalten und der Steuerung melden.
@@ -343,28 +343,28 @@ Nur in CI: der volle Liferay-6.2.5-Job mit Mailpit als Dienst-Container; im PR v
 
 | Fehler | Was tun |
 | --- | --- |
-| Ein Fehlversuch wird nicht gezählt, die Nachricht wird in jedem Lauf sofort wiederholt | der Fehlschlag eines Kanals ist ein Ergebnis, keine `PortalException`: Sie rollte die Buchführung zurück (Schritt 5, G08-13) |
-| Erinnerungslauf legt Nachrichten doppelt an oder ein zweiter Lauf läuft mit | Vermerk der Woche mit `ON CONFLICT DO NOTHING` in derselben Transaktion beanspruchen (G08-24) |
-| Nach einem Fehler im Erinnerungslauf kommt nie wieder eine Erinnerung | Vermerk und Nachrichten in **einer** Transaktion; ein Fehler rollt beide zurück (G08-25) |
-| Nachricht entsteht, obwohl der Statuswechsel scheiterte | Anlegen in der Transaktion des Wechsels, kein `REQUIRES_NEW` (G08-15) |
-| Zweites Anlegen bricht mit „current transaction is aborted“ ab | `INSERT … ON CONFLICT DO NOTHING`, keinen Schlüsselfehler provozieren (G08-10) |
-| Zwei Versandläufe übergeben dieselbe Nachricht | `FOR UPDATE SKIP LOCKED` und je Zeile eine Transaktion (G08-12); eindeutiger Schlüssel allein genügt nicht |
-| Fehler der E-Mail kommen nie an | `MailEngine.send` synchron, nicht `MailServiceUtil` (Profil 6.2.5, Abschnitt 3, 7) |
+| Ein Fehlversuch wird nicht gezählt, die Nachricht wird in jedem Lauf sofort wiederholt | der Fehlschlag eines Kanals ist ein Ergebnis, keine `PortalException`: Sie rollte die Buchführung zurück (Schritt 5, G8-13) |
+| Erinnerungslauf legt Nachrichten doppelt an oder ein zweiter Lauf läuft mit | Vermerk der Woche mit `ON CONFLICT DO NOTHING` in derselben Transaktion beanspruchen (G8-24) |
+| Nach einem Fehler im Erinnerungslauf kommt nie wieder eine Erinnerung | Vermerk und Nachrichten in **einer** Transaktion; ein Fehler rollt beide zurück (G8-25) |
+| Nachricht entsteht, obwohl der Statuswechsel scheiterte | Anlegen in der Transaktion des Wechsels, kein `REQUIRES_NEW` (G8-15) |
+| Zweites Anlegen bricht mit „current transaction is aborted“ ab | `INSERT … ON CONFLICT DO NOTHING`, keinen Schlüsselfehler provozieren (G8-10) |
+| Zwei Versandläufe übergeben dieselbe Nachricht | `FOR UPDATE SKIP LOCKED` und je Zeile eine Transaktion (G8-12); eindeutiger Schlüssel allein genügt nicht |
+| Fehler der E-Mail kommen nie an | `MailEngine.send` synchron, nicht `MailServiceUtil` (Profil 6.2.5, Abschnitte 3, 7) |
 | Mails erscheinen nicht in Mailpit oder dem Mock | Einstellungen im Control Panel überschreiben `portal-ext.properties` (Profil 6.2.5, Abschnitt 7); Port prüfen |
-| Erinnerung kommt um 10:00 oder 11:00 Uhr | die Fachlogik rechnet in GMT; Stichtag in `Europe/Berlin` bestimmen, nicht per Cron (G08-23) |
+| Erinnerung kommt um 10:00 oder 11:00 Uhr | die Fachlogik rechnet in GMT; Stichtag in `Europe/Berlin` bestimmen, nicht per Cron (G8-23) |
 | Der Takt ändert den Bestand eines Daten-Falls | Listener sind bei `bh.betrieb=test` ohne Wirkung; Läufe nur über die Testschnittstelle (Schritt 6) |
 | Zeiten der Wartezeit stimmen nicht | Datenbankverbindung nicht in UTC oder JVM nicht in GMT (gemeinsames Profil, Abschnitt 2.2) |
-| Der Zähler der Glocke sinkt beim Anzeigen der Vorschau | `getPreview` markiert nichts; nur `openNotifications` markiert (G08-21) |
+| Der Zähler der Glocke sinkt beim Anzeigen der Vorschau | `getPreview` markiert nichts; nur `openNotifications` markiert (G8-21) |
 | Kommentartext steht in der Nachricht | `plan()` bekommt Kommentare gar nicht (Schritt 3) |
-| Rücksprung führt auf eine fremde Adresse | `safeReturnPath` anwenden, nicht den rohen Parameter (G08-6) |
+| Rücksprung führt auf eine fremde Adresse | `safeReturnPath` anwenden, nicht den rohen Parameter (G8-6) |
 | Methode `getX` schreibt nichts | Methodenname mit `get`, `is`, `has` läuft nur lesend; `openNotifications` und `runDueReminders` heißen deshalb nicht so (Profil 6.2.5, Abschnitt 7) |
-| Nachricht an einen Empfänger, der inzwischen deaktiviert ist | beim Versand erneut prüfen und ohne Versuch aufgeben (G08-14) |
+| Nachricht an einen Empfänger, der inzwischen deaktiviert ist | beim Versand erneut prüfen und ohne Versuch aufgeben (G8-14) |
 | Teams-Nachricht doppelt im Postfach | eindeutiger Schlüssel `notificationId` und `ON CONFLICT DO NOTHING` |
 
 ## Bitte bestätigen
 
-- [ ] Neue Schlüssel in `portal-ext.beispiel.properties`: `bh.app.url` (Basis der Links in Nachrichten; im Scheduler gibt es keine
-      Anfrage, aus der sich die Adresse ergäbe) und die Absenderadresse der E-Mail; Profil 6.2.5, Abschnitt 5.1 Schritt 4 nennt beide nicht.
+- [ ] Schlüssel in `portal-ext.beispiel.properties` (stehen jetzt in P00, Schritt 5, und Profil 6.2.5, Abschnitt 5.1 Schritt 4): `bh.app.url` (Basis der Links in Nachrichten; im Scheduler gibt es keine
+      Anfrage, aus der sich die Adresse ergäbe) und die Absenderadresse der E-Mail; sie wurden dort nachgetragen.
 - [ ] Test-Kanal als Argument des Versandlaufs (nicht als Konfiguration) und Listener bei `bh.betrieb=test` ohne Wirkung; die Testaktion
       `nachrichten_versenden` bekommt außerhalb des neutralen Formats den Wert `kanal: "konfiguriert"` (echter Versand an den Mock bzw.
       Mailpit für den Playwright-Test).
@@ -377,9 +377,9 @@ Nur in CI: der volle Liferay-6.2.5-Job mit Mailpit als Dienst-Container; im PR v
 - [ ] Die Transaktion des Versands hält die Zeilensperre während der Übergabe an den Kanal (kein Zwischenzustand „in Arbeit“); Alternative:
       Sperre in einer Transaktion, Übergabe außerhalb, Markieren in einer zweiten. Gewählt ist die erste, weil Abschnitt 8 der Spec die
       Wiederholung nach Abbruch zulässt.
-- [ ] Seite `entwickler-postfach` (Teams-Postfach der Demo, Azubis eigene, Ausbilder alle) steht nicht in der Adressliste von Profil 6.2.5, Abschnitt 4.3; die Adresstabelle in P00 ist entsprechend zu ergänzen.
+- [ ] Seite `entwickler-postfach` (Teams-Postfach der Demo, Azubis eigene, Ausbilder alle) steht nicht in der Adressliste von Profil 6.2.5, Abschnitt 4.3; P00 (Schritt 12) führt sie jetzt in der Adresstabelle.
 - [ ] `userNotificationEventId` bleibt auf 6.2.5 leer (kein Abbild in der Glocke der Plattform, Profil 6.2.5, Abschnitt 3.1); die Wahl gehört zu P09 und U00.
-- [ ] Nummerierung der Gegenproben `G08-n`, weil `G8-n` in P05 die Gegenproben zu AK-508 meint (Zählweise: Szenario getrennt
-      ausgewiesen, AK-1022-07 ist Szenario (P10); in P05 ist das Szenario bisher mitgezählt).
+- [ ] Nummerierung der Gegenproben `G<Paket>-n` in beiden Reihen gleich (hier `G8-n`; P05 zählt die Gegenproben zu AK-508 als `G5-4`
+      bis `G5-7`). Zählweise: Szenario getrennt ausgewiesen, AK-1022-07 ist Szenario (P10), wie jetzt auch in P05.
 - [ ] Das Playbook folgt dem Aufbau aus P05 der Reihe und „Aufbau der Reihe (gilt für P01 bis P10)“ aus
-      `playbooks/liferay-72/P00-grundgeruest.md`; die P00 der Reihe 6.2.5 trägt diesen Abschnitt nicht.
+      `playbooks/liferay-72/P00-grundgeruest.md`; die P00 der Reihe 6.2.5 trägt ihn jetzt ebenfalls.

@@ -6,7 +6,7 @@ Reihe `playbooks/liferay-72/` · Plattform Liferay Portal 7.2 CE · Profil `prof
 ## 1. Ziel und Fertig-Kriterium
 
 Die Oberfläche der App folgt der UI-Spezifikation mit den Mitteln von 7.2: eigenes Theme `bh-theme` (FreeMarker, Gulp) mit Tokens als CSS-Variablen
-für Hell und Dunkel, Seitenleiste und Schublade, **eigene Glocke im Theme** aus `BH_Notification` (Profil 7.2, Abschnitt 3 und 3.5), Portlets ohne eigene
+für Hell und Dunkel, Seitenleiste und Schublade, **eigene Glocke im Theme** aus `BH_Notification` (Profil 7.2, Abschnitte 3 und 3.5), Portlets ohne eigene
 Überschrift, Status-Chips mit Symbol, Darstellung System/Hell/Dunkel vom Server ohne Aufblitzen, eigene Dialoge mit Fokusfalle, Seitentitel, Lade-
 und Leerzustände und WCAG 2.2 AA. Die Fachfunktionen der Oberfläche sind reine Java-Klassen in `bh-domain`; das Theme erhält seine Daten über
 einen `TemplateContextContributor` (Typ THEME) aus `bh-web`; Senna (SPA) ist für die Site abgeschaltet. Fertig, wenn:
@@ -28,7 +28,7 @@ gegenüber der TypeScript-App außer der genannten Verwaltung von Liferay.
 - L72-P00 bis L72-P08 abgenommen und gemergt. Die Portlets der Module existieren funktional (Anmelden, Kein Zugang, Start, Meine Wochen, Bericht,
   Prüfliste, Azubis, Personen, Benachrichtigungen, Nicht zustellbar, Einstellungen, Teams-Postfach der Demo); P09 gibt ihnen Rahmen, Gestaltung und
   Zugänglichkeit. Die Ablauf-Aktionen der Module (P02 bis P08) laufen; P09 ergänzt die Prüfaktionen und die Selektoren der Elemente.
-- Profil 7.2: Abschnitte 1 (Theme-Werkzeug, Browser), 3 (Oberfläche, Dunkelmodus 3.4, Glocke 3.5), 4 (Ablauf-Adapter), 6.3 (Oberfläche und Dunkelmodus) und 7
+- Profil 7.2, Abschnitte 1 (Theme-Werkzeug, Browser), 3 (Oberfläche, Dunkelmodus 3.4, Glocke 3.5), 4 (Ablauf-Adapter), 6.3 (Oberfläche und Dunkelmodus) und 7
   („Senna“, „Clay ist Sass“, „OSGi-Abhängigkeiten“); gemeinsames Profil, Abschnitt 2.5 (Glocke).
 - P00 hat bestätigt (Profil 7.2, „In P00 zu bestätigen“): `liferay-theme-tasks` und Node ohne Download durch Gradle, `TemplateContextContributor` vom Typ THEME
   und `data-theme` vor dem ersten Darstellen, Senna für die Site aus, Clay-Version und die Liste der Komponenten mit Token-Überschreibung, das Clay-Iconset für
@@ -77,7 +77,7 @@ Prüffälle **ohne** Ablauf-Szenario, M09 hat keines):
 | UI-AK-13 | Jeder Status-Chip zeigt Symbol und Text. | 4 (4 fachlogik) | gleichwertig; Symbole aus dem Clay-Iconset plus Text, Farben über Status-Tokens |
 | UI-AK-14 | Darstellung System, Hell, Dunkel; gilt sofort, bleibt erhalten, gilt auf zweitem Gerät. | 10 (10 fachlogik) | gleichwertig; `BH_Person.theme`, Prüfung im Service, Cookie für den Zustand ohne Anmeldung |
 | UI-AK-15 | Bei System folgt die App dem Gerät; kein Aufblitzen des falschen Schemas. | 3 (3 ablauf) | gleichwertig; `data-theme` vom Server, Senna aus |
-| UI-AK-16 | Keine Verstöße WCAG A und AA, hell und dunkel, 1280 und 375 px. | 4 (4 ablauf) | gleichwertig für alle Seiten der App; **abweichend, begründet** für die Verwaltung von Liferay (Profil 7.2, Abschnitt 3.4 und 6.3), kein Fall berührt sie |
+| UI-AK-16 | Keine Verstöße WCAG A und AA, hell und dunkel, 1280 und 375 px. | 4 (4 ablauf) | gleichwertig für alle Seiten der App; **abweichend, begründet** für die Verwaltung von Liferay (Profil 7.2, Abschnitte 3.4 und 6.3), kein Fall berührt sie |
 | UI-AK-17 | Alle Abläufe nur mit der Tastatur; Fokus sichtbar und nie verdeckt. | 2 (2 ablauf) | gleichwertig; `scroll-padding` für feste Leisten, Control Menu aus |
 | UI-AK-18 | Dialog fängt Fokus, Escape schließt, Fokus kehrt zurück. | 2 (2 ablauf) | gleichwertig; eigener `<dialog>` statt `Liferay.Util.openModal` |
 | UI-AK-19 | Eigener Seitentitel „<Seite> – Berichtsheft“ und genau eine Hauptüberschrift. | 2 (2 ablauf) | gleichwertig; Titel im Theme, Portlet-Dekorator `barebone` |
@@ -98,13 +98,13 @@ Summe: 20 UI-AK-IDs, 55 Prüffälle (22 fachlogik, 0 daten, 33 ablauf, 0 Szenari
 **Weg B**, mit den Prüffällen als Maßstab (sie prüfen Layout, Fokus und Titel über feste Merker, nicht Pixel). Das Paket ist groß: Die Steuerung darf es nach
 Modulgrenzen teilen (`playbooks/00-steuerung.md`, Abschnitt 3), z. B. (a) Schritte 2 bis 8 (Theme, Kontext, Rahmen, Glocke, Seiten, Darstellung) und
 (b) Schritte 9 bis 12 (Fokus, Barrierefreiheit, Prüfaktionen, Gegenproben). Wichtigster Fallstrick von 7.2: Clay färbt über Sass-Variablen, die zur
-Build-Zeit feste Farben werden; ohne Überschreibung bleibt jede Clay-Komponente im Dunkelmodus hell (Profil 7.2, Abschnitt 3.4 und 7). Weg A nur auf ausdrücklichen Auftrag.
+Build-Zeit feste Farben werden; ohne Überschreibung bleibt jede Clay-Komponente im Dunkelmodus hell (Profil 7.2, Abschnitte 3.4 und 7). Weg A nur auf ausdrücklichen Auftrag.
 
 ## 7. Schritte
 
 1. **Branch** `claude/l72-p09-oberflaeche`; Spec, `docs/05-ui-spezifikation.md`, Profil 7.2 (3.4, 3.5, 6.3, 7) und Prüffälle lesen. Prüfschritt: Liste der festen Texte
    (Abschnitt 5 der Spec) und der Elemente (`specs/pruefung/format.md`, Tabelle „Elemente“) im PR-Entwurf.
-2. **Theme `bh-theme` und Probe** (`themes/bh-theme`, Profil 7.2, Abschnitt 1 und 2): Gulp-Aufgaben von `liferay-theme-tasks` mit dem Node der Sitzung (`node.download=false`),
+2. **Theme `bh-theme` und Probe** (`themes/bh-theme`, Profil 7.2, Abschnitte 1 und 2): Gulp-Aufgaben von `liferay-theme-tasks` mit dem Node der Sitzung (`node.download=false`),
    Basistheme `styled` (Vorschlag; Clay-CSS ohne Gestaltung des Classic-Themes). Probe in `_custom.scss`: CSS-Variablen mit `var(--…)`, ein `:root`-Block, ein
    `[data-theme="dark"]`-Block und ein `@media (prefers-color-scheme: dark)`-Block für `[data-theme="system"]` überstehen den Sass-Lauf unverändert, und
    Funktionen wie `darken()` werden **nicht** auf `var(--…)` angewandt (Profil 7.2, Abschnitt 3.4). Prüfschritt: `./gradlew :themes:bh-theme:build deploy`, das erzeugte CSS im
@@ -125,7 +125,7 @@ Build-Zeit feste Farben werden; ohne Überschreibung bleibt jede Clay-Komponente
    gemerktem Wert `System`; Abbildung auf die Spaltenwerte `SYSTEM`, `LIGHT`, `DARK`; UI-AK-14), `MenuItems.forRole(rolle, hatNichtZustellbare)` (Reihenfolge nach M09-R02,
    „Teams-Postfach (Demo)“ nur mit Einschaltung; UI-AK-02) und `RelativeTime` (Anzeige, kein UI-AK). Prüfschritt: JUnit-Tests mit der UI-AK-ID ohne Bindestrich im Namen
    (`UIAK03_…`, `UIAK04_…`, `UIAK13_…`, `UIAK14_…`).
-5. **Template-Kontext** (Profil 7.2, Abschnitt 3.4, 7): `BhThemeContextContributor` (`TemplateContextContributor`, `type=THEME`) in `bh-web` legt in den Kontext des Themes: `bhTheme` (die
+5. **Template-Kontext** (Profil 7.2, Abschnitte 3.4, 7): `BhThemeContextContributor` (`TemplateContextContributor`, `type=THEME`) in `bh-web` legt in den Kontext des Themes: `bhTheme` (die
    Darstellung nach `Appearance.resolve()`: Wahl an `BH_Person.theme` des angemeldeten Benutzers, ohne Anmeldung das Cookie `bh_theme`, sonst `System`), `bhPerson` (Name,
    Rolle), `bhMenu` (Menüpunkte je Rolle mit Zählern für Prüfliste und Nicht zustellbar aus P05 und P08), `bhBell` (Zähler und Name aus `Bell`) und `bhDemo`. Das Theme
    bekommt nur einfache Werte; Dienste sucht `portal_normal.ftl` nie selbst. Der Beitragende prüft zuerst, ob die Anfrage zur Site „Berichtsheft“ gehört; für Control Panel
@@ -134,7 +134,7 @@ Build-Zeit feste Farben werden; ohne Überschreibung bleibt jede Clay-Komponente
    `<html data-theme="${bhTheme}" …>` und `color-scheme` (Schema steht ohne Skript fest), Seitentitel „<Seite> – Berichtsheft“, „Zum Inhalt springen“, Kopf mit Burger-Knopf (nur unter
    1024 px), Schriftzug „Berichtsheft“, Glocke und Kontomenü (Name, Rolle, „Einstellungen“, „Abmelden“ über `/c/portal/logout`), ab 1024 px Seitenleiste, darunter Schublade
    (Fokusfalle, Escape, „Schließen“, Klick daneben, Wahl eines Punktes; danach Fokus zurück zum Knopf), Menüpunkte je Rolle mit `aria-current` an der aktuellen Seite, Demo-Hinweis.
-   **Eigene Glocke** (Profil 7.2, Abschnitt 3.4, 3.5): Zähler und Vorschau der letzten 5 aus `BH_Notification` über die lesenden Resource-Befehle aus P08; die Vorschau markiert nichts.
+   **Eigene Glocke** (Profil 7.2, Abschnitte 3.4, 3.5): Zähler und Vorschau der letzten 5 aus `BH_Notification` über die lesenden Resource-Befehle aus P08; die Vorschau markiert nichts.
    Control Menu, Produktmenü und Dockbar von Liferay sind für Azubis und Ausbilder aus (keine Verwaltungsrechte); die Warnung vor dem Ablauf der Sitzung von Liferay wird
    abgeschaltet. Senna (SPA) ist für die Site aus (P00, Profil 7.2, Abschnitt 7); `FrameTest.UIAK15_sennaIstFuerDieSiteAus` prüft den Schalter, den P00 festgelegt hat. Merker `data-menue`,
    `data-menue-knopf`, `data-drawer-close`, `data-glocke`, `data-glocke-vorschau`. Prüfschritt: Ablauf-Fälle zu UI-AK-01 und UI-AK-02 bei 1280, 1024, 1023 und 375 px.
@@ -263,8 +263,8 @@ Nur in CI: Firefox und Edge für alle Ablauf-Fälle (P10), der volle Job der Kla
       `abweichend.liferay-72`, weil keiner die Verwaltung erreicht.
 - [ ] Schrift IBM Plex Sans (`docs/05-ui-spezifikation.md`) liegt im Repository nicht vor (dort nur Noto Sans für das PDF) und steht nicht in der Liste der Bibliotheken (gemeinsames Profil, Abschnitt 7). Vorschlag: Dateien samt Lizenz
       `OFL` ins Theme legen, Quelle im PR nennen; Ersatz Systemschrift.
-- [ ] Profil 7.2, Abschnitt 3.4 (UI-AK-10) nennt für die lesbare Adresse des Prüfansicht-Berichts `FriendlyURLMapper` „(P07)“; P07 ist der PDF-Export. Vorschlag: Der Mapper entsteht in P09 (Schritt 8), das
-      Profil wird bei Gelegenheit berichtigt.
+- [ ] Profil 7.2, Abschnitt 3.4 (UI-AK-10) nannte für die lesbare Adresse des Prüfansicht-Berichts `FriendlyURLMapper` „(P07)“; P07 ist der PDF-Export. Berichtigt: Der Mapper gehört zu P09
+      (Schritt 8), das Profil sagt jetzt „(P09)“.
 - [ ] `<dialog>` in Firefox und Edge der CI (Profil 7.2, „In P00 zu bestätigen“): Fehlt die Unterstützung, wird derselbe Dialog mit `role="dialog"` und eigener Fokusfalle gebaut; die Prüffälle UI-AK-18-01 und
       UI-AK-18-02 bleiben der Maßstab.
 - [ ] Gegenproben F-P09-1 bis F-P09-32 als Nachweis, dass Farbschema-, Kontrast-, Fokus- und Layout-Prüfungen wirken.

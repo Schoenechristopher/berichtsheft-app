@@ -11,7 +11,7 @@ Bau-Stand-Listen der Prüf-Adapter sind entfernt, der CI-Job der Klasse L72 ist 
 Fertig, wenn:
 
 1. alle Prüffälle in `specs/pruefung/*.json` (außer `testdaten.json`) über die Prüf-Adapter grün sind; keiner „noch nicht
-   gebaut“; als „abweichend, begründet“ nur die im Profil freigegebenen Fälle (darunter AK-101-01 und AK-106-01, Profil 6.1),
+   gebaut“; als „abweichend, begründet“ nur die im Profil freigegebenen Fälle (darunter AK-101-01 und AK-106-01, Profil 7.2, Abschnitt 6.1),
    getrennt gezählt und nie grün; übersprungen nur freigegebene Testgrenzen (Q-R06);
 2. die Prüffälle der Q-AK grün sind (2 AK-IDs; AK-1101-01 und AK-1102-01 in `specs/pruefung/Q.json`);
 3. die drei Szenario-Fälle in `specs/pruefung/szenarien.json` (AK-502-04, AK-703-06, AK-1022-07) in jedem Browser und bei 375 px
@@ -25,7 +25,7 @@ Fertig, wenn:
 
 - L72-P00 bis L72-P09 abgenommen und gemergt; der letzte Lauf des Jobs „Liferay 7.2“ auf dem Hauptzweig ist grün.
 - Der CI-Job der Klasse L72 nach dem Vorschlag aus P00 (Schritt 16) ist freigegeben und gemergt.
-- Profil: Abschnitte 4, 5, 6 und 7 und „Nachweis AK-505 und AK-508“; Fach-Spec `specs/Q-plattform-und-qualitaet.md` (Regeln Q-R01
+- Profil 7.2, Abschnitte 4, 5, 6 und 7 und „Nachweis AK-505 und AK-508“; Fach-Spec `specs/Q-plattform-und-qualitaet.md` (Regeln Q-R01
   bis Q-R06, Abschnitt 8).
 - Zugriff auf GitHub Actions: Firefox, Edge und der vollständige Lauf mit Bundle aus dem Cache laufen nur dort.
 
@@ -36,7 +36,7 @@ Fertig, wenn:
 - Prüffälle: `specs/pruefung/Q.json`, `specs/pruefung/szenarien.json`, alle Module `specs/pruefung/M01.json` bis
   `specs/pruefung/M09.json`; „Abweichend, begründet“ in `specs/pruefung/format.md`.
 - Vorgaben: `docs/ci-richtlinie.md` (Abschnitt 7, Klasse L72), `docs/01-spezifikation.md` (Beispielszenarien, Referenz).
-- Profil: Abschnitt 6 (alle Abweichungen mit Prüffall-ID) und die Freigaben von Chris dazu.
+- Profil 7.2, Abschnitt 6 (alle Abweichungen mit Prüffall-ID) und die Freigaben von Chris dazu.
 - Code-Landkarte: `specs/code-landkarte.md`, Abschnitt „Querschnitt“.
 
 ## 4. Weg A: aus dem Quellcode
@@ -54,7 +54,7 @@ wiederholen, (7) CI, (8) Demo-Anleitung, (9) Abnahmebericht. Zu jedem AK die Pr�
 | AK-ID | Kriterium (Kurzfassung aus der Fach-Spec) | Prüffälle | Bewertung auf 7.2 |
 | --- | --- | --- | --- |
 | AK-1101 | Die Web-App funktioniert in Edge, Chrome und Firefox; nachgewiesen, indem alle Browser-Tests in allen drei Browsern laufen. | 1 (1 ablauf) | gleichwertig; Firefox und Edge nur im CI-Job |
-| AK-1102 | Bei 375 px sind alle Kernfunktionen und Seiten ohne waagerechtes Scrollen bedienbar. | 1 (1 ablauf) | gleichwertig für alle Seiten der Site „Berichtsheft“; die Verwaltung von Liferay ist kein Teil der App (Profil 6.3) |
+| AK-1102 | Bei 375 px sind alle Kernfunktionen und Seiten ohne waagerechtes Scrollen bedienbar. | 1 (1 ablauf) | gleichwertig für alle Seiten der Site „Berichtsheft“; die Verwaltung von Liferay ist kein Teil der App (Profil 7.2, Abschnitt 6.3) |
 
 Testgrenzen: Die Grenze AK-408-03 in Firefox (Q, Abschnitt 8) übernimmt 7.2 **nur**, wenn der Ablauf-Adapter dort dieselbe Grenze
 des Werkzeugs zeigt; sonst läuft der Fall auch in Firefox. Die Szenarien liegen unter dem Modul der AK, die sie im Kern belegen
@@ -75,12 +75,12 @@ hierher. Findet die Abnahme einen Fehler, meldet die Sitzung ihn der Steuerung, 
    `./gradlew :modules:bh-test-integration:testIntegration` und der Ablauf-Adapter in Chromium und 375 px. Prüfschritt: keine
    roten, keine „noch nicht gebaut“; „abweichend, begründet“ genau die Fälle, die das Profil nennt und Chris freigegeben hat.
 4. **Abweichungen zählen.** Jeder Fall mit `"abweichend": { "liferay-72": … }` erscheint mit Verweis getrennt im Bericht.
-   Prüfschritt: Die Liste stimmt mit Profil, Abschnitt 6 überein; ein Fall mit `abweichend`, dessen Abweichung nicht freigegeben
+   Prüfschritt: Die Liste stimmt mit Profil 7.2, Abschnitt 6 überein; ein Fall mit `abweichend`, dessen Abweichung nicht freigegeben
    ist, ist ein Befund für die Steuerung, kein grüner Fall.
 5. **Q-Fälle (AK-1101, AK-1102).** AK-1101-01 ist der Kernablauf (erfassen, speichern, einreichen, freigeben, Historie lesen) in
    jedem Browser; AK-1102-01 stellt das Gerät auf 375 px und liest auf jeder Seite aus Q-R03 mit `ansicht_lesen`, ob sie
    waagerecht scrollt (auch mit offener Rückfrage beim Einreichen und Ablehnen). Die Anmeldung läuft über das Login-Portlet
-   (Profil, Abschnitt 4). „Kein Zugang“ kann der Ablauf nicht anmelden; dafür ein eigener Playwright-Test in `liferay-72/pruefung/`
+   (Profil 7.2, Abschnitt 4). „Kein Zugang“ kann der Ablauf nicht anmelden; dafür ein eigener Playwright-Test in `liferay-72/pruefung/`
    wie `e2e/ak-1102-smartphone.spec.ts`. Prüfschritt: beide Fälle grün in `chromium` und `smartphone-375`.
 6. **Beispielszenarien.** AK-502-04 (Einreichen scheitert an fehlendem Text), AK-703-06 (Vertretung nimmt Freigabe zurück) und
    AK-1022-07 (Erinnerung und Information an den Ausbilder) in `specs/pruefung/szenarien.json`. Prüfschritt: grün in Chromium und
@@ -100,7 +100,7 @@ hierher. Findet die Abnahme einen Fehler, meldet die Sitzung ihn der Steuerung, 
    stehen im PR.
 10. **Demo-Anleitung** in `liferay-72/README.md`: Bezug des Bundles von SourceForge (gemeinsam 4.1), JDK 11, PostgreSQL,
     `./gradlew initBundle build deploy`, Start mit `catalina.sh`, eingebetteter Suchdienst; oder `docker compose` mit
-    `liferay/portal:7.2.1-ga2` aus `liferay-72/` (Profil, Abschnitt 5). Die Testpersonen Anna, Bernd und Clara (Dora ohne Zugang,
+    `liferay/portal:7.2.1-ga2` aus `liferay-72/` (Profil 7.2, Abschnitt 5). Die Testpersonen Anna, Bernd und Clara (Dora ohne Zugang,
     Emil zum Anlegen) mit ihren Liferay-Konten und Platzhalter-Passwörtern nur bei `bh.betrieb=test`; die drei Szenarien Schritt für
     Schritt mit gestellter Uhr über die Testschnittstelle; Mailpit für die E-Mails (synchroner Versand, gemeinsam 3.2); Hinweis, dass
     Testschnittstelle und stellbare Uhr bei `bh.betrieb=produktion` fehlen und 7.2 CE keine Sicherheitsupdates bekommt (nur Demo).
@@ -137,7 +137,7 @@ hierher. Findet die Abnahme einen Fehler, meldet die Sitzung ihn der Steuerung, 
 | --- | --- |
 | Firefox oder Edge rot, lokal grün | nur im CI-Job prüfbar: Diagnosemeldungen früh einbauen, ein Lauf kostet; kein Test pro Browser abschalten (Q-R01) |
 | Job „Liferay 7.2“ überschreitet das Zeitlimit | Messung aus P00 heranziehen; Firefox und Edge in getrennte Jobs, Bundle aus dem Cache; nicht einfach das Limit erhöhen |
-| Speicher reicht im CI-Job nicht | Heap nach P00 senken, Browser trennen, sonst entfernter Suchdienst-Knoten (Profil, Abschnitt 7) |
+| Speicher reicht im CI-Job nicht | Heap nach P00 senken, Browser trennen, sonst entfernter Suchdienst-Knoten (Profil 7.2, Abschnitt 7) |
 | Ein abweichender Fall wird grün gezählt | Fälle mit `abweichend.liferay-72` sind nie grün; getrennt melden (`specs/pruefung/format.md`) |
 | Szenario AK-502-04 verliert die Tage | `submit` wirft bei fehlenden Pflichtangaben; zurück an P05 (Ergebnis statt Ausnahme) |
 | Eine zweite Testgrenze scheint nötig | nie selbst eintragen; Q-R06 verlangt Freigabe von Chris |

@@ -24,7 +24,7 @@ Keine Schemaänderung: M04 ändert nur Inhalte der Tabelle `BH_ReportDay` aus P0
 ## 2. Voraussetzungen
 
 - L72-P00 bis L72-P03 abgenommen und gemergt (Berichte und Tage existieren, Bundesland, Zugriff, Merker „vorbelegt“).
-- Profil 7.2: Abschnitte 3 (Transaktion und Gleichzeitigkeit, Oberfläche), 4 (Ablauf-Adapter, plattformeigene Tests) und 7
+- Profil 7.2, Abschnitte 3 (Transaktion und Gleichzeitigkeit, Oberfläche), 4 (Ablauf-Adapter, plattformeigene Tests) und 7
   („`PortalException` und Rollback“, Senna, „Service Builder schreibt am Cache vorbei“); gemeinsames Profil, Abschnitt 2.3 (`BH_ReportDay`), 2.4 (Sperre
   und Cache).
 - **Senna ist für die Site „Berichtsheft“ abgeschaltet** (P00, Profil 7.2, Abschnitt 7): Jede Navigation lädt die Seite neu; die
@@ -97,7 +97,7 @@ Referenz kein übertragbares Gegenstück. Weg A nur für `report-days.ts` und nu
 5. **Speichern** in `WeeklyReportLocalServiceImpl` (M04-R06, M04-R12; AK-406, AK-204, AK-407): `saveDays(long actorUserId, long
    weeklyReportId, List<DayInput> inputs)` in **einer** Transaktion (Voreinstellung `@Transactional(rollbackFor =
    {PortalException.class, SystemException.class})`):
-   - (a) Zeile des Berichts mit `SELECT … FOR UPDATE` sperren (`WeeklyReportFinderImpl`, Custom SQL in
+   - (a) Zeile des Berichts mit `lockForUpdate` (`SELECT … FOR UPDATE`) sperren (`WeeklyReportFinderImpl`, Custom SQL in
      `META-INF/custom-sql/default.xml`, gemeinsames Profil, Abschnitt 2.4, Schritt 1); der Finder liefert Status, Version und Besitzer **aus dieser
      Abfrage**, nicht aus dem Entity-Cache: Nur so gilt der Status, der beim Speichern tatsächlich gilt (Spec, Abschnitt 8). P05
      nutzt denselben Finder für die Statuswechsel; jede Methode, die Tage eines bestehenden Berichts schreibt, beginnt mit dieser

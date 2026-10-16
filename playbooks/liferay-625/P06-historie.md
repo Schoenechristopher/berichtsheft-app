@@ -13,7 +13,7 @@ Historie per Kaskade. Fertig, wenn:
 1. alle Prüffälle in `specs/pruefung/M06.json` grün sind (3 AK-IDs; 5 Fachlogik- und 8 Daten-Fälle);
 2. die eigenen Tests `AK803_TriggerDerHistorieTest` und `AK801_ZeitpunktUnabhaengigVonServerzeitTest` (`test/db/`),
    `AK803_ModelListenerTest` (`test/unit/`) und `AK803_ModelListenerAngemeldetTest` (`test/integration/`) grün sind
-   (Profil, „Nachweis AK-505 und AK-508“, Zeilen „Datenhaltung: Historie“ und „App: Historie“);
+   (Profil 6.2.5, „Nachweis AK-505 und AK-508“, Zeilen „Datenhaltung: Historie“ und „App: Historie“);
 3. die **Gegenprobe** aus Schritt 10 durchgeführt ist: jeder benannte Fehler macht die benannten Fälle bzw. Tests rot,
    darunter der Schutz der Historie aus dem Nachweis AK-505 und die Historie im selben Lauf wie der Statuswechsel aus
    dem Nachweis AK-508;
@@ -26,9 +26,9 @@ Schemaänderung: ja, nur im Skript „Schutz in der Datenhaltung“ (Trigger der
 
 - P00 bis P05 der Reihe abgenommen; `BH_StatusChange` und `BH_Comment` werden seit P05 geschrieben (mit `seq` je
   Bericht und `reviewRound`).
-- P00 hat Profil-Punkt 6 (`ModelListener` über `value.object.listener.*` in `service-ext.properties`) als „offen bis P06“
+- P00 hat Profil 6.2.5, „In P00 zu bestätigen“ Punkt 6 (`ModelListener` über `value.object.listener.*` in `service-ext.properties`) als „offen bis P06“
   vermerkt; P06 bestätigt ihn in Schritt 4.
-- Profil 6.2.5: Abschnitte 3 („Historie unveränderlich“), 4.2 (Aktionen „an der Fachlogik vorbei“ mit direktem SQL), 7
+- Profil 6.2.5, Abschnitte 3 („Historie unveränderlich“), 4.2 (Aktionen „an der Fachlogik vorbei“ mit direktem SQL), 7
   und „Nachweis AK-505 und AK-508“; gemeinsames Profil: 2.2 (UTC), 2.4 (Löschen nur per Kaskade), 2.6 (Trigger,
   `BH803`).
 
@@ -63,7 +63,7 @@ der Serverzeit, (8) Daten-Adapter mit direktem SQL, (9) eigene Tests, (10) Gegen
 | AK-802 | Kommentare und Begründungen früherer Runden bleiben erhalten und sind ihrer Runde zugeordnet. | 4 (2 fachlogik, 2 daten): AK-802-01, AK-802-02, AK-802-03, AK-802-04 | `specs/pruefung/M06.json` |
 | AK-803 | Historieneinträge kann niemand bearbeiten oder löschen; nur das endgültige Löschen der Person entfernt sie. Gilt für Statuswechsel und Kommentare; die Datenhaltung weist ihr Ändern und Löschen ab. | 5 (5 daten): AK-803-01, AK-803-02, AK-803-03, AK-803-04, AK-803-05 | `specs/pruefung/M06.json` |
 
-**Nachweis** (Profil, „Nachweis AK-505 und AK-508“): Die Zeile „Datenhaltung: Historie“ belegen AK-803-01 bis
+**Nachweis** (Profil 6.2.5, „Nachweis AK-505 und AK-508“): Die Zeile „Datenhaltung: Historie“ belegen AK-803-01 bis
 AK-803-05 über die Testschnittstelle mit direktem SQL und `AK803_TriggerDerHistorieTest`; die Zeile „App: Historie“
 belegen `AK803_ModelListenerTest` und `AK803_ModelListenerAngemeldetTest`. Die Historie entsteht in derselben
 Transaktion wie der Statuswechsel (M06 Abschnitt 8, Nachweis AK-508); das prüfen die Daten-Fälle von AK-508 über ihre
@@ -78,7 +78,7 @@ deckt genau diese Wege ab. Weg A nur auf ausdrücklichen Auftrag.
 
 ## 7. Schritte
 
-1. **Branch** `claude/l62-p06-historie`; Spec, Profil 4.2 und Prüffälle lesen. Prüfschritt: AK-Tabelle im PR-Entwurf.
+1. **Branch** `claude/l62-p06-historie`; Spec, Profil 6.2.5, Abschnitt 4.2 und Prüffälle lesen. Prüfschritt: AK-Tabelle im PR-Entwurf.
 2. **Trigger** im Skript „Schutz in der Datenhaltung“ (gemeinsam 2.6; AK-803, M06-R08 bis M06-R10), Namen wie in der
    TypeScript-App:
    - `status_change_no_update` und `status_change_no_delete` auf `BH_StatusChange`, `comment_no_update` und
@@ -88,19 +88,19 @@ deckt genau diese Wege ab. Weg A nur auf ausdrücklichen Auftrag.
      solange der Azubi besteht (M06-R09);
    - jede Abweisung `RAISE EXCEPTION … USING ERRCODE = 'BH803'`.
    Das Skript läuft als `UpgradeSchutzDerDatenhaltung` nach dem Anlegen der Tabellen; `build.auto.upgrade=false` bleibt,
-   sonst kopiert ein automatisches Upgrade die Tabellen und verliert die Trigger (Profil 7). Prüfschritt:
+   sonst kopiert ein automatisches Upgrade die Tabellen und verliert die Trigger (Profil 6.2.5, Abschnitt 7). Prüfschritt:
    `AK803_TriggerDerHistorieTest` (Schritt 9) grün; die Daten-Fälle von M05 bleiben grün.
 3. **Fehlergrund `de.berichtsheft.service.HistoryGuard`**: `isHistoryImmutable(Throwable)` geht die Ursachenkette durch
    und erkennt `java.sql.SQLException` mit SQLSTATE `BH803` oder eine `ModelListenerException` mit dem Grund
    `historie_unveraenderlich`; nie den Meldungstext (gemeinsam 2.6, „Fehlergrund“). Prüfschritt: Unit-Test mit einer
    verschachtelten Ausnahme, deren Meldungstext leer ist.
-4. **`ModelListener`** (Profil 3 „Historie unveränderlich“, „In P00 zu bestätigen“ 6). `StatusChangeListener` und
+4. **`ModelListener`** (Profil 6.2.5, Abschnitt 3 „Historie unveränderlich“, „In P00 zu bestätigen“ 6). `StatusChangeListener` und
    `CommentListener` unter `de.berichtsheft.model.listener` (`BaseModelListener`): `onBeforeUpdate` und `onBeforeRemove`
    werfen `ModelListenerException` mit dem Grund `historie_unveraenderlich`; Anlegen geht durch. Angemeldet in
    `service-ext.properties` mit `value.object.listener.de.berichtsheft.model.StatusChange` und
    `value.object.listener.de.berichtsheft.model.Comment`. Die Kaskade beim Löschen einer Person läuft nur in der
-   Datenbank; der Listener greift dort nicht (Profil, „Nachweis AK-505“). Prüfschritt: `AK803_ModelListenerTest` und
-   `AK803_ModelListenerAngemeldetTest` (Schritt 9) grün; damit ist Profil-Punkt 6 bestätigt.
+   Datenbank; der Listener greift dort nicht (Profil 6.2.5, „Nachweis AK-505“). Prüfschritt: `AK803_ModelListenerTest` und
+   `AK803_ModelListenerAngemeldetTest` (Schritt 9) grün; damit ist Profil 6.2.5, „In P00 zu bestätigen“ Punkt 6 bestätigt.
 5. **Fachfunktionen `de.berichtsheft.domain.history.ReportHistory`** (Gegenstück zu `src/domain/report-history.ts`;
    M06-R01 bis M06-R07, AK-801, AK-802): `groupHistory()` (nach Prüfrunde, neueste zuerst; Statuswechsel nach `seq`,
    Kommentare Gesamtkommentar vor den Tagen Mo bis Fr), `changeLabel()` („Erneut eingereicht“, „Freigabe
@@ -116,7 +116,7 @@ deckt genau diese Wege ab. Weg A nur auf ausdrücklichen Auftrag.
 7. **Zeitpunkte unabhängig von der Serverzeit** (gemeinsam 2.2). `createdAt` als `TIMESTAMP` in UTC aus der Uhr; JVM in
    GMT, JDBC-Sitzung in UTC. Prüfschritt: `AK801_ZeitpunktUnabhaengigVonServerzeitTest` (Schritt 9) und AK-801-04
    (Zeitpunkt über die Zeitumstellung) mit einem Portal, das einmal mit `TZ=Europe/Berlin` gestartet ist.
-8. **Daten-Adapter erweitern** (Profil 4.2). `historie_lesen` über `getReportHistory()`. Die Schreibversuche
+8. **Daten-Adapter erweitern** (Profil 6.2.5, Abschnitt 4.2). `historie_lesen` über `getReportHistory()`. Die Schreibversuche
    `historie_aendern`, `historie_loeschen` und `bericht_loeschen` gehen **mit direktem SQL über
    `DataAccess.getConnection()`** an der Persistenz vorbei, damit die Trigger geprüft werden und nicht der
    `ModelListener`; danach Entity-, Finder- und Hibernate-Sitzungs-Cache der betroffenen Entities leeren.
@@ -124,7 +124,7 @@ deckt genau diese Wege ab. Weg A nur auf ausdrücklichen Auftrag.
    wird über `HistoryGuard` als `{ "fehler": "historie_unveraenderlich" }` gemeldet. Prüfschritt:
    `ant pruefung-daten -Dbh.pruefung.filter=M06.json` grün (8 Fälle); `bestand_leeren` setzt die Datenbank weiterhin nur
    über das Löschen der Personen zurück.
-9. **Eigene Tests** (Profil, „Nachweis AK-505 und AK-508“):
+9. **Eigene Tests** (Profil 6.2.5, „Nachweis AK-505 und AK-508“):
    - `AK803_TriggerDerHistorieTest` (`test/db/`): `UPDATE` und `DELETE` auf `BH_StatusChange` und `BH_Comment` per JDBC
      → SQLSTATE `BH803`; `DELETE` eines Berichts mit Historie → `BH803`; Löschen der Person per Kaskade gelingt und
      entfernt Berichte, Tage, Statuswechsel und Kommentare; Löschen einer Person in fremder Historie scheitert am
@@ -152,7 +152,9 @@ deckt genau diese Wege ab. Weg A nur auf ausdrücklichen Auftrag.
 
     Prüfschritt: Tabelle mit dem tatsächlichen Ergebnis je Zeile im PR; nach dem Zurücknehmen alles grün. Wird ein
     benannter Fall von G6-1 bis G6-6 nicht rot, ist die Prüfung ohne Wirkung: anhalten und der Steuerung melden.
-11. **Bau-Stand.** M06 in `BauStand.java` eintragen. Prüfung nach Abschnitt 8.
+11. **Bau-Stand.** M06 in `BauStand.java` eintragen und AK-408-07 freischalten (von P04 bis hierher zurückgestellt: Einreichen aus P05,
+    Historie auf der Berichtsseite aus diesem Paket). Prüfschritt: AK-408-07 läuft grün, kein Fall mehr „noch nicht gebaut“ außer AK-205-01 und
+    AK-205-02 (P08). Prüfung nach Abschnitt 8.
 
 ## 8. Prüfung
 
@@ -189,7 +191,7 @@ Nur in CI: der volle Liferay-6.2.5-Job; im PR vermerken.
 | Löschen einer Person scheitert am Fremdschlüssel, obwohl sie nur eigene Historie hat | `actorId`/`authorId` nicht `DEFERRABLE INITIALLY DEFERRED` (gemeinsam 2.6) |
 | AK-803-Fälle grün, obwohl ein Trigger fehlt | Daten-Adapter schreibt über die Persistenz; direktes SQL über `DataAccess.getConnection()` (Schritt 8, G6-7) |
 | Fehler wird am Meldungstext erkannt | SQLSTATE `BH803` in der Ursachenkette bzw. Grund der `ModelListenerException` (`HistoryGuard`) |
-| Trigger nach einer Schemaänderung verschwunden | `build.auto.upgrade` stand auf `true`; nur `false`, Schemaänderungen als eigener `UpgradeProcess` (Profil 7) |
+| Trigger nach einer Schemaänderung verschwunden | `build.auto.upgrade` stand auf `true`; nur `false`, Schemaänderungen als eigener `UpgradeProcess` (Profil 6.2.5, Abschnitt 7) |
 | Nach direktem SQL zeigt die App den alten Stand | Entity-, Finder- und Hibernate-Sitzungs-Cache leeren |
 | Reihenfolge bei gleichem Zeitpunkt falsch | nach `seq` je Bericht sortieren, nicht nach `createdAt` |
 | Zeiten in der Historie verschoben | JVM nicht in GMT oder JDBC-Sitzung nicht in UTC; Anzeige mit Europe/Berlin (gemeinsam 2.2) |
@@ -200,4 +202,4 @@ Nur in CI: der volle Liferay-6.2.5-Job; im PR vermerken.
 
 - [ ] Testaktion `historie_aendern_persistenz` der Testschnittstelle (nur bei `bh.betrieb=test`), damit die Anmeldung des
       `ModelListener` geprüft ist; kein neutraler Fall, keine Änderung an `specs/pruefung/format.md`.
-- [ ] G6-7 ist eine Gegenprobe des Adapters mit erwartetem Grün; sie belegt die Wahl des direkten SQL nach Profil 4.2.
+- [ ] G6-7 ist eine Gegenprobe des Adapters mit erwartetem Grün; sie belegt die Wahl des direkten SQL nach Profil 6.2.5, Abschnitt 4.2.

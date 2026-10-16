@@ -14,10 +14,10 @@ Zugang, Start, Personen und Einstellungen (Bundesland). Fertig, wenn:
    5 Ablauf-Fälle), außer den zurückgestellten AK-205-01 und AK-205-02 (bis P08, sie brauchen den Erinnerungslauf);
 2. die Ablauf-Fälle AK-101-02, AK-101-03 und AK-106-02 in Chromium und bei 375 px grün sind und **nur** AK-101-01 und
    AK-106-01 als „abweichend, begründet“ erscheinen (Feld `abweichend` mit `liferay-72` in `specs/pruefung/M02.json`;
-   Profil 6.1), getrennt gezählt und nie grün;
+   Profil 7.2, Abschnitt 6.1), getrennt gezählt und nie grün;
 3. die plattformeigenen Tests zu Zugang je Anfrage, Sitzungsdauer, Binden beim ersten Login und gleichzeitigem Deaktivieren
    (AK-207) grün sind und die Gegenproben aus Schritt 13 je einen roten Lauf gezeigt haben;
-4. `/api/jsonws` keine BH-Dienste kennt (`remote-service="false"`, Profil, Abschnitt 7).
+4. `/api/jsonws` keine BH-Dienste kennt (`remote-service="false"`, Profil 7.2, Abschnitt 7).
 
 Keine Abweichung außer AK-101-01 und AK-106-01; AK-101-02 und AK-101-03 sind auf 7.2 gleichwertig.
 
@@ -25,10 +25,10 @@ Keine Abweichung außer AK-101-01 und AK-106-01; AK-101-02 und AK-101-03 sind au
 
 - L72-P00 und L72-P01 abgenommen und gemergt. P01 und P02 laufen **nacheinander**: beide ändern den Fachlogik-Adapter, den
   Bau-Stand und die Testschnittstelle (Uhr aus P00, Bundesland-Referenzdaten aus P01).
-- Profil: Abschnitte 3 (Anmeldung, Zugang bei jedem Zugriff, Binden, Sitzung, Rollen und Besitz, Persistenz), 4
+- Profil 7.2, Abschnitte 3 (Anmeldung, Zugang bei jedem Zugriff, Binden, Sitzung, Rollen und Besitz, Persistenz), 4
   (Testschnittstelle, Ablauf-Adapter), 6.1 (Anmeldung mit Liferay-Konten) und 7; gemeinsam 2.3 (`BH_Person`, `BH_Setting`),
   2.5 (Verbindung zum Liferay-Benutzer) und 2.6.
-- OIDC bleibt aus, solange P00 die sechs Bedingungen aus Profil 6.2 nicht nachgewiesen hat.
+- OIDC bleibt aus, solange P00 die sechs Bedingungen aus Profil 7.2, Abschnitt 6.2 nicht nachgewiesen hat.
 
 ## 3. Eingaben
 
@@ -37,7 +37,7 @@ Keine Abweichung außer AK-101-01 und AK-106-01; AK-101-02 und AK-101-03 sind au
 - Prüffälle: `specs/pruefung/M02.json`; Schnittstellen und Datenformate: `specs/pruefung/format.md`, „Schnittstellen von
   M02“; Testdaten `specs/pruefung/testdaten.json`.
 - Code-Landkarte: `specs/code-landkarte.md`, Abschnitt „M02 Personen und Zugang“ (Funktionen und Fallen; „Ersetzt durch
-  Bordmittel“ gilt hier nach Profil 6.1).
+  Bordmittel“ gilt hier nach Profil 7.2, Abschnitt 6.1).
 - Profil: `profile/liferay-72.md` 3, 6.1, 6.2, Pfadmuster unter „Bitte bestätigen“ (`bh-access` ist sicherheitsrelevant).
 
 ## 4. Weg A: aus dem Quellcode
@@ -56,12 +56,12 @@ Rollenregeln der Nutzerverwaltung, (4) Zugriffsprüfungen, (5) Personen-Service,
 
 | AK-ID | Kriterium (Kurzfassung aus der Fach-Spec) | Prüffälle | Bewertung auf 7.2 |
 | --- | --- | --- | --- |
-| AK-101 | Anmeldung nur über das Firmenkonto; ein eigenes Passwort in der App gibt es nicht. | 3 (3 ablauf) | AK-101-01 **abweichend, begründet** (Login-Portlet mit Passwortfeld, `anmeldewege` Liferay-Konto; Profil 6.1); AK-101-02, AK-101-03 gleichwertig |
+| AK-101 | Anmeldung nur über das Firmenkonto; ein eigenes Passwort in der App gibt es nicht. | 3 (3 ablauf) | AK-101-01 **abweichend, begründet** (Login-Portlet mit Passwortfeld, `anmeldewege` Liferay-Konto; Profil 7.2, Abschnitt 6.1); AK-101-02, AK-101-03 gleichwertig |
 | AK-102 | Firmenkonto ohne Eintrag oder mit deaktivierter Person wird abgewiesen, mit dem Hinweis „Kein Zugang – bitte an den Ausbilder wenden“. | 9 (9 fachlogik) | gleichwertig; Pre-Action prüft je Anfrage |
 | AK-103 | Ein Azubi sieht nur eigene Berichte; ein fremder Bericht ergibt „Zugriff verweigert“. | 3 (3 fachlogik) | gleichwertig |
 | AK-104 | Ein Azubi erreicht keine Prüf- oder Admin-Funktionen, auch nicht per direkt eingegebener Adresse. | 4 (4 fachlogik) | gleichwertig; Prüfung im Service, Liferay-Rolle nur Sichtbarkeit |
 | AK-105 | Jeder Ausbilder kann die Berichte aller Azubis ansehen. | 3 (3 fachlogik) | gleichwertig |
-| AK-106 | Nach dem Abmelden ist ohne erneute Anmeldung kein Zugriff möglich. | 2 (2 ablauf) | AK-106-01 **abweichend, begründet** (nur der letzte Schritt liest die Anmeldeseite; Profil 6.1); AK-106-02 gleichwertig |
+| AK-106 | Nach dem Abmelden ist ohne erneute Anmeldung kein Zugriff möglich. | 2 (2 ablauf) | AK-106-01 **abweichend, begründet** (nur der letzte Schritt liest die Anmeldeseite; Profil 7.2, Abschnitt 6.1); AK-106-02 gleichwertig |
 | AK-201 | Admin legt eine Person mit Firmen-E-Mail, Name und Rolle an; erster Login bindet über die bestätigte E-Mail, danach zählt nur die Konto-ID. | 11 (11 fachlogik) | gleichwertig mit Ersatz: Konto-ID = `userId`, bestätigte E-Mail = `User.isEmailAddressVerified()` |
 | AK-202 | Ein Azubi braucht zugeordneten Ausbilder und Ausbildungsbeginn; fehlt eines, nennt die Meldung das Feld. | 9 (9 fachlogik) | gleichwertig |
 | AK-203 | Der Admin ändert Rolle, zugeordneten Ausbilder sowie Ausbildungsbeginn und -ende. Die Folgen für die Berichte regelt M03. | 7 (7 fachlogik) | gleichwertig; Liferay-Rolle folgt `BH_Person.role` |
@@ -107,7 +107,7 @@ Plattform; der Plattformteil folgt ohnehin dem Profil (Liferay-Konten, `Lifecycl
    (`RuleReason`), unabhängig vom Meldungstext. Prüfschritt: JUnit-Tests je AK in `bh-domain`.
 5. **Zugriff** `de.berichtsheft.domain.access.ReportAccess` (M02-R09 bis M02-R12; AK-103, AK-104, AK-105, AK-204):
    `canViewReport()` (Azubi nur eigene, Ausbilder alle, deaktivierter Azubi bleibt lesbar, deaktivierte Person sieht nichts),
-   `canManagePeople()` (nur aktive Ausbilder). `canEditReport()` folgt in P05. Prüfschritt: JUnit-Tests `AK103_…` bis `AK105_…`.
+   `canManagePeople()` (nur aktive Ausbilder). `canEditReport()` entsteht in P04 (Speichern braucht es), P05 ergänzt dessen Fälle zu AK-505 und AK-704. Prüfschritt: JUnit-Tests `AK103_…` bis `AK105_…`.
 6. **Personen-Service** `PersonLocalServiceImpl` in `bh-service` (M02-R13, M02-R27; AK-201 bis AK-209): `addPerson`,
    `updatePerson`, `deactivatePerson`, `reactivatePerson`, `deletePerson`, `updateFederalState`, `getFederalState`,
    `getPeople`, `getActiveTrainees`. Jede Methode bekommt nur die `userId` des Handelnden, liest dessen `BH_Person` und prüft
@@ -119,7 +119,7 @@ Plattform; der Plattformteil folgt ohnehin dem Profil (Liferay-Konten, `Lifecycl
    Kinder über Service Builder (gemeinsam 2.4); `hasForeignHistory()` liefert bis P06 immer „nein“ (Platzhalter mit Test, den
    P06 scharfstellt). Prüfschritt: Arquillian-Test `PersonServiceTest.AK207_gleichzeitigesDeaktivierenLaesstLetztenAusbilderStehen`
    (zwei Threads, `CountDownLatch`, genau einer scheitert mit `letzter_ausbilder`).
-7. **Anmeldung, Zugang und Sitzung** in `bh-access` (Profil, Abschnitt 3; M02-R02 bis M02-R05, M02-R07, M02-R08):
+7. **Anmeldung, Zugang und Sitzung** in `bh-access` (Profil 7.2, Abschnitt 3; M02-R02 bis M02-R05, M02-R07, M02-R08):
    - `BhLoginPostAction` (`LifecycleAction`, `key=login.events.post`): ruft `matchLogin()` mit `String.valueOf(userId)`,
      E-Mail des Liferay-Kontos und `User.isEmailAddressVerified()`; bei `binden` **bedingt**
      `UPDATE BH_Person SET userId = ? WHERE personId = ? AND userId IS NULL AND active_ = true` und genau eine Zeile verlangen,
@@ -128,7 +128,7 @@ Plattform; der Plattformteil folgt ohnehin dem Profil (Liferay-Konten, `Lifecycl
      `BH_Person` zu `PortalUtil.getUserId(request)` und ruft `decideAccess()`; unbekannt oder deaktiviert → Abmelden und Seite
      `kein_zugang`; nach 8 Stunden ab Anmeldezeitpunkt → Sitzung beenden (`session.timeout` bleibt für Untätigkeit). Das
      Control Panel bleibt außen vor.
-   - `logout.events.post`: nichts Eigenes bei Liferay-Konten; mit OIDC (Profil 6.2) die Weiterleitung zum Anbieter.
+   - `logout.events.post`: nichts Eigenes bei Liferay-Konten; mit OIDC (Profil 7.2, Abschnitt 6.2) die Weiterleitung zum Anbieter.
    Prüfschritt: Arquillian-Tests `AccessTest.AK102_deaktiviertePersonVerliertZugangBeiDerNaechstenAnfrage`,
    `AccessTest.AK106_sitzungEndetNachAchtStunden` (Uhr gestellt) und `LoginTest.AK201_ersterLoginBindetNurBeiBestaetigterEmail`.
 8. **Portlets und MVC-Commands** in `bh-web`, funktional ohne Feinschliff (Gestaltung folgt in P09): Anmeldeseite als
@@ -153,7 +153,7 @@ Plattform; der Plattformteil folgt ohnehin dem Profil (Liferay-Konten, `Lifecycl
     `{ warnung, seite, angemeldet }`, dazu `passwortfeld` und `anmeldewege` aus den Merkern. Prüfschritt: Ablauf-Fälle von M02 in
     Chromium und 375 px: AK-101-02, AK-101-03, AK-106-02 grün; AK-101-01 und AK-106-01 als „abweichend, begründet“ mit Verweis
     „profile/liferay-72.md, Abschnitt 6.1“.
-12. **Keine JSON-Webdienste.** `remote-service="false"` an jeder Entity (Profil, Abschnitt 2). Prüfschritt: `/api/jsonws` (als
+12. **Keine JSON-Webdienste.** `remote-service="false"` an jeder Entity (Profil 7.2, Abschnitt 2). Prüfschritt: `/api/jsonws` (als
     Administrator geöffnet) listet keinen Dienst mit `bh` bzw. `de.berichtsheft`.
 13. **Gegenproben** (je ein benannter Fehler, je danach zurücknehmen):
     - **F-P02-1 „Deaktivierte Person kommt hinein“:** `decideAccess()` prüft `active` nicht. Rot werden AK-102-02, AK-102-03 und
@@ -180,14 +180,14 @@ Plattform; der Plattformteil folgt ohnehin dem Profil (Liferay-Konten, `Lifecycl
 | `./gradlew build formatSource` | grün, keine Änderungen |
 | `npx prisma generate && npx tsx scripts/playbooks/pruefen.ts` | „Playbook-Prüfung: keine Befunde.“ |
 
-Nur in CI: Firefox und Edge; mit freigegebenem OIDC (Profil 6.2) zusätzlich die Anmeldung über Keycloak. Im PR vermerken.
+Nur in CI: Firefox und Edge; mit freigegebenem OIDC (Profil 7.2, Abschnitt 6.2) zusätzlich die Anmeldung über Keycloak. Im PR vermerken.
 
 ## 9. Abschluss
 
 - Commit, z. B. „L72-P02: Personen und Zugang (Liferay-Konten, Zugang je Anfrage, Nutzerverwaltung)“; vor dem Push
   `./gradlew build` und die Prüf-Adapter von M02 lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-101, AK-102, AK-103, AK-104, AK-105, AK-106, AK-201, AK-202, AK-203, AK-204, AK-205, AK-206,
-  AK-207, AK-208, AK-209 mit Test und Prüffällen), den abweichenden Fällen AK-101-01 und AK-106-01 (Verweis Profil 6.1), den
+  AK-207, AK-208, AK-209 mit Test und Prüffällen), den abweichenden Fällen AK-101-01 und AK-106-01 (Verweis Profil 7.2, Abschnitt 6.1), den
   zurückgestellten Fällen AK-205-01 und AK-205-02, den Gegenproben und „Bitte bestätigen“. Hinweis: `bh-access`,
   `**/domain/access/**`, `**/service/impl/**`, `**/security/permission/**`, `service.xml`, `**/upgrade/**` und `bh-pruefung`
   sind geschützte Pfade (gemeinsam 5); Chris mergt.
@@ -201,8 +201,8 @@ Nur in CI: Firefox und Edge; mit freigegebenem OIDC (Profil 6.2) zusätzlich die
 | Deaktivierte Person kommt noch hinein | Pre-Action muss bei jeder Anfrage `BH_Person` lesen; die Liferay-Sitzung allein widerruft nichts |
 | Zweiter Login überschreibt die Bindung | Binden nur bedingt (`userId IS NULL AND active_ = true`), genau eine Zeile verlangen |
 | Groß/Klein in der E-Mail führt zu `konto_unbekannt` | E-Mail immer mit `normalizeEmail()` speichern, auch die des Liferay-Kontos; CHECK `person_email_normalized` |
-| Liferay-Konto ohne bestätigte E-Mail wird nie gebunden | ob Liferay `emailAddressVerified` beim Setzen des Passworts über den Link setzt, klärt P00 (Profil 6.1); sonst Weg der Kontoanlage anpassen |
+| Liferay-Konto ohne bestätigte E-Mail wird nie gebunden | ob Liferay `emailAddressVerified` beim Setzen des Passworts über den Link setzt, klärt P00 (Profil 7.2, Abschnitt 6.1); sonst Weg der Kontoanlage anpassen |
 | Rolle nur über die Liferay-Rolle geprüft | jede Service-Methode prüft gegen `BH_Person` (`canManagePeople()`, `canViewReport()`); die Liferay-Rolle steuert nur Sichtbarkeit |
 | `deletePerson` scheitert mit `BH803` | Kinder nie über Service Builder löschen; nur die Zeile `BH_Person`, danach Caches leeren (gemeinsam 2.4) |
 | Ablauf-Fall AK-101-02 rot wegen Passwortfeld | `seite_lesen` liest die Startseite nach der Anmeldung; dort darf das Login-Portlet nicht eingebunden sein |
-| Pre-Action sperrt das Control Panel | nur Seiten der Site „Berichtsheft“ prüfen (Profil, Abschnitt 3) |
+| Pre-Action sperrt das Control Panel | nur Seiten der Site „Berichtsheft“ prüfen (Profil 7.2, Abschnitt 3) |

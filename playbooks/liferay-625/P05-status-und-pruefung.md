@@ -14,7 +14,7 @@ Prüfliste, Freigeben, Ablehnen, Rücknahme der Freigabe, Schreibschutz der Tage
 1. alle Prüffälle in `specs/pruefung/M05.json` grün sind (19 AK-IDs; 59 Fachlogik- und 36 Daten-Fälle);
 2. die eigenen Tests des Nachweises AK-505 und AK-508 grün sind: `AK505_DatenhaltungWeistAendernEinesEingereichtenTagsAbTest`
    und `AK508_SperreUndBedingtesUpdateTest` in `test/db/`, `AK508_ZweiGleichzeitigeAktionenTest` in `test/integration/`
-   (Profil, „Nachweis AK-505 und AK-508“);
+   (Profil 6.2.5, „Nachweis AK-505 und AK-508“);
 3. die **Gegenprobe** aus Schritt 13 durchgeführt ist: jeder benannte Fehler macht genau die benannten Prüffälle bzw.
    Tests rot und ist danach zurückgenommen;
 4. die Beispielszenarien „Einreichen scheitert an fehlendem Text“ (AK-502-04) und „Vertretung nimmt Freigabe zurück“
@@ -29,10 +29,10 @@ Skript (gemeinsam 2.3, 2.6); bis `1.0.0` mit Neuanlage der Demo-Datenbank (P02, 
 
 - P00 bis P04 der Reihe abgenommen: Berichte und Tage (`WeeklyReport`, `ReportDay`), Speichern (`saveDays`) und
   Berichtsseite; M02 liefert Rollen und `canViewReport()`.
-- P00 hat „offen bis P05“ für Profil-Punkte 9 und 10 vermerkt (lesende Transaktionen nach Methodenpräfix, Zurückrollen
+- P00 hat „offen bis P05“ für Profil 6.2.5, „In P00 zu bestätigen“ Punkte 9 und 10 vermerkt (lesende Transaktionen nach Methodenpräfix, Zurückrollen
   bei `PortalException`, `SQLQuery.executeUpdate()` mit Zeilenzahl, `FOR UPDATE` in Custom SQL, Cache leeren); P05
   bestätigt sie in Schritt 2.
-- Profil 6.2.5: Abschnitte 3 (Transaktion, Sperre und bedingtes Update), 4.1 (Fehlercodes), 4.2 (Testschnittstelle), 7
+- Profil 6.2.5, Abschnitte 3 (Transaktion, Sperre und bedingtes Update), 4.1 (Fehlercodes), 4.2 (Testschnittstelle), 7
   („Lesende Transaktionen“, „Zurückrollen“, „Cache nach Custom SQL“) und „Nachweis AK-505 und AK-508“.
 - Gemeinsames Profil: 2.4 (Versionsspalte und bedingtes Update), 2.6 (`report_day_locked`, Fehlergrund `P0001`).
 - Die Historie wird hier geschrieben; ihre Unveränderlichkeit und Anzeige folgen in P06, die Nachrichten in P08
@@ -67,7 +67,7 @@ Prüfliste, (8) Portlets, (9) Daten-Adapter, (10) Fachlogik-Adapter, (11) eigene
 | AK-ID | Kriterium (Kurzfassung aus der Fach-Spec) | Prüffälle | Prüffall-Datei |
 | --- | --- | --- | --- |
 | AK-501 | Ein offener Bericht lässt sich nur mit vollständigen Pflichtangaben einreichen (nur Leerzeichen gelten als leer); nicht bei Wochen ganz außerhalb; die laufende Woche schon vor ihrem Ende. | 11 (9 fachlogik, 2 daten) | `specs/pruefung/M05.json` |
-| AK-502 | Fehlt eine Pflichtangabe, wird nicht eingereicht; die Tage werden mit „Tagesart fehlt“ bzw. „Tätigkeiten fehlen“ benannt und markiert. | 4 (2 fachlogik, 1 daten, 1 ablauf) | `specs/pruefung/M05.json`, `specs/pruefung/szenarien.json` |
+| AK-502 | Fehlt eine Pflichtangabe, wird nicht eingereicht; die Tage werden mit „Tagesart fehlt“ bzw. „Tätigkeiten fehlen“ benannt und markiert. | 3 (2 fachlogik, 1 daten): AK-502-01, AK-502-02, AK-502-03; AK-502-04 ist Szenario (P10) | `specs/pruefung/M05.json`, `specs/pruefung/szenarien.json` |
 | AK-503 | Bei Urlaub, Krank und Feiertag ist kein Text nötig; ein eingetragener Text bleibt. | 2 (1 fachlogik, 1 daten) | `specs/pruefung/M05.json` |
 | AK-504 | Auch eine Woche nur aus Urlaub und Feiertagen muss eingereicht werden und zählt bis dahin als offen. | 2 (1 fachlogik, 1 daten) | `specs/pruefung/M05.json` |
 | AK-505 | Nach dem Einreichen „Eingereicht“ und schreibgeschützt; Einreichen speichert Eingaben mit, beim Scheitern bleiben sie als Entwurf; zusätzlich Schutz in der Datenhaltung. | 7 (4 daten, 3 fachlogik): AK-505-01, AK-505-02, AK-505-03, AK-505-04, AK-505-05, AK-505-06, AK-505-07 | `specs/pruefung/M05.json` |
@@ -83,10 +83,13 @@ Prüfliste, (8) Portlets, (9) Daten-Adapter, (10) Fachlogik-Adapter, (11) eigene
 | AK-607 | Berichte im Status „Entwurf“ kann der Ausbilder weder freigeben noch ablehnen. | 5 (4 fachlogik, 1 daten) | `specs/pruefung/M05.json` |
 | AK-701 | Ein abgelehnter Bericht ist bearbeitbar und erneut einreichbar; danach „Eingereicht“ und wieder in der Prüfliste. | 3 (1 daten, 2 fachlogik) | `specs/pruefung/M05.json` |
 | AK-702 | Der Zyklus aus Ablehnen und erneutem Einreichen funktioniert beliebig oft (dreimal ablehnen, dann freigeben). | 6 (1 daten, 5 fachlogik) | `specs/pruefung/M05.json` |
-| AK-703 | Eine Freigabe lässt sich nur mit nicht leerer Begründung zurücknehmen; danach „Abgelehnt“ und bearbeitbar. | 6 (4 fachlogik, 1 daten, 1 ablauf) | `specs/pruefung/M05.json`, `specs/pruefung/szenarien.json` |
+| AK-703 | Eine Freigabe lässt sich nur mit nicht leerer Begründung zurücknehmen; danach „Abgelehnt“ und bearbeitbar. | 5 (4 fachlogik, 1 daten): AK-703-01, AK-703-02, AK-703-03, AK-703-04, AK-703-05; AK-703-06 ist Szenario (P10) | `specs/pruefung/M05.json`, `specs/pruefung/szenarien.json` |
 | AK-704 | Außer durch die Rücknahme kann niemand einen freigegebenen Bericht ändern, auch kein Ausbilder. | 6 (5 fachlogik, 1 daten) | `specs/pruefung/M05.json` |
 
-**Nachweis AK-505 und AK-508** (Profil, gleichnamiger Abschnitt): Fachlogik über `PruefungFachlogikTest`, Service über
+Summe: 19 AK-IDs, 95 Prüffälle in `M05.json` (59 `fachlogik`, 36 `daten`), dazu die zwei Ablauf-Szenarien AK-502-04 und
+AK-703-06 (P10, getrennt gezählt).
+
+**Nachweis AK-505 und AK-508** (Profil 6.2.5, gleichnamiger Abschnitt): Fachlogik über `PruefungFachlogikTest`, Service über
 `PruefungDatenTest`, Datenhaltung und echte Gleichzeitigkeit über die eigenen Tests aus Schritt 11. Den Teil
 „Datenhaltung: Historie“ (AK-803) und den `ModelListener` baut P06.
 
@@ -99,9 +102,9 @@ Gegenprobe in Schritt 13 sind deshalb Pflicht. Weg A nur auf ausdrücklichen Auf
 
 ## 7. Schritte
 
-1. **Branch** `claude/l62-p05-status-und-pruefung`; Spec (M05-R08, M05-R20, M05-R21), Profil 7 und Prüffälle lesen.
+1. **Branch** `claude/l62-p05-status-und-pruefung`; Spec (M05-R08, M05-R20, M05-R21), Profil 6.2.5, Abschnitt 7 und Prüffälle lesen.
    Prüfschritt: AK-Tabelle und Liste der Fehlercodes aus `specs/pruefung/format.md` im PR-Entwurf.
-2. **Transaktionsverhalten bestätigen** (Profil „In P00 zu bestätigen“ 9, 10). Ein Wegwerf-Test in `test/integration/`
+2. **Transaktionsverhalten bestätigen** (Profil 6.2.5, „In P00 zu bestätigen“ 9, 10). Ein Wegwerf-Test in `test/integration/`
    zeigt über die Testschnittstelle: (a) eine `PortalException` aus einer `*LocalServiceImpl`-Methode rollt zurück, eine
    normale Rückgabe nicht; (b) eine Methode mit Präfix `get` schreibt nicht; (c) `SQLQuery.executeUpdate()` liefert die
    Zahl geänderter Zeilen; (d) `SELECT … FOR UPDATE` in Custom SQL hält die Sperre bis zum Ende der Service-Transaktion.
@@ -130,27 +133,30 @@ Gegenprobe in Schritt 13 sind deshalb Pflicht. Weg A nur auf ausdrücklichen Auf
    M05-R05 bis M05-R07, AK-501, AK-502, AK-503, AK-504): `validateSubmission()` mit den betroffenen Tagen in
    Kalenderreihenfolge (`tagesart_fehlt`, `taetigkeiten_fehlen`); Urlaub, Krank, Feiertag ohne Text, ein eingetragener
    Text bleibt; Tage außerhalb zählen nicht; Woche ganz außerhalb → `woche_ausserhalb`; laufende Woche schon vor ihrem
-   Ende. **Bearbeitbarkeit** `ReportAccess.canEditReport()` (Status Entwurf oder Abgelehnt, nur eigener aktiver Azubi;
-   AK-505, AK-506, AK-701, AK-703, AK-704). Prüfschritt: Unit-Tests.
-6. **Sperre und bedingtes Update `WeeklyReportFinderImpl`** (Profil 3 „Sperre und bedingtes Update“, gemeinsam 2.4).
-   Custom SQL in `custom-sql/default.xml`: `lockForUpdate` (`SELECT … FROM BH_WeeklyReport WHERE weeklyReportId = ? FOR
-   UPDATE`) und `updateStatusConditional` (`UPDATE BH_WeeklyReport SET status = ?, version = version + 1, updatedAt = ?
-   WHERE weeklyReportId = ? AND status = ? AND version = ?`). Beide laufen über `openSession()` in der Hibernate-Sitzung
-   der Service-Transaktion. **Vor** dem bedingten Update ruft der Finder `session.flush()`: Hibernate schreibt geänderte
+   Ende. **Bearbeitbarkeit:** `ReportAccess.canEditReport()` (Status Entwurf oder Abgelehnt, nur eigener aktiver Azubi)
+   entstand schon in P04 (Schritt 3), weil Speichern es braucht; P05 ergänzt nur die Unit-Tests zu AK-505 und AK-704
+   (Eingereicht und Freigegeben nicht bearbeitbar, auch nicht für Ausbilder; AK-506, AK-701, AK-703). Prüfschritt:
+   Unit-Tests.
+6. **Bedingtes Update `WeeklyReportFinderImpl`** (Profil 6.2.5, Abschnitt 3 „Sperre und bedingtes Update“, gemeinsam 2.4). **Aus P04
+   vorhanden:** `lockForUpdate` (`SELECT … FROM BH_WeeklyReport WHERE weeklyReportId = ? FOR UPDATE`, P04 Schritt 4) und die
+   Schreibhilfe für die Tage `applyDayUpdates` (ohne eigene Prüfung, `saveDays` ruft sie auf). P05 ergänzt in
+   `custom-sql/default.xml` nur `updateStatusConditional` (`UPDATE BH_WeeklyReport SET status = ?, version = version + 1,
+   updatedAt = ? WHERE weeklyReportId = ? AND status = ? AND version = ?`); Sperre und Update laufen über `openSession()` in
+   der Hibernate-Sitzung der Service-Transaktion. **Vor** dem bedingten Update ruft der Finder `session.flush()`: Hibernate schreibt geänderte
    Tage sonst erst beim Abschluss, also nach dem Wechsel auf `SUBMITTED`, und `report_day_locked` wiese das eigene
    Einreichen ab. Nach dem Update Entity- und Finder-Cache des Berichts leeren und das Objekt aus der Sitzung lösen
-   (`session.evict`). **Auch `saveDays` (M04) beginnt mit `lockForUpdate`** und prüft erst danach Status und Person
-   (gemeinsam 2.4, Schritt 1). Prüfschritt: `AK508_SperreUndBedingtesUpdateTest` (Schritt 11) grün.
+   (`session.evict`). `saveDays` (M04) beginnt in P04 schon mit `lockForUpdate` und prüft erst danach Status und Person
+   (gemeinsam 2.4, Schritt 1); jeder Statuswechsel nutzt dieselbe Methode. Prüfschritt: `AK508_SperreUndBedingtesUpdateTest` (Schritt 11) grün.
 7. **Statuswechsel `WeeklyReportLocalServiceImpl`** (M05-R05 bis M05-R08, M05-R13, M05-R14, M05-R20 bis M05-R22).
    Öffentliche Methoden `submitReport`, `resubmitReport`, `withdrawReport`, `approveReport`, `rejectReport`,
-   `revokeApproval` (nie `get…`, Profil 7), jede mit handelnder Person, Bericht und gesehenem Stand (Status und `version`
+   `revokeApproval` (nie `get…`, Profil 6.2.5, Abschnitt 7), jede mit handelnder Person, Bericht und gesehenem Stand (Status und `version`
    aus dem Formular). Ablauf **in einer Transaktion**:
    1. `lockForUpdate`; Sicht-Recht mit `canViewReport()`; `decideTransition()` gegen den gesperrten Stand und den
       gesehenen Stand. Jede Ablehnung wirft `DomainRuleException` (Unterklasse von `PortalException`) mit `Fehlercode`
       und rollt zurück.
    2. Nur beim (erneuten) Einreichen: `woche_ausserhalb` vor dem Speichern prüfen (M05-R21, Ausnahme, rollt zurück);
       mitgeschickte Eingaben prüfen (`tage_ungueltig` als Ausnahme, nichts wird gespeichert, AK-505-04); Eingaben
-      speichern wie `saveDays`; `validateSubmission()`.
+      über `applyDayUpdates` (P04) speichern; `validateSubmission()`.
    3. **Zurückrollen:** Eine `PortalException` rollt die ganze Transaktion zurück, auch die mitgespeicherten Tage.
       Fehlende Pflichtangaben sind deshalb ein **Ergebnis** (`pflichtangaben_fehlen` mit den Tagen), keine Ausnahme; der
       Service gibt `TransitionResult` mit dem Code zurück, die Transaktion endet normal und die Tage bleiben als Entwurf
@@ -168,14 +174,17 @@ Gegenprobe in Schritt 13 sind deshalb Pflicht. Weg A nur auf ausdrücklichen Auf
 8. **Prüfliste** `getReviewQueue(viewer, scope)` (lesend; eingereichte Berichte, standardmäßig eigene Azubis, per Filter
    alle, letzte Einreichung, älteste zuerst; deaktivierter Azubi mit Hinweis; AK-601, AK-602) und `getFeedback()`
    (Gesamtkommentar bzw. Begründung der aktuellen Ablehnung, AK-606; einfacher Zugriff, den P06 durch `currentFeedback()`
-   ersetzt). Prüfschritt: Daten-Fälle zu AK-601, AK-602 und AK-606 grün.
+   ersetzt). **Statuswechsel scharf (P03):** `hasStatusChange()` im `WeeklyReportFinderImpl` (Platzhalter „nein“ aus P03,
+   Schritt 5) fragt jetzt `BH_StatusChange` ab; der Test aus P03 wird mit einem Bericht mit Statuswechsel scharf gestellt
+   (`historie` in der Übersicht). Prüfschritt: Daten-Fälle zu AK-601, AK-602 und AK-606 grün, Test zu `hasStatusChange()`
+   grün.
 9. **Portlets.** Berichtsseite (`BerichtPortlet`, aus P04) bekommt die Aktionen Einreichen und Zurückziehen, die
    Prüfansicht (`PrueflistePortlet`) Freigeben, Ablehnen (Gesamt- und Tageskommentare) und Freigabe zurücknehmen. Status
    und `version` des gesehenen Stands stehen als versteckte Felder im Formular; „Einreichen“ schickt die ungespeicherten
    Eingaben mit. Jede `processAction` ruft den Service; Fehlercodes werden zu Meldungen des Portlets, Merker
    `data-status`, `data-fehler`, `data-feld`. Gestaltung folgt in P09. Prüfschritt: Einreichen mit fehlendem Text zeigt
    die Fehlerleiste, die Eingaben bleiben gespeichert.
-10. **Daten-Adapter** (Testschnittstelle, Profil 4.2). Vor jedem Fall `bestand_leeren`, Testdaten und Ausgangsbestand nach
+10. **Daten-Adapter** (Testschnittstelle, Profil 6.2.5, Abschnitt 4.2). Vor jedem Fall `bestand_leeren`, Testdaten und Ausgangsbestand nach
     `specs/pruefung/format.md` herstellen (Personen, Berichte mit `tage` und `verlauf`, Uhr), Schritte über **dieselben
     Service-Methoden** wie die Portlets ausführen: `einreichen`, `erneut_einreichen`, `zurueckziehen`, `freigeben`,
     `ablehnen`, `freigabe_zuruecknehmen`, `tage_speichern`, `pruefliste_lesen`, `rueckmeldung_lesen`,
@@ -183,7 +192,7 @@ Gegenprobe in Schritt 13 sind deshalb Pflicht. Weg A nur auf ausdrücklichen Auf
     Fehler kommen als `{ "fehler": "<code>" }` aus dem `Fehlercode` der Ausnahme bzw. des Ergebnisses, nie aus dem
     Meldungstext. Rückgabe des Bestands mit Tagen, Historie und Kommentaren, Namen auf Schlüssel zurückgeführt,
     `version` nie ausgeben. Prüfschritt: `ant pruefung-daten -Dbh.pruefung.filter=M05.json` grün (36 Fälle).
-11. **Eigene Tests des Nachweises** (Profil, „Nachweis AK-505 und AK-508“):
+11. **Eigene Tests des Nachweises** (Profil 6.2.5, „Nachweis AK-505 und AK-508“):
     - `AK505_DatenhaltungWeistAendernEinesEingereichtenTagsAbTest` (`test/db/`): Bericht per SQL auf `SUBMITTED`, dann
       `UPDATE BH_ReportDay` per JDBC → SQLSTATE `P0001`; ebenso bei `APPROVED`; im Entwurf gelingt dasselbe Update.
     - `AK508_SperreUndBedingtesUpdateTest` (`test/db/`): (1) zwei JDBC-Verbindungen, A sperrt und wechselt den Status,
@@ -202,7 +211,7 @@ Gegenprobe in Schritt 13 sind deshalb Pflicht. Weg A nur auf ausdrücklichen Auf
     -Dbh.pruefung.filter=M05.json` grün (59 Fälle). Ablauf (für die Szenarien, verbindlich in P10): Aktionen
     `einreichen`, `freigeben`, `ablehnen`, `freigabe_zuruecknehmen` mit bestätigter Rückfrage, Seite `pruefliste` mit
     `eintraege` und `ausgewaehlt`; fertig, wenn die Seite nach der Weiterleitung den Merker `data-status` zeigt.
-13. **Gegenprobe** (Gemeinsame Regeln, „Gegenprobe“; Profil 7 „Zurückrollen“). Jeden Fehler einzeln einbauen, die
+13. **Gegenprobe** (Gemeinsame Regeln, „Gegenprobe“; Profil 6.2.5, Abschnitt 7 „Zurückrollen“). Jeden Fehler einzeln einbauen, die
     genannten Befehle laufen lassen, Ergebnis im PR festhalten, Fehler zurücknehmen. Eine Gegenprobe zählt nur, wenn die
     benannten Fälle rot werden:
 
@@ -211,13 +220,13 @@ Gegenprobe in Schritt 13 sind deshalb Pflicht. Weg A nur auf ausdrücklichen Auf
     | G5-1 (AK-505) | `submitReport` wirft bei fehlenden Pflichtangaben `DomainRuleException(pflichtangaben_fehlen)` statt das Ergebnis zurückzugeben | AK-505-03 (Tage zurückgerollt, Montag zeigt wieder „Netzwerk geplant“) | `ant pruefung-daten -Dbh.pruefung.filter=AK-505` |
     | G5-2 (AK-505) | `saveDays` ruft `canEditReport()` nicht auf (Speichern ohne Statusprüfung) | AK-505-01 und AK-704-06 (statt `nicht_bearbeitbar` scheitert das Speichern erst am Trigger mit `P0001`) | `ant pruefung-daten -Dbh.pruefung.filter=AK-505`, `-Dbh.pruefung.filter=AK-704` |
     | G5-3 (AK-505) | Trigger `report_day_locked` im Skript auskommentiert | `AK505_DatenhaltungWeistAendernEinesEingereichtenTagsAbTest` (kein neutraler Fall zeigt das) | `ant test-db -Dtest.class=AK505_DatenhaltungWeistAendernEinesEingereichtenTagsAbTest` |
-    | G8-1 (AK-508) | Service übergibt `decideTransition()` den gesperrten Stand als gesehenen Stand (Formularwerte ignoriert) | AK-508-01, AK-508-02, AK-508-03, AK-508-04, AK-508-05 | `ant pruefung-daten -Dbh.pruefung.filter=AK-508` |
-    | G8-2 (AK-508) | `decideTransition()` vergleicht nur den Status, nicht `version` (`veraltet` wirkungslos) | AK-508-09 (Fachlogik) und AK-508-04 (Daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-508`, `ant pruefung-daten -Dbh.pruefung.filter=AK-508` |
-    | G8-3 (AK-508) | `AND version = ?` aus `updateStatusConditional` entfernt | `AK508_SperreUndBedingtesUpdateTest`, Teil (2); die neutralen Fälle bleiben grün, weil die Prüfung unter der Sperre greift | `ant test-db -Dtest.class=AK508_SperreUndBedingtesUpdateTest` |
-    | G8-4 (AK-508) | `lockForUpdate` übersprungen und das Update ohne Bedingung auf Status und `version` | `AK508_ZweiGleichzeitigeAktionenTest` (beide Aktionen gelingen, zwei neue Einträge) | `ant test-integration -Dtest.class=AK508_ZweiGleichzeitigeAktionenTest` |
+    | G5-4 (AK-508) | Service übergibt `decideTransition()` den gesperrten Stand als gesehenen Stand (Formularwerte ignoriert) | AK-508-01, AK-508-02, AK-508-03, AK-508-04, AK-508-05 | `ant pruefung-daten -Dbh.pruefung.filter=AK-508` |
+    | G5-5 (AK-508) | `decideTransition()` vergleicht nur den Status, nicht `version` (`veraltet` wirkungslos) | AK-508-09 (Fachlogik) und AK-508-04 (Daten) | `ant pruefung-fachlogik -Dbh.pruefung.filter=AK-508`, `ant pruefung-daten -Dbh.pruefung.filter=AK-508` |
+    | G5-6 (AK-508) | `AND version = ?` aus `updateStatusConditional` entfernt | `AK508_SperreUndBedingtesUpdateTest`, Teil (2); die neutralen Fälle bleiben grün, weil die Prüfung unter der Sperre greift | `ant test-db -Dtest.class=AK508_SperreUndBedingtesUpdateTest` |
+    | G5-7 (AK-508) | `lockForUpdate` übersprungen und das Update ohne Bedingung auf Status und `version` | `AK508_ZweiGleichzeitigeAktionenTest` (beide Aktionen gelingen, zwei neue Einträge) | `ant test-integration -Dtest.class=AK508_ZweiGleichzeitigeAktionenTest` |
 
     Kein Teil der Gegenprobe, aber im PR festzuhalten: Ohne `session.flush()` vor `updateStatusConditional` wird
-    AK-505-02 nur dann rot, wenn Hibernate vor Custom SQL nicht von selbst schreibt (Profil-Punkt 10). Bleibt der Fall
+    AK-505-02 nur dann rot, wenn Hibernate vor Custom SQL nicht von selbst schreibt (Profil 6.2.5, „In P00 zu bestätigen“ Punkt 10). Bleibt der Fall
     grün, ist `session.flush()` eine Absicherung, und der PR vermerkt „Hibernate schreibt vor Custom SQL selbst“.
 
     Prüfschritt: Tabelle mit dem tatsächlichen Ergebnis je Zeile im PR; nach dem Zurücknehmen alles grün. Wird ein
@@ -262,7 +271,7 @@ Nur in CI: der volle Liferay-6.2.5-Job; die Szenarien AK-502-04 und AK-703-06 ve
 | Beide gleichzeitigen Aktionen gelingen | `lockForUpdate` am Anfang jeder schreibenden Methode, auch `saveDays`; bedingtes Update mit Status und `version` |
 | Fachlicher Fehler hinterlässt einen Historieneintrag | Fehler als `RuntimeException` oder Rückgabe statt `PortalException`; nur `PortalException` und `SystemException` rollen sicher zurück |
 | Nach dem Wechsel zeigt die App den alten Status | Entity- und Finder-Cache nach dem Custom SQL leeren, Objekt aus der Hibernate-Sitzung lösen |
-| Statuswechsel speichert nichts | Methodenname mit `get`, `is`, `has` läuft nur lesend (Profil 7) |
+| Statuswechsel speichert nichts | Methodenname mit `get`, `is`, `has` läuft nur lesend (Profil 6.2.5, Abschnitt 7) |
 | `*LocalServiceImpl` lässt sich nicht erzeugen | Java-8-Syntax (Lambda, Methodenreferenz) in einer Klasse, die Service Builder liest; nur in `domain/` erlaubt |
 | Meldung falsch nach gleichzeitiger Aktion | Entscheidung gegen den gesperrten Stand mit dem gesehenen Stand aus dem Formular (M05-R20) |
 | Zeitpunkt der Historie stimmt nicht mit der Uhr des Falls | „jetzt“ nur aus `ClockHolder`; kein Datenbank-Standardwert, kein `new Date()` |
@@ -275,6 +284,6 @@ Nur in CI: der volle Liferay-6.2.5-Job; die Szenarien AK-502-04 und AK-703-06 ve
 - [ ] `session.flush()` vor dem bedingten Update als feste Regel für alle Statuswechsel mit Speichern (nicht im Profil;
       folgt aus dem Schreibschutz-Trigger und dem verzögerten Schreiben von Hibernate 3).
 - [ ] Ergebnis `TransitionResult` nur für `pflichtangaben_fehlen`; alle anderen Ablehnungen als `DomainRuleException`
-      (Profil 4.1, 7).
-- [ ] Gegenprobe G8-3 zeigt nur ein eigener Test, kein neutraler Prüffall; das ist nach M05 Abschnitt 10 erwartet
+      (Profil 6.2.5, Abschnitte 4.1, 7).
+- [ ] Gegenprobe G5-6 zeigt nur ein eigener Test, kein neutraler Prüffall; das ist nach M05 Abschnitt 10 erwartet
       (die zweite Sicherung greift nur bei einem Fehler der Fachlogik).

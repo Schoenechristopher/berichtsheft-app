@@ -80,7 +80,7 @@ Knoten prüfen → Neuaufbau → Kontrolle → Einstellung zurück.
 
 | Fehler | Was tun |
 | --- | --- |
-| Neuaufbau bricht mit Speicherfehler ab | Heap nach `profile/liferay-72.md`, 1; sonst entfernter Knoten nur in CI (Profil, 7) |
+| Neuaufbau bricht mit Speicherfehler ab | Heap nach `profile/liferay-72.md`, 1; sonst entfernter Knoten nur in CI (Profil 7.2, Abschnitt 7) |
 | Benutzerliste leer, App funktioniert | Index nicht aufgebaut; die App ist nicht betroffen, Schritt 2 wiederholen |
 | Jeder Start dauert sehr lange | `index.on.startup` steht noch auf `true` (Schritt 3) |
 | Nach dem Neuaufbau ist ein Upgrade-Fall rot | nicht der Index; Ursache in U03 oder U04 suchen, der Neuaufbau ändert keine App-Daten |

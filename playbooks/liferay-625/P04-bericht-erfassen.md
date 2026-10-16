@@ -30,7 +30,7 @@ fasst (Schritt 9). AK-404 (Feiertag vorbelegt) gehört zu M01; der Hinweis in de
 - P00 bis P03 der Reihe abgenommen: Berichte und Tage (`WeeklyReport`, `ReportDay`, `holidayPreset`, `outsideTraining`), Seite
   „Meine Wochen“, Zugriff `canViewReport()` und `DomainRuleException` (P02), Uhr und Wochen (P01).
 - P04 blockiert P05 (Einreichen speichert über denselben Baustein).
-- Profil 6.2.5: Abschnitte 3 (Transaktion, Sperre und bedingtes Update, Oberfläche), 4.2, 4.3 (Ablauf-Adapter, Merker) und 7
+- Profil 6.2.5, Abschnitte 3 (Transaktion, Sperre und bedingtes Update, Oberfläche), 4.2, 4.3 (Ablauf-Adapter, Merker) und 7
   („Lesende Transaktionen“, „Zurückrollen“, „Cache nach Custom SQL“, „Portal-Bausteine mit festen Farben“, JSP mit Jasper von
   Tomcat 7). Gemeinsames Profil, Abschnitte 2.3 (`BH_ReportDay`), 2.4 (Sperre, Cache) und 2.6.
 
