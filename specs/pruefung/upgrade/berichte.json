@@ -1,0 +1,527 @@
+[
+  {
+    "id": "AK-505-51",
+    "modul": "M05",
+    "ebene": "upgrade",
+    "beschreibung": "Eingereichter und freigegebener Bericht kommen mit Status und Tagen unverändert auf 7.2 an (auch Sonderzeichen und Zeilenumbrüche) und bleiben schreibgeschützt",
+    "vorher": {
+      "uhr": "2026-10-06T09:00:00+02:00",
+      "ausgangsbestand": {
+        "berichte": [
+          {
+            "azubi": "anna",
+            "woche": "2026-W39",
+            "tage": {
+              "alle": {
+                "tagesart": "Betrieb",
+                "text": "Netzwerk geplant"
+              },
+              "Mo": {
+                "tagesart": "Betrieb",
+                "text": "Switch „Etage 2“ konfiguriert – Größe 48 Ports\nVLAN 10 und 20 getrennt"
+              },
+              "Fr": {
+                "tagesart": "Berufsschule",
+                "text": "Lernfeld 4: Übertragungstechnik"
+              }
+            },
+            "verlauf": [
+              {
+                "als": "anna",
+                "aktion": "einreichen",
+                "uhr": "2026-10-06T09:00:00+02:00"
+              },
+              {
+                "als": "bernd",
+                "aktion": "freigeben",
+                "uhr": "2026-10-06T09:30:00+02:00"
+              }
+            ]
+          },
+          {
+            "azubi": "anna",
+            "woche": "2026-W40",
+            "tage": {
+              "alle": {
+                "tagesart": "Betrieb",
+                "text": "Netzwerk geplant"
+              }
+            },
+            "verlauf": [
+              {
+                "als": "anna",
+                "aktion": "einreichen",
+                "uhr": "2026-10-06T10:00:00+02:00"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "nachher": {
+      "uhr": "2026-10-07T09:00:00+02:00",
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W39",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Switch „Etage 2“ konfiguriert – Größe 48 Ports\nVLAN 10 und 20 getrennt"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Berufsschule",
+              "text": "Lernfeld 4: Übertragungstechnik"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T09:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-06T09:30:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ],
+      "schritte": [
+        {
+          "als": "anna",
+          "aktion": "tage_speichern",
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "Mo": {
+              "tagesart": "Betrieb",
+              "text": "Nachträglich geändert"
+            }
+          }
+        },
+        {
+          "als": "anna",
+          "aktion": "tage_speichern",
+          "azubi": "anna",
+          "woche": "2026-W39",
+          "tage": {
+            "alle": {
+              "tagesart": "Betrieb",
+              "text": "Nachträglich geändert"
+            }
+          }
+        }
+      ],
+      "ergebnisse": [
+        {
+          "fehler": "nicht_bearbeitbar"
+        },
+        {
+          "fehler": "nicht_bearbeitbar"
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-505-52",
+    "modul": "M05",
+    "ebene": "upgrade",
+    "beschreibung": "Scheitert das Einreichen auf 6.2.5 an den Pflichtangaben, kommt der Bericht als Entwurf mit den mitgeschickten Eingaben, ohne Historie und ohne Nachricht an und lässt sich auf 7.2 weiter bearbeiten und einreichen",
+    "vorher": {
+      "uhr": "2026-10-06T10:00:00+02:00",
+      "ausgangsbestand": {
+        "berichte": [
+          {
+            "azubi": "anna",
+            "woche": "2026-W40",
+            "tage": {
+              "alle": {
+                "tagesart": "Betrieb",
+                "text": "Netzwerk geplant"
+              }
+            }
+          }
+        ]
+      },
+      "schritte": [
+        {
+          "als": "anna",
+          "aktion": "einreichen",
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "Mo": {
+              "tagesart": "Betrieb",
+              "text": "Switch konfiguriert"
+            },
+            "Fr": {
+              "tagesart": "Berufsschule",
+              "text": ""
+            }
+          }
+        },
+        {
+          "aktion": "nachrichten_lesen"
+        }
+      ],
+      "ergebnisse": [
+        {
+          "fehler": "pflichtangaben_fehlen",
+          "tage": [
+            {
+              "tag": "Fr",
+              "fehler": "taetigkeiten_fehlen"
+            }
+          ]
+        },
+        {
+          "nachrichten": []
+        }
+      ]
+    },
+    "nachher": {
+      "uhr": "2026-10-07T09:00:00+02:00",
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Switch konfiguriert"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Berufsschule",
+              "text": ""
+            }
+          ],
+          "historie": [],
+          "kommentare": []
+        }
+      ],
+      "schritte": [
+        {
+          "als": "anna",
+          "aktion": "tage_speichern",
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "Fr": {
+              "tagesart": "Berufsschule",
+              "text": "Lernfeld 3: Netzwerke"
+            }
+          }
+        },
+        {
+          "als": "anna",
+          "aktion": "einreichen",
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "uhr": "2026-10-07T09:05:00+02:00"
+        }
+      ],
+      "ergebnisse": [
+        {
+          "gespeichert": true
+        },
+        {
+          "status": "Eingereicht"
+        }
+      ],
+      "berichteDanach": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Switch konfiguriert"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Berufsschule",
+              "text": "Lernfeld 3: Netzwerke"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-07T09:05:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-505-53",
+    "modul": "M05",
+    "ebene": "upgrade",
+    "beschreibung": "Auf 6.2.5 abgewiesene Aktionen hinterlassen nichts (Zurückrollen); nach dem Upgrade gilt genau der Stand ohne sie",
+    "vorher": {
+      "uhr": "2026-10-06T10:00:00+02:00",
+      "ausgangsbestand": {
+        "berichte": [
+          {
+            "azubi": "anna",
+            "woche": "2026-W39",
+            "tage": {
+              "alle": {
+                "tagesart": "Betrieb",
+                "text": "Netzwerk geplant"
+              }
+            }
+          },
+          {
+            "azubi": "anna",
+            "woche": "2026-W40",
+            "tage": {
+              "alle": {
+                "tagesart": "Betrieb",
+                "text": "Netzwerk geplant"
+              }
+            },
+            "verlauf": [
+              {
+                "als": "anna",
+                "aktion": "einreichen"
+              }
+            ]
+          }
+        ]
+      },
+      "schritte": [
+        {
+          "als": "anna",
+          "aktion": "tage_speichern",
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": {
+            "Mo": {
+              "tagesart": "Betrieb",
+              "text": "Nachträglich geändert"
+            }
+          }
+        },
+        {
+          "als": "anna",
+          "aktion": "einreichen",
+          "azubi": "anna",
+          "woche": "2026-W39",
+          "tage": {
+            "Mo": {
+              "tagesart": "Homeoffice",
+              "text": "x"
+            }
+          }
+        }
+      ],
+      "ergebnisse": [
+        {
+          "fehler": "nicht_bearbeitbar"
+        },
+        {
+          "fehler": "tage_ungueltig",
+          "tage": [
+            {
+              "tag": "Mo",
+              "fehler": ["tagesart_unbekannt"]
+            }
+          ]
+        }
+      ]
+    },
+    "nachher": {
+      "uhr": "2026-10-07T09:00:00+02:00",
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W39",
+          "status": "Entwurf",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [],
+          "kommentare": []
+        },
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  }
+]

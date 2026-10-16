@@ -1,0 +1,412 @@
+[
+  {
+    "id": "AK-508-51",
+    "modul": "M05",
+    "ebene": "upgrade",
+    "beschreibung": "Der Versionsstand kommt unverändert an: Bernd hat den Bericht auf 6.2.5 nach drei Statuswechseln geöffnet und gibt ihn nach dem Upgrade auf diesem Stand frei",
+    "vorher": {
+      "uhr": "2026-10-06T09:00:00+02:00",
+      "ausgangsbestand": {
+        "berichte": [
+          {
+            "azubi": "anna",
+            "woche": "2026-W40",
+            "tage": {
+              "alle": {
+                "tagesart": "Betrieb",
+                "text": "Netzwerk geplant"
+              }
+            },
+            "verlauf": [
+              {
+                "als": "anna",
+                "aktion": "einreichen",
+                "uhr": "2026-10-06T09:00:00+02:00"
+              },
+              {
+                "als": "anna",
+                "aktion": "zurueckziehen",
+                "uhr": "2026-10-06T09:10:00+02:00"
+              },
+              {
+                "als": "anna",
+                "aktion": "einreichen",
+                "uhr": "2026-10-06T09:20:00+02:00"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "nachher": {
+      "uhr": "2026-10-07T09:00:00+02:00",
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T09:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T09:10:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T09:20:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ],
+      "schritte": [
+        {
+          "als": "bernd",
+          "aktion": "freigeben",
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "gesehen": "vorher:0"
+        }
+      ],
+      "ergebnisse": [
+        {
+          "status": "Freigegeben"
+        }
+      ],
+      "berichteDanach": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T09:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T09:10:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T09:20:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-07T09:00:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "AK-508-52",
+    "modul": "M05",
+    "ebene": "upgrade",
+    "beschreibung": "Ein auf 6.2.5 veralteter Stand bleibt nach dem Upgrade veraltet: Bernds Ansicht vor Zurückziehen und erneutem Einreichen scheitert, Annas Zurückziehen nach der Freigabe ebenso",
+    "vorher": {
+      "uhr": "2026-10-06T10:00:00+02:00",
+      "ausgangsbestand": {
+        "berichte": [
+          {
+            "azubi": "anna",
+            "woche": "2026-W40",
+            "tage": {
+              "alle": {
+                "tagesart": "Betrieb",
+                "text": "Netzwerk geplant"
+              }
+            },
+            "verlauf": [
+              {
+                "als": "anna",
+                "aktion": "einreichen"
+              }
+            ]
+          }
+        ]
+      },
+      "schritte": [
+        {
+          "als": "anna",
+          "aktion": "zurueckziehen",
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "gesehen": 0,
+          "uhr": "2026-10-06T10:10:00+02:00"
+        },
+        {
+          "als": "anna",
+          "aktion": "einreichen",
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "gesehen": 1,
+          "uhr": "2026-10-06T10:20:00+02:00"
+        }
+      ],
+      "ergebnisse": [
+        {
+          "status": "Entwurf"
+        },
+        {
+          "status": "Eingereicht"
+        }
+      ]
+    },
+    "nachher": {
+      "uhr": "2026-10-07T09:00:00+02:00",
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Eingereicht",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:10:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:20:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ],
+      "schritte": [
+        {
+          "als": "bernd",
+          "aktion": "freigeben",
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "gesehen": "vorher:0"
+        },
+        {
+          "als": "bernd",
+          "aktion": "freigeben",
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "gesehen": 0,
+          "uhr": "2026-10-07T09:10:00+02:00"
+        },
+        {
+          "als": "anna",
+          "aktion": "zurueckziehen",
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "gesehen": "vorher:2"
+        }
+      ],
+      "ergebnisse": [
+        {
+          "fehler": "inzwischen_geaendert"
+        },
+        {
+          "status": "Freigegeben"
+        },
+        {
+          "fehler": "bereits_geprueft"
+        }
+      ],
+      "berichteDanach": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "status": "Freigegeben",
+          "tage": [
+            {
+              "tag": "Mo",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Di",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Mi",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Do",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            },
+            {
+              "tag": "Fr",
+              "tagesart": "Betrieb",
+              "text": "Netzwerk geplant"
+            }
+          ],
+          "historie": [
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:00:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Entwurf",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:10:00+02:00",
+              "runde": 1,
+              "begruendung": null
+            },
+            {
+              "von": "Entwurf",
+              "nach": "Eingereicht",
+              "person": "anna",
+              "zeitpunkt": "2026-10-06T10:20:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            },
+            {
+              "von": "Eingereicht",
+              "nach": "Freigegeben",
+              "person": "bernd",
+              "zeitpunkt": "2026-10-07T09:10:00+02:00",
+              "runde": 2,
+              "begruendung": null
+            }
+          ],
+          "kommentare": []
+        }
+      ]
+    }
+  }
+]

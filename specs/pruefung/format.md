@@ -354,6 +354,136 @@ oben (fachliche Aktionen bzw. Prüfaktionen).
 }
 ```
 
+## Aufbau eines Upgrade-Falls
+
+Ergänzung für die Reihe U (`playbooks/upgrade-625-auf-72/`), Stand 16.10.2026, **zur Freigabe** (siehe „Bitte
+bestätigen“ am Ende). Ein Fall der Ebene `upgrade` beschreibt einen Bestand auf Liferay 6.2.5 (`vorher`) und den
+Zustand, den die App nach dem Upgrade auf Liferay 7.2 zeigen muss (`nachher`). Er nennt wie ein Daten-Fall keine
+Tabelle, Spalte oder technische Kennung; die Adapter beider Plattformen übersetzen.
+
+**Dateien:** `upgrade/<gegenstand>.json`, je eine JSON-Liste von Upgrade-Fällen:
+
+| Datei | Gegenstand |
+| --- | --- |
+| `upgrade/berichte.json` | Berichte, Tage und Schreibschutz (AK-505) |
+| `upgrade/historie.json` | Statuswechsel und Kommentare als unveränderliche Historie (AK-801, AK-802, AK-803) |
+| `upgrade/version.json` | Versionsstand und gesehener Stand (AK-508) |
+| `upgrade/personen.json` | Personen, Rollen, Zuordnung, Bindung an das Konto (AK-104, AK-201, AK-203, AK-204) |
+| `upgrade/benachrichtigungen.json` | Glocke, Ausgangskorb, Kanalwahl, Erinnerungslauf (AK-1004, AK-1011, AK-1015, AK-1021) |
+
+Die Prüf-Runner der Modul-Fälle und `npm run ak:abdeckung` lesen nur die Dateien direkt unter `specs/pruefung/`;
+Upgrade-Fälle führt nur der Upgrade-Runner aus (unten, „Runner“). Ein Upgrade-Fall zählt deshalb nicht als Nachweis
+einer AK auf einer Plattform.
+
+**ID-Schema:** wie oben `<AK-ID>-<NN>`; die laufenden Nummern **51 bis 99** sind den Upgrade-Fällen vorbehalten, 01 bis
+50 den Modul-Fällen. Die ID ist eindeutig über alle Dateien einschließlich `upgrade/`; die AK-ID steht in der Tabelle
+„Akzeptanzkriterien“ der Fach-Spec von `modul`. So beginnt auch ein Upgrade-Fall mit seiner AK-ID, und die Nummer
+zeigt die Ebene.
+
+**Felder** (statt der Tabelle „Aufbau eines Prüffalls“):
+
+| Feld | Pflicht | Inhalt |
+| --- | --- | --- |
+| `id`, `modul`, `beschreibung`, `abweichend` | wie oben | wie oben; `abweichend` mit dem Schlüssel `upgrade-625-auf-72` |
+| `ebene` | ja | immer `upgrade` |
+| `vorher` | ja | Bestand auf 6.2.5, siehe unten |
+| `nachher` | ja | erwarteter Zustand auf 7.2, siehe unten |
+
+`uhr`, `ausgangsbestand`, `schritte` und `erwartet` stehen bei einem Upgrade-Fall nicht auf der obersten Ebene; ihre
+Rolle übernehmen die Felder in `vorher` und `nachher`. Das Feld `"id"` steht auch hier nur auf der Ebene des Falls.
+
+**`vorher`** (auf 6.2.5, hergestellt wie der Ausgangsbestand eines Daten-Falls):
+
+| Feld | Pflicht | Inhalt |
+| --- | --- | --- |
+| `uhr` | ja | Uhr auf 6.2.5 beim Herstellen; Berichte entstehen bis zu diesem Zeitpunkt (Daten-Fall, Schritt 3) |
+| `ausgangsbestand` | nein | `personen` und `berichte` (mit `tage` und `verlauf`) wie beim Daten-Fall |
+| `schritte` | nein | Aktionen der Daten-Fälle, ausgeführt auf 6.2.5 nach dem Ausgangsbestand |
+| `ergebnisse` | bei `schritte` ja | erwartetes Ergebnis je Schritt auf 6.2.5 |
+
+Weicht ein Ergebnis in `vorher` ab, ist der Fall **fehlerhaft**, nicht rot: Der Bestand vor dem Upgrade ist nicht der
+angenommene, und das Upgrade wird für diesen Fall nicht ausgeführt. Ein abgewiesener Schritt hinterlässt wie beim
+Daten-Fall nichts; `vorher` beschreibt deshalb nie einen halb gespeicherten Stand (Zurückrollen, M05 Abschnitt 8).
+
+**`nachher`** (auf 7.2 nach dem Upgrade):
+
+| Feld | Pflicht | Inhalt |
+| --- | --- | --- |
+| `uhr` | ja | Uhr auf 7.2 vor dem ersten Lesen; nicht vor dem letzten Zeitpunkt aus `vorher` |
+| `berichte` | ja (Liste, darf leer sein) | Bestand der Berichte, die der Fall in `vorher` oder `nachher` nennt, gelesen direkt nach dem Upgrade; Format wie `erwartet.berichte` im Daten-Fall, auch `"fehlt": true` |
+| `personen` | nein | Personenstand direkt nach dem Upgrade, siehe unten; fehlt das Feld, wird er nicht verglichen |
+| `schritte` | nein | Aktionen der Daten-Fälle auf 7.2, ausgeführt nach dem Vergleich von `berichte` und `personen` |
+| `ergebnisse` | bei `schritte` ja | erwartetes Ergebnis je Schritt auf 7.2 |
+| `berichteDanach` | nein | Bestand der Berichte nach den Schritten; fehlt das Feld, muss er gleich `berichte` sein |
+
+**Personenstand nach dem Upgrade:** alle Personen der App, nach `schluessel` sortiert, je
+`{ "schluessel", "name", "rolle", "aktiv", "ausbilder", "ausbildungsbeginn", "ausbildungsende", "kanaele", "gebunden" }`.
+`ausbilder`, `ausbildungsbeginn` und `ausbildungsende` sind `null`, wenn nicht gesetzt (bei Ausbildern immer);
+`kanaele` in der Reihenfolge von M08; `gebunden` sagt, ob die Person an ein Konto gebunden ist (M02-R07). Personen aus
+`testdaten.json` mit `"angelegt": true` sind nach dem Laden gebunden (wie im Seed der Referenz), Personen aus
+`ausgangsbestand.personen` nicht. Eine Testperson mit `"angelegt": false` fehlt im Personenstand.
+
+**Gesehener Stand über das Upgrade:** In `nachher.schritte` ist `gesehen` entweder eine Schrittnummer `n` von
+`nachher` (`0` = direkt nach dem Upgrade) oder `"vorher:<n>"`, der Stand nach Schritt `n` von `vorher`
+(`"vorher:0"` = nach dem Ausgangsbestand). Der Runner merkt sich diesen Stand auf 6.2.5, wie ihn ein offenes Formular
+hält, und reicht ihn auf 7.2 ein. So prüft ein Fall, dass der Versionsstand das Upgrade unverändert übersteht
+(AK-508), ohne ihn zu nennen.
+
+**Weitere Regeln:**
+
+- **Uhr und Hintergrundjobs:** Zwischen `vorher` und `nachher` und während des Falls läuft kein Hintergrundjob von
+  selbst; Versand und Erinnerung lösen nur Schritte aus (`nachrichten_versenden`, `erinnerung_ausloesen`).
+- **Übergaben:** `uebergaben` einer gespeicherten Nachricht zählt die Übergaben an den Test-Kanal auf beiden
+  Plattformen zusammen; eine auf 6.2.5 zugestellte Nachricht, die 7.2 noch einmal übergibt, fällt so auf.
+- **Kein gemeinsamer Bestand:** Jeder Fall hat seinen eigenen Bestand und sein eigenes Upgrade. Der Runner darf Fälle
+  parallel in getrennten Datenbanken ausführen, aber nie mehrere Fälle in einem Bestand zusammenlegen.
+
+**Runner:** nur für das Upgrade 6.2.5 → 7.2; die TypeScript-App hat keinen Upgrade-Fall und liest `upgrade/` nicht. Je
+Fall:
+
+1. Leere 6.2.5-Instanz mit installierter App und `bh.betrieb=test`; Testdaten laden.
+2. `vorher` über die Testschnittstelle von 6.2.5 herstellen und `vorher.ergebnisse` vergleichen.
+3. 6.2.5 anhalten, Datenbank und Dokumentenablage sichern (U01).
+4. Upgrade nach U02 bis U05 auf einer Kopie der Sicherung.
+5. 7.2 mit `bh.betrieb=test` starten, Uhr auf `nachher.uhr`; `berichte` und `personen` lesen und vergleichen, dann
+   `schritte` mit `ergebnisse` und `berichteDanach`.
+
+Der Runner liegt unter `liferay-72/upgrade-625/` und läuft nur von Hand (`workflow_dispatch`, Prüfklasse U nach
+`docs/ci-richtlinie.md`). Eine Abweichung trägt `"abweichend": { "upgrade-625-auf-72": "<Verweis>" }` und gilt wie oben
+erst mit Freigabe.
+
+**Beispiel** (AK-508: Bernd hat den Bericht auf 6.2.5 geöffnet und gibt ihn nach dem Upgrade auf diesem Stand frei):
+
+```json
+{
+  "id": "AK-508-51",
+  "modul": "M05",
+  "ebene": "upgrade",
+  "vorher": {
+    "uhr": "2026-10-06T09:00:00+02:00",
+    "ausgangsbestand": {
+      "berichte": [
+        {
+          "azubi": "anna",
+          "woche": "2026-W40",
+          "tage": { "alle": { "tagesart": "Betrieb", "text": "Netzwerk geplant" } },
+          "verlauf": [{ "als": "anna", "aktion": "einreichen" }, "…"]
+        }
+      ]
+    }
+  },
+  "nachher": {
+    "uhr": "2026-10-07T09:00:00+02:00",
+    "berichte": [{ "azubi": "anna", "woche": "2026-W40", "status": "Eingereicht", "tage": ["…"], "historie": ["…"], "kommentare": [] }],
+    "schritte": [{ "als": "bernd", "aktion": "freigeben", "azubi": "anna", "woche": "2026-W40", "gesehen": "vorher:0" }],
+    "ergebnisse": [{ "status": "Freigegeben" }],
+    "berichteDanach": ["…"]
+  }
+}
+```
+
+(`"…"` steht abgekürzt für die vollständigen Listen; der Fall in `upgrade/version.json` nennt sie ganz.)
+
 ## Schnittstellen von M01 (Fachlogik)
 
 Die Signaturen stehen in `specs/M01-kalender-und-zeit.md`, Abschnitt 6.
@@ -830,3 +960,29 @@ Plattform (`profile/<plattform>.md`), und der Fall trägt `"abweichend": { "<pla
 - Berichte weisen ihn getrennt aus („abweichend, begründet“), nie als grün.
 - Die TypeScript-App ist die Referenz und hat keine Abweichungen: Der TypeScript-Runner scheitert an einem Fall mit
   `abweichend.typescript`.
+
+## Bitte bestätigen
+
+Offen aus der Reihe U (Paket G4-I, 16.10.2026); abhaken nur durch Chris.
+
+- [ ] Abschnitt „Aufbau eines Upgrade-Falls“ als Ergänzung dieses Formats: Ebene `upgrade` mit den Feldern `vorher`
+  und `nachher` statt `uhr`, `ausgangsbestand`, `schritte` und `erwartet` auf der obersten Ebene. Die Feldtabelle in
+  „Aufbau eines Prüffalls“ nennt `erwartet` als Pflicht für jede Ebene; für `upgrade` gilt die Ausnahme aus dem neuen
+  Abschnitt.
+- [ ] ID-Schema der Upgrade-Fälle: `<AK-ID>-<NN>` mit den laufenden Nummern 51 bis 99, eindeutig über alle Dateien
+  einschließlich `upgrade/`.
+- [ ] `gesehen` als `"vorher:<n>"` für einen Stand, der vor dem Upgrade gesehen wurde (Nachweis des Versionsstands,
+  AK-508).
+- [ ] Personenstand nach dem Upgrade mit `gebunden`; Personen aus `testdaten.json` mit `"angelegt": true` gelten nach
+  dem Laden als gebunden, auch auf Liferay (Testschnittstelle 6.2.5 und 7.2).
+- [ ] `uebergaben` zählt bei Upgrade-Fällen über beide Plattformen.
+- [ ] Runner nur für 6.2.5 → 7.2 unter `liferay-72/upgrade-625/`, je Fall eigener Bestand, nur von Hand (Klasse U);
+  Abweichungsschlüssel `upgrade-625-auf-72`.
+- [ ] Werkzeuge: `parseCheckCases` in `scripts/ak-abdeckung/coverage.ts` verlangt `erwartet` und `<AK-ID>-<NN>`, die
+  Lader in `tests/pruefung/cases.ts`, `scripts/ak-abdeckung/` und `scripts/playbooks/dateien.ts` lesen nur die oberste
+  Ebene. Upgrade-Fälle bleiben deshalb heute unberührt; `scripts/merge-kriterien/` liest `upgrade/` mit
+  (`git ls-tree -r`) und zählt die IDs als Prüffälle. Soll ein Werkzeug `upgrade/` künftig prüfen, braucht es die
+  Ausnahme für `vorher`/`nachher` (eigener Auftrag).
+- [ ] Die 17 Upgrade-Fälle: AK-505-51 bis AK-505-53 (`berichte.json`), AK-801-51, AK-802-51, AK-803-51, AK-803-52
+  (`historie.json`), AK-508-51, AK-508-52 (`version.json`), AK-201-51, AK-203-51, AK-204-51, AK-104-51
+  (`personen.json`), AK-1015-51, AK-1004-51, AK-1011-51, AK-1021-51 (`benachrichtigungen.json`).
