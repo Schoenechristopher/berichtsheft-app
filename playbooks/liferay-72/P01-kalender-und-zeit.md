@@ -25,7 +25,7 @@ TypeScript-App („gleichwertig“ für alle sieben AK-IDs).
 - L72-P00 abgenommen und gemergt (Gerüst mit `bh-domain`, `bh-clock`, Fachlogik-Adapter mit Bau-Stand, Testschnittstelle,
   Systemzeit-Prüfung im Build). M01 hängt von keinem Modul ab, wird aber **vor** P02 gebaut: P01 und P02 ändern beide den
   Fachlogik-Adapter und den Bau-Stand, und P02 braucht die Bundesland-Referenzdaten (`FederalStates`) und die Uhr.
-- Profil 7.2: Abschnitt 1 (Java 11 zur Laufzeit, Java 8 als Quellstand der Fachlogik), 3.2 (Uhr als OSGi-Service), 4
+- Profil 7.2, Abschnitt 1 (Java 11 zur Laufzeit, Java 8 als Quellstand der Fachlogik), 3.2 (Uhr als OSGi-Service), 4
   (Fachlogik-Adapter, Gegenprobe) und 7 (Zeitzone); gemeinsames Profil, Abschnitt 2.2 (Datum und Zeit), 3.2 (Uhr-Service, Fachlogik als reine Java-Klassen)
   und 7 (Feiertage ohne Bibliothek).
 - JDK 11 und die JVM-Einstellung `-Duser.timezone=GMT` aus P00: Die Fachlogik darf sich darauf **nicht** verlassen (Schritt 4).

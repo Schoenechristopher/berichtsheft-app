@@ -38,7 +38,7 @@ AK-IDs seines Moduls. Keine Schemaänderung: Service Builder kommt erst mit P02 
   Cloud-Sitzung nicht (`CLAUDE.md`); alles läuft nativ.
 - Netz: SourceForge, Maven Central und das Ubuntu-Archiv sind erreichbar; Liferay-CDN, Liferay-Nexus, Adoptium und Azul
   nicht (`profile/liferay-gemeinsam.md` 4.6). Maven Central kann mit 429 ablehnen: Abrufe bündeln, mit Pause wiederholen.
-- Profil 6.2.5: Abschnitte 1, 2, 4, 5, 7 und „In P00 zu bestätigen“; gemeinsames Profil: 2.2, 2.6, 3.2, 4, 5, 7.
+- Profil 6.2.5, Abschnitte 1, 2, 4, 5, 7 und „In P00 zu bestätigen“; gemeinsames Profil: 2.2, 2.6, 3.2, 4, 5, 7.
 - Ein Branch, z. B. `claude/l62-p00-grundgeruest`, und ein Draft-PR (`CLAUDE.md`, „Arbeitsweise“).
 - Änderungen an `.claude/hooks/session-start.sh` und `.github/workflows/ci.yml` sind Klasse I und geschützte Pfade: der
   Auftrag muss sie nennen, Chris gibt frei.
@@ -67,10 +67,10 @@ für die Testschnittstelle). Konfiguration und Build entstehen aus dem Profil.
 
 Bau-Reihenfolge des Gerüsts:
 
-1. Laufzeit: JDK 8, Ant, Bundle, Plugins SDK, JDBC-Treiber (Profil 1, 5.1; gemeinsam 4.1, 4.2, 4.5).
-2. Projektbaum `liferay-625/` nach Profil 2.1, SDK-Dateien eingerichtet, aber nicht eingecheckt.
-3. Portal-Konfiguration aus `liferay-625/config/portal-ext.beispiel.properties` (Profil 5.1, Schritt 4).
-4. Plugin `bh-portlet` ohne Fachcode: Uhr-Service (gemeinsam 3.2), Testschnittstelle (Profil 4.2), Paketwurzel
+1. Laufzeit: JDK 8, Ant, Bundle, Plugins SDK, JDBC-Treiber (Profil 6.2.5, Abschnitte 1, 5.1; gemeinsam 4.1, 4.2, 4.5).
+2. Projektbaum `liferay-625/` nach Profil 6.2.5, Abschnitt 2.1, SDK-Dateien eingerichtet, aber nicht eingecheckt.
+3. Portal-Konfiguration aus `liferay-625/config/portal-ext.beispiel.properties` (Profil 6.2.5, Abschnitt 5.1, Schritt 4).
+4. Plugin `bh-portlet` ohne Fachcode: Uhr-Service (gemeinsam 3.2), Testschnittstelle (Profil 6.2.5, Abschnitt 4.2), Paketwurzel
    `de.berichtsheft`, Prüfung „Fachlogik ohne Liferay-Import“.
 5. Theme `bh-theme` mit Eltern-Theme `_styled`, noch ohne Gestaltung (P09).
 6. Prüf-Runner der drei Ebenen mit Bau-Stand, Testdaten-Test.
@@ -86,11 +86,30 @@ werden in P10 abgenommen.
 System. Weicht das System vom Profil ab, gilt das System, und die Abweichung kommt als „abweichend, begründet“ unter
 „Bitte bestätigen“, nie als Änderung am Profil.
 
+### Aufbau der Reihe (gilt für P01 bis P10)
+
+- Dateiname und Kurzname wie in `playbooks/typescript/` (`P05-status-und-pruefung.md` …); Kopfzeile mit Reihe, Plattform,
+  Profil und Stand wie hier.
+- Branch `claude/l62-pNN-<kurzname>`; Ant-Befehle im Ordner `liferay-625/portlets/bh-portlet/` nach `. ../../env.sh`,
+  Playwright aus der Wurzel des Repositorys.
+- Abschnitt 5 hat je Modul eine AK-Tabelle mit **jeder** AK-ID einzeln (Kurzfassung, Zahl der Prüffälle je Ebene, Datei);
+  ein Ablauf-Szenario aus `specs/pruefung/szenarien.json` steht getrennt (nicht in der Zahl der Prüffälle der AK-ID),
+  Abweichungen als **abweichend, begründet** mit Prüffall-ID und Verweis auf das Profil.
+- Fachlogik in `de.berichtsheft.domain.<bereich>` (Sprachstand Java 8, ohne Liferay-Import), Service in `*LocalServiceImpl`
+  (prüft Rolle und Besitz selbst), Oberfläche in Portlets; „jetzt“ nur aus `ClockHolder`.
+- Plattformeigene Tests heißen `AK505_<Beschreibung>Test` (AK-ID ohne Bindestrich), Prüffall-Tests tragen die ID unverändert
+  (`AK-505-01`); Berichte nennen die AK-ID mit Bindestrich (Profil 6.2.5, Abschnitt 4).
+- Jede Prüfung, die ein Playbook baut, bekommt eine **wirksame Gegenprobe**: ein benannter, absichtlich eingebauter Fehler
+  und die benannten Fälle bzw. Tests, die er rot macht; danach zurücknehmen. Nummern `G<Paket>-n` (`G5-4` ist die vierte
+  Gegenprobe von P05). CHECK-Constraints heißen wie im gemeinsamen Profil, Abschnitt 2.3, in beiden Reihen gleich.
+- Abschnitt 8 nennt mindestens: Fachlogik-Adapter des Moduls, Daten-Adapter des Moduls, plattformeigene Tests,
+  Ablauf-Fälle in Chromium und 375 px, den Ant-Lauf und die Playbook-Prüfung.
+
 ## 7. Schritte
 
 1. **Bestand prüfen.** `git status`, `ls liferay-625` (fehlt erwartungsgemäß), `java -version` (21), `psql --version`
    (16). Prüfschritt: Ausgangslage im PR notiert.
-2. **JDK 8 und Ant** (gemeinsam 4.2, Profil 5.1 Schritt 1). `apt-get install -y openjdk-8-jdk-headless ant` (Paket
+2. **JDK 8 und Ant** (gemeinsam 4.2, Profil 6.2.5, Abschnitt 5.1 Schritt 1). `apt-get install -y openjdk-8-jdk-headless ant` (Paket
    `openjdk-8-jdk-headless` aus `noble-security`/`universe`, vorher `apt-get update`). `JAVA_HOME` nur für die
    Liferay-Befehle auf Java 8 (`export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64` in einer Hilfsdatei
    `liferay-625/env.sh`, die jeder Befehl mit `.` einliest), `JAVA_TOOL_OPTIONS` leer wie bei Keycloak in `CLAUDE.md`.
@@ -102,35 +121,36 @@ System. Weicht das System vom Profil ab, gilt das System, und die Abweichung kom
 3. **Bundle und Plugins SDK** (gemeinsam 4.1). Beide Archive von SourceForge mit `curl -L --retry 4` nach
    `$HOME/.bh-liferay/download/` laden (Bundle 300.963.516 Byte, SDK 3.676.136 Byte; Größe prüfen), das Bundle nach
    `$HOME/.bh-liferay/bundle/` entpacken. JDBC-Treiber 42.7.14 von Maven Central nach `tomcat-7.0.62/lib/ext/`, den
-   mitgelieferten PostgreSQL-Treiber entfernen (gemeinsam 4.5, Profil 5.1 Schritt 2). Das SDK wird über `liferay-625/`
+   mitgelieferten PostgreSQL-Treiber entfernen (gemeinsam 4.5, Profil 6.2.5, Abschnitt 5.1 Schritt 2). Das SDK wird über `liferay-625/`
    entpackt, ohne vorhandene Dateien zu überschreiben; seine eigenen Dateien (`build-common*.xml`, `lib/`, `tools/`,
-   `portlets/build.xml` usw.) schließt `liferay-625/.gitignore` aus. Eingecheckt sind nur die Dateien aus Profil 2.1.
+   `portlets/build.xml` usw.) schließt `liferay-625/.gitignore` aus. Eingecheckt sind nur die Dateien aus Profil 6.2.5, Abschnitt 2.1.
    `build.<benutzer>.properties` aus `liferay-625/build.beispiel.properties` erzeugen (`app.server.parent.dir` auf das
    Bundle). Prüfschritt: `git status` zeigt keine SDK-Datei; Tomcat-Version im Bundle notiert (erwartet 7.0.62).
 4. **Startskript** (Klasse I, `.claude/hooks/session-start.sh`). Ein eigener Abschnitt richtet Schritt 2 und 3 nur ein,
    wenn die Sitzung ihn verlangt (Umgebungsvariable `BH_PLATTFORM=liferay-625`), damit TypeScript-Sitzungen nicht
    langsamer werden; die Archive bleiben unter `$HOME/.bh-liferay/` zwischengespeichert, ein zweiter Lauf lädt nichts.
-   Er legt die Datenbanken `berichtsheft_l625` und `berichtsheft_l625_test` für die Rolle `berichtsheft` an (Profil 5.1
+   Er legt die Datenbanken `berichtsheft_l625` und `berichtsheft_l625_test` für die Rolle `berichtsheft` an (Profil 6.2.5, Abschnitt 5.1
    Schritt 3) und schreibt sein Protokoll nach `/tmp/session-start.log`. Prüfschritt: zwei Läufe hintereinander, der
    zweite in unter einer Minute; ohne `BH_PLATTFORM` ändert sich am bisherigen Ablauf nichts.
-5. **Portal-Konfiguration.** `liferay-625/config/portal-ext.beispiel.properties` mit allen Schlüsseln aus Profil 5.1
+5. **Portal-Konfiguration.** `liferay-625/config/portal-ext.beispiel.properties` mit allen Schlüsseln aus Profil 6.2.5, Abschnitt 5.1
    Schritt 4 (Datenbank, `setup.wizard.enabled=false`, `bh.betrieb`, `bh.teams.modus`, Anmeldung, Sitzung, persönliche
-   Seiten aus, SMTP Port 1025, `index.on.startup=false`); Passwörter nur als Platzhalter. Das Startskript erzeugt daraus
+   Seiten aus, SMTP Port 1025, Absender der E-Mail (`admin.email.from.address`, `admin.email.from.name`), `bh.app.url`
+   (Basis der Links in Nachrichten, `http://localhost:8080`), `index.on.startup=false`); Passwörter nur als Platzhalter. Das Startskript erzeugt daraus
    `portal-ext.properties` im Bundle mit `bh.betrieb=test`. Prüfschritt: `grep -c '<platzhalter>'` in der Vorlage > 0,
    keine echten Zugangsdaten im Repository.
-6. **Erster Start ohne Plugin** (Profil „In P00 zu bestätigen“ 1, 2, 11). `tomcat-7.0.62/bin/catalina.sh run` mit
+6. **Erster Start ohne Plugin** (Profil 6.2.5, „In P00 zu bestätigen“ 1, 2, 11). `tomcat-7.0.62/bin/catalina.sh run` mit
    `setenv.sh` des Bundles (`-Duser.timezone=GMT`, Heap 2 GB als Ausgangswert, `-XX:MaxPermSize` ist unter Java 8
    wirkungslos). Prüfschritt: Log meldet „Server startup in … ms“; Portal-Tabellen liegen in `berichtsheft_l625`;
    `SHOW TimeZone` über die JDBC-Sitzung des Portals ergibt UTC, auch nach einem zweiten Start mit `TZ=Europe/Berlin`
    (gemeinsam 2.2).
-7. **Plugin `bh-portlet` ohne Fachcode.** `ant create` des SDK nicht nötig; Gerüst nach Profil 2.1 von Hand:
+7. **Plugin `bh-portlet` ohne Fachcode.** `ant create` des SDK nicht nötig; Gerüst nach Profil 6.2.5, Abschnitt 2.1 von Hand:
    `portlet.xml` mit einem Platzhalter-Portlet, `liferay-portlet.xml`, `liferay-plugin-package.properties`,
    `liferay-hook.xml` (noch leer bis P02), `web.xml` mit dem Servlet der Testschnittstelle. Paketwurzel `de.berichtsheft`
-   (Profil 2.1, „Bitte bestätigen“). `javac.source` und `javac.target` auf `1.8` (Profil 1). Ant-Ziele `test-unit`,
+   (Profil 6.2.5, Abschnitt 2.1, „Bitte bestätigen“). `javac.source` und `javac.target` auf `1.8` (Profil 6.2.5, Abschnitt 1). Ant-Ziele `test-unit`,
    `test-db`, `pruefung-fachlogik`, `pruefung-daten`, `test-integration` in der `build.xml` des Plugins mit der Ant-Aufgabe
-   `junit` (Profil 2.2); jedes Ziel nimmt `-Dbh.pruefung.filter=<Datei oder ID-Präfix>` (Gegenstück zu `-t "M05.json"`)
+   `junit` (Profil 6.2.5, Abschnitt 2.2); jedes Ziel nimmt `-Dbh.pruefung.filter=<Datei oder ID-Präfix>` (Gegenstück zu `-t "M05.json"`)
    und `-Dtest.class=<Klasse>`. Prüfschritt: `ant compile` und `ant war`; der Name des WAR ist notiert.
-8. **Abhängigkeiten** (gemeinsam 7, Profil 4.1). `ivy.xml` mit zwei Konfigurationen: `default` (PDFBox erst in P07,
+8. **Abhängigkeiten** (gemeinsam 7, Profil 6.2.5, Abschnitt 4.1). `ivy.xml` mit zwei Konfigurationen: `default` (PDFBox erst in P07,
    JDBC nur im Bundle) und `test` (JUnit 4.13.2, Jackson Databind 2.12.7.2). `ivy-settings.xml` nur mit Maven Central.
    **Jackson nur in Tests:** Jackson steht ausschließlich in der Konfiguration `test`; die Version 2.12.x bleibt auch bei
    Java 8, damit die Ausweichregel Java 7 keine zweite Version braucht (gemeinsam 7). P00 prüft, dass 2.12.7.2 die letzte
@@ -142,35 +162,37 @@ System. Weicht das System vom Profil ab, gilt das System, und die Abweichung kom
    (M01-R03). Keine Klasse unter `de.berichtsheft.domain` liest die Systemzeit. Prüfschritt: Unit-Test „Uhr in Produktion
    nicht stellbar“ und ein Test `DomainOhneLiferayTest`, der alle Quellen unter `domain/` auf `import com.liferay.` und
    `new Date()`/`System.currentTimeMillis()` durchsucht (Gegenprobe: ein Import in einer Testquelle macht ihn rot).
-10. **Testschnittstelle** (Profil 4.2). Servlet `de.berichtsheft.pruefung.ZustandServlet` unter
+10. **Testschnittstelle** (Profil 6.2.5, Abschnitt 4.2). Servlet `de.berichtsheft.pruefung.ZustandServlet` unter
     `/bh-portlet/pruefung/zustand`, fest in `web.xml`, prüft `bh.betrieb=test` bei **jeder** Anfrage, sonst 404.
     Aktionen in P00: `uhr_stellen`, `uhr_zuruecksetzen`, `bestand_leeren` (noch leer), `testdaten_laden` (liest nur,
     legt bis P02 nichts an). Antwort als JSON mit festen Fehlercodes (`{ "fehler": "<code>" }`), nie mit Meldungstext.
     Prüfschritt: `curl -s -o /dev/null -w "%{http_code}"` liefert 200 mit `bh.betrieb=test` und 404 nach Umstellen auf
     `produktion` und Neustart; dazu ein Versuch, das Servlet per `ServletContext.addServlet` anzumelden, als Beleg für
-    Profil-Punkt 19 (Ergebnis notieren, Versuch zurücknehmen).
+    Profil 6.2.5, „In P00 zu bestätigen“ Punkt 19 (Ergebnis notieren, Versuch zurücknehmen).
 11. **Prüf-Runner.** Lader `de.berichtsheft.pruefung.Prueffaelle` (Jackson, nur Testklassenpfad) liest alle Dateien
     `specs/pruefung/*.json` außer `testdaten.json` aus `bh.pruefung.dir` (Voreinstellung: Wurzel des Repositorys) und
     verteilt nach Ebene: `fachlogik` an `PruefungFachlogikTest`, `daten` an `PruefungDatenTest`, `ablauf` an den
     Ablauf-Runner. Jeder Fall ist ein Test mit dem Namen `<Prüffall-ID> (<Datei>, <Ebene>)` (`@Parameters(name = "{0}")`).
     **Bau-Stand:** `BauStand.java` mit der Liste der gebauten Module (anfangs leer) und der zurückgestellten Fälle
-    (AK-305-09 bis P04, AK-205-01 und AK-205-02 bis P08, wie in der TypeScript-Reihe). Ein ungebauter oder
+    (AK-305-09 bis P04, AK-408-07 bis P06, AK-205-01 und AK-205-02 bis P08; die TypeScript-Reihe baut AK-408-07 schon in P04). Ein ungebauter oder
     zurückgestellter Fall endet mit `Assume` und der Meldung „<ID> noch nicht gebaut“; ein Fall mit
-    `abweichend.liferay-625` mit „<ID> abweichend, begründet: <Verweis>“ (Profil 4.1). Der Runner schreibt am Ende eine
+    `abweichend.liferay-625` mit „<ID> abweichend, begründet: <Verweis>“ (Profil 6.2.5, Abschnitt 4.1). Der Runner schreibt am Ende eine
     Zusammenfassung „grün / rot / noch nicht gebaut / abweichend“ ins Ant-Log; ein Fall ohne Markierung, den kein Adapter
     ausführen kann, ist rot. Jedes Playbook P01 bis P09 trägt am Ende sein Modul ein; P10 löscht beide Listen.
     Prüfschritt: `ant pruefung-fachlogik` zeigt alle Fälle als „noch nicht gebaut“, keinen roten; ein absichtlich
     eingetragenes Modul ohne Adapter macht dessen Fälle rot (Gegenprobe, danach zurücknehmen).
 12. **Ablauf-Runner und Testdaten.** `liferay-625/e2e/playwright.config.ts` (Projekte `chromium`, `smartphone-375`, in CI
     zusätzlich `firefox`, `msedge`, `a11y`), `liferay-625/e2e/pruefung-ablauf.spec.ts` und `liferay-625/e2e/seiten.ts`
-    (Adresstabelle nach Profil 4.3, Seiten und Merker); der Ablauf übernimmt Prüfungen und Fallverteilung aus
+    (Adresstabelle nach Profil 6.2.5, Abschnitt 4.3, Seiten und Merker: `anmelden`, `kein_zugang`, `start`, `wochen`, `bericht`, `pruefliste`,
+    `azubis`, `personen`, `nicht_zustellbar`, `benachrichtigungen`, `einstellungen` und `entwickler-postfach` (Teams-Postfach der
+    Demo, Azubis eigene, Ausbilder alle), alle unter `/web/berichtsheft/<Seite>`, `bericht` über `friendly-url-routes.xml`); der Ablauf übernimmt Prüfungen und Fallverteilung aus
     `e2e/pruefung-ablauf.spec.ts` und `e2e/pruefung/ablauf-adapter.ts`, ohne diese Dateien zu ändern (ob eine gemeinsame
-    Adresstabelle für beide Plattformen möglich ist, kommt unter „Bitte bestätigen“, Profil 4.3). Testdaten-Test
+    Adresstabelle für beide Plattformen möglich ist, kommt unter „Bitte bestätigen“, Profil 6.2.5, Abschnitt 4.3). Testdaten-Test
     `TestdatenTest` in `test/unit/`: fünf Personen mit eindeutigem Schlüssel, Rolle, E-Mail und Konto, Anna, Bernd und
     Clara `angelegt`, Dora und Emil nicht; kein Feld `id`. Prüfschritt:
     `npx playwright test -c liferay-625/e2e/playwright.config.ts --project=chromium --list` findet die Ablauf-Fälle und
     meldet sie beim Lauf als übersprungen („noch nicht gebaut“), nicht „keine Tests gefunden“; `ant test-unit` grün.
-13. **Messung von Speicher und Laufzeit** (Profil 7 „Größe“, `docs/06-spec-architektur.md` „Risiken“). Jede Messung
+13. **Messung von Speicher und Laufzeit** (Profil 6.2.5, Abschnitt 7 „Größe“, `docs/06-spec-architektur.md` „Risiken“). Jede Messung
     dreimal, Mittelwert und Höchstwert; Umgebung dazu notieren (`nproc`, `free -m`, `df -h $HOME`). Werkzeug für die
     Zeit `/usr/bin/time -v` (Laufzeit, „Maximum resident set size“), für den laufenden Tomcat `ps -o rss=,vsz= -p <pid>`
     und `jcmd <pid> GC.heap_info`.
@@ -194,7 +216,7 @@ System. Weicht das System vom Profil ab, gilt das System, und die Abweichung kom
     - **schnell** (jeder Lauf des PRs): JDK 8 und Ant, Bundle, SDK und Ivy-Zwischenspeicher aus dem Actions-Cache,
       `ant compile war test-unit pruefung-fachlogik test-db` mit PostgreSQL als Dienst-Container;
     - **voll** (bereiter PR, Wochenlauf, Label `volle-pruefung`): Portal starten (natives Bundle wie in der Sitzung oder
-      Docker Hub `liferay/portal:6.2.5-ga6`, Profil-Punkt 21), `ant deploy`, `ant pruefung-daten test-integration`, dann
+      Docker Hub `liferay/portal:6.2.5-ga6`, Profil 6.2.5, „In P00 zu bestätigen“ Punkt 21), `ant deploy`, `ant pruefung-daten test-integration`, dann
       Playwright mit `chromium` und `smartphone-375`, Mailpit als Dienst-Container.
 
     Beide Jobs gehen in „Prüfung abgeschlossen“ ein (CI-36). Öffentliches Repository: nur Testdaten, keine Geheimnisse,
@@ -202,7 +224,7 @@ System. Weicht das System vom Profil ab, gilt das System, und die Abweichung kom
     `npm run pruefumfang -- --auswahl liferay-625/portlets/bh-portlet/build.xml` meldet L62; ein Draft-Lauf zeigt den
     schnellen Job grün, die Zeile „Liferay 6.2.5“ in „Prüfungen je Teil“ ist damit festgelegt (Eintrag in
     `docs/ci-richtlinie.md` übernimmt die Steuerung).
-15. **Profil bestätigen.** Zu jedem Punkt aus „In P00 zu bestätigen“ (Profil, 1 bis 22) ein Eintrag mit Beleg (Befehl,
+15. **Profil bestätigen.** Zu jedem Punkt aus „In P00 zu bestätigen“ (Profil 6.2.5, Punkte 1 bis 22) ein Eintrag mit Beleg (Befehl,
     Logzeile, Versuch). Was P00 noch nicht zeigen kann, bekommt das Playbook, in dem es entsteht: Service Builder,
     `build.auto.upgrade`, Upgrade-Reihenfolge und `ModelListener` (Punkte 4 bis 6) → P02 bzw. P06; Transaktion, Custom
     SQL und Cache (9, 10) → P05; Scheduler und Mail (12, 13) → P08; Glocke, Sass, Theme (14, 17, 18) → P09; Login und
@@ -248,7 +270,7 @@ Nur in CI: der volle Liferay-6.2.5-Job mit Docker-Image oder nativem Bundle, Mai
 | Maven Central antwortet 429 | Abrufe bündeln, Pause, höchstens vier Wiederholungen; Ivy-Zwischenspeicher behalten |
 | Portal startet nicht auf PostgreSQL 16 (`authentication method 10 not supported`) | alter Treiber noch in `lib/ext/`; nur 42.7.14 behalten (gemeinsam 4.5) |
 | Zeiten um eine oder zwei Stunden verschoben | JVM nicht in GMT oder JDBC-Sitzung nicht in UTC; `setenv.sh` und Zeitzonen-Nachweis (Schritt 6) |
-| `ant deploy` fertig, Tests scheitern sofort | Hot Deploy ist asynchron; auf die Meldung im Log bzw. eine Antwort der Testschnittstelle warten (Profil 7) |
+| `ant deploy` fertig, Tests scheitern sofort | Hot Deploy ist asynchron; auf die Meldung im Log bzw. eine Antwort der Testschnittstelle warten (Profil 6.2.5, Abschnitt 7) |
 | SDK-Dateien tauchen in `git status` auf | `liferay-625/.gitignore` ergänzen; nichts vom SDK einchecken |
 | Jackson im WAR | Abhängigkeit in die Ivy-Konfiguration `test` verschieben (Schritt 8) |
 | Runner zeigt „0 Tests“ | `bh.pruefung.dir` zeigt nicht auf die Wurzel des Repositorys |
@@ -257,8 +279,8 @@ Nur in CI: der volle Liferay-6.2.5-Job mit Docker-Image oder nativem Bundle, Mai
 
 ## Bitte bestätigen
 
-- [ ] SDK-Dateien werden beim Einrichten über `liferay-625/` entpackt und per `.gitignore` ausgeschlossen; Profil 2.1
-      nennt `liferay-625/` die Wurzel des SDK, Profil 5.1 entpackt das SDK außerhalb des Repositorys (abweichend,
+- [ ] SDK-Dateien werden beim Einrichten über `liferay-625/` entpackt und per `.gitignore` ausgeschlossen; Profil 6.2.5, Abschnitt 2.1
+      nennt `liferay-625/` die Wurzel des SDK, Profil 6.2.5, Abschnitt 5.1 entpackt das SDK außerhalb des Repositorys (abweichend,
       begründet: Die Ant-Dateien eines Plugins importieren die SDK-Dateien relativ).
 - [ ] Liferay-Teil des Startskripts nur mit `BH_PLATTFORM=liferay-625`, Zwischenspeicher unter `$HOME/.bh-liferay/`.
 - [ ] Jackson Databind 2.12.7.2 nach `profile/liferay-gemeinsam.md` 7; Profil 6.2.5, 4.1 nennt noch „ab 2.13 Java 8,

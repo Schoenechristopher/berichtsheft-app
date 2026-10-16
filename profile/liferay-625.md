@@ -306,7 +306,7 @@ Der Runner übernimmt Ablauf und Prüfungen aus `e2e/pruefung-ablauf.spec.ts`, `
 - **Seiten:** `anmelden` → `/web/berichtsheft/anmelden` (zugleich `auth.login.url`), `kein_zugang` →
   `/web/berichtsheft/kein-zugang`, `start` → `/web/berichtsheft/start` (Landeseite nach dem Login über
   `default.landing.page.path`), `wochen`, `pruefliste`, `azubis`, `personen`, `nicht_zustellbar`,
-  `benachrichtigungen`, `einstellungen` als Seiten der Site mit gleichnamiger Adresse; `bericht` über die Adresse aus
+  `benachrichtigungen`, `einstellungen`, `entwickler-postfach` als Seiten der Site mit gleichnamiger Adresse; `bericht` über die Adresse aus
   `friendly-url-routes.xml`. Die Liste legt P00 fest.
 - **Merker:** dieselben festen Merker wie in der TypeScript-App (`data-status`, `data-woche`, `data-fehler`,
   `data-feld`, `data-warnung-verlassen`, `data-anmeldeweg` …); Portlets und Theme setzen sie.
@@ -341,7 +341,8 @@ kommen in P00 ins Startskript (`liferay-gemeinsam.md`, „Hinweis für KE-S01“
    - Sitzung: `session.timeout=480`, `session.timeout.warning=0` (kein Dialog des Portals),
      `session.timeout.auto.extend=false`;
    - persönliche Seiten aus: `layout.user.private.layouts.enabled=false`, `layout.user.public.layouts.enabled=false`;
-   - SMTP: Mailpit bzw. SMTP-Mock, Port 1025.
+   - SMTP: Mailpit bzw. SMTP-Mock, Port 1025; Absender der E-Mail (`admin.email.from.address`, `admin.email.from.name`);
+   - `bh.app.url`: Basis der Links in Nachrichten (der Scheduler hat keine Anfrage, aus der sich die Adresse ergäbe);
 5. Start: `tomcat-7.0.62/bin/catalina.sh run` (mit `setenv.sh` des Bundles, `-Duser.timezone=GMT`, Heap 2 GB als
    Ausgangswert); einmal mit `TZ=Europe/Berlin` für den Zeitzonen-Nachweis (gemeinsam 2.2).
 6. `ant build-service deploy` im Plugin, `ant deploy` im Theme; warten auf die Meldung im Tomcat-Log (2.2).

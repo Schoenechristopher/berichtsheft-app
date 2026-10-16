@@ -28,7 +28,7 @@ Abweichung gegenüber der TypeScript-App.
 - L72-P00, L72-P01 (Wochen, Feiertage, Uhr) und L72-P02 (Personen, Zugriff, Bundesland, `getActiveTrainees()`) abgenommen und
   gemergt. M03 ist die Grundlage von M04, M05 und M08; die Tabelle `BH_WeeklyReport` trägt deshalb schon `status` und `version`
   (gemeinsames Profil, Abschnitt 2.3, 2.4).
-- Profil 7.2: Abschnitt 3 (Persistenz, Transaktion und Gleichzeitigkeit, Hintergrundjobs, Zeitplan 3.3), 4 (Daten-Adapter,
+- Profil 7.2, Abschnitt 3 (Persistenz, Transaktion und Gleichzeitigkeit, Hintergrundjobs, Zeitplan 3.3), 4 (Daten-Adapter,
   plattformeigene Tests) und 7 („Service Builder schreibt am Cache vorbei“, Scheduler in UTC); gemeinsames Profil, Abschnitt 2.2, 2.3 und 2.6.
 - Der Scheduler-Eintrag liegt im Modul `bh-notification` (Profil 7.2, Abschnitt 2); P08 nutzt dieselbe Registrierung für Ausgangskorb und
   Erinnerung.

@@ -31,7 +31,7 @@ Glocke gilt Profil 7.2, Abschnitt 3.5.
 - L72-P00 bis L72-P06 abgenommen und gemergt; M08 hängt von M02 (Rollen, Zuordnung, Rücksprung), M03 (offene Wochen, Anlegen) und M05
   (Statuswechsel mit `TransitionEvent`) ab, nicht von M07. P03 hat den Scheduler-Rahmen in `bh-notification` angelegt, P05 den
   Einhängepunkt in `transition` und `submit` (P05, Schritt 7).
-- Profil 7.2: Abschnitte 3 (Hintergrundjobs, Zeitplan 3.3, Benachrichtigung in der App 3.5, E-Mail, Teams), 4 (Daten-Adapter), 5
+- Profil 7.2, Abschnitte 3 (Hintergrundjobs, Zeitplan 3.3, Benachrichtigung in der App 3.5, E-Mail, Teams), 4 (Daten-Adapter), 5
   (SMTP-Mock, Mailpit nur in CI) und 7 („`PortalException` und Rollback“, „Mail asynchron“, „Scheduler in UTC“); gemeinsames Profil, Abschnitt 2.3, 2.5 und 3.2.
 - P00 hat bestätigt (Profil 7.2, „In P00 zu bestätigen“): der synchrone Mailversand über die Mail-Sitzung des Portals, die Scheduler-Aufrufe
   (`SchedulerEngineHelper`, `StorageType.MEMORY_CLUSTERED`, Takt) und dass das Gelesen-Markieren der Liferay-Glocke einen

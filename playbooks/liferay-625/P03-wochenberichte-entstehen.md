@@ -31,7 +31,7 @@ Schemaänderung: ja. Neue Entities `WeeklyReport` (mit Spalte `version`, damit P
   `de.berichtsheft.domain.calendar` (P01), `BH_Person` und `BH_Setting`, `canViewReport()`, `DomainRuleException` mit
   `Fehlercode`, das Skript `UpgradeSchutzDerDatenhaltung` und die Testdaten (P02).
 - P03 blockiert P04 (Tage speichern braucht Berichte und Tage) und P05.
-- Profil 6.2.5: Abschnitte 2.1, 3 (Persistenz, Transaktion, Hintergrundjobs, Schema-Schritte), 4.1, 4.2 (Testschnittstelle)
+- Profil 6.2.5, Abschnitte 2.1, 3 (Persistenz, Transaktion, Hintergrundjobs, Schema-Schritte), 4.1, 4.2 (Testschnittstelle)
   und 7 („Lesende Transaktionen“, „Cache nach Custom SQL“, „Scheduler in GMT“, `build.auto.upgrade`). Gemeinsames Profil, Abschnitte 2.2,
   2.3 (Tabellen `BH_WeeklyReport`, `BH_ReportDay`), 2.4 (Cache), 2.5 (Scheduler, `BH_ReminderRun` erst P08) und 2.6.
 

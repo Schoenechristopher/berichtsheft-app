@@ -23,7 +23,7 @@ außer den Triggern und Fremdschlüsseln der Historie im Skript „Schutz in der
 ## 2. Voraussetzungen
 
 - L72-P00 bis L72-P05 abgenommen (`BH_StatusChange` und `BH_Comment` werden seit P05 geschrieben, `report_day_locked` steht).
-- Profil: Abschnitte 3 (Historie und Schreibschutz), 4 (Daten-Adapter, plattformeigene Tests, Zeitzone), 7 (`ModelListener`)
+- Profil 7.2, Abschnitte 3 (Historie und Schreibschutz), 4 (Daten-Adapter, plattformeigene Tests, Zeitzone), 7 (`ModelListener`)
   und „Nachweis AK-505 und AK-508“; gemeinsam 2.2 (UTC), 2.4 (Löschen eines Azubis, Cache) und 2.6.
 - P00 hat die Signatur von `BaseModelListener.onBeforeUpdate`/`onBeforeRemove` in 7.2 bestätigt.
 
@@ -73,7 +73,7 @@ Caches); dafür gibt es keine Vorlage im Quellcode.
    - jede Abweisung `RAISE EXCEPTION … USING ERRCODE = 'BH803'`.
    Danach Datenbank `berichtsheft_l72` neu anlegen und Bundle neu starten. Prüfschritt: direktes `UPDATE` und `DELETE` auf
    `BH_StatusChange` und `BH_Comment` scheitern mit `BH803`; `report_day_locked` aus P05 steht weiter in `pg_trigger`.
-3. **`ModelListener` der Historie** (Profil, Nachweis AK-505, Punkt 3): `StatusChangeModelListener` und `CommentModelListener`
+3. **`ModelListener` der Historie** (Profil 7.2, Nachweis AK-505, Punkt 3): `StatusChangeModelListener` und `CommentModelListener`
    (`extends BaseModelListener<…>`, `@Component(service = ModelListener.class)`, Paket `…model.listener`) weisen **nur** in
    `onBeforeUpdate` und `onBeforeRemove` ab, mit `ModelListenerException` und Ursache `HistoryImmutableException` (Grund
    `historie_unveraenderlich`). `onBeforeCreate` bleibt unberührt: P05 legt Einträge an. Prüfschritt:
@@ -120,7 +120,8 @@ Caches); dafür gibt es keine Vorlage im Quellcode.
     | F-P06-5 „Historien-Listener am falschen Hook“ (AK-508) | `StatusChangeModelListener` weist zusätzlich in `onBeforeCreate` ab | AK-508-01, AK-508-02, AK-508-03, AK-508-04, AK-508-05 (schon der erste Statuswechsel scheitert und wird zurückgerollt), dazu `ConcurrentTransitionTest.AK508_vonZweiGleichzeitigenAktionenGelingtGenauEine` (kein Erfolg statt genau einem) | AK-508-06 bis AK-508-11 (Fachlogik) |
 
     Prüfschritt: fünf rote Läufe mit den benannten Fällen im PR notiert, danach M02, M05 und M06 grün.
-11. **Bau-Stand.** M06 eintragen. Prüfung nach Abschnitt 8.
+11. **Bau-Stand.** M06 eintragen und AK-408-07 freischalten (von P04 bis hierher zurückgestellt: Einreichen aus P05, Historie auf der
+    Berichtsseite aus diesem Paket). Prüfschritt: AK-408-07 läuft grün, zurückgestellt bleiben nur AK-205-01 und AK-205-02 (P08). Prüfung nach Abschnitt 8.
 
 ## 8. Prüfung
 

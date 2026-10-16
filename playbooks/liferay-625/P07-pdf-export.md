@@ -31,7 +31,7 @@ Schemaänderung: nein. M07 speichert nichts (Fach-Spec M07, Abschnitt 5). Neue B
   Rücknahme (P05) und die Historie mit `currentApproval()` (P06, `de.berichtsheft.domain.history.ReportHistory`); Personen und
   Sichtbarkeit `canViewReport()` (P02); Uhr, Wochen und Zeitzone (P01). P07 hat keinen Vorgänger in M07, aber alle Daten-Fälle
   brauchen `freigeben` und `freigabe_zuruecknehmen` aus P05.
-- Profil 6.2.5: Abschnitte 3 (PDF, Transaktion, Oberfläche), 4.1, 4.2 und 7 („Lesende Transaktionen“, „Zurückrollen“,
+- Profil 6.2.5, Abschnitte 3 (PDF, Transaktion, Oberfläche), 4.1, 4.2 und 7 („Lesende Transaktionen“, „Zurückrollen“,
   „Mehrere Klassenlader“, JSP mit Jasper von Tomcat 7, `build.auto.upgrade`). Gemeinsames Profil, Abschnitte 2.2 (Uhr, Zeit in UTC), 3.2 und 7
   (PDFBox, Noto Sans).
 

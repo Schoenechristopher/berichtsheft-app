@@ -14,7 +14,7 @@ und die Portlets Kein Zugang, Start, Personen und Einstellungen (Bundesland). Fe
    den zurückgestellten AK-205-01 und AK-205-02 (sie brauchen den Erinnerungslauf, P08) und den zwei Fällen mit
    `abweichend.liferay-625`;
 2. genau **AK-101-01** und **AK-106-01** als „abweichend, begründet“ ausgewiesen sind (Feld `abweichend` in
-   `specs/pruefung/M02.json`, Verweis Profil 6.1); AK-101-02, AK-101-03 und AK-106-02 laufen und sind grün;
+   `specs/pruefung/M02.json`, Verweis Profil 6.2.5, Abschnitt 6.1); AK-101-02, AK-101-03 und AK-106-02 laufen und sind grün;
 3. die eigenen Tests zu AK-102, AK-104, AK-201, AK-204 und AK-207 (Schritt 11) grün sind;
 4. Service Builder die Tabellen `BH_Person` und `BH_Setting` nach `profile/liferay-gemeinsam.md` 2.3 anlegt und das
    Skript „Schutz in der Datenhaltung“ (gemeinsam 2.6) ihre Teile enthält (Schemaänderung: ja, neue Tabellen über
@@ -25,8 +25,8 @@ und die Portlets Kein Zugang, Start, Personen und Einstellungen (Bundesland). Fe
 - P00 und P01 abgenommen und gemergt (Uhr-Service, Testschnittstelle, Runner, Kalender). P01 und P02 laufen
   **nacheinander**: beide ändern den Fachlogik-Adapter und `BauStand.java`.
 - P00 hat bestätigt oder als „offen bis P02“ markiert: Hook-Teile im selben Plugin, `custom-jsp-dir`, Folgeseiten der
-  Anmeldung abschaltbar, `auth.login.url` und Landeseite (Profil „In P00 zu bestätigen“ 7, 15, 16).
-- Profil 6.2.5: Abschnitte 3 (Anmeldung, Zugang je Anfrage, Rollen und Besitz, Persistenz, Transaktion), 4.2
+  Anmeldung abschaltbar, `auth.login.url` und Landeseite (Profil 6.2.5, „In P00 zu bestätigen“ 7, 15, 16).
+- Profil 6.2.5, Abschnitte 3 (Anmeldung, Zugang je Anfrage, Rollen und Besitz, Persistenz, Transaktion), 4.2
   (Testschnittstelle, Liferay-Konten der Testdaten), 5.1 (Anmeldung, Sitzung), 6.1 (Abweichungen) und 7.
 - Gemeinsames Profil: 2.3 (`BH_Person`, `BH_Setting`), 2.4 (Löschen nur per Kaskade), 2.5 (Verbindung zum
   Liferay-Benutzer, ein Mandant), 2.6, 5 (sicherheitsrelevante Pfade).
@@ -46,7 +46,7 @@ und die Portlets Kein Zugang, Start, Personen und Einstellungen (Bundesland). Fe
 Nur auf ausdrücklichen Auftrag. Übertragbar sind die reinen Funktionen; Lesereihenfolge `src/domain/access.ts`,
 `src/domain/people.ts`, `src/domain/report-access.ts`, danach `src/lib/people/service.ts` (nur für Reihenfolge und
 Fehlerübersetzung, die Transaktion baut 6.2.5 anders, Schritt 6). Der Plattformteil (Auth.js, `src/proxy.ts`,
-`src/lib/session.ts`) ist nicht übertragbar; er entsteht aus Profil 3 und 6.1. Belege zum Abgleich:
+`src/lib/session.ts`) ist nicht übertragbar; er entsteht aus Profil 6.2.5, Abschnitte 3 und 6.1. Belege zum Abgleich:
 `src/domain/access.test.ts`, `src/domain/people.test.ts`, `src/domain/report-access.test.ts`, `tests/db/people.test.ts`.
 
 ## 5. Weg B: aus der Spec
@@ -54,7 +54,7 @@ Fehlerübersetzung, die Transaktion baut 6.2.5 anders, Schritt 6). Der Plattform
 Bau-Reihenfolge: (1) Service Builder und Schema, (2) Zugang und Binden als reine Funktionen, (3) Regeln der
 Nutzerverwaltung, (4) Zugriffsprüfungen, (5) `PersonLocalServiceImpl`, (6) Login-Aktion, Filter und Sitzung, (7) JSP-Hook
 und Portlets, (8) Testschnittstelle und Testdaten, (9) Adapter, eigene Tests. Zu jedem AK die Prüffälle und die
-Bewertung nach Profil 6.1:
+Bewertung nach Profil 6.2.5, Abschnitt 6.1:
 
 | AK-ID | Kriterium (Kurzfassung aus der Fach-Spec) | Prüffälle | Auf 6.2.5 |
 | --- | --- | --- | --- |
@@ -81,13 +81,13 @@ Playbook setzt keine weitere Markierung und ändert die Prüffälle nicht.
 ## 6. Empfehlung
 
 **Weg B.** Die Regeln (Zugang, Binden, Rollenwechsel, Löschen) sind in der Spec vollständig und als Fachlogik-Fälle
-prüfbar; der Plattformteil folgt Profil 3 und 6.1. Weg A nur für den Abgleich der reinen Funktionen.
+prüfbar; der Plattformteil folgt Profil 6.2.5, Abschnitte 3 und 6.1. Weg A nur für den Abgleich der reinen Funktionen.
 
 ## 7. Schritte
 
-1. **Branch** `claude/l62-p02-personen-und-zugang`; Spec, Profil 6.1 und Prüffälle lesen. Prüfschritt: AK-Tabelle aus
+1. **Branch** `claude/l62-p02-personen-und-zugang`; Spec, Profil 6.2.5, Abschnitt 6.1 und Prüffälle lesen. Prüfschritt: AK-Tabelle aus
    Abschnitt 5 mit den zwei abweichenden Fällen im PR-Entwurf.
-2. **Service Builder und Schema** (gemeinsam 2.3, 2.6; Profil 3 „Persistenz“, „Schema-Schritte“, 7
+2. **Service Builder und Schema** (gemeinsam 2.3, 2.6; Profil 6.2.5, Abschnitt 3 „Persistenz“, „Schema-Schritte“, 7
    „`build.auto.upgrade`“). `service.xml` mit `package-path="de.berichtsheft"`, `<namespace>BH</namespace>`, Entities
    `Person` und `Setting` mit den Spalten aus gemeinsam 2.3 (`active` → `active_`, `userId` leer bis zum ersten Login),
    Finder `UserId`, `Email`, `TrainerId`; Spaltenlängen in `portlet-model-hints.xml`. `service-ext.properties` mit
@@ -99,12 +99,12 @@ prüfbar; der Plattformteil folgt Profil 3 und 6.1. Weg A nur für den Abgleich 
    partiellen eindeutigen Index auf `userId` ein. Spätere Playbooks ergänzen das Skript um ihre Teile; bis zur Version
    `1.0.0` wird die Demo-Datenbank bei einer Schemaänderung neu angelegt (siehe „Bitte bestätigen“). Prüfschritt:
    `ant build-service deploy`; ein `INSERT` eines Azubis ohne Ausbilder per `psql` scheitert am CHECK; Ort von
-   `upgrade.processes` und Reihenfolge Tabellen → Skript belegt (Profil „In P00 zu bestätigen“ 4 bis 6).
+   `upgrade.processes` und Reihenfolge Tabellen → Skript belegt (Profil 6.2.5, „In P00 zu bestätigen“ 4 bis 6).
 3. **Zugang `de.berichtsheft.domain.access.AccessRules`** (Gegenstück zu `src/domain/access.ts`; M02-R03, M02-R07,
    M02-R08, AK-101, AK-102, AK-201): `decideAccess()` (nur angelegte, aktive Personen; Hinweis nach M02-R03),
    `matchLogin()` (zuerst `userId`, sonst einmaliges Binden über die bestätigte E-Mail), `homePathFor()`,
    `safeReturnPath()` (nur Pfade der Site, gehört fachlich zu M08). Die Fachlogik kennt nur die Werte, nicht `User`: Die
-   Login-Aktion übergibt `userId`, E-Mail und `emailAddressVerified` (Profil 6.1, AK-201). Ablehnungsgründe als feste
+   Login-Aktion übergibt `userId`, E-Mail und `emailAddressVerified` (Profil 6.2.5, Abschnitt 6.1, AK-201). Ablehnungsgründe als feste
    Codes (`Fehlercode`). Prüfschritt: Unit-Test `AK102_ZugangTest` und `AK201_ZuordnungTest` in `test/unit/`.
 4. **Nutzerverwaltung `de.berichtsheft.domain.people.PeopleRules`** (Gegenstück zu `src/domain/people.ts`; M02-R06,
    M02-R14 bis M02-R26; AK-201, AK-202, AK-203,
@@ -114,12 +114,12 @@ prüfbar; der Plattformteil folgt Profil 3 und 6.1. Weg A nur für den Abgleich 
    Liferay-Klasse. Prüfschritt: `test/unit/` mit Namen ab der AK-ID.
 5. **Zugriff `de.berichtsheft.domain.access.ReportAccess`** (Gegenstück zu `src/domain/report-access.ts`; M02-R09 bis
    M02-R12, AK-103, AK-104, AK-105, AK-204): `canViewReport()` (Azubi nur eigene, Ausbilder alle, deaktivierter Azubi
-   bleibt lesbar), `canManagePeople()` (nur aktive Ausbilder). `canEditReport()` kommt in P05 hinzu. Prüfschritt:
+   bleibt lesbar), `canManagePeople()` (nur aktive Ausbilder). `canEditReport()` entsteht in P04 (Speichern braucht es), P05 ergänzt dessen Fälle zu AK-505 und AK-704. Prüfschritt:
    Unit-Tests.
 6. **`PersonLocalServiceImpl`** (M02-R13, M02-R27; AK-201, AK-202, AK-203, AK-204, AK-205, AK-206,
    AK-207, AK-208, AK-209). Schreibende Methoden heißen `addPerson`,
    `updatePerson`, `deactivatePerson`, `reactivatePerson`, `deletePerson`, `updateFederalState`; lesende `getPeople`,
-   `getFederalState` (Präfix `get` läuft nur lesend, Profil 7). Jede Methode nimmt die handelnde Person und prüft sie
+   `getFederalState` (Präfix `get` läuft nur lesend, Profil 6.2.5, Abschnitt 7). Jede Methode nimmt die handelnde Person und prüft sie
    selbst über `de.berichtsheft.service.permission.PeoplePermission` (gegen `BH_Person`, nicht gegen Liferay-Rollen).
    **Ausschluss gleichzeitiger Änderungen (M02-R27):** jede schreibende Methode sperrt zuerst die einzige Zeile von
    `BH_Setting` mit `SELECT … FOR UPDATE` (Custom SQL in `PersonFinderImpl`), liest danach den Personenstand und prüft;
@@ -131,8 +131,8 @@ prüfbar; der Plattformteil folgt Profil 3 und 6.1. Weg A nur für den Abgleich 
    Fremdschlüsselfehler beim Löschen wird in `fremde_historie` übersetzt (AK-206). Beim Anlegen legt der Service das
    Liferay-Konto mit derselben E-Mail an (`UserLocalServiceUtil.addUser`, ohne Passwort in der App) und setzt die
    Liferay-Rolle „BH Azubi“ bzw. „BH Ausbilder“; Rollenwechsel tauscht sie. Deaktivieren lässt das Liferay-Konto aktiv
-   (Profil 6.1). Prüfschritt: `AK207_ZweiGleichzeitigeDeaktivierungenTest` (Schritt 11).
-7. **Anmeldung und Sitzung** (Profil 3 „Anmeldung“, „Zugang je Anfrage“, 5.1, 6.1).
+   (Profil 6.2.5, Abschnitt 6.1). Prüfschritt: `AK207_ZweiGleichzeitigeDeaktivierungenTest` (Schritt 11).
+7. **Anmeldung und Sitzung** (Profil 6.2.5, Abschnitt 3 „Anmeldung“, „Zugang je Anfrage“, 5.1, 6.1).
    - `de.berichtsheft.hook.events.LoginPostAction` (`login.events.post` in `portal.properties` des Plugins): sucht die
      Person über `matchLogin()`, bindet beim ersten Login **bedingt** (`UPDATE BH_Person SET userId = ? WHERE personId = ?
      AND userId IS NULL AND active_ = true`, eine Zeile, sonst die gebundene Person neu lesen) und vermerkt den
@@ -142,23 +142,23 @@ prüfbar; der Plattformteil folgt Profil 3 und 6.1. Weg A nur für den Abgleich 
      `PortalUtil.getUserId(request)` → `BH_Person` (aktiv, gebunden), entscheidet mit `decideAccess()`; ohne Zugang
      Weiterleitung auf `/web/berichtsheft/kein-zugang`, nach 8 Stunden ab `bh.anmeldezeitpunkt` Abmelden (M02-R04,
      M02-R05).
-   - Portal-Einstellungen aus Profil 5.1: `auth.login.url`, `default.landing.page.path`, `default.logout.page.path`,
+   - Portal-Einstellungen aus Profil 6.2.5, Abschnitt 5.1: `auth.login.url`, `default.landing.page.path`, `default.logout.page.path`,
      `auth.forward.by.last.path=true` (Rücksprungziel, AK-1003), `company.security.auto.login=false`,
      Folgeseiten aus (Nutzungsbedingungen, Erinnerungsfrage, Passwortwechsel), `session.timeout.warning=0`.
-   - Abmelden über `/c/portal/logout`; das Portal ist der Anmeldedienst, damit gilt M02-R05 (Profil 6.1, AK-106).
+   - Abmelden über `/c/portal/logout`; das Portal ist der Anmeldedienst, damit gilt M02-R05 (Profil 6.2.5, Abschnitt 6.1, AK-106).
    Prüfschritt: Anmelden als Anna führt auf die Startseite der Rolle; Dora (Konto ohne `BH_Person`) landet auf
    `kein_zugang`.
-8. **JSP-Hook und Portlets** (Profil 3.2, 4.3). `custom-jsp-dir` `/html/hooks/login`: Anmeldeseite des Login-Portlets
+8. **JSP-Hook und Portlets** (Profil 6.2.5, Abschnitte 3.2, 4.3). `custom-jsp-dir` `/html/hooks/login`: Anmeldeseite des Login-Portlets
    mit den festen Merkern (`data-anmeldeweg="liferay-konto"`, Passwortfeld vorhanden; das ist der abweichende Teil von
    AK-101-01), „Passwort vergessen“ und `html/portal/update_password.jsp` („Passwort setzen“ aus dem Link der
    Einladungsmail). `MVCPortlet`-Klassen unter `de.berichtsheft.portlet`: `KeinZugangPortlet` (Hinweis nach M02-R03),
    `StartPortlet` (leitet nach Rolle), `PersonenPortlet` (Liste, Anlegen, Bearbeiten, Deaktivieren, Reaktivieren,
    Löschen mit Namensbestätigung), `EinstellungenPortlet` (Bundesland). **Jede `processAction` ruft den Service, und der
    Service prüft selbst**; ausgeblendete Menüpunkte sind kein Schutz. Seiten und Rechte legt die Testschnittstelle bzw.
-   ein `UpgradeProcess` an, nicht das Control Panel (Profil 5.1 Schritt 7). Gestaltung folgt in P09. Prüfschritt: Anna
+   ein `UpgradeProcess` an, nicht das Control Panel (Profil 6.2.5, Abschnitt 5.1 Schritt 7). Gestaltung folgt in P09. Prüfschritt: Anna
    ruft die Seite `personen` per Adresse und eine Aktions-URL des `PersonenPortlet` (`p_p_lifecycle=1`) direkt auf; beides
    wird abgewiesen (AK-104).
-9. **Testschnittstelle und Testdaten** (Profil 4.2). `testdaten_laden` legt je Person aus `specs/pruefung/testdaten.json`
+9. **Testschnittstelle und Testdaten** (Profil 6.2.5, Abschnitt 4.2). `testdaten_laden` legt je Person aus `specs/pruefung/testdaten.json`
    ein Liferay-Konto mit der E-Mail und dem Demo-Passwort aus der Konfiguration (Platzhalter) an, für Anna, Bernd und
    Clara zusätzlich `BH_Person`; Dora und Emil bekommen nur das Konto (Gegenprobe zu AK-102). Die E-Mail der Testkonten
    gilt als bestätigt. `bestand_leeren` löscht Personen nur über `deletePerson` bzw. die Kaskade. `BH_Setting` mit `NW`.
@@ -174,7 +174,7 @@ prüfbar; der Plattformteil folgt Profil 3 und 6.1. Weg A nur für den Abgleich 
     Ergebnisform `{ warnung, seite, angemeldet }`, auf der Anmeldeseite zusätzlich `passwortfeld` und `anmeldewege`.
     Prüfschritt: `ant pruefung-fachlogik -Dbh.pruefung.filter=M02.json`; Ablauf-Runner mit `-g "M02.json"` in Chromium
     und bei 375 px.
-11. **Eigene Tests je AK** (Namen beginnen mit der AK-ID; JUnit ohne Bindestrich, Profil 4.1):
+11. **Eigene Tests je AK** (Namen beginnen mit der AK-ID; JUnit ohne Bindestrich, Profil 6.2.5, Abschnitt 4.1):
     - `AK201_BindenNurEinmalTest` in `test/db/`: zwei JDBC-Verbindungen binden gleichzeitig dieselbe Person; genau eine
       ändert eine Zeile.
     - `AK207_ZweiGleichzeitigeDeaktivierungenTest` in `test/integration/`: zwei Threads mit Startschranke deaktivieren
@@ -210,23 +210,23 @@ Nur in CI: Firefox und Edge, der volle Liferay-6.2.5-Job; im PR vermerken.
   Abschnitt 8 lokal grün.
 - Draft-PR mit der AK-Tabelle (AK-101, AK-102, AK-103, AK-104, AK-105, AK-106, AK-201, AK-202, AK-203, AK-204, AK-205,
   AK-206, AK-207, AK-208, AK-209 mit Test und Prüffällen), den abweichenden Fällen AK-101-01 und AK-106-01 mit Verweis
-  auf Profil 6.1, den zurückgestellten Fällen AK-205-01 und AK-205-02 und „Bitte bestätigen“. Hinweis: `hook/**`,
+  auf Profil 6.2.5, Abschnitt 6.1, den zurückgestellten Fällen AK-205-01 und AK-205-02 und „Bitte bestätigen“. Hinweis: `hook/**`,
   `liferay-hook.xml`, `portal.properties`, `html/hooks/login/**`, `servlet/filter/**`, `domain/access/**`,
   `service/impl/**`, `service/permission/**`, `service.xml`, `sql/**` und `upgrade/**` sind sicherheitsrelevant
-  (gemeinsam 5, Profil 2.3); Chris gibt frei.
+  (gemeinsam 5, Profil 6.2.5, Abschnitt 2.3); Chris gibt frei.
 - Bericht an die Steuerung; `FORTSCHRITT.md` schreibt die Steuerung.
 
 ## 10. Typische Fehler
 
 | Fehler | Was tun |
 | --- | --- |
-| Ablauf-Fälle scheitern alle bei `anmelden` | Folgeseiten der Anmeldung (Nutzungsbedingungen, Erinnerungsfrage, Passwortwechsel) sind an; Profil 5.1 |
-| Deaktivierte Person sieht die Meldung des Portals statt des Hinweises | Liferay-Konto nicht mitdeaktivieren; der Filter zeigt `kein_zugang` (Profil 6.1, AK-102) |
+| Ablauf-Fälle scheitern alle bei `anmelden` | Folgeseiten der Anmeldung (Nutzungsbedingungen, Erinnerungsfrage, Passwortwechsel) sind an; Profil 6.2.5, Abschnitt 5.1 |
+| Deaktivierte Person sieht die Meldung des Portals statt des Hinweises | Liferay-Konto nicht mitdeaktivieren; der Filter zeigt `kein_zugang` (Profil 6.2.5, Abschnitt 6.1, AK-102) |
 | Deaktivierung wirkt erst nach Ablauf der Sitzung | Filter liest `BH_Person` bei jeder Anfrage, kein Zwischenspeicher in der Sitzung (M02-R04) |
-| Erster Login bindet nicht | `emailAddressVerified` des Kontos ist falsch; Weg der Bestätigung nach P00 (Profil 6.1, AK-201) |
+| Erster Login bindet nicht | `emailAddressVerified` des Kontos ist falsch; Weg der Bestätigung nach P00 (Profil 6.2.5, Abschnitt 6.1, AK-201) |
 | Zweiter Login überschreibt die Bindung | Binden nur als bedingtes Update `WHERE userId IS NULL AND active_ = true` |
 | Letzter aktiver Ausbilder lässt sich bei zwei gleichzeitigen Aktionen deaktivieren | Sperre auf `BH_Setting` vor dem Lesen des Personenstands fehlt (Schritt 6) |
-| Schreibende Service-Methode speichert nichts | Methodenname beginnt mit `get`, `is` oder `has` und läuft nur lesend (Profil 7) |
+| Schreibende Service-Methode speichert nichts | Methodenname beginnt mit `get`, `is` oder `has` und läuft nur lesend (Profil 6.2.5, Abschnitt 7) |
 | Fachlicher Fehler lässt halbe Änderungen zurück | Ablehnung als `DomainRuleException` (Unterklasse von `PortalException`) werfen, nicht als `RuntimeException` |
 | Löschen einer Person scheitert mit `BH803` | Kinder über Service Builder gelöscht; nur die Zeile `BH_Person`, Kinder per Kaskade (gemeinsam 2.4) |
 | Nach dem Löschen zeigt die App die Person noch | Entity-, Finder- und Hibernate-Cache nach Custom SQL leeren |
@@ -235,7 +235,7 @@ Nur in CI: Firefox und Edge, der volle Liferay-6.2.5-Job; im PR vermerken.
 
 ## Bitte bestätigen
 
-- [ ] Markierung „abweichend, begründet“ für AK-101-01 und AK-106-01 nach Profil 6.1; sie steht bereits in
+- [ ] Markierung „abweichend, begründet“ für AK-101-01 und AK-106-01 nach Profil 6.2.5, Abschnitt 6.1; sie steht bereits in
       `specs/pruefung/M02.json`. Profil 6.2.5, „Bitte bestätigen“ nennt das Eintragen noch als offen (veralteter Text im
       Profil, keine Änderung durch dieses Playbook).
 - [ ] Ausschluss gleichzeitiger Änderungen der Nutzerverwaltung über die Sperre der einzigen Zeile von `BH_Setting`
@@ -246,4 +246,4 @@ Nur in CI: Firefox und Edge, der volle Liferay-6.2.5-Job; im PR vermerken.
 - [ ] Wachsendes Skript „Schutz in der Datenhaltung“ bis zur Version `1.0.0`; vorher wird die Demo-Datenbank bei jeder
       Schemaänderung neu angelegt, erst ab `1.0.0` gibt es Upgrade-Schritte (gemeinsam 2.6 nennt nur `1.0.0`).
 - [ ] Merker `data-anmeldeweg="liferay-konto"` auf der Anmeldeseite (AK-101-01 bleibt abweichend).
-- [ ] Die App deaktiviert das Liferay-Konto nicht mit (Profil, „Bitte bestätigen“; AK-102, AK-204).
+- [ ] Die App deaktiviert das Liferay-Konto nicht mit (Profil 6.2.5, „Bitte bestätigen“; AK-102, AK-204).

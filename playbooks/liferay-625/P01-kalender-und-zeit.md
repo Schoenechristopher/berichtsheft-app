@@ -24,7 +24,7 @@ P02 und P03 als `VARCHAR(10)` gespeichert (gemeinsames Profil, Abschnitt 2.2). P
 - P00 der Reihe abgenommen: Gerüst, Uhr-Service (`Clock`, `SystemClock`, `FixedClock`, `ClockHolder`, `bh.betrieb`),
   Prüf-Runner mit Bau-Stand, Testschnittstelle, `DomainOhneLiferayTest`, Ant-Ziele.
 - M01 hängt von keinem Modul ab und wird vor P02 gebaut: P02 braucht die Uhr, P03 die Wochenfunktionen und die Feiertage.
-- Profil 6.2.5: Abschnitte 2.1 (Paketwurzel, `domain/`), 4.1 (Ebenen, Testnamen, Fehlercodes) und 7 („Service Builder
+- Profil 6.2.5, Abschnitte 2.1 (Paketwurzel, `domain/`), 4.1 (Ebenen, Testnamen, Fehlercodes) und 7 („Service Builder
   liest Java-Quellen …“). Gemeinsames Profil, Abschnitte 2.2 (Datum und Zeit), 3.2 (Uhr-Service, Fachlogik als reine Java-Klassen,
   Ausweichregel Java 7) und 7 (Feiertage ohne Bibliothek).
 

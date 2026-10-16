@@ -24,7 +24,7 @@ Keine Schemaänderung: M07 speichert nichts (Spec, Abschnitt 5). Keine Abweichun
 
 - L72-P00 bis L72-P06 abgenommen und gemergt (Zugriff aus M02, Wochen und Ausblendung aus M03, Status und Freigabe aus M05, Historie mit
   `currentApproval()` und `getHistory()` aus M06, Uhr und Zeitzone aus M01).
-- Profil 7.2: Abschnitte 1 und 3 (PDF), 4 (Daten-Adapter, Zeitzone) und 7 (Zeit, OSGi-Abhängigkeiten); gemeinsames Profil, Abschnitt 2.2 (Zeit in UTC, Anzeige
+- Profil 7.2, Abschnitte 1 und 3 (PDF), 4 (Daten-Adapter, Zeitzone) und 7 (Zeit, OSGi-Abhängigkeiten); gemeinsames Profil, Abschnitt 2.2 (Zeit in UTC, Anzeige
   in Europe/Berlin) und 7 (PDFBox 2.0.37, Noto Sans).
 - P00 hat bestätigt, dass PDFBox per `compileInclude` als OSGi-Modul läuft (Profil 7.2, „In P00 zu bestätigen“); ohne diesen Nachweis
   bleibt Schritt 4 stehen und wird gemeldet.
