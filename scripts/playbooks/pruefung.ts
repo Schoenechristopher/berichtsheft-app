@@ -51,6 +51,8 @@ export interface Context {
   caseIds: ReadonlySet<string>;
   /** Ob es einen Repository-Pfad (Datei oder Ordner) gibt. */
   pathExists: (path: string) => boolean;
+  /** Blindtest-Zustand (`--blindtest`): `BLINDTEST_FUTURE_DIRS` zählen wie `FUTURE_DIRS` als anzulegende Pfade. */
+  blindtest?: boolean;
 }
 
 export const VORLAGE_PATH = "playbooks/vorlage-arbeitspaket.md";
@@ -101,6 +103,12 @@ export const PROFILE_FILES = ["profile/typescript-nextjs.md", "profile/liferay-6
 
 /** Ordner, die in G4 neu entstehen; Pfade darin werden nicht geprüft (gemeinsame Konventionen G4). */
 const FUTURE_DIRS = ["playbooks/", "profile/"];
+
+/**
+ * Ordner, die im Blindtest-Zustand fehlen (Branch ohne Anwendungscode, `playbooks/00-steuerung.md` Abschnitt 12);
+ * Pfade darin werden nur mit dem Schalter `--blindtest` nicht geprüft.
+ */
+export const BLINDTEST_FUTURE_DIRS = ["src/", "prisma/", "e2e/", "tests/"];
 
 /** Anfänge von Repository-Pfaden, deren Existenz geprüft wird. */
 const PATH_PREFIXES = [
@@ -258,11 +266,11 @@ function requiredCriteria(kind: DocumentKind, context: Context): readonly string
 }
 
 /**
- * Modellkennungen (MW-R03): `claude-<familie>…` oder `claude-<version>-…` (z. B. `claude-3-5-…`) und die
- * Familiennamen als ganze Wörter. Erlaubt bleiben „Claude Code“, „Claude-Sitzung“, `.claude/`, `claude/…` und
- * Pfade wie `/tmp/claude-0/`.
+ * Modellkennungen (MW-R03): `claude-<familie>…`, `claude-<version>-…` (z. B. `claude-3-5-…`), auch nur mit einer
+ * Versionszahl (`claude-<zahl>`, nicht gefolgt von Ziffer oder `/`), und die Familiennamen als ganze Wörter.
+ * Erlaubt bleiben „Claude Code“, „Claude-Sitzung“, `.claude/`, `claude/…` und Pfade wie `/tmp/claude-0/`.
  */
-const MODEL_ID = /\bclaude-(?:opus|sonnet|haiku|fable|\d+[-.]\d)[\w.-]*/gi;
+const MODEL_ID = /\bclaude-(?:opus|sonnet|haiku|fable|\d+[-.]\d|\d+(?![\d/]))[\w.-]*/gi;
 const MODEL_FAMILY = /\b(?:opus|sonnet|haiku|fable)\b/gi;
 
 /** Prüfungen für jede Datei: IDs, Repository-Pfade und Modellkennungen. */
@@ -285,7 +293,7 @@ function checkReferences(file: string, markdown: string, context: Context): Find
     }
     if (!/^\s*```/.test(text)) {
       for (const match of text.matchAll(/`([^`\n]+)`/g)) {
-        const path = repositoryPath(match[1]);
+        const path = repositoryPath(match[1], context.blindtest);
         if (path && !context.pathExists(path)) {
           findings.push({ file, line, reason: "fehlender-pfad", detail: path });
         }
@@ -309,15 +317,16 @@ function checkReferences(file: string, markdown: string, context: Context): Find
 /**
  * Zu prüfender Repository-Pfad aus dem Inhalt eines Backtick-Abschnitts, sonst `null`: nur ein einzelnes Wort mit
  * bekanntem Anfang; ausgenommen sind Muster (`*`, `{a,b}`, `<…>`, `…`) und die Ordner, die in G4 neu entstehen
- * (`playbooks/`, `profile/` samt Unterordnern). Eine Zeilenangabe (`:12`, `:12-20`) oder ein Anker (`#…`) am Ende
+ * (`playbooks/`, `profile/` samt Unterordnern); im Blindtest auch `src/`, `prisma/`, `e2e/`, `tests/`. Eine Zeilenangabe (`:12`, `:12-20`) oder ein Anker (`#…`) am Ende
  * zählt nicht zum Pfad.
  */
-export function repositoryPath(code: string): string | null {
+export function repositoryPath(code: string, blindtest = false): string | null {
   const text = code.trim();
   if (/\s/.test(text) || !PATH_PREFIXES.some((prefix) => text.startsWith(prefix))) {
     return null;
   }
-  if (/[*<>…{}]/.test(text) || FUTURE_DIRS.some((dir) => text.startsWith(dir))) {
+  const futureDirs = blindtest ? [...FUTURE_DIRS, ...BLINDTEST_FUTURE_DIRS] : FUTURE_DIRS;
+  if (/[*<>…{}]/.test(text) || futureDirs.some((dir) => text.startsWith(dir))) {
     return null;
   }
   return text.replace(/#.*$/, "").replace(/:\d+(?:[-:]\d+)?$/, "");
