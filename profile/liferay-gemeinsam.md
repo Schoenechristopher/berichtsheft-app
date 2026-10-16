@@ -1,6 +1,6 @@
 # Gemeinsame Grundlage der Liferay-Umsetzungen
 
-Stand: 15.10.2026 (Etappe G4, Paket C) · Status: **Entwurf zur Freigabe** · @Chris
+Stand: 16.10.2026 (Etappe G4, Paket C; Nachtrag G4-N) · Status: **Entwurf zur Freigabe** · @Chris
 
 ## 1. Zweck und Geltung
 
@@ -36,6 +36,11 @@ Fach-Specs M02, M03, M04, M05, M06 und M08.
 
 - **Service Builder** erzeugt Entities, Persistenz und `tables.sql`. Beide Umsetzungen verwenden denselben
   `namespace` **`BH`**; Service Builder bildet daraus den Tabellennamen `BH_<Entity>` (Vorschlag, siehe „Bitte
+  bestätigen“).
+- **Paketwurzel `de.berichtsheft`** auf beiden Plattformen: Java-Pakete beginnen mit `de.berichtsheft` (z. B.
+  `de.berichtsheft.domain.access`, `de.berichtsheft.model`), und das `package-path` von Service Builder in jeder
+  `service.xml` ist `de.berichtsheft`. Damit sind Klassennamen, `value.object.listener.de.berichtsheft.model.…` und die
+  Spring- bzw. OSGi-Konfiguration auf 6.2.5 und 7.2 gleich, und U02 muss keine Pakete umbenennen (siehe „Bitte
   bestätigen“).
 - **Gleiche Namen auf beiden Plattformen:** Entity-, Spalten-, Constraint-, Index- und Triggernamen sind in 6.2.5 und
   7.2 identisch. U03 muss an den App-Tabellen dann nichts umbenennen.
@@ -265,7 +270,8 @@ Gilt für beide Plattformen gleich und ist die Grundlage für den Abschnitt „N
   Person in fremder Historie erkennt zuerst die Fachlogik (`loeschenPruefen` → `fremde_historie`, Deaktivieren wird
   angeboten; M02-R22, `specs/pruefung/format.md`); die Fremdschlüssel `actorId`/`authorId` sind nur das Netz dahinter
   und weisen das Löschen auch an der Fachlogik vorbei ab.
-- **Nachweis:** die Daten-Fälle AK-508-01 bis AK-508-11 über den Prüf-Adapter; zusätzlich ein plattformeigener Test
+- **Nachweis:** die Fälle AK-508-01, AK-508-02, AK-508-03, AK-508-04 und AK-508-05 (Ebene Daten) und AK-508-06,
+  AK-508-07, AK-508-08, AK-508-09, AK-508-10 und AK-508-11 (Ebene Fachlogik) über den Prüf-Adapter; zusätzlich ein plattformeigener Test
   „AK-508 von zwei gleichzeitigen Aktionen gelingt genau eine“ mit zwei parallelen Transaktionen (M05 Abschnitt 10:
   echte Gleichzeitigkeit prüft kein neutraler Fall).
 
@@ -276,8 +282,8 @@ Gilt für beide Plattformen gleich und ist die Grundlage für den Abschnitt „N
 | `Person.accountId` (Konto-ID des Firmenkontos) und die Auth.js-Sitzung (JWT, kein eigenes Modell) | Liferay-Konto (`User_`) und Liferay-Sitzung; `BH_Person.userId` verweist auf den Liferay-Benutzer | Anmeldung mit Liferay-eigenen Konten ist bereits entschieden (`docs/06-spec-architektur.md`, „Bewusste Abweichung“); die App speichert keine Passwörter, das tut Liferay | M02-R03 bis M02-R05, M02-R07, M02-R08 (Binden beim ersten Login über die E-Mail, nur wenn ungebunden und aktiv), AK-101 (abweichend, begründet), AK-102, AK-106, AK-201 |
 | Rolle `Person.role` als einzige Quelle | bleibt in `BH_Person.role`; zusätzlich zwei reguläre Liferay-Rollen „BH Azubi“ und „BH Ausbilder“, die die App beim Anlegen und beim Rollenwechsel setzt | M02 Abschnitt 8: Rollen pflegt der Admin in der App. Die Liferay-Rolle steuert nur Sichtbarkeit von Seiten und Portlets; geschützt wird im Service gegen `BH_Person` | M02-R01, M02-R12, M02-R13, M02-R18, AK-104, AK-203, AK-207, AK-208 |
 | Zuordnung Azubi → Ausbilder | bleibt `BH_Person.trainerId`; keine eigene Zuordnungstabelle nötig | Liferay-Rollen kennen keine Zuordnung zu einer Person | M02-R09 bis M02-R11, AK-103, AK-105 |
-| In-App-Anzeige der Benachrichtigungen (Glocke) | Liferay-Benachrichtigungen (`UserNotificationEvent` über einen `UserNotificationHandler`) | Bordmittel nach `docs/06-spec-architektur.md`; die Glocke der Plattform zeigt die Nachricht | M08-R16, AK-1001 bis AK-1003 |
-| — dabei **bleibt** `BH_Notification` auch für den Kanal App | Eintrag in `BH_Notification` ist die Quelle, die Glocke ein Abbild (`userNotificationEventId`) | Nur die eigene Tabelle sichert „genau eine je Ereignis, Empfänger und Kanal“ (M08-R11) und den Ausgangskorb für E-Mail und Teams; `UserNotificationEvent` hat keinen fachlichen Schlüssel | M08-R03, M08-R11, M08-R13, M08-R14, AK-1004 |
+| In-App-Anzeige der Benachrichtigungen (Glocke) | **eigene Glocke im Theme** aus `BH_Notification` mit der Fachlogik von UI-AK-03 und AK-1015 (Zähler „99+“, Vorschau ohne Gelesen-Markierung); dazu `UserNotificationEvent` über einen `UserNotificationHandler` als Abbild | Die Glocke der Plattform (Dockbar in 6.2.5, Control Menu in 7.2) erfüllt M09-R03 und AK-1015 nicht sicher; Einzelheiten `profile/liferay-625.md` 3.1, `profile/liferay-72.md` 3.5. Weicht vom Bordmittel-Grundsatz in `docs/06-spec-architektur.md` ab (siehe „Bitte bestätigen“) | M08-R16, M09-R03, UI-AK-03, AK-1001 bis AK-1003, AK-1015 |
+| — dabei **bleibt** `BH_Notification` auch für den Kanal App | Eintrag in `BH_Notification` ist die Quelle, die Liferay-Glocke ein Abbild (`userNotificationEventId`; auf 6.2.5 wird es nur für U03 weitergeführt und nicht angezeigt, Wahl in U00) | Nur die eigene Tabelle sichert „genau eine je Ereignis, Empfänger und Kanal“ (M08-R11) und den Ausgangskorb für E-Mail und Teams; `UserNotificationEvent` hat keinen fachlichen Schlüssel | M08-R03, M08-R11, M08-R13, M08-R14, AK-1004 |
 | pg-boss (eigenes Datenbankschema, kein Prisma-Modell) | Liferay-Scheduler: 6.2.5 `scheduler-entry` in `liferay-portlet.xml`, 7.2 `SchedulerEntry` mit `MessageListener` | Bordmittel nach `docs/06-spec-architektur.md` | M03 (tägliches Anlegen), M08-R17, AK-1021 bis AK-1025; Zeitplan in Europe/Berlin, nie in der Zeitzone des Servers (M08 Abschnitt 8) |
 | — dabei **bleibt** `BH_ReminderRun` | | Der Scheduler sichert nicht „höchstens ein Lauf je Woche“, auch nicht bei mehreren Knoten oder Nachholen | M08-R17, AK-1023 |
 
@@ -332,7 +338,10 @@ dass die Liferay-Umsetzungen nur PostgreSQL unterstützen.
 **Nachweis:** AK-803-01 bis AK-803-05 (Daten-Fälle `historie_aendern`, `historie_loeschen`, `bericht_loeschen`,
 `person_loeschen`), AK-206-01 bis AK-206-07 (fremde Historie), dazu je Plattform ein Integrationstest „AK-505
 Datenhaltung weist Ändern eines eingereichten Tags ab“ per direktem SQL (Gegenstück zu `tests/db/status-change.test.ts`,
-kein neutraler Prüffall zeigt das; AK-505-01 bis AK-505-07 prüfen die Fachlogik).
+kein neutraler Prüffall zeigt das). AK-505-01, AK-505-02, AK-505-03 und AK-505-04 sind Fälle der Ebene Daten und laufen
+über den Prüf-Adapter; AK-505-05, AK-505-06 und AK-505-07 prüfen die Fachlogik. Beim Einreichen rollt eine
+`PortalException` die in derselben Transaktion gespeicherten Tage zurück; `pflichtangaben_fehlen` ist deshalb ein Ergebnis
+und keine Ausnahme, damit die Tage Entwurf bleiben (M05-R08, AK-505-03; Profile, „Fallstricke und Grenzen“).
 
 ## 3. Abbildung der Bausteine
 
@@ -351,8 +360,8 @@ Quelle belegt, nicht im laufenden System; das bleibt P00.
 | Historie unveränderlich | ModelListener sperrt Ändern und Löschen | wie 6.2.5 | **geändert:** PostgreSQL-Trigger plus ModelListener (2.6); Bitte bestätigen |
 | Uhr | eigener Uhr-Service, für Tests stellbar | eigener OSGi-Uhr-Service | gemeinsame Schnittstelle in 3.2; in P00 zu klären |
 | Hintergrundjobs | Scheduler-Eintrag im Portlet | Scheduler mit MessageListener | gemeinsame Regeln in 3.2; Zeitplan in Europe/Berlin in P00 zu klären |
-| Benachrichtigung in der App | UserNotification | wie 6.2.5 | gemeinsam in 2.5 (eigene Tabelle bleibt Quelle); in P00 zu klären |
-| E-Mail | Liferay-Mailservice → Mailpit | wie 6.2.5 | gemeinsam in 3.2; in P00 zu klären |
+| Benachrichtigung in der App | eigene Glocke im Theme aus `BH_Notification`; `UserNotification` nur als Abbild | eigene Glocke im Theme; `UserNotification` als Abbild, `readAt` folgt beiden Wegen | **geändert:** gemeinsam in 2.5 (eigene Tabelle bleibt Quelle); Bitte bestätigen; in P00 zu klären |
+| E-Mail | synchroner Versand (`MailEngine.send`) → Mailpit | synchroner Versand über die `javax.mail.Session` des Portals → Mailpit | **geändert:** nicht der asynchrone `MailService`; gemeinsam in 3.2; Bitte bestätigen; in P00 zu klären |
 | Teams | Adapter mit Demo-Postfach | Adapter mit Demo-Postfach | gemeinsam in 3.2 (`BH_TeamsDevMessage`) |
 | PDF | Java-PDF-Bibliothek, Noto Sans eingebettet | wie 6.2.5 | Vorschlag Apache PDFBox 2.0.x für beide (Abschnitt 7); in P00 zu klären |
 | Oberfläche | Portlets, AlloyUI/Bootstrap 2, eigenes Theme | Portlets, Clay/Bootstrap 4, eigenes Theme | Plattform-Unterschied, nur im Profil |
@@ -391,7 +400,9 @@ dieselben Quellen auf beiden Plattformen laufen; PDFBox bleibt 2.0.x (läuft ab 
 `BH_TeamsDevMessage` (höchstens eine Nachricht je Benachrichtigung, eindeutiger Schlüssel `notificationId`); gewählt
 über die Eigenschaft `bh.teams.modus` (Gegenstück zu `TEAMS_MODE`), ein echter Teams-Versand ist nicht Teil von L62/L72.
 
-**E-Mail an Mailpit (M08):** Versand über den Mailservice von Liferay; SMTP-Host und -Port in `portal-ext.properties`
+**E-Mail an Mailpit (M08):** **synchroner** Versand: Der Ausgangskorb braucht Erfolg oder Fehler je Nachricht (Versuche,
+`lastError`, `failedAt`), der `MailService` von Liferay versendet aber asynchron über den Message Bus und meldet Fehler
+nicht zurück. 6.2.5 sendet deshalb über `MailEngine.send`, 7.2 über die `javax.mail.Session` des Portals. SMTP-Host und -Port in `portal-ext.properties`
 (Demo: Mailpit, Port 1025, ohne Anmeldung). In der Cloud-Sitzung ein SMTP-Mock, wie bei der TypeScript-App. Jede Nachricht
 trägt eine feste Kennung (`Message-ID` aus `notificationId`), damit eine Wiederholung erkennbar ist (M08 Abschnitt 8).
 
@@ -500,19 +511,22 @@ prüft, ob Liferay auf PostgreSQL 16 startet; sonst Ausweichen auf eine ältere 
 ## 5. Sicherheitsrelevante Dateien (Eingabe für AM-R04)
 
 Vorschlag für die Ergänzung von AM-R04 in `docs/07-spec-automatisches-mergen.md` (umgesetzt in G4-L). Die Pfadmuster
-sind vorläufig: Die Profile bestätigen oder korrigieren sie, sobald ihre Projektstruktur feststeht (Abschnitt 2 der
-Profile), und G4-L übernimmt den bestätigten Stand. Angenommen ist diese Struktur: 6.2.5
+sind vorläufig: Die Profile haben sie gegen ihre Projektstruktur abgeglichen (`profile/liferay-625.md` 2.3,
+`profile/liferay-72.md` Abschnitt 2); P00 bestätigt sie am laufenden Projekt, und G4-L übernimmt den bestätigten Stand.
+Angenommen ist diese Struktur: 6.2.5
 `liferay-625/portlets/<portlet>/docroot/…`, 7.2 `liferay-72/modules/<modul>/…` und `liferay-72/configs/…`.
 
 | Entsprechung zu | 6.2.5 (`liferay-625/`) | 7.2 (`liferay-72/`) | Begründung |
 | --- | --- | --- | --- |
-| `src/auth.ts`, `src/lib/auth/**` (Anmeldung, Binden) | `liferay-625/**/hook/**`, `liferay-625/**/liferay-hook.xml`, `liferay-625/**/portal.properties` des Hooks (`login.events.post`) | `liferay-72/modules/**/login/**`, `liferay-72/modules/**/*LoginPostAction*.java` | Binden der Person an den Liferay-Benutzer und Zugang (M02-R03, M02-R07, M02-R08) |
+| `src/auth.ts`, `src/lib/auth/**` (Anmeldung, Binden) | `liferay-625/**/hook/**`, `liferay-625/**/liferay-hook.xml`, `liferay-625/**/portal.properties` des Hooks (`login.events.post`), `liferay-625/**/html/hooks/login/**` | `liferay-72/modules/bh-access/**`, `liferay-72/modules/**/*LoginPostAction*.java` | Binden der Person an den Liferay-Benutzer und Zugang (M02-R03, M02-R07, M02-R08) |
 | `src/proxy.ts`, `src/lib/session.ts` (jede Anfrage prüft die Person) | `liferay-625/**/servlet/filter/**`, `liferay-625/**/*Filter.java` | `liferay-72/modules/**/servlet/filter/**`, `liferay-72/modules/**/*Filter.java` | Zugang bei jedem Zugriff, Sitzungsdauer, Rücksprungziel (M02-R04, M02-R05, AK-1003) |
 | `src/domain/access.ts`, `src/domain/report-access.ts` | `liferay-625/**/domain/access/**` | `liferay-72/modules/**/domain/access/**` | Fachregeln Zugang und Sichtbarkeit (M02-R03, M02-R09 bis M02-R12) |
 | Rollen- und Besitzprüfung in Serveraktionen | `liferay-625/**/service/impl/**`, `liferay-625/**/service/permission/**` | `liferay-72/modules/**/service/impl/**`, `liferay-72/modules/**/security/permission/**` | jede Aktion prüft selbst (M02-R13, M05 Abschnitt 8) |
-| Rechte der Portlets | `liferay-625/**/portlet.xml`, `liferay-625/**/liferay-portlet.xml`, `liferay-625/**/resource-actions/**` | `liferay-72/modules/**/portlet/**Portlet.java` (Komponenten-Eigenschaften `javax.portlet.security-role-ref`), `liferay-72/modules/**/resource-actions/**` | Rollen, Rechte und Sichtbarkeit der Portlets |
-| Konfiguration der Anmeldung, Betriebsart, Testschnittstelle | `liferay-625/**/portal-ext.properties`, `liferay-625/**/pruefung/**` | `liferay-72/configs/**`, `liferay-72/modules/**/pruefung/**` | `bh.betrieb`, Test-Zugang und Testschnittstelle dürfen in Produktion nie wirken (M01-R03, M02 Abschnitt 8) |
-| Schema und Schutz in der Datenhaltung | `liferay-625/**/service.xml`, `liferay-625/**/sql/**`, `liferay-625/**/model/listener/**` | `liferay-72/modules/**/service.xml`, `liferay-72/modules/**/sql/**`, `liferay-72/modules/**/model/listener/**` | Schema nach Abschnitt 2, Trigger und Constraints (AK-505, AK-803, MW-R05) |
+| Rechte der Portlets | `liferay-625/**/portlet.xml`, `liferay-625/**/liferay-portlet.xml`, `liferay-625/**/resource-actions/**` | `liferay-72/modules/**/portlet/**/*Portlet.java` (Komponenten-Eigenschaften `javax.portlet.security-role-ref`), `liferay-72/modules/**/resource-actions/**` | Rollen, Rechte und Sichtbarkeit der Portlets |
+| Konfiguration der Anmeldung, Betriebsart, Testschnittstelle | `liferay-625/**/portal-ext*.properties`, `liferay-625/**/web.xml`, `liferay-625/**/pruefung/**` | `liferay-72/configs/**`, `liferay-72/modules/bh-pruefung/**`, `liferay-72/modules/bh-clock/**`, `liferay-72/modules/**/configuration/**`, `liferay-72/pruefung/**` | `bh.betrieb`, Test-Zugang und Testschnittstelle dürfen in Produktion nie wirken (M01-R03, M02 Abschnitt 8) |
+| Schema und Schutz in der Datenhaltung | `liferay-625/**/service.xml`, `liferay-625/**/sql/**`, `liferay-625/**/model/listener/**`, `liferay-625/**/custom-sql/**`, `liferay-625/**/portlet.properties`, `liferay-625/**/service*.properties`, `liferay-625/**/portlet-model-hints.xml` | `liferay-72/modules/**/service.xml`, `liferay-72/modules/**/sql/**`, `liferay-72/modules/**/model/listener/**`, `liferay-72/modules/**/custom-sql/**`, `liferay-72/modules/**/service/persistence/impl/**` | Schema nach Abschnitt 2, Trigger und Constraints (AK-505, AK-803, MW-R05); Sperre und bedingtes Update (AK-508); `service*.properties` meldet auf 6.2.5 den `ModelListener` an und setzt `build.auto.upgrade` |
+| Eigene Upgrade-Schritte (Skript „Schutz in der Datenhaltung“ als `UpgradeProcess` bzw. `UpgradeStepRegistrator`) | `liferay-625/**/upgrade/**` | `liferay-72/modules/**/upgrade/**` | Das Skript aus 2.6 legt Trigger, Fremdschlüssel und CHECK-Constraints an (AK-505 Schreibschutz der Tage, AK-803 Historie); ein geänderter Schritt hebelt den Schutz aus |
+| Bibliotheken und Bezugsquellen, Build | `liferay-625/**/ivy.xml`, `liferay-625/**/ivy-settings.xml`, `liferay-625/**/build*.xml`, `liferay-625/**/build*.properties` | `liferay-72/**/build.gradle`, `liferay-72/settings.gradle`, `liferay-72/gradle.properties`, `liferay-72/modules/**/bnd.bnd`, `liferay-72/themes/**/package.json` | Externe Bibliotheken (Abschnitt 7) und Bezugsquellen werden hier festgelegt; auf 7.2 steht auch `Liferay-Require-SchemaVersion` in `bnd.bnd` |
 
 ## 6. Pfad der Upgrade-Schritte der Reihe U
 
@@ -526,7 +540,7 @@ Vorschlag, in U00 zu bestätigen:
   Tools-Archiv, Abschnitt 4.1) unter `liferay-72/upgrade-625/`.
 - **Geschützt (AM-R04):** `liferay-72/modules/bh-upgrade-625/**` und `liferay-72/upgrade-625/**`. Die Upgrade-Schritte
   innerhalb einer Plattform (Schema-Versionen des eigenen Service-Moduls, inklusive Skript aus 2.6) fallen unter
-  `**/upgrade/**` derselben Module und sind über Abschnitt 5 („Schema und Schutz in der Datenhaltung“) mit erfasst.
+  `**/upgrade/**` derselben Module und sind durch die Zeile „Eigene Upgrade-Schritte“ in Abschnitt 5 erfasst.
 
 ## 7. Freigegebene externe Bibliotheken je Plattform
 
@@ -541,8 +555,16 @@ Alles „Vorschlag, in P00 zu bestätigen“. Eine Bibliothek, die hier nicht st
 | Feiertage, Ausweiche | Jollyday 0.5.10 | Jollyday 0.5.10 | Apache-2.0 | Maven Central `de.jollyday:jollyday`; einmalige Feiertage nach M01-R16 müssten ergänzt werden |
 | Komponententests | JUnit 4.13.2 | JUnit 4.13.2 | EPL-1.0 | Maven Central `junit:junit` |
 | Integrationstests | – | Liferay-Arquillian, `com.liferay:com.liferay.arquillian.extension.junit.bridge` 1.0.20 (neueste auf Maven Central am 15.10.2026; ob sie zu 7.2 passt, in P00 zu klären) | LGPL-2.1 (Liferay) | Maven Central |
+| JSON in Tests (Prüf-Adapter liest `specs/pruefung/*.json`) | Jackson Databind 2.12.7.2, nur Test-Klassenpfad | Jackson Databind 2.12.7.2, nur Test-Klassenpfad | Apache-2.0 | Maven Central `com.fasterxml.jackson.core:jackson-databind` (2.12.x; ab 2.13 braucht Jackson Java 8, 2.12.x läuft deshalb auch bei der Ausweichregel Java 7); Quelle der Version siehe unten |
 | Ablauf-Fälle | Playwright für Node, Version wie in der TypeScript-App (`@playwright/test` 1.56.1) | wie 6.2.5 | Apache-2.0 | npm, bereits Abhängigkeit des Repositorys |
 | JDBC | PostgreSQL-Treiber 42.7.14 bei Java 8; 42.2.29.jre7, falls Java 7 | PostgreSQL-Treiber 42.7.14 | BSD-2-Clause | Maven Central `org.postgresql:postgresql` (42.7.14: 1.221.004 Byte, 42.2.29.jre7: 985.754 Byte) |
+
+Jackson Databind ist die **einzige** JSON-Bibliothek beider Plattformen; eine zweite JSON-Bibliothek ist nicht vorgesehen. Die Version 2.12.7.2
+(2. Mai 2024, Apache-2.0) stammt aus dem Wiki [Jackson Release 2.12](https://github.com/FasterXML/jackson/wiki/Jackson-Release-2.12)
+und der Seite [mvnrepository.com](https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind/2.12.7.2),
+beide per Websuche gefunden; der direkte Abruf von Maven Central scheiterte am 16.10.2026 an einer Sperre (HTTP 429 mit
+`retry-after` von rund 18 Stunden), `maven-metadata.xml` konnte nicht gelesen werden. **P00 prüft, dass 2.12.7.2 die letzte
+2.12.x auf Maven Central ist und sich mit Java 7 und 8 sowie Java 11 laden lässt.**
 
 Begründung Feiertage: Die eigene Umsetzung ist eine reine Funktion wie in `src/domain/`, hat keine Abhängigkeit und
 bildet die Regeln M01-R15 bis M01-R19 einschließlich der einmaligen Feiertage genau ab; geprüft durch AK-1206-01 bis
@@ -575,6 +597,16 @@ AK-1206-11.
       Begründung: Service Builder erzeugt für `Date` auf beiden Plattformen `TIMESTAMP`; ein abweichender Spaltentyp
       bräuchte eigenes SQL und ein eigenes Mapping. Gleichwertig, solange JVM und JDBC-Sitzung fest in UTC laufen; P00 weist
       das mit gestellter Server-Zeitzone nach.
+- [ ] **Eigene Glocke im Theme** aus `BH_Notification` auf 6.2.5 (und 7.2, siehe `profile/liferay-72.md` 3.5) statt der
+      Glocke der Plattform; `UserNotificationEvent` bleibt Abbild (2.5, 3.1). Weicht von der Zeile „Benachrichtigung in der
+      App“ in `docs/06-spec-architektur.md` ab, die dann angepasst werden sollte. Ob 6.2.5 das Abbild nur für U03
+      weiterführt oder ganz weglässt, entscheidet U00.
+- [ ] **Synchroner Mailversand** (6.2.5 `MailEngine.send`, 7.2 `javax.mail.Session` des Portals) statt des asynchronen
+      `MailService`, damit der Ausgangskorb Erfolg und Fehler je Nachricht erfährt (3.2).
+- [ ] Paketwurzel `de.berichtsheft` für Java-Pakete und `package-path` von Service Builder auf beiden Plattformen (2.1).
+- [ ] Jackson Databind 2.12.7.2 als einzige JSON-Testbibliothek beider Plattformen (Abschnitt 7).
+- [ ] Pfadmuster für AM-R04 in Abschnitt 5 einschließlich `**/upgrade/**`, `custom-sql`, `service*.properties` und der
+      ivy- und build-Dateien von 6.2.5, zur Übernahme durch G4-L; die Muster bleiben vorläufig, bis P00 sie am Projekt bestätigt.
 - [ ] Genau eine Liferay-Instanz und ein Mandant: `email` global eindeutig, `BH_Setting` mit einer Zeile (2.5). Alternative
       wären Schlüssel mit `companyId`.
 
