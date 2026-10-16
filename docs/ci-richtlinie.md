@@ -154,7 +154,8 @@ Angaben zu anderen Repositories stehen bewusst nicht in dieser öffentlichen Dat
 - **CI-26 Workflows aus Forks nur nach Freigabe:** Unter Settings → Actions → General ist „Require approval for all
   external contributors“ gesetzt. Ein fremder PR startet keinen Job, bevor Chris ihn freigibt.
 - **CI-27 Rechte knapp halten:** Jeder Workflow setzt `permissions: contents: read`. Mehr Rechte gibt es nur je Job und
-  mit Begründung im PR. `pull_request_target` und `workflow_run` mit Code aus einem PR sind verboten.
+  mit Begründung im PR. `pull_request_target` und `workflow_run` mit Code aus einem PR sind verboten. Ausnahme: der Workflow „Rückmeldung“
+  (CI-38) darf als `workflow_run` am PR kommentieren, ohne Checkout und ohne Code aus dem PR.
 - **CI-28 Keine Geheimnisse in Workflows:** Workflows nutzen nur Demo-Werte (`.env.example`, `docker-compose.yml`,
   Keycloak-Realm). Braucht ein Job je ein echtes Secret, läuft er nie für PRs aus Forks und wird vorher mit Chris
   abgestimmt.
@@ -164,6 +165,12 @@ Angaben zu anderen Repositories stehen bewusst nicht in dieser öffentlichen Dat
   Prüfung im PR.
 - **CI-31 Fremdsoftware nicht einchecken:** Liferay-Bundles, JDKs und Datenbank-Abzüge kommen aus ihrer Bezugsquelle
   oder dem Cache, nie ins Repository.
+- **CI-38 Rückmeldung als Kommentar:** Der Workflow `rueckmeldung.yml` schreibt nach jedem abgeschlossenen CI-Lauf eines
+  PRs einen Kommentar mit dem Ergebnis von „Prüfung abgeschlossen“ (grün oder rot, Commit, Link zum Lauf). Grüne Läufe
+  erzeugen sonst kein Ereignis für Sitzungen, die den PR abonnieren. Abgebrochene Läufe (CI-15) bleiben stumm; Läufe aus
+  `merge_group`, `push` und Wochenlauf gehören zu keinem PR. Rechte nur `pull-requests: write` und `actions: read`, nur
+  `GITHUB_TOKEN`, keine fremden Actions. Er läuft nur mit der Datei vom Standardzweig, ein Lauf am eigenen PR ist nicht
+  möglich.
 - **Einstellungen im Repository** (setzt Chris einmalig):
   - Regelsatz für `main`: nur per PR, kein Force-Push, schnelle Prüfung muss grün sein.
   - Code security: Secret Scanning mit Push Protection, Dependabot-Warnungen, „Private vulnerability reporting“.
