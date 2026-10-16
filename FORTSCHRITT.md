@@ -524,6 +524,7 @@ Gemergt am 15.10.2026. Steuerung je Welle in einer frischen Sitzung.
   Pfadmuster dort in Abschnitt 5 sind vorläufig.
 - Bekannte Grenze von `pruefen.ts`: Kennungen wie `claude-5` ohne Familiennamen werden nicht erkannt (Vorschlag
   `claude-\d+(?![\d/])`).
+  **Erledigt durch #54** (Schalter `--blindtest`, Kennungen mit nur einer Versionszahl).
 
 ### Welle 2 – Pakete D, E und F (parallel)
 
@@ -572,6 +573,60 @@ Gemergt am 16.10.2026 (#51, #50, #49). Steuerung W2 in einer frischen Sitzung.
 - G4-G und G4-H: S3-Teile der Reihen 6.2.5 und 7.2. G4-I: Upgrade U00–U06 plus Prüffälle.
 - Dazu das Werkzeugpaket, der Nachtrag `liferay-gemeinsam.md` (Glocke, Mail, Paketwurzel, Testbibliothek, `**/upgrade/**`,
   Pfadmuster, Korrektur der Ebenen in 2.4 und 2.6) und die abweichend-Markierung in `specs/pruefung`.
+
+### Welle 3, Stufe 3a – Pakete M, W, N und I
+
+Gemergt am 16.10.2026 (#53, #54, #55, #56). Steuerung W3 in einer frischen Sitzung. Die Stufen 3b (G, H) folgen.
+
+| PR | Paket | Inhalt | Merge |
+| --- | --- | --- | --- |
+| #53 | G4-M | „abweichend“ für AK-101-01 und AK-106-01 in `specs/pruefung/M02.json` | `33741c3` |
+| #54 | G4-W | Blindtest-Werkzeug `scripts/playbooks` (`--blindtest`, Kennungen mit Versionszahl) | `e9747b9` |
+| #55 | G4-N | Nachtrag `profile/liferay-gemeinsam.md` (und `liferay-72.md`) | `adb6189` |
+| #56 | G4-I | Upgrade-Reihe U00–U06 und Upgrade-Prüffälle | `e4d176d` |
+
+**Freigaben (Chris, 16.10.2026):**
+
+- **#53:** Fach-Spec-Markierung „abweichend, begründet“.
+- **#55:** Festlegungen in Abschnitt 8 (Jackson 2.12.7.2; von P00 zu bestätigen, dass es die letzte 2.12.x ist).
+- **#56:** Glocke Variante B: U03 erzeugt das Abbild in `UserNotificationEvent` aus `BH_Notification`.
+- **#56:** Format-Ergänzung in `specs/pruefung/format.md` für Upgrade-Fälle.
+
+**Entscheidung zu MW-R03 (Chris, 16.10.2026):** Die automatische Zeile „Co-Authored-By“ in Commits bleibt, weil sie für
+spätere Analysen wichtig ist. MW-R03 gilt für Dateien und PR-Texte, nicht für diese Commit-Zeile.
+
+**Paket-Einträge (MW-R10, KE-R18; Kosten aus den Sitzungsdaten, US-Dollar):**
+
+| Feld | G4-M (#53) | G4-W (#54) | G4-N (#55) | G4-I (#56) |
+| --- | --- | --- | --- | --- |
+| Stufe | S2 | S2 | S2 | S3 hoch |
+| Kosten | 0,32 | 0,60 | 1,13 | 7,96 |
+| Harte Grenze | – | – | – | 17 |
+| Beim ersten Anlauf abgenommen | ja | ja | ja | ja |
+| Eskalation | keine | keine | keine | keine |
+| Merge | `33741c3` | `e9747b9` | `adb6189` | `e4d176d` |
+
+**Steuerung W3:** 8,68 bei einer Grenze von 7. Welle 2 lag noch bei 15,16. Die Maßnahmen haben also gewirkt:
+S2-Reviews nur auf den Diff, PR-Abos erst bei „fertig“.
+**A-Abschluss Teil 1:** 0,30. Ergebnis: kein Fehler. Im `merge_group`-Lauf meldet „Merge-Kriterien“ bewusst nur
+„Merge-Warteschlange“; maßgeblich ist der PR-Lauf auf dem aktuellen Head. Dieser Satz kommt in `docs/07`, wenn A
+abgeschlossen wird.
+
+**Fallen und Lehren aus Welle 3:**
+
+- **Profilaussagen und AK-IDs vor dem Auftrag per grep prüfen.** Ein Auftrag behauptete „7.2 nur Liferay-Glocke“; das war
+  falsch.
+- **PortalException:** Sie rollt die ganze Transaktion zurück, auch die Tage. Deshalb ist `pflichtangaben_fehlen` ein
+  Ergebnis und kein Fehler.
+- Die CI-Rückmeldung (CI-38) kommt zuverlässig an (4 von 4); `send_later` ist dafür nicht mehr nötig.
+- `delete_trigger` lehnt der Berechtigungsfilter ab; `update_trigger` mit `enabled=false` funktioniert.
+- Kosten der Hilfsagenten: S2-Review 60 000–80 000 Token, S1-Prüflauf rund 53 000.
+- Chris will kurze Meldungen: Merge-Reihenfolge als Liste, Entscheidungen in wenigen Wörtern.
+
+**Offene Punkte:**
+
+- Eigenes Paket für eine `coverage.ts`-Ausnahme auf Ebene `upgrade`.
+- Eigenes Paket für einen CI-Workflow der Klasse U, vor Etappe U.
 
 ## A – Automatisches Mergen
 
@@ -625,8 +680,15 @@ Kriterien und Entscheidung von Chris weichen voneinander ab.
 | 8 | #51 | G4 W2, D | b8bd635 | nein | geschützter Pfad `playbooks/**` (AM-R04); Schalter aus (AM-R12); Check „Merge-Kriterien“ im Lauf der Warteschlange: Status failure, Zusammenfassung leer, AM-R05 daraus nicht ablesbar | Chris: gemergt | nein |
 | 9 | #50 | G4 W2, E | eeb7246 | nein | geschützter Pfad `profile/**` (AM-R04); Schalter aus (AM-R12); Check „Merge-Kriterien“ im Lauf der Warteschlange: Status failure, Zusammenfassung leer, AM-R05 daraus nicht ablesbar | Chris: gemergt | nein |
 | 10 | #49 | G4 W2, F | 243d7ce | nein | geschützter Pfad `profile/**` (AM-R04); Schalter aus (AM-R12); Check „Merge-Kriterien“ im Lauf der Warteschlange: Status failure, Zusammenfassung leer, AM-R05 daraus nicht ablesbar | Chris: gemergt | nein |
+| 11 | #53 | G4 W3a, M | d41d5ad | nein | geschützter Pfad `specs/**` (AM-R04); „Bitte bestätigen“ als `[ ]` im PR-Text (AM-R05 möglich); Schalter aus (AM-R12). Check „Merge-Kriterien“ im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
+| 12 | #54 | G4 W3a, W | 954fade | nur „Schalter aus“ (Klasse L) | Schalter aus (AM-R12). Check im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
+| 13 | #55 | G4 W3a, N | 0ef33fb | nein | geschützter Pfad `profile/**` (AM-R04); „Bitte bestätigen“ als `[ ]` im PR-Text (AM-R05 möglich); Schalter aus (AM-R12). Check im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
+| 14 | #56 | G4 W3a, I | 33dae6b | nein | geschützte Pfade `specs/pruefung/**`, `playbooks/**` (AM-R04); „Bitte bestätigen“ als `[ ]` im PR-Text (AM-R05 möglich); Schalter aus (AM-R12). Check im Lauf der Warteschlange: Status failure, Zusammenfassung leer | Chris: gemergt | nein |
 
-**Zählung: 10 Paket-PRs im Schattenbetrieb, kein Widerspruch.** Das Ziel von A (10 Paket-PRs ohne Widerspruch) ist erreicht;
+Die Zusammenfassung des Checks ist bei allen vier PRs leer (auch bei den Läufen mit Status success); die gelisteten Gründe
+sind deshalb die nach AM-R04, AM-R05 und AM-R12 erwarteten und nicht aus dem Check abgelesen.
+
+**Zählung: 14 Paket-PRs im Schattenbetrieb, kein Widerspruch.** Das Ziel von A (10 Paket-PRs ohne Widerspruch) ist erreicht;
 der Schalter `aktiv: true` liegt bei Chris.
 
 ### Welle 1 – Paket A1
