@@ -121,8 +121,8 @@ Grundlage ist gemeinsam 3.1. Die Tabelle nennt nur, wie 7.2 den gemeinsamen Baus
 | Historie und Schreibschutz | gemeinsam 2.6; `ModelListener` als DS-Komponenten (Nachweis unten) | `bh-service`, Paket `…model.listener` |
 | Uhr | eigener OSGi-Service, Abschnitt 3.2 | `bh-clock` |
 | Hintergrundjobs | `MessageListener` plus `SchedulerEngineHelper.register(…)` mit `TriggerFactory`; Abschnitt 3.3 | `bh-notification` |
-| Benachrichtigung in der App | `UserNotificationHandler` (DS-Komponente mit `javax.portlet.name` des Benachrichtigungs-Portlets) und `UserNotificationEventLocalService`; Quelle bleibt `BH_Notification` (gemeinsam 2.5). Zähler und Vorschau im Kopf: Vorschlag eigene Glocke im Theme, weil UI-AK-03 („99+“, Name mit genauer Zahl, Vorschau ohne Gelesen-Markierung) mit der Liferay-Glocke nicht sicher erfüllbar ist; das weicht von gemeinsam 2.5 und dem Bordmittel-Grundsatz ab und steht unter „Bitte bestätigen“. `readAt` (M08-R16): Abschnitt 3.5 | `bh-notification`, `bh-theme` |
-| E-Mail | gemeinsam 3.2 (Mailservice von Liferay, Konfiguration `mail.session.mail.smtp.*` in `portal-ext.properties`). Offen: Der `MailService` versendet asynchron und meldet keinen Fehler je Nachricht zurück (Abschnitt 7); Vorschlag für liferay-gemeinsam.md (beide Plattformen): synchroner Versand über die `javax.mail.Session` des Portals, unter „Bitte bestätigen“ | `bh-notification` |
+| Benachrichtigung in der App | `UserNotificationHandler` (DS-Komponente mit `javax.portlet.name` des Benachrichtigungs-Portlets) und `UserNotificationEventLocalService`; Quelle bleibt `BH_Notification` (gemeinsam 2.5). Zähler und Vorschau im Kopf: eigene Glocke im Theme (gemeinsam 2.5), weil UI-AK-03 („99+“, Name mit genauer Zahl, Vorschau ohne Gelesen-Markierung) mit der Liferay-Glocke nicht sicher erfüllbar ist; sie weicht vom Bordmittel-Grundsatz ab und steht in gemeinsam 8 unter „Bitte bestätigen“. `readAt` (M08-R16): Abschnitt 3.5 | `bh-notification`, `bh-theme` |
+| E-Mail | gemeinsam 3.2: synchroner Versand über die `javax.mail.Session` des Portals, damit der Ausgangskorb Erfolg und Fehler je Nachricht erfährt (der `MailService` versendet asynchron, Abschnitt 7); Konfiguration `mail.session.mail.smtp.*` in `portal-ext.properties`. Steht in gemeinsam 8 unter „Bitte bestätigen“ | `bh-notification` |
 | Teams | gemeinsam 3.2, Eigenschaft `bh.teams.modus` als OSGi-Konfiguration | `bh-notification` |
 | PDF | PDFBox 2.0.37 (gemeinsam 7) per `compileInclude` ins Modul eingebettet; Noto Sans als Ressource des Moduls | `bh-pdf` |
 | Oberfläche | MVC-Portlets mit JSP, Clay-Taglibs nur, wo sie Tokens annehmen; eigene Seiten-Vorlage im Theme; Senna (SPA) für die Site abgeschaltet (Abschnitt 7) | `bh-web`, `bh-theme` |
@@ -248,7 +248,7 @@ Java-Fachlogik und vergleicht das Ergebnis als Ganzes. Eine unbekannte Schnittst
 Lauf scheitern. Der Name jedes Testfalls ist die Prüffall-ID (z. B. `AK-508-06`). Ein Fall mit
 `"abweichend": { "liferay-72": … }` wird nicht ausgeführt, sondern als eigener Testfall „abweichend, begründet“ gemeldet
 (Assumption mit Verweis, getrennt gezählt, nie grün). Zum Lesen von JSON braucht der Test eine Bibliothek, die
-gemeinsam 7 noch nicht nennt (Vorschlag unter „Bitte bestätigen“).
+gemeinsam 7 festlegt: Jackson Databind 2.12.7.2, nur Test-Klassenpfad.
 
 **Testschnittstelle (`bh-pruefung`):** JAX-RS-Anwendung unter `/o/bh-pruefung/…` (Gegenstück zu
 `src/app/api/test/zustand/route.ts`) mit Uhr stellen, Bestand leeren, Testdaten laden (Personen, Bundesland, Liferay-Konten
@@ -487,11 +487,12 @@ gelingen, der Test zeigt zwei Erfolge bzw. zwei Historieneinträge und wird rot;
       erleichtert U02).
 - [ ] Testnamen in Java mit `AK505_…` statt `AK-505 …` (Bindestrich in Methodennamen nicht erlaubt; Abschnitt 4).
 - [ ] **Vorschlag für liferay-gemeinsam.md (beide Plattformen), Abschnitt 7:** eine JSON-Bibliothek nur für Tests (Prüf-Adapter liest `specs/pruefung/*.json`),
-      Vorschlag Gson (Apache-2.0, Maven Central `com.google.code.gson:gson`, Version in P00), für beide Plattformen.
+      Vorschlag Jackson Databind 2.12.7.2 (Apache-2.0, Maven Central `com.fasterxml.jackson.core:jackson-databind`;
+      Quelle und Prüfung in `liferay-gemeinsam.md` Abschnitt 7), für beide Plattformen.
 - [ ] Zeitplan im festen Takt mit Entscheidung in der Fachlogik statt Cron in Berliner Zeit (3.3).
 - [ ] **Vorschlag für liferay-gemeinsam.md (beide Plattformen), Abschnitt 3.2:** synchroner Mailversand über die
       Mail-Sitzung des Portals statt des asynchronen `MailService`, damit der Ausgangskorb Erfolg und Fehler je Nachricht
-      erfährt (Abschnitt 3, 7). Bis zur Freigabe gilt gemeinsam 3.2.
+      erfährt (Abschnitt 3, 7). Steht in gemeinsam 3.2 und 8 zur Freigabe.
 - [ ] **Pfadmuster für AM-R04 (gemeinsam 5, Spalte 7.2), Übernahme durch G4-L:**
 
 | Muster aus gemeinsam 5 bzw. neu | Stand | Begründung |
