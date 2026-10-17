@@ -192,7 +192,12 @@ export function bestimmeUmfang(anlass) {
       if (anlass.entwurf) {
         // Liferay: die schnelle Prüfung der berührten Plattformen läuft (CI-09), die volle erst bei bereitem PR.
         return umfang(
-          { ...umfangNachKlassen(dateien, { liferayVoll: false }), e2e: false, modulauswahl: false },
+          {
+            ...umfangNachKlassen(dateien, { liferayVoll: false }),
+            e2e: false,
+            browserVoll: false,
+            modulauswahl: false,
+          },
           "Entwurf: nur schnelle Prüfung (CI-10)",
         );
       }

@@ -210,7 +210,7 @@ jobs:
     timeout-minutes: 30
     concurrency:
       # CI-04: je Plattform höchstens ein schwerer Lauf gleichzeitig.
-      group: liferay625-schnell-${{ github.event.pull_request.number || github.ref }}
+      group: liferay625-schnell-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     services:
       postgres:
@@ -258,7 +258,7 @@ jobs:
     timeout-minutes: 90
     concurrency:
       # CI-04: je Plattform höchstens ein schwerer Lauf gleichzeitig.
-      group: liferay625-voll-${{ github.event.pull_request.number || github.ref }}
+      group: liferay625-voll-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     services:
       postgres:
@@ -306,7 +306,7 @@ jobs:
     timeout-minutes: 30
     concurrency:
       # CI-04: je Plattform höchstens ein schwerer Lauf gleichzeitig.
-      group: liferay72-schnell-${{ github.event.pull_request.number || github.ref }}
+      group: liferay72-schnell-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     services:
       postgres:
@@ -354,7 +354,7 @@ jobs:
     timeout-minutes: 90
     concurrency:
       # CI-04: je Plattform höchstens ein schwerer Lauf gleichzeitig.
-      group: liferay72-voll-${{ github.event.pull_request.number || github.ref }}
+      group: liferay72-voll-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     services:
       postgres:

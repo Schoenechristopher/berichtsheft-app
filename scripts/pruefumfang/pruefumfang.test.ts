@@ -104,6 +104,12 @@ describe("bestimmeUmfang (CI-10 bis CI-14, CI-35)", () => {
     });
   });
 
+  it("Entwurf mit Klasse O: kein Browser-Lauf, auch nicht Firefox und Edge (CI-10)", () => {
+    expect(
+      bestimmeUmfang({ ereignis: "pull_request", entwurf: true, dateien: ["src/components/a.tsx"] }),
+    ).toMatchObject({ schnell: true, e2e: false, browserVoll: false });
+  });
+
   it("bereiter PR: Umfang nach Klassen (CI-11, CI-32)", () => {
     expect(bestimmeUmfang({ ereignis: "pull_request", entwurf: false, dateien: logik })).toMatchObject({
       e2e: true,
