@@ -5,15 +5,17 @@
  * Reines JavaScript ohne Abhängigkeiten, damit der Workflow es ohne `npm ci` mit `node` ausführen kann.
  */
 
-/** @typedef {"D" | "P" | "L" | "O" | "I" | "L62" | "L72" | "unbekannt"} Klasse */
+/** @typedef {"D" | "P" | "L" | "O" | "I" | "L62" | "L72" | "U" | "unbekannt"} Klasse */
 
 /**
  * @typedef {object} Umfang
  * @property {boolean} schnell Schnelle Prüfung (Lint, Typecheck, Vitest, AK-Abdeckung).
  * @property {boolean} e2e Docker Compose + Playwright mit `chromium` und `smartphone-375`.
  * @property {boolean} browserVoll Zusätzlich `firefox`, `msedge`, `a11y` und `screenshots`.
- * @property {boolean} liferay625 Liferay-6.2.5-Job.
- * @property {boolean} liferay72 Liferay-7.2-Job.
+ * @property {boolean} liferay625 Schnelle Prüfung Liferay 6.2.5 (Job `liferay625-schnell`, CI-09, CI-25).
+ * @property {boolean} liferay72 Schnelle Prüfung Liferay 7.2 (Job `liferay72-schnell`).
+ * @property {boolean} liferay625Voll Volle Prüfung Liferay 6.2.5 (Job `liferay625-voll`, CI-10, CI-11, CI-35).
+ * @property {boolean} liferay72Voll Volle Prüfung Liferay 7.2 (Job `liferay72-voll`).
  * @property {boolean} modulauswahl Umfang nach Klassen: Die Ablauf-Fälle dürfen nach Modul ausgewählt werden (CI-37,
  *   `modulauswahl.mjs`); `false` bei erzwungener voller Prüfung (CI-35).
  * @property {string} grund Begründung für die Zusammenfassung des Laufs.
@@ -23,6 +25,8 @@
 const ZUORDNUNG = /** @type {const} */ ([
   ["L62", ["liferay-625/"]],
   ["L72", ["liferay-72/"]],
+  // Klasse U: startet automatisch keinen Liferay-Job; der Upgrade-Test läuft nur von Hand (upgrade.yml).
+  ["U", ["upgrade-625-auf-72/"]],
   ["D", ["docs/", "profile/", "playbooks/"]],
   ["P", ["specs/pruefung/"]],
   [
@@ -103,6 +107,8 @@ function umfang(teil, grund) {
     browserVoll: false,
     liferay625: false,
     liferay72: false,
+    liferay625Voll: false,
+    liferay72Voll: false,
     modulauswahl: false,
     ...teil,
     grund,
@@ -110,13 +116,15 @@ function umfang(teil, grund) {
 }
 
 const VOLL = { schnell: true, e2e: true, browserVoll: true };
+const LIFERAY_VOLL = { liferay625: true, liferay72: true, liferay625Voll: true, liferay72Voll: true };
 
 /**
  * Umfang nach den Klassen der geänderten Dateien (CI-32): Vereinigung aller ausgelösten Jobs.
  * @param {string[]} dateien
+ * @param {{ liferayVoll?: boolean }} [optionen] `liferayVoll: false` für Entwürfe (CI-10): Liferay nur schnell.
  * @returns {Umfang}
  */
-export function umfangNachKlassen(dateien) {
+export function umfangNachKlassen(dateien, { liferayVoll = true } = {}) {
   const klassen = new Set(dateien.map(klassifiziere));
   const liste = [...klassen].sort().join(", ") || "keine Änderungen";
   const browserVoll = ["O", "I", "unbekannt"].some((k) => klassen.has(k));
@@ -128,10 +136,22 @@ export function umfangNachKlassen(dateien) {
       browserVoll,
       liferay625: klassen.has("L62"),
       liferay72: klassen.has("L72"),
+      liferay625Voll: liferayVoll && klassen.has("L62"),
+      liferay72Voll: liferayVoll && klassen.has("L72"),
       modulauswahl: true,
     },
     `Änderungsklassen: ${liste}`,
   );
+}
+
+/**
+ * Berührt der PR nur die Klassen L62, L72 und D, und davon mindestens eine Liferay-Klasse (AM-R08, Ausnahme)?
+ * @param {string[]} dateien
+ * @returns {boolean}
+ */
+function nurLiferay(dateien) {
+  const klassen = new Set(dateien.map(klassifiziere));
+  return (klassen.has("L62") || klassen.has("L72")) && [...klassen].every((k) => ["L62", "L72", "D"].includes(k));
 }
 
 /**
@@ -157,33 +177,41 @@ export function bestimmeUmfang(anlass) {
       if ((anlass.tageSeitLetztemCommit ?? 0) >= 7) {
         return umfang({}, "Wochenlauf: kein neuer Commit auf main seit dem letzten Wochenlauf");
       }
-      return umfang({ ...VOLL, liferay625: true, liferay72: true }, "Wochenlauf: alle Konfigurationen (CI-14, CI-35)");
+      return umfang({ ...VOLL, ...LIFERAY_VOLL }, "Wochenlauf: alle Konfigurationen (CI-14, CI-35)");
     case "workflow_dispatch":
       if (anlass.auswahl === "klassen") {
         return umfangNachKlassen(dateien);
       }
-      return umfang({ ...VOLL, liferay625: true, liferay72: true }, "Start von Hand: alle Konfigurationen (CI-35)");
+      return umfang({ ...VOLL, ...LIFERAY_VOLL }, "Start von Hand: alle Konfigurationen (CI-35)");
     case "push":
       return umfang({ schnell: true }, "main nach dem Merge: nur schnelle Prüfung (CI-13)");
     case "pull_request":
       if ((anlass.labels ?? []).includes("volle-pruefung")) {
-        return umfang(
-          { ...VOLL, liferay625: true, liferay72: true },
-          "Label volle-pruefung: alle Konfigurationen (CI-35)",
-        );
+        return umfang({ ...VOLL, ...LIFERAY_VOLL }, "Label volle-pruefung: alle Konfigurationen (CI-35)");
       }
       if (anlass.entwurf) {
-        return umfang({ schnell: true }, "Entwurf: nur schnelle Prüfung (CI-10)");
+        // Liferay: die schnelle Prüfung der berührten Plattformen läuft (CI-09), die volle erst bei bereitem PR.
+        return umfang(
+          {
+            ...umfangNachKlassen(dateien, { liferayVoll: false }),
+            e2e: false,
+            browserVoll: false,
+            modulauswahl: false,
+          },
+          "Entwurf: nur schnelle Prüfung (CI-10)",
+        );
       }
       if ((anlass.labels ?? []).includes("automerge")) {
         // AM-R08: Wer automatisch gemergt werden soll, braucht mindestens den Umfang der Klasse L.
         const nachKlassen = umfangNachKlassen(dateien);
-        return nachKlassen.e2e
-          ? nachKlassen
-          : umfang(
-              { ...nachKlassen, e2e: true },
-              `${nachKlassen.grund}; Label automerge: mindestens Klasse L (AM-R08)`,
-            );
+        if (nachKlassen.e2e || nurLiferay(dateien)) {
+          // Reine Liferay-PRs (Klassen L62, L72, D): der -voll-Job der Plattform ersetzt Compose mit Chromium.
+          return nachKlassen;
+        }
+        return umfang(
+          { ...nachKlassen, e2e: true },
+          `${nachKlassen.grund}; Label automerge: mindestens Klasse L (AM-R08)`,
+        );
       }
       return umfangNachKlassen(dateien);
     case "merge_group":

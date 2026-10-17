@@ -104,6 +104,12 @@ describe("bestimmeUmfang (CI-10 bis CI-14, CI-35)", () => {
     });
   });
 
+  it("Entwurf mit Klasse O: kein Browser-Lauf, auch nicht Firefox und Edge (CI-10)", () => {
+    expect(
+      bestimmeUmfang({ ereignis: "pull_request", entwurf: true, dateien: ["src/components/a.tsx"] }),
+    ).toMatchObject({ schnell: true, e2e: false, browserVoll: false });
+  });
+
   it("bereiter PR: Umfang nach Klassen (CI-11, CI-32)", () => {
     expect(bestimmeUmfang({ ereignis: "pull_request", entwurf: false, dateien: logik })).toMatchObject({
       e2e: true,
@@ -124,6 +130,89 @@ describe("bestimmeUmfang (CI-10 bis CI-14, CI-35)", () => {
     expect(
       bestimmeUmfang({ ereignis: "pull_request", entwurf: false, labels: ["automerge"], dateien: ["src/app/x.tsx"] }),
     ).toMatchObject({ e2e: true, browserVoll: true });
+  });
+
+  describe("Liferay-Jobs und AM-R08 für reine Liferay-PRs", () => {
+    type Erwartet = {
+      e2e: boolean;
+      liferay625: boolean;
+      liferay72: boolean;
+      liferay625Voll: boolean;
+      liferay72Voll: boolean;
+    };
+    const bereit = (dateien: string[], labels: string[] = []): Anlass => ({
+      ereignis: "pull_request",
+      entwurf: false,
+      labels,
+      dateien,
+    });
+    const faelle: [string, Anlass, Erwartet][] = [
+      [
+        "L62 allein mit automerge: -voll-Job statt Compose",
+        bereit(["liferay-625/ci/schnell.sh", "docs/a.md"], ["automerge"]),
+        { e2e: false, liferay625: true, liferay72: false, liferay625Voll: true, liferay72Voll: false },
+      ],
+      [
+        "L72 allein mit automerge: -voll-Job statt Compose",
+        bereit(["liferay-72/ci/voll.sh"], ["automerge"]),
+        { e2e: false, liferay625: false, liferay72: true, liferay625Voll: false, liferay72Voll: true },
+      ],
+      [
+        "L62 und L72 mit automerge: beide -voll-Jobs",
+        bereit(["liferay-625/a.java", "liferay-72/b.java"], ["automerge"]),
+        { e2e: false, liferay625: true, liferay72: true, liferay625Voll: true, liferay72Voll: true },
+      ],
+      [
+        "L62 mit src/ und automerge: Klasse L, zusätzlich Compose",
+        bereit(["liferay-625/a.java", "src/domain/weeks.ts"], ["automerge"]),
+        { e2e: true, liferay625: true, liferay72: false, liferay625Voll: true, liferay72Voll: false },
+      ],
+      [
+        "Doku mit automerge: bleibt Klasse L, kein Liferay-Job",
+        bereit(["docs/a.md"], ["automerge"]),
+        { e2e: true, liferay625: false, liferay72: false, liferay625Voll: false, liferay72Voll: false },
+      ],
+      [
+        "Pfad upgrade-625-auf-72 mit automerge: Klasse U, nicht rein Liferay, daher Klasse L, kein Liferay-Job",
+        bereit(["upgrade-625-auf-72/ci/lauf.sh"], ["automerge"]),
+        { e2e: true, liferay625: false, liferay72: false, liferay625Voll: false, liferay72Voll: false },
+      ],
+      [
+        "L62 ohne automerge, bereit: -voll-Job (CI-11), kein Compose",
+        bereit(["liferay-625/a.java"]),
+        { e2e: false, liferay625: true, liferay72: false, liferay625Voll: true, liferay72Voll: false },
+      ],
+      [
+        "L62 im Entwurf: nur der -schnell-Job (CI-09, CI-10)",
+        { ...bereit(["liferay-625/a.java"]), entwurf: true },
+        { e2e: false, liferay625: true, liferay72: false, liferay625Voll: false, liferay72Voll: false },
+      ],
+      [
+        "L72 in der Merge-Warteschlange: -voll-Job (CI-35)",
+        { ereignis: "merge_group", dateien: ["liferay-72/a.java"] },
+        { e2e: false, liferay625: false, liferay72: true, liferay625Voll: false, liferay72Voll: true },
+      ],
+      [
+        "Wochenlauf: alle vier Liferay-Jobs",
+        { ereignis: "schedule", tageSeitLetztemCommit: 1 },
+        { e2e: true, liferay625: true, liferay72: true, liferay625Voll: true, liferay72Voll: true },
+      ],
+    ];
+    it.each(faelle)("%s", (_name, anlass, erwartet) => {
+      expect(bestimmeUmfang(anlass)).toMatchObject(erwartet);
+    });
+
+    it("Klasse U allein: kein Liferay-Job, schnelle Prüfung wie immer (CI-34)", () => {
+      expect(klassifiziere("upgrade-625-auf-72/ci/lauf.sh")).toBe("U");
+      expect(umfangNachKlassen(["upgrade-625-auf-72/ci/lauf.sh"])).toMatchObject({
+        schnell: true,
+        e2e: false,
+        liferay625: false,
+        liferay72: false,
+        liferay625Voll: false,
+        liferay72Voll: false,
+      });
+    });
   });
 
   it("main nach dem Merge: nur schnelle Prüfung (CI-13)", () => {
