@@ -1,0 +1,55 @@
+name: Upgrade 6.2.5 nach 7.2
+
+# Klasse U (docs/ci-richtlinie.md, Abschnitt 7): sehr langer Test, startet nur von Hand und nie automatisch.
+# Die Schritte liegen im Skript upgrade-625-auf-72/ci/lauf.sh; fehlt es, meldet der Lauf „noch nicht gebaut“.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: upgrade-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  upgrade:
+    name: Upgrade 6.2.5 nach 7.2
+    runs-on: ubuntu-latest
+    # Richtwert 45 bis 90 Minuten (docs/ci-richtlinie.md, Abschnitt 1); P00/U misst.
+    timeout-minutes: 120
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: liferay
+          POSTGRES_PASSWORD: liferay
+          POSTGRES_DB: liferay
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U liferay -d liferay"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      # Nur Demo-Werte (CI-28).
+      LIFERAY_DB_URL: postgresql://liferay:liferay@localhost:5432/liferay
+      LIFERAY_DB_HOST: localhost
+      LIFERAY_DB_PORT: "5432"
+      LIFERAY_DB_NAME: liferay
+      LIFERAY_DB_USER: liferay
+      LIFERAY_DB_PASSWORD: liferay
+    steps:
+      - uses: actions/checkout@v5
+      - name: Skript upgrade-625-auf-72/ci/lauf.sh ausführen (sonst „noch nicht gebaut“)
+        env:
+          SKRIPT: upgrade-625-auf-72/ci/lauf.sh
+        run: |
+          if [ ! -f "$SKRIPT" ]; then
+            echo "### Upgrade 6.2.5 nach 7.2: noch nicht gebaut" >> "$GITHUB_STEP_SUMMARY"
+            echo "Das Skript \`$SKRIPT\` fehlt, der Job endet grün. Die Inhalte liefert das P00-Paket des Upgrades." >> "$GITHUB_STEP_SUMMARY"
+            echo "$SKRIPT fehlt: noch nicht gebaut"
+            exit 0
+          fi
+          bash "$SKRIPT"

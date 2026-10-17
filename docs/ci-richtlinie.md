@@ -209,7 +209,7 @@ Die volle Prüfung läuft erst, wenn der PR „bereit“ ist (CI-10, CI-11). Die
 | I Infrastruktur und Abhängigkeiten | `package.json`, `package-lock.json`, `Dockerfile`, `docker/**`, `docker-compose.yml`, `keycloak/**`, `.github/**`, `.claude/**`, `.env.example`, `.dockerignore`, `.gitattributes`, `.gitignore`, `.prettierignore`, `.prettierrc.json`, `tsconfig.json`, `eslint.config.mjs`, `vitest.config.ts`, `prisma.config.ts` | alle Konfigurationen der TypeScript-App | wirkt auf alles, z. B. neue Bibliotheksversionen |
 | L62 Liferay 6.2.5 | `liferay-625/**` | Liferay-6.2.5-Job | eigene Umsetzung |
 | L72 Liferay 7.2 | `liferay-72/**` | Liferay-7.2-Job | eigene Umsetzung |
-| U Upgrade | – | nur von Hand (`workflow_dispatch`) | sehr lang, nur bei U-PRs nötig |
+| U Upgrade | `upgrade-625-auf-72/**` | nur von Hand (`workflow_dispatch`, Workflow `upgrade.yml`); die schnelle Prüfung läuft wie immer, ein Liferay-Job startet nicht automatisch | sehr lang, nur bei U-PRs nötig |
 | sonstige Pfade | alles, was oben fehlt | alle Konfigurationen der TypeScript-App (CI-34) | im Zweifel voll |
 
 Beispiele: Ein PR, der nur `docs/` und `src/domain/weeks.ts` ändert, ist Klasse L und läuft mit Chromium und 375 px.
@@ -228,10 +228,13 @@ Festlegung des Umfangs (12.10.2026, von Chris an Claude übertragen):
   (`docs/07-spec-automatisches-mergen.md`, AM-R08). Der Job „Umfang“ setzt das um: Mit dem Label `automerge` läuft
   mindestens Compose mit Chromium und 375 px. Der Workflow „Merge-Kriterien“ (nur lesende Rechte, CI-27) wertet den
   Antrag aus.
+- **Ausnahme für reine Liferay-PRs (E2, Chris, 17.10.2026):** Berührt ein PR mit dem Label `automerge` nur die Klassen
+  L62, L72 und D (mindestens eine Liferay-Klasse), ist der `-voll`-Job seiner Plattform der Mindestumfang statt Compose
+  mit Chromium und 375 px. Mit `src/` oder anderen Pfaden gilt Klasse L oder höher, ein reiner Doku-PR bleibt Klasse L.
 
 ### Browser für Liferay (L62, L72)
 
-Vorschlag (G4-L, 16.10.2026), gilt für die Ablauf-Prüffälle beider Liferay-Umsetzungen:
+Bestätigt (Freigabe über die Gesamtsteuerung am 16.10.2026, Punkt aus #61), gilt für die Ablauf-Prüffälle beider Liferay-Umsetzungen:
 
 - **Je PR (volle Prüfung der Klasse L62 bzw. L72):** Ablauf-Prüffälle in Chromium und in 375 px (`chromium`,
   `smartphone-375`), wie Klasse L der TypeScript-App.
@@ -242,10 +245,30 @@ Vorschlag (G4-L, 16.10.2026), gilt für die Ablauf-Prüffälle beider Liferay-Um
   Portal-Start ohnehin bis zu 60 Minuten braucht (P00 misst). Die Liferay-Pakete ändern meist Service und Logik;
   Darstellung und Bedienung prüfen Chromium und 375 px (AK-1102). Restrisiko wie oben: Ein Fehler nur in Firefox oder
   Edge fällt spätestens im Wochenlauf auf.
-- **Bitte bestätigen:** Diese Festlegung ersetzt den Hinweis „Prüffälle mit Playwright (Chromium)“ in der Tabelle
-  unten; die Workflows setzt ein eigener Auftrag der Klasse I um.
+- **Umsetzung:** Diese Festlegung ersetzt den Hinweis „Prüffälle mit Playwright (Chromium)“ in der Tabelle unten. Das
+  Gerüst steht in `ci.yml` (Auftrag L-CI); die Browser-Schritte baut P00 der Plattform in `voll.sh`.
 
 ### Prüfungen je Teil
+
+Jobs und Skript-Vertrag (Entscheidung E1, Chris, 17.10.2026): Die Build-Schritte der Plattformen liegen als Skripte in
+deren Ordnern, damit P00 `.github/**` nicht ändern muss.
+
+| Job in `ci.yml` | läuft, wenn | ruft auf |
+|---|---|---|
+| `liferay625-schnell` | „Umfang“ meldet `liferay625` (Klasse L62, auch im Entwurf, CI-09) | `liferay-625/ci/schnell.sh` |
+| `liferay625-voll` | „Umfang“ meldet `liferay625_voll`: Klasse L62 bei bereitem PR, in der Merge-Warteschlange; Wochenlauf, Start von Hand und Label `volle-pruefung` immer (CI-10, CI-11, CI-14, CI-35) | `liferay-625/ci/voll.sh` |
+| `liferay72-schnell` | „Umfang“ meldet `liferay72` (Klasse L72) | `liferay-72/ci/schnell.sh` |
+| `liferay72-voll` | „Umfang“ meldet `liferay72_voll`, Regel wie bei 6.2.5 | `liferay-72/ci/voll.sh` |
+| `upgrade` (`upgrade.yml`) | nur von Hand (`workflow_dispatch`) | `upgrade-625-auf-72/ci/lauf.sh` |
+
+- **Skript-Vertrag:**
+  - „schnell“ und „voll“ entsprechen den Stufen in Schritt 14 (6.2.5) bzw. 16 (7.2) von `P00-grundgeruest.md`.
+  - Fehlt das Skript, schreibt der Job „noch nicht gebaut“ in die Zusammenfassung des Schritts und endet grün.
+  - Das Gerüst stellt nur PostgreSQL 16 als Dienst-Container bereit (`LIFERAY_DB_URL`, `LIFERAY_DB_HOST`,
+    `LIFERAY_DB_PORT`, `LIFERAY_DB_NAME`, `LIFERAY_DB_USER`, `LIFERAY_DB_PASSWORD`, nur Demo-Werte, CI-28).
+  - JDK, Actions-Cache (CI-19) und Bundle richtet das Skript ein; ein Skript beendet sich mit Exit-Code ungleich 0, wenn
+    die Prüfung rot ist.
+- **Abschluss:** „Prüfung abgeschlossen“ (CI-36) wertet die vier Jobs aus: übersprungen ist in Ordnung, rot nicht.
 
 | Teil | Schnelle Prüfung | Kern-Prüfung im Draft | Volle Prüfung | Doku-Pfade |
 |---|---|---|---|---|
@@ -271,4 +294,6 @@ Vorschlag (G4-L, 16.10.2026), gilt für die Ablauf-Prüffälle beider Liferay-Um
    - Jedes neue Label an einem PR startet die Prüfung neu. So stammt das Ergebnis am Commit immer aus einer
      vollständigen Auswertung und nie aus einem übersprungenen Lauf.
 4. Liferay-Jobs kommen mit L62 bzw. L72 dazu (CI-25).
+   **Gerüst umgesetzt am 17.10.2026 (Auftrag L-CI):** `liferay625-schnell`, `liferay625-voll`, `liferay72-schnell`,
+   `liferay72-voll` in `ci.yml`, Klasse U und `upgrade.yml`. Die Inhalte der Skripte liefern die P00-Pakete.
 5. Erster Monatsrückblick (CI-08) Anfang Dezember 2026.

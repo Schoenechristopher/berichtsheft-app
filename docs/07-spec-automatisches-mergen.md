@@ -101,6 +101,9 @@ bei einem Fehler passiert.**
   Stand grün, und zwar mit dem Umfang der Änderungsklasse (CI-32), mindestens aber der Klasse L. Ein PR, der nur Doku
   ändert, braucht also trotzdem einmal Chromium und 375 px, wenn er automatisch gemergt werden soll. Umgesetzt im Job
   „Umfang“: Mit dem Label `automerge` läuft mindestens der Umfang der Klasse L; das Label startet die Prüfung neu.
+  Ausnahme für reine Liferay-PRs (Entscheidung E2, Chris, 17.10.2026): Berührt der PR nur die Klassen L62, L72 und D,
+  und davon mindestens eine Liferay-Klasse, ist der `-voll`-Job seiner Plattform der Mindestumfang statt Compose mit
+  Chromium und 375 px. Berührt er zusätzlich andere Pfade (etwa `src/`), gilt wieder Klasse L oder höher.
 - **AM-R09 Dependabot:** Ein Dependabot-PR darf trotz AM-R04 automatisch gemergt werden, wenn er nur Patch- oder
   Minor-Versionen von Entwicklungsabhängigkeiten oder nur Patch-Versionen von Laufzeitabhängigkeiten anhebt und die
   volle Prüfung aller Konfigurationen grün ist. Major-Versionen und Minor-Versionen von Laufzeitabhängigkeiten gibt
